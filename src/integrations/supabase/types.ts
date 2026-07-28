@@ -14,7 +14,450 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          author: string | null
+          content: string | null
+          cover: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published: boolean
+          published_at: string | null
+          slug: string
+          tags: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          content?: string | null
+          cover?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          slug: string
+          tags?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          content?: string | null
+          cover?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          slug?: string
+          tags?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contact_info: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          key: string
+          label: string | null
+          sort_order: number | null
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          key: string
+          label?: string | null
+          sort_order?: number | null
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          key?: string
+          label?: string | null
+          sort_order?: number | null
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          handled: boolean
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          handled?: boolean
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          handled?: boolean
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          active: boolean
+          answer: string
+          category: string | null
+          created_at: string
+          id: string
+          question: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          answer: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          question: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          answer?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          question?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      features: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          sort_order: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      gallery_items: {
+        Row: {
+          active: boolean
+          category: string | null
+          created_at: string
+          id: string
+          image: string
+          sort_order: number | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          id?: string
+          image: string
+          sort_order?: number | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          id?: string
+          image?: string
+          sort_order?: number | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      packages: {
+        Row: {
+          airline: string | null
+          category: Database["public"]["Enums"]["package_category"]
+          country: string | null
+          cover: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          destination: string | null
+          discount: number | null
+          duration: string | null
+          excluded: Json | null
+          featured: boolean
+          gallery: Json | null
+          hotel: string | null
+          id: string
+          included: Json | null
+          price: number
+          seats: number | null
+          short_description: string | null
+          slug: string
+          sort_order: number | null
+          status: Database["public"]["Enums"]["package_status"]
+          timeline: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          airline?: string | null
+          category: Database["public"]["Enums"]["package_category"]
+          country?: string | null
+          cover?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string | null
+          discount?: number | null
+          duration?: string | null
+          excluded?: Json | null
+          featured?: boolean
+          gallery?: Json | null
+          hotel?: string | null
+          id?: string
+          included?: Json | null
+          price?: number
+          seats?: number | null
+          short_description?: string | null
+          slug: string
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["package_status"]
+          timeline?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          airline?: string | null
+          category?: Database["public"]["Enums"]["package_category"]
+          country?: string | null
+          cover?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string | null
+          discount?: number | null
+          duration?: string | null
+          excluded?: Json | null
+          featured?: boolean
+          gallery?: Json | null
+          hotel?: string | null
+          id?: string
+          included?: Json | null
+          price?: number
+          seats?: number | null
+          short_description?: string | null
+          slug?: string
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["package_status"]
+          timeline?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          active: boolean
+          cover: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          slug: string
+          sort_order: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cover?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          slug: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cover?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          slug?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          body: string | null
+          created_at: string
+          cta_href: string | null
+          cta_label: string | null
+          data: Json | null
+          id: string
+          image: string | null
+          key: string
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          cta_href?: string | null
+          cta_label?: string | null
+          data?: Json | null
+          id?: string
+          image?: string | null
+          key: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          cta_href?: string | null
+          cta_label?: string | null
+          data?: Json | null
+          id?: string
+          image?: string | null
+          key?: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_stats: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          sort_order: number | null
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          sort_order?: number | null
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          sort_order?: number | null
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          active: boolean
+          avatar: string | null
+          content: string
+          created_at: string
+          id: string
+          name: string
+          rating: number
+          role: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          avatar?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          name: string
+          rating?: number
+          role?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          avatar?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          name?: string
+          rating?: number
+          role?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +466,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      package_category: "umrah" | "trip" | "flight" | "visa"
+      package_status: "draft" | "published" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +594,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      package_category: ["umrah", "trip", "flight", "visa"],
+      package_status: ["draft", "published", "archived"],
+    },
   },
 } as const
