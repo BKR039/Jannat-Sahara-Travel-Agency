@@ -4,7 +4,9 @@ import { useTranslation } from "react-i18next";
 import { Check, X, MapPin, Clock, Users, Hotel, Plane, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
+import { BookingDialog } from "@/components/booking/BookingDialog";
 import { packageBySlugQuery } from "@/lib/queries";
+
 
 export const Route = createFileRoute("/packages/$slug")({
   head: () => ({
@@ -155,9 +157,20 @@ function PackagePage() {
                 <div className="flex items-center gap-2"><Plane className="h-4 w-4 text-primary" /> {pkg.airline}</div>
               )}
             </div>
-            <Button asChild size="lg" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/contact">{t("actions.bookNow")}</Link>
-            </Button>
+            <BookingDialog
+              packageId={pkg.id}
+              packageTitle={pkg.title}
+              packageCategory={pkg.category}
+              trigger={
+                <Button
+                  size="lg"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {t("actions.bookNow")}
+                </Button>
+              }
+            />
+
           </div>
         </aside>
       </div>
