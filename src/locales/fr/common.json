@@ -1,0 +1,33 @@
+{
+  "brand": {
+    "name": "Janat Sahara Voyages",
+    "tagline": "Votre voyage spirituel commence ici"
+  },
+  "nav": {
+    "home": "Accueil",
+    "umrah": "Omra",
+    "trips": "Voyages",
+    "flights": "Billets d'avion",
+    "visas": "Visas",
+    "about": "À propos",
+    "contact": "Contact"
+  },
+  "actions": {
+    "bookNow": "Réserver",
+    "learnMore": "En savoir plus",
+    "menu": "Menu",
+    "toggleTheme": "Changer le thème",
+    "changeLanguage": "Changer de langue"
+  },
+  "footer": {
+    "quickLinks": "Liens rapides",
+    "services": "Nos services",
+    "contact": "Nous contacter",
+    "rights": "Tous droits réservés",
+    "address": "Tunis, El Mourouj 5, Rue 20 Mars"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "language": "Langue"
+  }
+}
