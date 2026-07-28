@@ -229,12 +229,30 @@ export function BranchesSection() {
 
   if (!isLoading && branches.length === 0) return null;
 
+  const jsonLd = branches.map((b) => ({
+    "@context": "https://schema.org",
+    "@type": "TravelAgency",
+    name: b.name,
+    address: { "@type": "PostalAddress", streetAddress: b.address, addressLocality: b.city, addressCountry: "TN" },
+    telephone: b.phone ?? undefined,
+    email: b.email ?? undefined,
+    geo: { "@type": "GeoCoordinates", latitude: Number(b.latitude), longitude: Number(b.longitude) },
+    openingHours: b.working_hours ?? undefined,
+    url: b.google_maps_url ?? undefined,
+  }));
+
   return (
     <section
       id="branches"
       aria-labelledby="branches-heading"
       className="relative overflow-hidden bg-gradient-to-b from-background to-muted/30 py-20 md:py-28"
     >
+      {jsonLd.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <div className="pointer-events-none absolute inset-0 opacity-40">
         <div className="absolute -top-40 end-1/3 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -bottom-40 start-1/4 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
