@@ -12,6 +12,7 @@ export type Faq = Database["public"]["Tables"]["faqs"]["Row"];
 export type SiteStat = Database["public"]["Tables"]["site_stats"]["Row"];
 export type SiteContent = Database["public"]["Tables"]["site_content"]["Row"];
 export type ContactInfo = Database["public"]["Tables"]["contact_info"]["Row"];
+export type Branch = Database["public"]["Tables"]["branches"]["Row"];
 export type PackageCategory = Database["public"]["Enums"]["package_category"];
 
 async function unwrap<T>(p: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
@@ -121,4 +122,18 @@ export const contactInfoQuery = () =>
     queryKey: ["contact_info"] as const,
     queryFn: () =>
       unwrap<ContactInfo[]>(supabase.from("contact_info").select("*").order("sort_order")),
+  });
+
+export const branchesQuery = () =>
+  queryOptions({
+    queryKey: ["branches"] as const,
+    queryFn: () =>
+      unwrap<Branch[]>(
+        supabase
+          .from("branches")
+          .select("*")
+          .eq("is_active", true)
+          .order("is_main_branch", { ascending: false })
+          .order("sort_order"),
+      ),
   });

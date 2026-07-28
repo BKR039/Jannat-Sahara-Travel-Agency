@@ -12,6 +12,7 @@ import {
   LatestArticlesSection,
   CtaSection,
 } from "@/components/sections/HomeSections";
+import { BranchesSection } from "@/components/sections/BranchesSection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,6 +56,7 @@ function Index() {
       <TestimonialsSection />
       <GalleryPreviewSection />
       <LatestArticlesSection />
+      <BranchesSection />
       <CtaSection />
     </SiteLayout>
   );

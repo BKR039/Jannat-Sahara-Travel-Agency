@@ -115,6 +115,63 @@ export type Database = {
           },
         ]
       }
+      branches: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          email: string | null
+          google_maps_url: string | null
+          id: string
+          image: string | null
+          is_active: boolean
+          is_main_branch: boolean
+          latitude: number
+          longitude: number
+          name: string
+          phone: string | null
+          sort_order: number
+          updated_at: string
+          working_hours: string | null
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          email?: string | null
+          google_maps_url?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean
+          is_main_branch?: boolean
+          latitude: number
+          longitude: number
+          name: string
+          phone?: string | null
+          sort_order?: number
+          updated_at?: string
+          working_hours?: string | null
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          email?: string | null
+          google_maps_url?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean
+          is_main_branch?: boolean
+          latitude?: number
+          longitude?: number
+          name?: string
+          phone?: string | null
+          sort_order?: number
+          updated_at?: string
+          working_hours?: string | null
+        }
+        Relationships: []
+      }
       contact_info: {
         Row: {
           created_at: string
