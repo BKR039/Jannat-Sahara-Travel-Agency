@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -134,6 +135,7 @@ function RootComponent() {
       <ThemeProvider defaultTheme="light">
         <LanguageProvider>
           <Outlet />
+          <Toaster position="top-center" richColors closeButton />
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>
