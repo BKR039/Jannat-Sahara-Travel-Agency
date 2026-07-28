@@ -224,6 +224,8 @@ export function BranchesSection() {
   const { data, isLoading } = useQuery(branchesQuery());
   const branches = data ?? [];
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   if (!isLoading && branches.length === 0) return null;
 
@@ -249,7 +251,7 @@ export function BranchesSection() {
           <div className="lg:col-span-3">
             <div className="sticky top-24 overflow-hidden rounded-2xl border border-border/60 bg-card/50 p-1.5 shadow-xl shadow-primary/10 backdrop-blur">
               <Suspense fallback={<MapSkeleton />}>
-                {branches.length > 0 ? (
+                {mounted && branches.length > 0 ? (
                   <BranchesMap
                     branches={branches}
                     activeId={activeId}
