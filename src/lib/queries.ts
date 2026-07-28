@@ -12,6 +12,7 @@ export type Faq = Database["public"]["Tables"]["faqs"]["Row"];
 export type SiteStat = Database["public"]["Tables"]["site_stats"]["Row"];
 export type SiteContent = Database["public"]["Tables"]["site_content"]["Row"];
 export type ContactInfo = Database["public"]["Tables"]["contact_info"]["Row"];
+export type Branch = Database["public"]["Tables"]["branches"]["Row"];
 export type PackageCategory = Database["public"]["Enums"]["package_category"];
 
 async function unwrap<T>(p: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
