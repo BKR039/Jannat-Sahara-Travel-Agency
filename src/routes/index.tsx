@@ -1,24 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { SiteLayout } from "@/components/layout/SiteLayout";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const { t } = useTranslation();
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <SiteLayout>
+      <section className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center gap-6 px-4 py-24 text-center md:px-6">
+        <span className="rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+          Foundation ready · الأساس جاهز
+        </span>
+        <h1 className="max-w-3xl text-4xl font-bold leading-tight text-foreground md:text-6xl">
+          {t("brand.tagline")}
+        </h1>
+        <p className="max-w-xl text-base text-muted-foreground md:text-lg">
+          {t("brand.name")}
+        </p>
+      </section>
+    </SiteLayout>
   );
 }
