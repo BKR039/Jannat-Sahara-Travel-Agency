@@ -125,6 +125,19 @@
     "reference": "Référence",
     "home": "Retour à l'accueil",
     "contact": "Nous contacter"
+  },
+  "branches": {
+    "title": "Nos agences & contact",
+    "subtitle": "Rendez-nous visite ou contactez-nous directement — notre équipe est à votre écoute",
+    "ourBranches": "Nos agences",
+    "mainBranch": "Agence principale",
+    "viewOnMap": "Voir sur la carte",
+    "directions": "Itinéraire",
+    "contactCard": {
+      "title": "Contact direct",
+      "subtitle": "Nous répondons à toutes vos questions",
+      "follow": "Suivez-nous"
+    }
   }
 }
 
