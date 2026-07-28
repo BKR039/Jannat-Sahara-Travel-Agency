@@ -59,6 +59,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
@@ -337,86 +370,158 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          kind: string
+          read_at: string | null
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          kind: string
+          read_at?: string | null
+          title: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          kind?: string
+          read_at?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
           airline: string | null
+          brochure_pdf: string | null
           category: Database["public"]["Enums"]["package_category"]
+          city: string | null
           country: string | null
           cover: string | null
           created_at: string
           currency: string
+          departure_date: string | null
           description: string | null
           destination: string | null
           discount: number | null
+          discount_price: number | null
           duration: string | null
           excluded: Json | null
           featured: boolean
           gallery: Json | null
           hotel: string | null
+          hotel_rating: number | null
           id: string
           included: Json | null
+          meeting_point: string | null
           price: number
+          required_documents: Json | null
+          return_date: string | null
           seats: number | null
+          seo_description: string | null
+          seo_keywords: Json | null
+          seo_title: string | null
           short_description: string | null
           slug: string
           sort_order: number | null
           status: Database["public"]["Enums"]["package_status"]
           timeline: Json | null
           title: string
+          total_seats: number | null
+          transport: string | null
           updated_at: string
         }
         Insert: {
           airline?: string | null
+          brochure_pdf?: string | null
           category: Database["public"]["Enums"]["package_category"]
+          city?: string | null
           country?: string | null
           cover?: string | null
           created_at?: string
           currency?: string
+          departure_date?: string | null
           description?: string | null
           destination?: string | null
           discount?: number | null
+          discount_price?: number | null
           duration?: string | null
           excluded?: Json | null
           featured?: boolean
           gallery?: Json | null
           hotel?: string | null
+          hotel_rating?: number | null
           id?: string
           included?: Json | null
+          meeting_point?: string | null
           price?: number
+          required_documents?: Json | null
+          return_date?: string | null
           seats?: number | null
+          seo_description?: string | null
+          seo_keywords?: Json | null
+          seo_title?: string | null
           short_description?: string | null
           slug: string
           sort_order?: number | null
           status?: Database["public"]["Enums"]["package_status"]
           timeline?: Json | null
           title: string
+          total_seats?: number | null
+          transport?: string | null
           updated_at?: string
         }
         Update: {
           airline?: string | null
+          brochure_pdf?: string | null
           category?: Database["public"]["Enums"]["package_category"]
+          city?: string | null
           country?: string | null
           cover?: string | null
           created_at?: string
           currency?: string
+          departure_date?: string | null
           description?: string | null
           destination?: string | null
           discount?: number | null
+          discount_price?: number | null
           duration?: string | null
           excluded?: Json | null
           featured?: boolean
           gallery?: Json | null
           hotel?: string | null
+          hotel_rating?: number | null
           id?: string
           included?: Json | null
+          meeting_point?: string | null
           price?: number
+          required_documents?: Json | null
+          return_date?: string | null
           seats?: number | null
+          seo_description?: string | null
+          seo_keywords?: Json | null
+          seo_title?: string | null
           short_description?: string | null
           slug?: string
           sort_order?: number | null
           status?: Database["public"]["Enums"]["package_status"]
           timeline?: Json | null
           title?: string
+          total_seats?: number | null
+          transport?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -604,11 +709,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin"
+      app_role: "super_admin" | "admin" | "staff"
       package_category: "umrah" | "trip" | "flight" | "visa"
-      package_status: "draft" | "published" | "archived"
+      package_status: "draft" | "published" | "archived" | "sold_out"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -736,9 +843,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin"],
+      app_role: ["super_admin", "admin", "staff"],
       package_category: ["umrah", "trip", "flight", "visa"],
-      package_status: ["draft", "published", "archived"],
+      package_status: ["draft", "published", "archived", "sold_out"],
     },
   },
 } as const

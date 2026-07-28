@@ -12,16 +12,32 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisaRouteImport } from './routes/visa'
 import { Route as UmrahRouteImport } from './routes/umrah'
 import { Route as TripsRouteImport } from './routes/trips'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminPackagesRouteImport } from './routes/admin.packages'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
+import { Route as AdminFaqRouteImport } from './routes/admin.faq'
+import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
+import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
+import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
+import { Route as AdminBlogRouteImport } from './routes/admin.blog'
+import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 
 const VisaRoute = VisaRouteImport.update({
   id: '/visa',
@@ -36,6 +52,11 @@ const UmrahRoute = UmrahRouteImport.update({
 const TripsRoute = TripsRouteImport.update({
   id: '/trips',
   path: '/trips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -68,6 +89,16 @@ const BlogRoute = BlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -77,6 +108,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const PackagesSlugRoute = PackagesSlugRouteImport.update({
   id: '/packages/$slug',
@@ -88,110 +124,267 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPackagesRoute = AdminPackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFaqRoute = AdminFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCustomersRoute = AdminCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBranchesRoute = AdminBranchesRouteImport.update({
+  id: '/branches',
+  path: '/branches',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBookingsRoute = AdminBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBlogRoute = AdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminsRoute = AdminAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/admin/admins': typeof AdminAdminsRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/branches': typeof AdminBranchesRoute
+  '/admin/customers': typeof AdminCustomersRoute
+  '/admin/faq': typeof AdminFaqRoute
+  '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/admin/admins': typeof AdminAdminsRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/branches': typeof AdminBranchesRoute
+  '/admin/customers': typeof AdminCustomersRoute
+  '/admin/faq': typeof AdminFaqRoute
+  '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/admin/admins': typeof AdminAdminsRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/branches': typeof AdminBranchesRoute
+  '/admin/customers': typeof AdminCustomersRoute
+  '/admin/faq': typeof AdminFaqRoute
+  '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
+    | '/auth'
     | '/blog'
     | '/booking-success'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/admin/admins'
+    | '/admin/blog'
+    | '/admin/bookings'
+    | '/admin/branches'
+    | '/admin/customers'
+    | '/admin/faq'
+    | '/admin/gallery'
+    | '/admin/messages'
+    | '/admin/notifications'
+    | '/admin/packages'
+    | '/admin/settings'
+    | '/admin/testimonials'
     | '/blog/$slug'
     | '/packages/$slug'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/auth'
     | '/blog'
     | '/booking-success'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/admin/admins'
+    | '/admin/blog'
+    | '/admin/bookings'
+    | '/admin/branches'
+    | '/admin/customers'
+    | '/admin/faq'
+    | '/admin/gallery'
+    | '/admin/messages'
+    | '/admin/notifications'
+    | '/admin/packages'
+    | '/admin/settings'
+    | '/admin/testimonials'
     | '/blog/$slug'
     | '/packages/$slug'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
+    | '/auth'
     | '/blog'
     | '/booking-success'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/admin/admins'
+    | '/admin/blog'
+    | '/admin/bookings'
+    | '/admin/branches'
+    | '/admin/customers'
+    | '/admin/faq'
+    | '/admin/gallery'
+    | '/admin/messages'
+    | '/admin/notifications'
+    | '/admin/packages'
+    | '/admin/settings'
+    | '/admin/testimonials'
     | '/blog/$slug'
     | '/packages/$slug'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRouteWithChildren
   BookingSuccessRoute: typeof BookingSuccessRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   FlightsRoute: typeof FlightsRoute
   GalleryRoute: typeof GalleryRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TripsRoute: typeof TripsRoute
   UmrahRoute: typeof UmrahRoute
   VisaRoute: typeof VisaRoute
@@ -219,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/trips'
       fullPath: '/trips'
       preLoaderRoute: typeof TripsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -263,6 +463,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -276,6 +490,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/packages/$slug': {
       id: '/packages/$slug'
@@ -291,8 +512,126 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/admin/testimonials': {
+      id: '/admin/testimonials'
+      path: '/testimonials'
+      fullPath: '/admin/testimonials'
+      preLoaderRoute: typeof AdminTestimonialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/packages': {
+      id: '/admin/packages'
+      path: '/packages'
+      fullPath: '/admin/packages'
+      preLoaderRoute: typeof AdminPackagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/faq': {
+      id: '/admin/faq'
+      path: '/faq'
+      fullPath: '/admin/faq'
+      preLoaderRoute: typeof AdminFaqRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/customers': {
+      id: '/admin/customers'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AdminCustomersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/branches': {
+      id: '/admin/branches'
+      path: '/branches'
+      fullPath: '/admin/branches'
+      preLoaderRoute: typeof AdminBranchesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bookings': {
+      id: '/admin/bookings'
+      path: '/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/blog': {
+      id: '/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AdminBlogRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/admins': {
+      id: '/admin/admins'
+      path: '/admins'
+      fullPath: '/admin/admins'
+      preLoaderRoute: typeof AdminAdminsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAdminsRoute: typeof AdminAdminsRoute
+  AdminBlogRoute: typeof AdminBlogRoute
+  AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminBranchesRoute: typeof AdminBranchesRoute
+  AdminCustomersRoute: typeof AdminCustomersRoute
+  AdminFaqRoute: typeof AdminFaqRoute
+  AdminGalleryRoute: typeof AdminGalleryRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminPackagesRoute: typeof AdminPackagesRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTestimonialsRoute: typeof AdminTestimonialsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminsRoute: AdminAdminsRoute,
+  AdminBlogRoute: AdminBlogRoute,
+  AdminBookingsRoute: AdminBookingsRoute,
+  AdminBranchesRoute: AdminBranchesRoute,
+  AdminCustomersRoute: AdminCustomersRoute,
+  AdminFaqRoute: AdminFaqRoute,
+  AdminGalleryRoute: AdminGalleryRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminPackagesRoute: AdminPackagesRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTestimonialsRoute: AdminTestimonialsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
@@ -307,12 +646,15 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
   BlogRoute: BlogRouteWithChildren,
   BookingSuccessRoute: BookingSuccessRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   FlightsRoute: FlightsRoute,
   GalleryRoute: GalleryRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TripsRoute: TripsRoute,
   UmrahRoute: UmrahRoute,
   VisaRoute: VisaRoute,
