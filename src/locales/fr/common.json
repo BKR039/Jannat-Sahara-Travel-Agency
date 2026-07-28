@@ -5,29 +5,95 @@
   },
   "nav": {
     "home": "Accueil",
+    "about": "À propos",
     "umrah": "Omra",
     "trips": "Voyages",
     "flights": "Billets d'avion",
-    "visas": "Visas",
-    "about": "À propos",
+    "visa": "Visas",
+    "gallery": "Galerie",
+    "faq": "FAQ",
+    "blog": "Blog",
     "contact": "Contact"
   },
   "actions": {
     "bookNow": "Réserver",
     "learnMore": "En savoir plus",
+    "viewAll": "Voir tout",
+    "readMore": "Lire la suite",
+    "send": "Envoyer",
+    "search": "Rechercher",
     "menu": "Menu",
     "toggleTheme": "Changer le thème",
     "changeLanguage": "Changer de langue"
+  },
+  "home": {
+    "featuredPackages": "Offres phares",
+    "featuredPackagesDesc": "Nos meilleures offres Omra sélectionnées",
+    "featuredTrips": "Voyages sélectionnés",
+    "featuredTripsDesc": "Des destinations inoubliables",
+    "services": "Nos services",
+    "servicesDesc": "Des solutions complètes pour tous vos besoins",
+    "whyUs": "Pourquoi nous choisir ?",
+    "whyUsDesc": "Parce que nous offrons toujours le meilleur",
+    "testimonials": "Avis clients",
+    "testimonialsDesc": "Ce que nos clients disent de nous",
+    "gallery": "Galerie photos",
+    "galleryDesc": "Aperçus de nos voyages",
+    "latestArticles": "Derniers articles",
+    "latestArticlesDesc": "Conseils et actualités",
+    "bookingWidget": {
+      "title": "Trouvez votre voyage idéal",
+      "type": "Type de service",
+      "destination": "Destination",
+      "date": "Date",
+      "search": "Rechercher"
+    }
+  },
+  "categories": {
+    "umrah": "Omra",
+    "trip": "Voyage",
+    "flight": "Vol",
+    "visa": "Visa",
+    "all": "Tout"
+  },
+  "package": {
+    "from": "À partir de",
+    "duration": "Durée",
+    "destination": "Destination",
+    "seats": "Places disponibles",
+    "hotel": "Hôtel",
+    "airline": "Compagnie",
+    "included": "Inclus",
+    "excluded": "Non inclus",
+    "timeline": "Programme",
+    "gallery": "Galerie"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour répondre à toutes vos questions",
+    "name": "Nom complet",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "subject": "Sujet",
+    "message": "Message",
+    "send": "Envoyer le message",
+    "success": "Votre message a été envoyé avec succès",
+    "error": "Une erreur est survenue"
   },
   "footer": {
     "quickLinks": "Liens rapides",
     "services": "Nos services",
     "contact": "Nous contacter",
-    "rights": "Tous droits réservés",
-    "address": "Tunis, El Mourouj 5, Rue 20 Mars"
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Abonnez-vous pour recevoir nos offres",
+    "subscribe": "S'abonner",
+    "rights": "Tous droits réservés"
   },
   "common": {
     "loading": "Chargement...",
-    "language": "Langue"
+    "empty": "Aucune donnée à afficher",
+    "error": "Erreur",
+    "language": "Langue",
+    "currency": "TND"
   }
 }

@@ -5,29 +5,95 @@
   },
   "nav": {
     "home": "الرئيسية",
+    "about": "من نحن",
     "umrah": "العمرة",
     "trips": "الرحلات",
     "flights": "تذاكر الطيران",
-    "visas": "التأشيرات",
-    "about": "من نحن",
+    "visa": "التأشيرات",
+    "gallery": "المعرض",
+    "faq": "أسئلة شائعة",
+    "blog": "المدونة",
     "contact": "اتصل بنا"
   },
   "actions": {
     "bookNow": "احجز الآن",
     "learnMore": "اعرف المزيد",
+    "viewAll": "عرض الكل",
+    "readMore": "قراءة المزيد",
+    "send": "إرسال",
+    "search": "بحث",
     "menu": "القائمة",
     "toggleTheme": "تبديل الوضع",
     "changeLanguage": "تغيير اللغة"
+  },
+  "home": {
+    "featuredPackages": "باقات مميزة",
+    "featuredPackagesDesc": "أفضل باقات العمرة المختارة بعناية",
+    "featuredTrips": "رحلات مميزة",
+    "featuredTripsDesc": "وجهات سياحية لا تُنسى",
+    "services": "خدماتنا",
+    "servicesDesc": "حلول متكاملة لكل احتياجاتك",
+    "whyUs": "لماذا تختارنا؟",
+    "whyUsDesc": "لأننا نقدم الأفضل دائماً",
+    "testimonials": "آراء العملاء",
+    "testimonialsDesc": "ما يقوله عملاؤنا عنا",
+    "gallery": "معرض الصور",
+    "galleryDesc": "لمحات من رحلاتنا",
+    "latestArticles": "أحدث المقالات",
+    "latestArticlesDesc": "نصائح وأخبار من مدونتنا",
+    "bookingWidget": {
+      "title": "ابحث عن رحلتك المثالية",
+      "type": "نوع الخدمة",
+      "destination": "الوجهة",
+      "date": "التاريخ",
+      "search": "بحث"
+    }
+  },
+  "categories": {
+    "umrah": "عمرة",
+    "trip": "رحلة",
+    "flight": "طيران",
+    "visa": "تأشيرة",
+    "all": "الكل"
+  },
+  "package": {
+    "from": "ابتداءً من",
+    "duration": "المدة",
+    "destination": "الوجهة",
+    "seats": "المقاعد المتاحة",
+    "hotel": "الفندق",
+    "airline": "الناقل",
+    "included": "يشمل",
+    "excluded": "لا يشمل",
+    "timeline": "البرنامج",
+    "gallery": "الصور"
+  },
+  "contact": {
+    "title": "تواصل معنا",
+    "subtitle": "نحن هنا للإجابة على جميع استفساراتكم",
+    "name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "subject": "الموضوع",
+    "message": "الرسالة",
+    "send": "إرسال الرسالة",
+    "success": "تم إرسال رسالتك بنجاح، سنتواصل معكم قريباً",
+    "error": "حدث خطأ، يرجى المحاولة مرة أخرى"
   },
   "footer": {
     "quickLinks": "روابط سريعة",
     "services": "خدماتنا",
     "contact": "تواصل معنا",
-    "rights": "جميع الحقوق محفوظة",
-    "address": "تونس، المروج 5، شارع 20 مارس"
+    "newsletter": "النشرة البريدية",
+    "newsletterDesc": "اشترك ليصلك جديد العروض",
+    "subscribe": "اشتراك",
+    "rights": "جميع الحقوق محفوظة"
   },
   "common": {
     "loading": "جاري التحميل...",
-    "language": "اللغة"
+    "empty": "لا توجد بيانات لعرضها",
+    "error": "حدث خطأ",
+    "language": "اللغة",
+    "currency": "د.ت"
   }
 }
