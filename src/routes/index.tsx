@@ -56,6 +56,7 @@ function Index() {
       <TestimonialsSection />
       <GalleryPreviewSection />
       <LatestArticlesSection />
+      <BranchesSection />
       <CtaSection />
     </SiteLayout>
   );
