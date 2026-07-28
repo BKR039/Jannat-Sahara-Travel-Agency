@@ -123,3 +123,17 @@ export const contactInfoQuery = () =>
     queryFn: () =>
       unwrap<ContactInfo[]>(supabase.from("contact_info").select("*").order("sort_order")),
   });
+
+export const branchesQuery = () =>
+  queryOptions({
+    queryKey: ["branches"] as const,
+    queryFn: () =>
+      unwrap<Branch[]>(
+        supabase
+          .from("branches")
+          .select("*")
+          .eq("is_active", true)
+          .order("is_main_branch", { ascending: false })
+          .order("sort_order"),
+      ),
+  });
