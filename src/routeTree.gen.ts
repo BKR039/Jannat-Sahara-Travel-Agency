@@ -12,16 +12,22 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisaRouteImport } from './routes/visa'
 import { Route as UmrahRouteImport } from './routes/umrah'
 import { Route as TripsRouteImport } from './routes/trips'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminPackagesRouteImport } from './routes/admin.packages'
+import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 
 const VisaRoute = VisaRouteImport.update({
   id: '/visa',
@@ -36,6 +42,11 @@ const UmrahRoute = UmrahRouteImport.update({
 const TripsRoute = TripsRouteImport.update({
   id: '/trips',
   path: '/trips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -68,6 +79,16 @@ const BlogRoute = BlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -77,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const PackagesSlugRoute = PackagesSlugRouteImport.update({
   id: '/packages/$slug',
@@ -88,110 +114,157 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const AdminPackagesRoute = AdminPackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBookingsRoute = AdminBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/packages': typeof AdminPackagesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/packages': typeof AdminPackagesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/packages': typeof AdminPackagesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
+    | '/auth'
     | '/blog'
     | '/booking-success'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/admin/bookings'
+    | '/admin/packages'
     | '/blog/$slug'
     | '/packages/$slug'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/auth'
     | '/blog'
     | '/booking-success'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/admin/bookings'
+    | '/admin/packages'
     | '/blog/$slug'
     | '/packages/$slug'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
+    | '/auth'
     | '/blog'
     | '/booking-success'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/admin/bookings'
+    | '/admin/packages'
     | '/blog/$slug'
     | '/packages/$slug'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRouteWithChildren
   BookingSuccessRoute: typeof BookingSuccessRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   FlightsRoute: typeof FlightsRoute
   GalleryRoute: typeof GalleryRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TripsRoute: typeof TripsRoute
   UmrahRoute: typeof UmrahRoute
   VisaRoute: typeof VisaRoute
@@ -219,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/trips'
       fullPath: '/trips'
       preLoaderRoute: typeof TripsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -263,6 +343,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -276,6 +370,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/packages/$slug': {
       id: '/packages/$slug'
@@ -291,8 +392,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/admin/packages': {
+      id: '/admin/packages'
+      path: '/packages'
+      fullPath: '/admin/packages'
+      preLoaderRoute: typeof AdminPackagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bookings': {
+      id: '/admin/bookings'
+      path: '/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminPackagesRoute: typeof AdminPackagesRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminBookingsRoute: AdminBookingsRoute,
+  AdminPackagesRoute: AdminPackagesRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
@@ -307,12 +436,15 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
   BlogRoute: BlogRouteWithChildren,
   BookingSuccessRoute: BookingSuccessRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   FlightsRoute: FlightsRoute,
   GalleryRoute: GalleryRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TripsRoute: TripsRoute,
   UmrahRoute: UmrahRoute,
   VisaRoute: VisaRoute,
