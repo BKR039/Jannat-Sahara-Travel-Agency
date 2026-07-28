@@ -95,5 +95,36 @@
     "error": "Erreur",
     "language": "Langue",
     "currency": "TND"
+  },
+  "booking": {
+    "title": "Réserver votre offre",
+    "subtitle": "Remplissez le formulaire et nous vous contacterons pour confirmer {{pkg}}",
+    "cancel": "Annuler",
+    "submit": "Confirmer la réservation",
+    "submitting": "Envoi en cours...",
+    "fields": {
+      "name": "Nom complet",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "people": "Nombre de personnes",
+      "notes": "Notes complémentaires",
+      "passport": "Scan du passeport",
+      "passportHint": "PDF ou image, 5 Mo maximum"
+    },
+    "errors": {
+      "required": "Merci de renseigner le nom et le téléphone",
+      "tooLarge": "Le fichier dépasse 5 Mo",
+      "badType": "Format non supporté (PDF ou image)",
+      "upload": "Échec du téléversement, réessayez",
+      "generic": "Impossible d'envoyer la réservation, réessayez"
+    }
+  },
+  "bookingSuccess": {
+    "title": "Réservation reçue avec succès",
+    "subtitle": "Merci d'avoir choisi Janat Sahara. Notre équipe vous contactera sous 24h pour confirmer les détails.",
+    "reference": "Référence",
+    "home": "Retour à l'accueil",
+    "contact": "Nous contacter"
   }
 }
+
