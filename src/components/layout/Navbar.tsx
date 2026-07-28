@@ -7,7 +7,17 @@ import { Logo } from "@/components/common/Logo";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 
-const NAV_KEYS = ["home", "umrah", "trips", "flights", "visas", "about", "contact"] as const;
+const NAV = [
+  { key: "home", to: "/" as const },
+  { key: "about", to: "/about" as const },
+  { key: "umrah", to: "/umrah" as const },
+  { key: "trips", to: "/trips" as const },
+  { key: "flights", to: "/flights" as const },
+  { key: "visa", to: "/visa" as const },
+  { key: "gallery", to: "/gallery" as const },
+  { key: "blog", to: "/blog" as const },
+  { key: "contact", to: "/contact" as const },
+];
 
 export function Navbar() {
   const { t } = useTranslation();
@@ -21,22 +31,24 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {NAV_KEYS.map((key) => (
-            <a
-              key={key}
-              href={key === "home" ? "/" : `#${key}`}
+          {NAV.map((item) => (
+            <Link
+              key={item.key}
+              to={item.to}
+              activeOptions={{ exact: item.to === "/" }}
+              activeProps={{ className: "bg-primary/10 text-primary" }}
               className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
             >
-              {t(`nav.${key}`)}
-            </a>
+              {t(`nav.${item.key}`)}
+            </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-1 md:gap-2">
           <LanguageSwitcher />
           <ThemeToggle />
-          <Button className="hidden bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex">
-            {t("actions.bookNow")}
+          <Button asChild className="hidden bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex">
+            <Link to="/contact">{t("actions.bookNow")}</Link>
           </Button>
           <Button
             variant="ghost"
@@ -53,18 +65,20 @@ export function Navbar() {
       {open && (
         <div className="border-t border-border bg-background lg:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
-            {NAV_KEYS.map((key) => (
-              <a
-                key={key}
-                href={key === "home" ? "/" : `#${key}`}
-                className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent"
+            {NAV.map((item) => (
+              <Link
+                key={item.key}
+                to={item.to}
                 onClick={() => setOpen(false)}
+                activeOptions={{ exact: item.to === "/" }}
+                activeProps={{ className: "bg-primary/10 text-primary" }}
+                className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent"
               >
-                {t(`nav.${key}`)}
-              </a>
+                {t(`nav.${item.key}`)}
+              </Link>
             ))}
-            <Button className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              {t("actions.bookNow")}
+            <Button asChild className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link to="/contact">{t("actions.bookNow")}</Link>
             </Button>
           </nav>
         </div>
