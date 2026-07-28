@@ -11,7 +11,9 @@ function toPascal(name: string): string {
     .join("");
 }
 
-export function DynamicIcon({ name, ...props }: { name?: string | null } & LucideProps) {
+type Props = Omit<LucideProps, "ref"> & { name?: string | null };
+
+export function DynamicIcon({ name, ...props }: Props) {
   if (!name) return <Sparkles {...props} />;
   const key = toPascal(name) as IconName;
   const Icon = icons[key] ?? Sparkles;
