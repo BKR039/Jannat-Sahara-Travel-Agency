@@ -39,27 +39,19 @@ export function HeroSection() {
         )}
 
 
-        <div className="mt-4 flex flex-wrap justify-center gap-3 animate-fade-in">
-          <Button
-            asChild
-            size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/30"
-          >
+        <div className="mt-4 flex flex-wrap justify-center gap-3 ds-reveal">
+          <Button asChild size="lg" className="shadow-brand-glow">
             <Link to={hero?.cta_href ?? "/umrah"}>
               {hero?.cta_label ?? t("actions.bookNow")}
-              <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
+              <ArrowLeft className="ms-2 h-5 w-5 rtl:rotate-180" />
             </Link>
           </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="border-on-dark/40 bg-on-dark/10 text-on-dark backdrop-blur hover:bg-on-dark/20"
-          >
+          <Button asChild size="lg" variant="dark" className="bg-on-dark/10 backdrop-blur hover:bg-on-dark/20">
             <Link to="/about">
-              <Play className="me-2 h-4 w-4" /> {t("actions.learnMore")}
+              <Play className="me-2 h-5 w-5" /> {t("actions.learnMore")}
             </Link>
           </Button>
+        </div>
         </div>
       </div>
     </section>
