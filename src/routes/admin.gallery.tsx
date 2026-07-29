@@ -97,7 +97,7 @@ function GalleryAdminPage() {
         description="Photos and videos shown on the public gallery."
         actions={
           <>
-            <label className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary/90 cursor-pointer">
+            <label className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-small text-primary-foreground hover:bg-primary/90 cursor-pointer">
               <Upload className="h-4 w-4" /> Bulk upload
               <input type="file" accept="image/*,video/*" multiple className="sr-only" onChange={bulkUpload} />
             </label>
@@ -119,7 +119,7 @@ function GalleryAdminPage() {
       </AdminCard>
 
       <AdminCard>
-        {list.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !list.data?.length ? (
+        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
           <EmptyState title="No gallery items yet" icon={ImageIcon} />
         ) : (
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -127,8 +127,8 @@ function GalleryAdminPage() {
               <div key={i.id} className="group relative overflow-hidden rounded-xl border border-border bg-card">
                 <img src={i.image} alt={i.title ?? ""} className="aspect-square w-full object-cover" loading="lazy" />
                 <div className="p-2">
-                  <p className="text-xs font-medium truncate">{i.title ?? "—"}</p>
-                  <p className="text-[10px] text-muted-foreground">{i.category ?? "—"}</p>
+                  <p className="text-caption font-medium truncate">{i.title ?? "—"}</p>
+                  <p className="text-caption text-muted-foreground">{i.category ?? "—"}</p>
                 </div>
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Switch checked={i.active} onCheckedChange={() => toggleActive.mutate(i)} />
@@ -212,7 +212,7 @@ function GalleryEditor({ initial, onClose, onSaved }: { initial: Item | null; on
           <div className="grid gap-1"><Label>Image *</Label>
             <div className="flex gap-2">
               <Input value={f.image} onChange={(e) => setF({ ...f, image: e.target.value })} />
-              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-sm cursor-pointer hover:bg-accent">
+              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-small cursor-pointer hover:bg-accent">
                 <Upload className="h-4 w-4" /><input type="file" accept="image/*" className="sr-only" onChange={upload} />
               </label>
             </div>

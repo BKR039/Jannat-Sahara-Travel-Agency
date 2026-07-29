@@ -45,10 +45,10 @@ function FaqPage() {
                 className="rounded-lg border border-border-subtle bg-card px-5 ds-reveal"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <AccordionTrigger className="text-start text-base font-semibold">
+                <AccordionTrigger className="text-start text-body font-semibold">
                   {f.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                <AccordionContent className="text-small leading-relaxed text-muted-foreground">
                   {f.answer}
                 </AccordionContent>
               </AccordionItem>

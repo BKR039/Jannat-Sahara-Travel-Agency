@@ -88,10 +88,10 @@ function AuthPage() {
           <Logo />
         </Link>
 
-        <div className="rounded-2xl border border-border bg-card/80 backdrop-blur shadow-lg p-6 sm:p-8">
+        <div className="rounded-lg border border-border bg-card/80 backdrop-blur shadow-lg p-6 sm:p-8">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold tracking-tight">Admin dashboard</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Sign in to manage Janat Sahara Travel</p>
+            <h1 className="text-h3 font-bold tracking-tight">Admin dashboard</h1>
+            <p className="mt-1 text-small text-muted-foreground">Sign in to manage Janat Sahara Travel</p>
           </div>
 
           <Tabs value={tab} onValueChange={(v) => setTab(v as "login" | "forgot")}>
@@ -145,7 +145,7 @@ function AuthPage() {
 
             <TabsContent value="forgot">
               <form onSubmit={onForgot} className="space-y-4">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-small text-muted-foreground">
                   Enter your admin email. We'll send a secure link to reset your password.
                 </p>
                 <div className="space-y-2">
@@ -170,7 +170,7 @@ function AuthPage() {
             </TabsContent>
           </Tabs>
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-caption text-muted-foreground">
             <Link to="/" className="hover:text-foreground">← Back to website</Link>
           </p>
         </div>

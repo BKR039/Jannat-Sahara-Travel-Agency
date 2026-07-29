@@ -108,11 +108,11 @@ function CustomersPage() {
       </AdminCard>
 
       <AdminCard>
-        {raw.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !customers.length ? (
+        {raw.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !customers.length ? (
           <EmptyState title="No customers yet" icon={Users} />
         ) : (
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
-            <table className="w-full text-sm">
+            <table className="w-full text-small">
               <thead><tr className="border-b border-border text-left">
                 <th className="px-4 sm:px-5 py-2 font-semibold">Name</th>
                 <th className="px-4 py-2 font-semibold">Phone</th>
@@ -127,10 +127,10 @@ function CustomersPage() {
                   <tr key={c.key} className="border-b border-border/60 hover:bg-muted/30">
                     <td className="px-4 sm:px-5 py-3 font-medium">{c.name}</td>
                     <td className="px-4 py-3">{c.phone}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{c.email ?? "—"}</td>
+                    <td className="px-4 py-3 text-caption text-muted-foreground">{c.email ?? "—"}</td>
                     <td className="px-4 py-3 tabular-nums">{c.bookings}</td>
-                    <td className="px-4 py-3 text-xs">{Array.from(c.package_categories).join(", ") || "—"}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{new Date(c.last_booking).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-caption">{Array.from(c.package_categories).join(", ") || "—"}</td>
+                    <td className="px-4 py-3 text-caption text-muted-foreground whitespace-nowrap">{new Date(c.last_booking).toLocaleDateString()}</td>
                     <td className="px-4 sm:px-5 py-3 text-right">
                       <div className="inline-flex gap-1">
                         <a className="p-2 rounded-md hover:bg-accent" href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}><Phone className="h-4 w-4" /></a>

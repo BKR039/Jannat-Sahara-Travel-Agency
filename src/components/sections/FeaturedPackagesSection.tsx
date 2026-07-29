@@ -29,7 +29,7 @@ export function FeaturedPackagesSection({
         <SectionHeading eyebrow={eyebrow} title={title} description={description} align="start" className="mb-0" />
         <Link
           to={viewAllHref}
-          className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+          className="inline-flex items-center gap-1 text-small font-semibold text-primary hover:underline"
         >
           {t("actions.viewAll")}
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" />

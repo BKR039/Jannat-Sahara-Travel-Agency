@@ -16,8 +16,8 @@ export function StatsSection() {
             <div className="rounded-lg bg-primary/10 p-3 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
               <DynamicIcon name={s.icon} className="h-6 w-6" />
             </div>
-            <div className="text-3xl font-extrabold text-foreground md:text-4xl">{s.value}</div>
-            <div className="text-sm text-muted-foreground">{s.label}</div>
+            <div className="text-h2 font-extrabold text-foreground ">{s.value}</div>
+            <div className="text-small text-muted-foreground">{s.label}</div>
           </div>
         ))}
       </div>

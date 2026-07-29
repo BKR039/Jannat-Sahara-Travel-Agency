@@ -43,10 +43,10 @@ function AdminLayout() {
   if (!hasAdminRole(roles)) {
     return (
       <div dir="ltr" className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-md text-center rounded-2xl border border-border bg-card p-8 shadow-sm">
+        <div className="max-w-md text-center rounded-lg border border-border bg-card p-8 shadow-sm">
           <ShieldX className="mx-auto h-10 w-10 text-destructive" />
-          <h1 className="mt-4 text-xl font-bold">Access denied</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h1 className="mt-4 text-h5 font-bold">Access denied</h1>
+          <p className="mt-2 text-small text-muted-foreground">
             Your account doesn't have permission to access the admin dashboard. Contact your super admin
             to request access.
           </p>

@@ -60,7 +60,7 @@ function NotificationsPage() {
         actions={<Button variant="outline" size="sm" onClick={() => markAllRead.mutate()}><CheckCheck className="me-2 h-4 w-4" /> Mark all read</Button>}
       />
       <AdminCard>
-        {list.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !list.data?.length ? (
+        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
           <EmptyState title="No notifications yet" icon={Bell} />
         ) : (
           <div className="divide-y divide-border -mx-4 sm:-mx-5">
@@ -70,12 +70,12 @@ function NotificationsPage() {
                 <div key={n.id} className={`flex items-start gap-3 px-4 sm:px-5 py-3 ${!n.read_at ? "bg-primary/5" : ""}`}>
                   <div className="mt-0.5 rounded-lg bg-primary/10 p-2 text-primary"><Icon className="h-4 w-4" /></div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium">{n.title}</p>
-                    {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
-                    <p className="mt-1 text-[11px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</p>
+                    <p className="text-small font-medium">{n.title}</p>
+                    {n.body && <p className="text-caption text-muted-foreground">{n.body}</p>}
+                    <p className="mt-1 text-caption text-muted-foreground">{new Date(n.created_at).toLocaleString()}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Link to={linkFor(n.kind)} className="text-xs text-primary hover:underline px-2">View</Link>
+                    <Link to={linkFor(n.kind)} className="text-caption text-primary hover:underline px-2">View</Link>
                     {!n.read_at && <Button size="sm" variant="ghost" onClick={() => markRead.mutate(n.id)}>Mark read</Button>}
                     <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove.mutate(n.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>

@@ -11,10 +11,10 @@ export function Logo({ className }: { className?: string }) {
         className="h-11 w-11 object-contain"
       />
       <div className="flex flex-col leading-tight">
-        <span className="font-display text-base font-bold text-foreground">
+        <span className="font-display text-body font-bold text-foreground">
           {t("brand.name")}
         </span>
-        <span className="text-[11px] text-muted-foreground">
+        <span className="text-caption text-muted-foreground">
           {t("brand.tagline")}
         </span>
       </div>

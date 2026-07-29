@@ -39,15 +39,15 @@ function ArticlePage() {
   return (
     <SiteLayout>
       <article className="mx-auto max-w-3xl px-4 py-16 md:px-6">
-        <Link to="/blog" className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+        <Link to="/blog" className="mb-6 inline-flex items-center gap-1 text-small font-semibold text-primary hover:underline">
           <ArrowRight className="h-4 w-4 rtl:rotate-180" /> العودة إلى المدونة
         </Link>
-        <div className="mb-3 text-xs text-muted-foreground">
+        <div className="mb-3 text-caption text-muted-foreground">
           {article.published_at && new Date(article.published_at).toLocaleDateString("ar-EG")}
           {article.author && ` · ${article.author}`}
         </div>
-        <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">{article.title}</h1>
-        {article.excerpt && <p className="mt-4 text-lg text-muted-foreground">{article.excerpt}</p>}
+        <h1 className="text-h2 font-extrabold text-foreground ">{article.title}</h1>
+        {article.excerpt && <p className="mt-4 text-body-lg text-muted-foreground">{article.excerpt}</p>}
         {article.cover && (
           <img src={article.cover} alt={article.title} className="mt-8 aspect-[16/9] w-full rounded-lg object-cover" />
         )}

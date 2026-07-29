@@ -66,7 +66,7 @@ function ContactInfoSection() {
           <ContactInfoRow key={c.id} row={c} onSave={(patch) => upsert.mutate({ id: c.id, ...patch })} onDelete={() => remove.mutate(c.id)} />
         ))}
         <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Add new</p>
+          <p className="text-caption font-semibold uppercase text-muted-foreground">Add new</p>
           <div className="grid gap-2 sm:grid-cols-5">
             <Input placeholder="key (phone, email, whatsapp, facebook…)" value={draft.key} onChange={(e) => setDraft({ ...draft, key: e.target.value })} />
             <Input placeholder="Label" value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} />
@@ -203,7 +203,7 @@ function SiteContentBlock({ row, onSave }: { row: { key: string; title: string |
   });
   return (
     <div className="rounded-lg border border-border p-3 space-y-2">
-      <p className="text-xs font-semibold uppercase text-muted-foreground">Block: {row.key}</p>
+      <p className="text-caption font-semibold uppercase text-muted-foreground">Block: {row.key}</p>
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="grid gap-1"><Label>Title</Label><Input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
         <div className="grid gap-1"><Label>Subtitle</Label><Input value={f.subtitle} onChange={(e) => setF({ ...f, subtitle: e.target.value })} /></div>

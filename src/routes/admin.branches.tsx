@@ -77,7 +77,7 @@ function BranchesAdminPage() {
 
       <AdminCard>
         {list.isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-small text-muted-foreground">Loading…</p>
         ) : !list.data?.length ? (
           <EmptyState title="No branches yet" icon={MapPin} action={<Button onClick={() => setCreating(true)}><Plus className="me-2 h-4 w-4" /> Add branch</Button>} />
         ) : (
@@ -88,16 +88,16 @@ function BranchesAdminPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-semibold truncate">{b.name}</p>
-                    <p className="text-xs text-muted-foreground">{b.city}</p>
+                    <p className="text-caption text-muted-foreground">{b.city}</p>
                   </div>
                   {b.is_main_branch && (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary uppercase">Main</span>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-caption font-bold text-primary uppercase">Main</span>
                   )}
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{b.address}</p>
-                {b.phone && <p className="mt-1 text-xs">{b.phone}</p>}
+                <p className="mt-2 text-caption text-muted-foreground line-clamp-2">{b.address}</p>
+                {b.phone && <p className="mt-1 text-caption">{b.phone}</p>}
                 <div className="mt-3 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-xs">
+                  <div className="flex items-center gap-2 text-caption">
                     <Switch checked={b.is_active} onCheckedChange={() => toggleActive.mutate(b)} />
                     <span className="text-muted-foreground">{b.is_active ? "Active" : "Hidden"}</span>
                   </div>
@@ -245,7 +245,7 @@ function BranchEditor({
             <Label>Image</Label>
             <div className="flex gap-2">
               <Input value={f.image} onChange={(e) => setF({ ...f, image: e.target.value })} placeholder="https://…" />
-              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-sm cursor-pointer hover:bg-accent">
+              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-small cursor-pointer hover:bg-accent">
                 <Upload className="h-4 w-4" /><input type="file" accept="image/*" className="sr-only" onChange={uploadImage} />
               </label>
             </div>

@@ -216,13 +216,13 @@ function BookingsPage() {
 
       <AdminCard>
         {bookings.isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-small text-muted-foreground">Loading…</p>
         ) : !bookings.data?.rows.length ? (
           <EmptyState title="No bookings match your filters" icon={Users} />
         ) : (
           <>
             <div className="overflow-x-auto -mx-4 sm:-mx-5">
-              <table className="w-full text-sm">
+              <table className="w-full text-small">
                 <thead>
                   <tr className="border-b border-border text-left">
                     <th className="px-4 sm:px-5 py-2 font-semibold">Customer</th>
@@ -238,12 +238,12 @@ function BookingsPage() {
                     <tr key={b.id} className="border-b border-border/60 hover:bg-muted/30">
                       <td className="px-4 sm:px-5 py-3">
                         <div className="font-medium">{b.name}</div>
-                        <div className="text-xs text-muted-foreground">{b.phone}</div>
-                        {b.email && <div className="text-xs text-muted-foreground">{b.email}</div>}
+                        <div className="text-caption text-muted-foreground">{b.phone}</div>
+                        {b.email && <div className="text-caption text-muted-foreground">{b.email}</div>}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-sm">{b.package_title ?? "General"}</div>
-                        <div className="text-xs text-muted-foreground uppercase">{b.package_category ?? "—"}</div>
+                        <div className="text-small">{b.package_title ?? "General"}</div>
+                        <div className="text-caption text-muted-foreground uppercase">{b.package_category ?? "—"}</div>
                       </td>
                       <td className="px-4 py-3">{b.people}</td>
                       <td className="px-4 py-3">
@@ -257,7 +257,7 @@ function BookingsPage() {
                           </SelectContent>
                         </Select>
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                      <td className="px-4 py-3 text-caption text-muted-foreground whitespace-nowrap">
                         {new Date(b.created_at).toLocaleString()}
                       </td>
                       <td className="px-4 sm:px-5 py-3 text-right">
@@ -318,7 +318,7 @@ function BookingsPage() {
               </table>
             </div>
 
-            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="mt-4 flex items-center justify-between text-caption text-muted-foreground">
               <span>
                 {total} total · page {page + 1} / {totalPages}
               </span>
@@ -343,7 +343,7 @@ function BookingsPage() {
                 <DialogTitle>{detail.name}</DialogTitle>
                 <DialogDescription>{detail.package_title ?? "General inquiry"}</DialogDescription>
               </DialogHeader>
-              <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <div className="grid gap-3 text-small sm:grid-cols-2">
                 <Field label="Phone" value={detail.phone} />
                 <Field label="Email" value={detail.email ?? "—"} />
                 <Field label="People" value={String(detail.people)} />
@@ -351,7 +351,7 @@ function BookingsPage() {
                 <Field label="Status" value={<StatusBadge status={detail.status} />} />
                 <Field label="Created" value={new Date(detail.created_at).toLocaleString()} />
                 <div className="sm:col-span-2">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase">Notes</p>
+                  <p className="text-caption font-semibold text-muted-foreground uppercase">Notes</p>
                   <p className="mt-1 whitespace-pre-wrap">{detail.notes ?? "—"}</p>
                 </div>
                 {detail.passport_path && (
@@ -373,7 +373,7 @@ function BookingsPage() {
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-semibold text-muted-foreground uppercase">{label}</p>
+      <p className="text-caption font-semibold text-muted-foreground uppercase">{label}</p>
       <div className="mt-1">{value}</div>
     </div>
   );

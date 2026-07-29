@@ -29,10 +29,10 @@ function BookingSuccess() {
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ds-reveal">
           <CheckCircle2 className="h-12 w-12 text-primary" />
         </div>
-        <h1 className="text-3xl font-extrabold md:text-4xl">{t("bookingSuccess.title")}</h1>
+        <h1 className="text-h2 font-extrabold ">{t("bookingSuccess.title")}</h1>
         <p className="mt-3 max-w-md text-muted-foreground">{t("bookingSuccess.subtitle")}</p>
         {id && (
-          <div className="mt-6 rounded-xl border border-border-subtle bg-card px-5 py-3 text-sm">
+          <div className="mt-6 rounded-xl border border-border-subtle bg-card px-5 py-3 text-small">
             <span className="text-muted-foreground">{t("bookingSuccess.reference")}: </span>
             <span className="font-mono font-semibold">{id.slice(0, 8).toUpperCase()}</span>
           </div>

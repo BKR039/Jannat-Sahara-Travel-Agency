@@ -115,7 +115,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 to={item.to}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-small font-medium transition-colors",
                   active
                     ? "bg-primary/10 text-primary"
                     : "text-foreground/70 hover:bg-accent hover:text-foreground",
@@ -124,7 +124,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 <Icon className="h-4 w-4" />
                 <span className="flex-1">{item.label}</span>
                 {item.to === "/admin/notifications" && (unread.data ?? 0) > 0 && (
-                  <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+                  <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
                     {unread.data}
                   </span>
                 )}
@@ -137,13 +137,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-small text-muted-foreground hover:bg-accent"
           >
             <ExternalLink className="h-4 w-4" /> View public site
           </a>
           <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3">
-            <p className="text-xs text-muted-foreground">Signed in as</p>
-            <p className="truncate text-sm font-medium">{user.email}</p>
+            <p className="text-caption text-muted-foreground">Signed in as</p>
+            <p className="truncate text-small font-medium">{user.email}</p>
             <Button
               variant="outline"
               size="sm"

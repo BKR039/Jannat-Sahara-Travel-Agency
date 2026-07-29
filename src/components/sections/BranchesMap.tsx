@@ -104,12 +104,12 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
         >
           <Popup>
             <div className="min-w-[220px] space-y-1.5 text-right" dir="rtl">
-              <div className="text-base font-bold text-primary">{b.name}</div>
-              <div className="text-xs text-muted-foreground">{b.address}</div>
+              <div className="text-body font-bold text-primary">{b.name}</div>
+              <div className="text-caption text-muted-foreground">{b.address}</div>
               {b.phone && (
                 <a
                   href={`tel:${b.phone.replace(/\s+/g, "")}`}
-                  className="flex items-center justify-end gap-1.5 text-xs font-medium"
+                  className="flex items-center justify-end gap-1.5 text-caption font-medium"
                   dir="ltr"
                 >
                   <Phone className="h-3 w-3" />
@@ -121,7 +121,7 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
                   href={b.google_maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground"
+                  className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-caption font-semibold text-primary-foreground"
                 >
                   <Navigation className="h-3 w-3" />
                   {t("branches.directions")}

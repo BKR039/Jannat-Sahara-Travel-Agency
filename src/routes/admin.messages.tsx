@@ -40,7 +40,7 @@ function MessagesPage() {
     <>
       <PageHeader title="Contact messages" description="Inbound messages from the public contact form." />
       <AdminCard>
-        {list.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !list.data?.length ? (
+        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
           <EmptyState title="No messages yet" icon={Mail} />
         ) : (
           <div className="divide-y divide-border -mx-4 sm:-mx-5">
@@ -50,19 +50,19 @@ function MessagesPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{m.name}</p>
-                      {!m.handled && <span className="text-[10px] font-bold uppercase text-primary">NEW</span>}
+                      {!m.handled && <span className="text-caption font-bold uppercase text-primary">NEW</span>}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-caption text-muted-foreground">
                       {m.email} {m.phone && `· ${m.phone}`} · {new Date(m.created_at).toLocaleString()}
                     </p>
-                    {m.subject && <p className="mt-2 text-sm font-medium">{m.subject}</p>}
-                    <p className="mt-1 whitespace-pre-wrap text-sm">{m.message}</p>
+                    {m.subject && <p className="mt-2 text-small font-medium">{m.subject}</p>}
+                    <p className="mt-1 whitespace-pre-wrap text-small">{m.message}</p>
                   </div>
                   <div className="flex flex-col gap-1">
                     <Button size="sm" variant="outline" onClick={() => setHandled.mutate({ id: m.id, handled: !m.handled })}>
                       {m.handled ? <><MailOpen className="me-2 h-4 w-4" /> Reopen</> : <><CheckCircle2 className="me-2 h-4 w-4" /> Mark handled</>}
                     </Button>
-                    <a className="text-xs text-primary hover:underline" href={`mailto:${m.email}`}>Reply by email</a>
+                    <a className="text-caption text-primary hover:underline" href={`mailto:${m.email}`}>Reply by email</a>
                     <AlertDialog>
                       <AlertDialogTrigger asChild><Button size="sm" variant="ghost" className="text-destructive"><Trash2 className="h-4 w-4" /></Button></AlertDialogTrigger>
                       <AlertDialogContent>

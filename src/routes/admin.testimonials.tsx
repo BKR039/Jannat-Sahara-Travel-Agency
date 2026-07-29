@@ -58,7 +58,7 @@ function TestimonialsAdminPage() {
     <>
       <PageHeader title="Testimonials" actions={<Button onClick={() => setCreating(true)}><Plus className="me-2 h-4 w-4" /> New testimonial</Button>} />
       <AdminCard>
-        {list.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !list.data?.length ? (
+        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
           <EmptyState title="No testimonials yet" icon={Star} />
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -68,7 +68,7 @@ function TestimonialsAdminPage() {
                   {t.avatar && <img src={t.avatar} alt={t.name} className="h-10 w-10 rounded-full object-cover" />}
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">{t.name}</p>
-                    {t.role && <p className="text-xs text-muted-foreground">{t.role}</p>}
+                    {t.role && <p className="text-caption text-muted-foreground">{t.role}</p>}
                     <div className="mt-1 flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star key={i} className={`h-3 w-3 ${i < t.rating ? "fill-primary text-primary" : "text-muted-foreground"}`} />
@@ -76,9 +76,9 @@ function TestimonialsAdminPage() {
                     </div>
                   </div>
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{t.content}</p>
+                <p className="mt-3 text-small text-muted-foreground line-clamp-3">{t.content}</p>
                 <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs"><Switch checked={t.active} onCheckedChange={() => toggle.mutate(t)} /><span>{t.active ? "Active" : "Hidden"}</span></div>
+                  <div className="flex items-center gap-2 text-caption"><Switch checked={t.active} onCheckedChange={() => toggle.mutate(t)} /><span>{t.active ? "Active" : "Hidden"}</span></div>
                   <div className="flex gap-1">
                     <Button size="icon" variant="ghost" onClick={() => setEditing(t)}><Edit3 className="h-4 w-4" /></Button>
                     <AlertDialog>
@@ -154,7 +154,7 @@ function TestimonialEditor({ initial, onClose, onSaved }: { initial: T | null; o
           <div className="grid gap-1"><Label>Avatar</Label>
             <div className="flex gap-2">
               <Input value={f.avatar} onChange={(e) => setF({ ...f, avatar: e.target.value })} />
-              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-sm cursor-pointer hover:bg-accent">
+              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-small cursor-pointer hover:bg-accent">
                 <Upload className="h-4 w-4" /><input type="file" accept="image/*" className="sr-only" onChange={upload} />
               </label>
             </div>
