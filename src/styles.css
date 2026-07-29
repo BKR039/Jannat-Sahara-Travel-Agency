@@ -193,3 +193,23 @@
     letter-spacing: -0.01em;
   }
 }
+
+/* Leaflet brand markers */
+.janat-marker { background: transparent !important; border: none !important; }
+.janat-pin { transition: transform 0.25s ease, filter 0.25s ease; transform-origin: bottom center; }
+.janat-pin:hover { transform: scale(1.08); }
+.janat-pin-active {
+  animation: janat-pin-bounce 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 6px 14px oklch(0.72 0.19 50 / 0.55));
+}
+@keyframes janat-pin-bounce {
+  0%, 100% { transform: translateY(0) scale(1.15); }
+  50% { transform: translateY(-8px) scale(1.2); }
+}
+.leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 4px; }
+.leaflet-popup-tip { background: white; }
+
+/* Hide scrollbar for horizontal branch card rail */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
