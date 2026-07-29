@@ -24,7 +24,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-30 w-full border-b border-border-subtle bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 md:px-6">
         <Link to="/" className="shrink-0">
           <Logo />
@@ -36,8 +36,8 @@ export function Navbar() {
               key={item.key}
               to={item.to}
               activeOptions={{ exact: item.to === "/" }}
-              activeProps={{ className: "bg-primary/10 text-primary" }}
-              className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+              activeProps={{ className: "bg-accent text-primary" }}
+              className="rounded-md px-3 py-2 text-nav text-text-secondary transition-colors duration-150 ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {t(`nav.${item.key}`)}
             </Link>
@@ -47,7 +47,7 @@ export function Navbar() {
         <div className="flex items-center gap-1 md:gap-2">
           <LanguageSwitcher />
           <ThemeToggle />
-          <Button asChild className="hidden bg-primary text-primary-foreground hover:bg-primary/90 md:inline-flex">
+          <Button asChild className="hidden md:inline-flex">
             <Link to="/contact">{t("actions.bookNow")}</Link>
           </Button>
           <Button
@@ -63,7 +63,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t border-border bg-background lg:hidden">
+        <div className="border-t border-border-subtle bg-surface lg:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
             {NAV.map((item) => (
               <Link
@@ -71,13 +71,13 @@ export function Navbar() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 activeOptions={{ exact: item.to === "/" }}
-                activeProps={{ className: "bg-primary/10 text-primary" }}
-                className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent"
+                activeProps={{ className: "bg-accent text-primary" }}
+                className="rounded-md px-3 py-2 text-nav text-text-secondary hover:bg-accent"
               >
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <Button asChild className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button asChild className="mt-2" fullWidth>
               <Link to="/contact">{t("actions.bookNow")}</Link>
             </Button>
           </nav>
