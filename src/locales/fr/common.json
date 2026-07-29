@@ -131,12 +131,35 @@
     "subtitle": "Rendez-nous visite ou contactez-nous directement — notre équipe est à votre écoute",
     "ourBranches": "Nos agences",
     "mainBranch": "Agence principale",
+    "active": "Sélectionnée",
     "viewOnMap": "Voir sur la carte",
     "directions": "Itinéraire",
+    "call": "Appeler",
+    "whatsapp": "WhatsApp",
+    "share": "Partager",
+    "copy": "Copier",
+    "copied": "Copié",
+    "linkCopied": "Lien copié",
     "contactCard": {
       "title": "Contact direct",
       "subtitle": "Nous répondons à toutes vos questions",
       "follow": "Suivez-nous"
+    },
+    "info": {
+      "title": "Informations de contact",
+      "subtitle": "D'autres façons de nous joindre",
+      "phone": "Téléphone",
+      "whatsapp": "WhatsApp",
+      "email": "E-mail",
+      "headquarters": "Siège social",
+      "hours": "Horaires"
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "subtitle": "Remplissez le formulaire, nous vous répondons rapidement.",
+      "selectBranch": "Choisir une agence",
+      "whatsappInstead": "Ou via WhatsApp",
+      "thanks": "Message reçu. Nous vous contactons très bientôt."
     }
   }
 }
