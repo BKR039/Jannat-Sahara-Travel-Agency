@@ -40,7 +40,7 @@ function BlogPage() {
                 key={a.id}
                 to="/blog/$slug"
                 params={{ slug: a.slug }}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg animate-fade-in"
+                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {a.cover && (
@@ -53,7 +53,7 @@ function BlogPage() {
                     {a.published_at && new Date(a.published_at).toLocaleDateString("ar-EG")}
                     {a.author && ` · ${a.author}`}
                   </div>
-                  <h3 className="line-clamp-2 text-lg font-bold text-foreground group-hover:text-primary">
+                  <h3 className="line-clamp-2 text-card-title text-foreground group-hover:text-primary">
                     {a.title}
                   </h3>
                   {a.excerpt && <p className="line-clamp-3 text-sm text-muted-foreground">{a.excerpt}</p>}

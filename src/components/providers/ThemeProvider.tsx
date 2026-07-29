@@ -22,6 +22,8 @@ function applyTheme(theme: Theme) {
   const resolved = theme === "system" ? getSystemTheme() : theme;
   const root = document.documentElement;
   root.classList.toggle("dark", resolved === "dark");
+  // Design system reads [data-theme] (tokens/colors.css)
+  root.setAttribute("data-theme", resolved);
 }
 
 export function ThemeProvider({ children, defaultTheme = "system" }: { children: ReactNode; defaultTheme?: Theme }) {

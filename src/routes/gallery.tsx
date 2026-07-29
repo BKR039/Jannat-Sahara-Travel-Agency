@@ -67,7 +67,7 @@ function GalleryPage() {
             {filtered.map((g, i) => (
               <div
                 key={g.id}
-                className="group relative aspect-square overflow-hidden rounded-2xl bg-muted animate-fade-in"
+                className="group relative aspect-square overflow-hidden rounded-lg bg-muted ds-reveal"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 <img
@@ -78,7 +78,7 @@ function GalleryPage() {
                 />
                 {g.title && (
                   <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition group-hover:opacity-100">
-                    <span className="text-sm font-semibold text-white">{g.title}</span>
+                    <span className="text-sm font-semibold text-on-dark">{g.title}</span>
                   </div>
                 )}
               </div>

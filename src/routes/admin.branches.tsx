@@ -83,7 +83,7 @@ function BranchesAdminPage() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {list.data.map((b) => (
-              <div key={b.id} className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+              <div key={b.id} className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 {b.image && <img src={b.image} alt={b.name} className="mb-3 h-32 w-full rounded-lg object-cover" />}
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">

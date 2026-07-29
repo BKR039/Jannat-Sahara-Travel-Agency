@@ -14,53 +14,41 @@ export function HeroSection() {
     <section className="relative isolate overflow-hidden">
       <div className="absolute inset-0 -z-10">
         {hero?.image && (
-          <img
-            src={hero.image}
-            alt=""
-            className="h-full w-full object-cover"
-          />
+          <img src={hero.image} alt="" aria-hidden="true" className="h-full w-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-green/80 via-brand-green/60 to-brand-green/90" />
-        <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_20%,rgba(255,255,255,0.15),transparent)]" />
+        {/* DS: --gradient-oasis-night base + --gradient-hero-scrim for legibility */}
+        <div className="absolute inset-0 bg-gradient-oasis-night opacity-80" />
+        <div className="absolute inset-0 bg-gradient-hero-scrim" />
       </div>
 
-      <div className="mx-auto flex min-h-[85vh] max-w-7xl flex-col items-center justify-center gap-6 px-4 py-24 text-center text-white md:px-6">
-        <div className="flex flex-wrap justify-center gap-2 animate-fade-in">
+      <div className="mx-auto flex min-h-[85vh] max-w-7xl flex-col items-center justify-center gap-6 px-4 py-24 text-center text-on-dark md:px-6">
+        <div className="flex flex-wrap justify-center gap-2 ds-reveal">
           {badges.map((b) => (
-            <span key={b} className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
+            <span
+              key={b}
+              className="rounded-full border border-on-dark/25 bg-on-dark/10 px-3 py-1 text-caption backdrop-blur"
+            >
               {b}
             </span>
           ))}
         </div>
 
-        <h1 className="max-w-4xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl lg:text-7xl animate-fade-in">
-          {hero?.title ?? t("brand.tagline")}
-        </h1>
+        <h1 className="max-w-4xl text-display ds-reveal">{hero?.title ?? t("brand.tagline")}</h1>
         {hero?.subtitle && (
-          <p className="max-w-2xl text-lg text-white/90 md:text-xl animate-fade-in">
-            {hero.subtitle}
-          </p>
+          <p className="max-w-2xl text-body-lg text-on-dark/90 ds-reveal">{hero.subtitle}</p>
         )}
 
-        <div className="mt-4 flex flex-wrap justify-center gap-3 animate-fade-in">
-          <Button
-            asChild
-            size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/30"
-          >
+
+        <div className="mt-4 flex flex-wrap justify-center gap-3 ds-reveal">
+          <Button asChild size="lg" className="shadow-brand-glow">
             <Link to={hero?.cta_href ?? "/umrah"}>
               {hero?.cta_label ?? t("actions.bookNow")}
-              <ArrowLeft className="ms-2 h-4 w-4 rtl:rotate-180" />
+              <ArrowLeft className="ms-2 h-5 w-5 rtl:rotate-180" />
             </Link>
           </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
-          >
+          <Button asChild size="lg" variant="dark" className="bg-on-dark/10 backdrop-blur hover:bg-on-dark/20">
             <Link to="/about">
-              <Play className="me-2 h-4 w-4" /> {t("actions.learnMore")}
+              <Play className="me-2 h-5 w-5" /> {t("actions.learnMore")}
             </Link>
           </Button>
         </div>

@@ -43,7 +43,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={c.label ?? c.key}
-                  className="rounded-full bg-white/10 p-2 hover:bg-white/20 transition"
+                  className="rounded-full bg-on-dark/10 p-2 hover:bg-on-dark/20 transition"
                 >
                   <DynamicIcon name={c.icon} className="h-4 w-4" />
                 </a>
