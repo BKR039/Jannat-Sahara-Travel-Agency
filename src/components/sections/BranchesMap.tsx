@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useTranslation } from "react-i18next";
@@ -10,7 +10,8 @@ const brandMarkerIcon = (highlighted: boolean) =>
   L.divIcon({
     className: "janat-marker",
     html: `<div class="janat-pin${highlighted ? " janat-pin-active" : ""}">
-        <svg viewBox="0 0 32 42" width="${highlighted ? 42 : 34}" height="${highlighted ? 54 : 44}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        ${highlighted ? '<span class="janat-pin-pulse"></span>' : ""}
+        <svg viewBox="0 0 32 42" width="${highlighted ? 42 : 32}" height="${highlighted ? 54 : 42}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="g-${highlighted ? "a" : "n"}" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="var(--color-orange-500)"/>
@@ -22,8 +23,8 @@ const brandMarkerIcon = (highlighted: boolean) =>
           <circle cx="16" cy="15.5" r="3" fill="var(--color-orange-500)"/>
         </svg>
       </div>`,
-    iconSize: highlighted ? [42, 54] : [34, 44],
-    iconAnchor: highlighted ? [21, 52] : [17, 42],
+    iconSize: highlighted ? [42, 54] : [32, 42],
+    iconAnchor: highlighted ? [21, 52] : [16, 40],
     popupAnchor: [0, -42],
   });
 
@@ -38,7 +39,7 @@ function FitToBranches({ branches, hasActive }: { branches: Branch[]; hasActive:
     const bounds = L.latLngBounds(
       branches.map((b) => [Number(b.latitude), Number(b.longitude)] as [number, number]),
     );
-    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 11 });
   }, [branches, map, hasActive]);
   return null;
 }
@@ -47,7 +48,10 @@ function FlyTo({ target }: { target: Branch | null }) {
   const map = useMap();
   useEffect(() => {
     if (!target) return;
-    map.flyTo([Number(target.latitude), Number(target.longitude)], 15, { duration: 1.1 });
+    map.flyTo([Number(target.latitude), Number(target.longitude)], 14, {
+      duration: 1.35,
+      easeLinearity: 0.22,
+    });
   }, [target, map]);
   return null;
 }
@@ -68,7 +72,8 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
 
   useEffect(() => {
     if (activeId && markerRefs.current[activeId]) {
-      markerRefs.current[activeId]?.openPopup();
+      const timer = setTimeout(() => markerRefs.current[activeId]?.openPopup(), 700);
+      return () => clearTimeout(timer);
     }
   }, [activeId]);
 
@@ -81,13 +86,15 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
       center={center}
       zoom={6}
       scrollWheelZoom={false}
-      className="h-full w-full"
-      style={{ minHeight: "520px", borderRadius: "1.25rem" }}
+      zoomControl={false}
+      className="janat-map h-full w-full"
+      style={{ minHeight: "100%", background: "transparent" }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
       />
+      <ZoomControl position="bottomright" />
       <FitToBranches branches={branches} hasActive={!!activeId} />
       <FlyTo target={active} />
       {branches.map((b) => (
@@ -103,9 +110,9 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
           }}
         >
           <Popup>
-            <div className="min-w-[220px] space-y-1.5 text-right" dir="rtl">
+            <div className="min-w-[230px] space-y-2 p-1 text-right" dir="rtl">
               <div className="text-body font-bold text-primary">{b.name}</div>
-              <div className="text-caption text-muted-foreground">{b.address}</div>
+              <div className="text-caption leading-relaxed text-muted-foreground">{b.address}</div>
               {b.phone && (
                 <a
                   href={`tel:${b.phone.replace(/\s+/g, "")}`}
@@ -121,7 +128,7 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
                   href={b.google_maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-caption font-semibold text-primary-foreground"
+                  className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption font-semibold text-primary-foreground no-underline"
                 >
                   <Navigation className="h-3 w-3" />
                   {t("branches.directions")}
