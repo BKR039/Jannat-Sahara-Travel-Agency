@@ -682,7 +682,7 @@ export function BranchesSection() {
               </Suspense>
 
               {/* floating glass status card */}
-              <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/75 px-5 py-4 shadow-xl backdrop-blur-xl md:block">
+              <div className="pointer-events-none absolute bottom-6 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/75 px-5 py-4 shadow-xl backdrop-blur-xl md:block">
                 <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
                   {t("branches.ourBranches")}
                 </p>
