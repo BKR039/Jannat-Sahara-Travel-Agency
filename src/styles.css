@@ -594,6 +594,22 @@
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
 }
+@utility text-small {
+  font-family: var(--font-body);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-body);
+}
+@utility text-button {
+  font-family: var(--font-body);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+@utility text-input {
+  font-family: var(--font-body);
+  font-size: var(--font-size-input);
+  line-height: var(--line-height-body);
+}
 @utility text-caption {
   font-family: var(--font-body);
   font-size: var(--font-size-caption);

@@ -84,7 +84,7 @@ function AdminsPage() {
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {u.roles.map((r) => (
-                          <span key={r} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-bold uppercase ${r === "super_admin" ? "bg-primary/15 text-primary" : r === "admin" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
+                          <span key={r} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-bold uppercase ${r === "super_admin" ? "bg-primary/15 text-primary" : r === "admin" ? "bg-emerald-500/10 text-success" : "bg-muted text-muted-foreground"}`}>
                             {r}
                             {r !== "super_admin" && (
                               <button title="Remove role" onClick={() => removeMut.mutate({ userId: u.id, role: r })}>×</button>

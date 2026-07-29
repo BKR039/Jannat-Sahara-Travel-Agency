@@ -38,7 +38,7 @@ export const Route = createFileRoute("/admin/")({
   component: DashboardPage,
 });
 
-const CHART_COLORS = ["#E8722C", "#0F3D2E", "#D4A574", "#8B4513", "#3A6B4F"];
+const CHART_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"];
 
 function DashboardPage() {
   const fetchStats = useServerFn(getDashboardStats);
@@ -93,7 +93,7 @@ function DashboardPage() {
                 <XAxis dataKey="month" fontSize={11} />
                 <YAxis fontSize={11} allowDecimals={false} />
                 <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)" }} />
-                <Bar dataKey="count" fill="#E8722C" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="count" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -13,13 +13,13 @@ const brandMarkerIcon = (highlighted: boolean) =>
         <svg viewBox="0 0 32 42" width="${highlighted ? 42 : 34}" height="${highlighted ? 54 : 44}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="g-${highlighted ? "a" : "n"}" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#E8722C"/>
-              <stop offset="1" stop-color="#0F3D2E"/>
+              <stop offset="0" stop-color="var(--color-orange-500)"/>
+              <stop offset="1" stop-color="var(--color-teal-700)"/>
             </linearGradient>
           </defs>
           <path d="M16 0C7.16 0 0 7.05 0 15.75 0 27.2 14.14 40.4 15.02 41.18a1.44 1.44 0 0 0 1.96 0C17.86 40.4 32 27.2 32 15.75 32 7.05 24.84 0 16 0z" fill="url(#g-${highlighted ? "a" : "n"})"/>
           <circle cx="16" cy="15.5" r="6" fill="white"/>
-          <circle cx="16" cy="15.5" r="3" fill="#E8722C"/>
+          <circle cx="16" cy="15.5" r="3" fill="var(--color-orange-500)"/>
         </svg>
       </div>`,
     iconSize: highlighted ? [42, 54] : [34, 44],

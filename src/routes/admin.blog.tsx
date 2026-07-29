@@ -91,7 +91,7 @@ function BlogAdminPage() {
                     <td className="px-4 py-3 text-caption text-muted-foreground">/{a.slug}</td>
                     <td className="px-4 py-3">
                       <button onClick={() => togglePublish.mutate(a)} title={a.published ? "Unpublish" : "Publish"}>
-                        {a.published ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+                        {a.published ? <Eye className="h-4 w-4 text-success" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                       </button>
                     </td>
                     <td className="px-4 py-3 text-caption">{a.published_at ? new Date(a.published_at).toLocaleDateString() : "—"}</td>
