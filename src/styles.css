@@ -751,3 +751,20 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* DS motion durations as utilities (tokens/motion.css) */
+@utility duration-instant {
+  transition-duration: var(--duration-instant);
+}
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+@utility duration-base {
+  transition-duration: var(--duration-base);
+}
+@utility duration-moderate {
+  transition-duration: var(--duration-moderate);
+}
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
+}

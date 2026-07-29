@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /** Badge / Chip — DS /components/07-data-display.md · --radius-badge (pill) */
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-caption font-semibold transition-colors duration-150 [&_svg]:size-3.5",
+  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-caption font-semibold transition-colors duration-fast [&_svg]:size-3.5",
   {
     variants: {
       variant: {

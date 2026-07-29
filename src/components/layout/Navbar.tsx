@@ -37,7 +37,7 @@ export function Navbar() {
               to={item.to}
               activeOptions={{ exact: item.to === "/" }}
               activeProps={{ className: "bg-accent text-primary" }}
-              className="rounded-md px-3 py-2 text-nav text-text-secondary transition-colors duration-150 ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="rounded-md px-3 py-2 text-nav text-text-secondary transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {t(`nav.${item.key}`)}
             </Link>

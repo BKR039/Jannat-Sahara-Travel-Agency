@@ -23,7 +23,7 @@ export function ServicesSection() {
             <Link
               key={s.id}
               to={`/${s.slug}` as string}
-              className="group flex flex-col gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg ds-reveal"
+              className="group flex flex-col gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-md">
@@ -53,7 +53,7 @@ export function FeaturesSection() {
         {data.map((f, i) => (
           <div
             key={f.id}
-            className="group flex gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-[220ms] ease-standard hover:border-primary/40 hover:shadow-md ds-reveal"
+            className="group flex gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:border-primary/40 hover:shadow-md ds-reveal"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="shrink-0 rounded-xl bg-primary/10 p-3 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
@@ -166,7 +166,7 @@ export function LatestArticlesSection() {
               key={a.id}
               to="/blog/$slug"
               params={{ slug: a.slug }}
-              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               {a.cover && (
@@ -205,7 +205,7 @@ export function CtaSection() {
         <p className="max-w-2xl text-body-lg opacity-95">{t("brand.tagline")}</p>
         <Link
           to="/contact"
-          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition-all duration-[220ms] ease-standard hover:scale-105"
+          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition-all duration-base ease-standard hover:scale-105"
         >
           {t("contact.title")}
         </Link>

@@ -14,7 +14,7 @@ const buttonVariants = cva(
   [
     "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md",
     "font-semibold cursor-pointer select-none",
-    "transition-[background-color,color,box-shadow,transform] duration-150 ease-standard",
+    "transition-[background-color,color,box-shadow,transform] duration-fast ease-standard",
     "active:scale-[0.98]",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     "disabled:pointer-events-none disabled:opacity-45 disabled:cursor-not-allowed",
@@ -35,9 +35,9 @@ const buttonVariants = cva(
         dark: "bg-surface-dark-alt text-primary-foreground hover:bg-surface-dark",
       },
       size: {
-        sm: "h-9 px-4 text-sm [&_svg]:size-4 rounded-sm",
-        default: "h-11 px-5 text-base [&_svg]:size-5",
-        md: "h-11 px-5 text-base [&_svg]:size-5",
+        sm: "h-9 px-4 text-small [&_svg]:size-4 rounded-sm",
+        default: "h-11 px-5 text-body [&_svg]:size-5",
+        md: "h-11 px-5 text-body [&_svg]:size-5",
         lg: "h-13 px-6 text-[1.0625rem] [&_svg]:size-5",
         icon: "h-11 w-11 [&_svg]:size-5",
         "icon-sm": "h-9 w-9 rounded-sm [&_svg]:size-4",

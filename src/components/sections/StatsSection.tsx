@@ -11,7 +11,7 @@ export function StatsSection() {
         {data.map((s) => (
           <div
             key={s.id}
-            className="group flex flex-col items-center gap-3 rounded-lg border border-border bg-gradient-to-b from-card to-card/50 p-6 text-center shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:shadow-lg"
+            className="group flex flex-col items-center gap-3 rounded-lg border border-border bg-gradient-to-b from-card to-card/50 p-6 text-center shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg"
           >
             <div className="rounded-lg bg-primary/10 p-3 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
               <DynamicIcon name={s.icon} className="h-6 w-6" />

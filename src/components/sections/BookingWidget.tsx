@@ -28,7 +28,7 @@ export function BookingWidget() {
               key={k}
               type="button"
               onClick={() => setType(k)}
-              className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-150 ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+              className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-fast ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
                 type === k
                   ? "bg-primary text-primary-foreground shadow-brand-glow"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"

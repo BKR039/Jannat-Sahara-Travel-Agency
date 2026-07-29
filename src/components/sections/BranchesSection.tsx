@@ -90,7 +90,7 @@ function BranchCard({
           onSelect(branch.id);
         }
       }}
-      className={`group relative cursor-pointer rounded-xl border bg-card/80 p-5 backdrop-blur-xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
+      className={`group relative cursor-pointer rounded-xl border bg-card/80 p-5 backdrop-blur-xl transition-all duration-moderate focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
         ${
           active
             ? "-translate-y-1 border-primary shadow-2xl shadow-primary/25 ring-1 ring-primary/40"
@@ -296,7 +296,7 @@ function ContactInfoGrid() {
       {cards.map((c) => (
         <div
           key={c.key}
-          className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/70 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+          className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/70 p-5 shadow-sm backdrop-blur-xl transition-all duration-moderate hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
         >
           <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 text-primary transition-transform group-hover:scale-110">
             <c.icon className="h-5 w-5" />
@@ -346,7 +346,7 @@ function ContactInfoGrid() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label ?? s.key}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg bg-background/70 text-primary transition-all duration-[220ms] ease-standard hover:scale-110 hover:bg-primary hover:text-primary-foreground"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg bg-background/70 text-primary transition-all duration-base ease-standard hover:scale-110 hover:bg-primary hover:text-primary-foreground"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -403,7 +403,7 @@ function ContactForm({ branches }: { branches: Branch[] }) {
             href={whatsappHref(whatsappItem.value)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-small font-semibold text-primary transition-all duration-[220ms] ease-standard hover:bg-primary hover:text-primary-foreground"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-small font-semibold text-primary transition-all duration-base ease-standard hover:bg-primary hover:text-primary-foreground"
           >
             <MessageCircle className="h-4 w-4" />
             {t("branches.form.whatsappInstead")}

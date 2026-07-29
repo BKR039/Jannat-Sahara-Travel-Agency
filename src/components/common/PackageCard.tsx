@@ -19,7 +19,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
       params={{ slug: pkg.slug }}
       className={cn(
         "group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm",
-        "transition-[box-shadow,transform] duration-[220ms] ease-standard",
+        "transition-[box-shadow,transform] duration-base ease-standard",
         "hover:-translate-y-0.5 hover:shadow-md",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         className,
@@ -32,7 +32,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
             alt={pkg.title}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-[480ms] ease-emphasized group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition-transform duration-slow ease-emphasized group-hover:scale-[1.03]"
           />
         )}
         <div className="absolute inset-0 bg-gradient-hero-scrim opacity-90" />
@@ -95,7 +95,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
               )}
             </div>
           </div>
-          <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-accent px-4 text-small font-semibold text-primary transition-colors duration-150 group-hover:bg-primary group-hover:text-primary-foreground">
+          <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-accent px-4 text-small font-semibold text-primary transition-colors duration-fast group-hover:bg-primary group-hover:text-primary-foreground">
             <Tag className="h-4 w-4" aria-hidden="true" /> {t("actions.bookNow")}
           </span>
         </div>

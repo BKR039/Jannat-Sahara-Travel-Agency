@@ -40,7 +40,7 @@ function BlogPage() {
                 key={a.id}
                 to="/blog/$slug"
                 params={{ slug: a.slug }}
-                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {a.cover && (
