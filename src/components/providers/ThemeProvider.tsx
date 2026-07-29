@@ -69,8 +69,15 @@ export function ThemeProvider({ children, defaultTheme = "system" }: { children:
   );
 }
 
+const FALLBACK_THEME: ThemeContextValue = {
+  theme: "system",
+  resolvedTheme: "light",
+  setTheme: (next) => applyTheme(next),
+  toggleTheme: () => applyTheme(getSystemTheme() === "dark" ? "light" : "dark"),
+};
+
 export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used inside <ThemeProvider>");
-  return ctx;
+  // Fall back instead of throwing: during HMR or a duplicated module instance
+  // the context can be missing, which would blank the whole page.
+  return useContext(ThemeContext) ?? FALLBACK_THEME;
 }
