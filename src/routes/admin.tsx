@@ -43,7 +43,7 @@ function AdminLayout() {
   if (!hasAdminRole(roles)) {
     return (
       <div dir="ltr" className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-md text-center rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-card)]">
+        <div className="max-w-md text-center rounded-2xl border border-border bg-card p-8 shadow-sm">
           <ShieldX className="mx-auto h-10 w-10 text-destructive" />
           <h1 className="mt-4 text-xl font-bold">Access denied</h1>
           <p className="mt-2 text-sm text-muted-foreground">

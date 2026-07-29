@@ -62,7 +62,7 @@ function ResetPasswordPage() {
         <Link to="/" className="mb-8 flex items-center justify-center">
           <Logo />
         </Link>
-        <div className="rounded-2xl border border-border bg-card/80 backdrop-blur shadow-[var(--shadow-elegant)] p-6 sm:p-8">
+        <div className="rounded-2xl border border-border bg-card/80 backdrop-blur shadow-lg p-6 sm:p-8">
           <div className="mb-6 text-center">
             <ShieldCheck className="mx-auto h-8 w-8 text-primary" />
             <h1 className="mt-2 text-2xl font-bold">Set a new password</h1>

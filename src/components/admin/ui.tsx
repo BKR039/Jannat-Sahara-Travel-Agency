@@ -10,9 +10,9 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+        <h1 className="text-h3 text-foreground">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -34,13 +34,13 @@ export function StatCard({
   tone?: "primary" | "green" | "gold" | "muted";
 }) {
   const toneClasses: Record<string, string> = {
-    primary: "bg-primary/10 text-primary",
-    green: "bg-[color:var(--color-brand-green)]/10 text-[color:var(--color-brand-green)]",
-    gold: "bg-[color:var(--color-brand-gold)]/10 text-[color:var(--color-brand-gold)]",
+    primary: "bg-accent text-primary",
+    green: "bg-mint-muted text-brand-green",
+    gold: "bg-secondary-muted text-brand-gold",
     muted: "bg-muted text-muted-foreground",
   };
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+    <div className="rounded-lg border border-border-subtle bg-card p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -69,7 +69,7 @@ export function AdminCard({
   className?: string;
 }) {
   return (
-    <section className={`rounded-xl border border-border bg-card shadow-[var(--shadow-card)] ${className}`}>
+    <section className={`rounded-lg border border-border-subtle bg-card shadow-sm ${className}`}>
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 sm:px-5">
           <div>
@@ -96,7 +96,7 @@ export function EmptyState({
   icon?: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 py-12 px-6 text-center">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-surface-sunken/40 py-12 px-6 text-center">
       {Icon && <Icon className="h-8 w-8 text-muted-foreground" />}
       <p className="mt-3 text-sm font-medium">{title}</p>
       {description && <p className="mt-1 text-xs text-muted-foreground max-w-sm">{description}</p>}
@@ -106,16 +106,16 @@ export function EmptyState({
 }
 
 const STATUS_TONE: Record<string, string> = {
-  new: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  contacted: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-  confirmed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  completed: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
-  cancelled: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-  published: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  draft: "bg-slate-500/10 text-slate-600 dark:text-slate-400",
-  archived: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400",
-  sold_out: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+  new: "bg-info-muted text-info",
+  pending: "bg-warning-muted text-warning",
+  contacted: "bg-secondary-muted text-brand-gold",
+  confirmed: "bg-success-muted text-success",
+  completed: "bg-mint-muted text-brand-green",
+  cancelled: "bg-danger-muted text-destructive",
+  published: "bg-success-muted text-success",
+  draft: "bg-muted text-muted-foreground",
+  archived: "bg-muted text-muted-foreground",
+  sold_out: "bg-danger-muted text-destructive",
 };
 
 export function StatusBadge({ status }: { status: string | null | undefined }) {
