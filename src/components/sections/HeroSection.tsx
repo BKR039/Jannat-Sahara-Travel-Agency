@@ -52,7 +52,6 @@ export function HeroSection() {
             </Link>
           </Button>
         </div>
-        </div>
       </div>
     </section>
   );
