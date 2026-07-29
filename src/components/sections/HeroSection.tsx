@@ -24,10 +24,10 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_20%,rgba(255,255,255,0.15),transparent)]" />
       </div>
 
-      <div className="mx-auto flex min-h-[85vh] max-w-7xl flex-col items-center justify-center gap-6 px-4 py-24 text-center text-white md:px-6">
+      <div className="mx-auto flex min-h-[85vh] max-w-7xl flex-col items-center justify-center gap-6 px-4 py-24 text-center text-on-dark md:px-6">
         <div className="flex flex-wrap justify-center gap-2 animate-fade-in">
           {badges.map((b) => (
-            <span key={b} className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
+            <span key={b} className="rounded-full border border-on-dark/25 bg-on-dark/10 px-3 py-1 text-xs font-medium backdrop-blur">
               {b}
             </span>
           ))}
@@ -37,7 +37,7 @@ export function HeroSection() {
           {hero?.title ?? t("brand.tagline")}
         </h1>
         {hero?.subtitle && (
-          <p className="max-w-2xl text-lg text-white/90 md:text-xl animate-fade-in">
+          <p className="max-w-2xl text-lg text-on-dark/90 md:text-xl animate-fade-in">
             {hero.subtitle}
           </p>
         )}
@@ -57,7 +57,7 @@ export function HeroSection() {
             asChild
             size="lg"
             variant="outline"
-            className="border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+            className="border-on-dark/40 bg-on-dark/10 text-on-dark backdrop-blur hover:bg-on-dark/20"
           >
             <Link to="/about">
               <Play className="me-2 h-4 w-4" /> {t("actions.learnMore")}

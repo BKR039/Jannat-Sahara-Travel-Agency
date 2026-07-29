@@ -51,11 +51,11 @@ function PackagePage() {
           {pkg.cover && <img src={pkg.cover} alt="" className="h-full w-full object-cover" />}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/85" />
         </div>
-        <div className="mx-auto max-w-6xl px-4 py-24 text-white md:px-6">
-          <Link to={`/${pkg.category === "trip" ? "trips" : pkg.category === "flight" ? "flights" : pkg.category}`} className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-white/80 hover:text-white">
+        <div className="mx-auto max-w-6xl px-4 py-24 text-on-dark md:px-6">
+          <Link to={`/${pkg.category === "trip" ? "trips" : pkg.category === "flight" ? "flights" : pkg.category}`} className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-on-dark/80 hover:text-on-dark">
             <ArrowRight className="h-4 w-4 rtl:rotate-180" /> {t("actions.viewAll")}
           </Link>
-          <span className="inline-block rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur">
+          <span className="inline-block rounded-full border border-on-dark/30 bg-on-dark/10 px-3 py-1 text-xs font-semibold backdrop-blur">
             {t(`categories.${pkg.category}`)}
           </span>
           <h1 className="mt-4 text-4xl font-extrabold md:text-6xl">{pkg.title}</h1>

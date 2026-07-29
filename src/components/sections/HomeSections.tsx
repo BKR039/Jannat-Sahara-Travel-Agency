@@ -81,13 +81,13 @@ export function TestimonialsSection() {
           eyebrow="★★★★★"
           title={t("home.testimonials")}
           description={t("home.testimonialsDesc")}
-          className="[&_h2]:text-white [&_p]:text-white/80 [&_span]:border-white/30 [&_span]:bg-white/10 [&_span]:text-white"
+          className="[&_h2]:text-on-dark [&_p]:text-on-dark/80 [&_span]:border-on-dark/30 [&_span]:bg-on-dark/10 [&_span]:text-on-dark"
         />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {data.map((tst, i) => (
             <figure
               key={tst.id}
-              className="flex flex-col gap-4 rounded-2xl bg-white/10 p-6 backdrop-blur animate-fade-in"
+              className="flex flex-col gap-4 rounded-2xl bg-on-dark/10 p-6 backdrop-blur animate-fade-in"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="flex gap-0.5 text-primary">
@@ -137,7 +137,7 @@ export function GalleryPreviewSection() {
             />
             {g.title && (
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
-                <span className="text-sm font-semibold text-white">{g.title}</span>
+                <span className="text-sm font-semibold text-on-dark">{g.title}</span>
               </div>
             )}
           </div>
@@ -205,7 +205,7 @@ export function CtaSection() {
         <p className="max-w-2xl text-lg opacity-95">{t("brand.tagline")}</p>
         <Link
           to="/contact"
-          className="rounded-full bg-white px-8 py-3 text-sm font-bold text-primary shadow-lg transition hover:scale-105"
+          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition hover:scale-105"
         >
           {t("contact.title")}
         </Link>

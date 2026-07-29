@@ -27,8 +27,8 @@ export function PackagesPage({
           <img src={cover} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-brand-green/85 to-brand-green/95" />
         </div>
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-24 text-center text-white md:px-6">
-          <span className="rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-24 text-center text-on-dark md:px-6">
+          <span className="rounded-full border border-on-dark/30 bg-on-dark/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
             {t(`categories.${category}`)}
           </span>
           <h1 className="text-4xl font-extrabold md:text-6xl animate-fade-in">{title}</h1>

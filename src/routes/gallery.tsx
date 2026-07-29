@@ -78,7 +78,7 @@ function GalleryPage() {
                 />
                 {g.title && (
                   <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition group-hover:opacity-100">
-                    <span className="text-sm font-semibold text-white">{g.title}</span>
+                    <span className="text-sm font-semibold text-on-dark">{g.title}</span>
                   </div>
                 )}
               </div>
