@@ -67,7 +67,7 @@ function GalleryPage() {
             {filtered.map((g, i) => (
               <div
                 key={g.id}
-                className="group relative aspect-square overflow-hidden rounded-2xl bg-muted animate-fade-in"
+                className="group relative aspect-square overflow-hidden rounded-lg bg-muted ds-reveal"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 <img

@@ -35,7 +35,7 @@ function AboutPage() {
           <span className="rounded-full border border-on-dark/30 bg-on-dark/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
             {data?.subtitle}
           </span>
-          <h1 className="mt-4 text-4xl font-extrabold md:text-6xl animate-fade-in">
+          <h1 className="mt-4 text-4xl font-extrabold md:text-6xl ds-reveal">
             {data?.title ?? "من نحن"}
           </h1>
         </div>
@@ -46,13 +46,13 @@ function AboutPage() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {extra.mission && (
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="rounded-lg border border-border-subtle bg-card p-6">
               <h3 className="mb-2 text-lg font-bold text-primary">مهمتنا</h3>
               <p className="text-sm text-muted-foreground">{extra.mission}</p>
             </div>
           )}
           {extra.vision && (
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="rounded-lg border border-border-subtle bg-card p-6">
               <h3 className="mb-2 text-lg font-bold text-primary">رؤيتنا</h3>
               <p className="text-sm text-muted-foreground">{extra.vision}</p>
             </div>

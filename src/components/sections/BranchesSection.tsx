@@ -50,7 +50,7 @@ function whatsappHref(phone: string) {
 
 function MapSkeleton() {
   return (
-    <div className="flex h-full min-h-[520px] items-center justify-center rounded-3xl bg-muted/40">
+    <div className="flex h-full min-h-[520px] items-center justify-center rounded-xl bg-muted/40">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
     </div>
   );
@@ -90,7 +90,7 @@ function BranchCard({
           onSelect(branch.id);
         }
       }}
-      className={`group relative cursor-pointer rounded-3xl border bg-card/80 p-5 backdrop-blur-xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
+      className={`group relative cursor-pointer rounded-xl border bg-card/80 p-5 backdrop-blur-xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
         ${
           active
             ? "-translate-y-1 border-primary shadow-2xl shadow-primary/25 ring-1 ring-primary/40"
@@ -98,13 +98,13 @@ function BranchCard({
         }`}
     >
       {active && (
-        <span className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/10 via-transparent to-transparent" />
+        <span className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-primary/10 via-transparent to-transparent" />
       )}
 
       <div className="relative flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors ${
               active
                 ? "bg-primary text-primary-foreground"
                 : "bg-gradient-to-br from-primary/15 to-primary/5 text-primary"
@@ -296,9 +296,9 @@ function ContactInfoGrid() {
       {cards.map((c) => (
         <div
           key={c.key}
-          className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card/70 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+          className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/70 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
         >
-          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary transition-transform group-hover:scale-110">
+          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 text-primary transition-transform group-hover:scale-110">
             <c.icon className="h-5 w-5" />
           </div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -332,7 +332,7 @@ function ContactInfoGrid() {
       ))}
 
       {socials.length > 0 && (
-        <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-primary/10 via-card/70 to-card/60 p-5 shadow-sm backdrop-blur-xl sm:col-span-2 lg:col-span-1 xl:col-span-1">
+        <div className="rounded-xl border border-border/60 bg-gradient-to-br from-primary/10 via-card/70 to-card/60 p-5 shadow-sm backdrop-blur-xl sm:col-span-2 lg:col-span-1 xl:col-span-1">
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t("branches.contactCard.follow")}
           </p>
@@ -346,7 +346,7 @@ function ContactInfoGrid() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label ?? s.key}
-                  className="flex h-11 w-11 items-center justify-center rounded-2xl bg-background/70 text-primary transition hover:scale-110 hover:bg-primary hover:text-primary-foreground"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg bg-background/70 text-primary transition-all duration-[220ms] ease-standard hover:scale-110 hover:bg-primary hover:text-primary-foreground"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -394,7 +394,7 @@ function ContactForm({ branches }: { branches: Branch[] }) {
   };
 
   return (
-    <div className="grid gap-6 rounded-3xl border border-border/60 bg-card/70 p-6 shadow-xl shadow-primary/5 backdrop-blur-xl md:p-8 lg:grid-cols-5">
+    <div className="grid gap-6 rounded-xl border border-border/60 bg-card/70 p-6 shadow-xl shadow-primary/5 backdrop-blur-xl md:p-8 lg:grid-cols-5">
       <div className="lg:col-span-2">
         <h3 className="text-2xl font-bold">{t("branches.form.title")}</h3>
         <p className="mt-2 text-sm text-muted-foreground">{t("branches.form.subtitle")}</p>
@@ -403,7 +403,7 @@ function ContactForm({ branches }: { branches: Branch[] }) {
             href={whatsappHref(whatsappItem.value)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-all duration-[220ms] ease-standard hover:bg-primary hover:text-primary-foreground"
           >
             <MessageCircle className="h-4 w-4" />
             {t("branches.form.whatsappInstead")}
@@ -413,7 +413,7 @@ function ContactForm({ branches }: { branches: Branch[] }) {
 
       <form onSubmit={onSubmit} className="space-y-4 lg:col-span-3">
         {sent && (
-          <div className="flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-primary animate-fade-in">
+          <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-4 text-primary ds-reveal">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Check className="h-5 w-5" />
             </div>
@@ -528,7 +528,7 @@ export function BranchesSection() {
             <div className="hidden max-h-[560px] flex-col gap-3 overflow-y-auto pr-1 lg:flex">
               {isLoading
                 ? [0, 1, 2].map((i) => (
-                    <div key={i} className="h-40 animate-pulse rounded-3xl bg-muted/50" />
+                    <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/50" />
                   ))
                 : branches.map((b) => (
                     <BranchCard
@@ -549,7 +549,7 @@ export function BranchesSection() {
                 ? [0, 1].map((i) => (
                     <div
                       key={i}
-                      className="h-52 w-[85%] shrink-0 animate-pulse rounded-3xl bg-muted/50"
+                      className="h-52 w-[85%] shrink-0 animate-pulse rounded-xl bg-muted/50"
                     />
                   ))
                 : branches.map((b) => (
@@ -572,7 +572,7 @@ export function BranchesSection() {
 
           {/* Map — desktop: right 60%, mobile: on top (order-1) */}
           <div className="order-1 lg:order-2 lg:col-span-3">
-            <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/50 p-1.5 shadow-2xl shadow-primary/10 backdrop-blur">
+            <div className="overflow-hidden rounded-xl border border-border/60 bg-card/50 p-1.5 shadow-2xl shadow-primary/10 backdrop-blur">
               <Suspense fallback={<MapSkeleton />}>
                 {mounted && branches.length > 0 ? (
                   <BranchesMap

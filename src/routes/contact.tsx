@@ -64,7 +64,7 @@ function ContactPage() {
             {details.map((c, i) => (
               <div
                 key={c.id}
-                className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 animate-fade-in"
+                className="flex items-start gap-4 rounded-lg border border-border-subtle bg-card p-5 ds-reveal"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="rounded-xl bg-primary/10 p-3 text-primary">
@@ -80,7 +80,7 @@ function ContactPage() {
             ))}
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <form onSubmit={onSubmit} className="space-y-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm">
             <div className="grid gap-4 sm:grid-cols-2">
               <Input name="name" required placeholder={t("contact.name")} />
               <Input name="email" type="email" required placeholder={t("contact.email")} />

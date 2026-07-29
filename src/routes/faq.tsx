@@ -42,7 +42,7 @@ function FaqPage() {
               <AccordionItem
                 key={f.id}
                 value={f.id}
-                className="rounded-2xl border border-border bg-card px-5 animate-fade-in"
+                className="rounded-lg border border-border-subtle bg-card px-5 ds-reveal"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <AccordionTrigger className="text-start text-base font-semibold">

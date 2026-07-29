@@ -42,7 +42,7 @@ export function FeaturedPackagesSection({
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {data?.slice(0, 4).map((p, i) => (
-              <div key={p.id} className="animate-fade-in" style={{ animationDelay: `${i * 80}ms` }}>
+              <div key={p.id} className="ds-reveal" style={{ animationDelay: `${i * 80}ms` }}>
                 <PackageCard pkg={p} />
               </div>
             ))}

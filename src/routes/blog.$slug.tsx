@@ -24,7 +24,7 @@ function ArticlePage() {
       <SiteLayout>
         <div className="mx-auto max-w-3xl animate-pulse space-y-6 px-4 py-16">
           <div className="h-8 w-3/4 rounded bg-muted" />
-          <div className="aspect-[16/9] rounded-2xl bg-muted" />
+          <div className="aspect-[16/9] rounded-lg bg-muted" />
           <div className="space-y-2">
             <div className="h-4 rounded bg-muted" />
             <div className="h-4 w-5/6 rounded bg-muted" />
@@ -49,7 +49,7 @@ function ArticlePage() {
         <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">{article.title}</h1>
         {article.excerpt && <p className="mt-4 text-lg text-muted-foreground">{article.excerpt}</p>}
         {article.cover && (
-          <img src={article.cover} alt={article.title} className="mt-8 aspect-[16/9] w-full rounded-2xl object-cover" />
+          <img src={article.cover} alt={article.title} className="mt-8 aspect-[16/9] w-full rounded-lg object-cover" />
         )}
         {article.content && (
           <div className="prose prose-lg mt-8 max-w-none text-foreground/90 whitespace-pre-wrap leading-relaxed">

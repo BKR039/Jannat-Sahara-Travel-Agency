@@ -27,7 +27,7 @@ function PackagePage() {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-6xl animate-pulse space-y-6 px-4 py-16">
-          <div className="aspect-[16/9] rounded-2xl bg-muted" />
+          <div className="aspect-[16/9] rounded-lg bg-muted" />
           <div className="h-8 w-1/2 rounded bg-muted" />
         </div>
       </SiteLayout>
@@ -66,7 +66,7 @@ function PackagePage() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 lg:grid-cols-3 md:px-6">
         <div className="space-y-8 lg:col-span-2">
           {pkg.description && (
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="rounded-lg border border-border-subtle bg-card p-6">
               <p className="leading-relaxed text-foreground/90">{pkg.description}</p>
             </div>
           )}
@@ -76,7 +76,7 @@ function PackagePage() {
               <h2 className="mb-4 text-2xl font-bold">{t("package.timeline")}</h2>
               <ol className="space-y-4">
                 {timeline.map((step, i) => (
-                  <li key={i} className="relative rounded-2xl border border-border bg-card p-5">
+                  <li key={i} className="relative rounded-lg border border-border-subtle bg-card p-5">
                     <div className="mb-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{step.day}</div>
                     <h3 className="mb-1 font-bold">{step.title}</h3>
                     <p className="text-sm text-muted-foreground">{step.description}</p>
@@ -88,7 +88,7 @@ function PackagePage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             {included.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6">
+              <div className="rounded-lg border border-border-subtle bg-card p-6">
                 <h3 className="mb-4 flex items-center gap-2 font-bold text-primary">
                   <Check className="h-5 w-5" /> {t("package.included")}
                 </h3>
@@ -100,7 +100,7 @@ function PackagePage() {
               </div>
             )}
             {excluded.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6">
+              <div className="rounded-lg border border-border-subtle bg-card p-6">
                 <h3 className="mb-4 flex items-center gap-2 font-bold text-destructive">
                   <X className="h-5 w-5" /> {t("package.excluded")}
                 </h3>
@@ -126,7 +126,7 @@ function PackagePage() {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:h-fit">
-          <div className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm">
             <div>
               <p className="text-xs text-muted-foreground">{t("package.from")}</p>
               <div className="flex items-baseline gap-2">
