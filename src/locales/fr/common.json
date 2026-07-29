@@ -160,7 +160,16 @@
       "selectBranch": "Choisir une agence",
       "whatsappInstead": "Ou via WhatsApp",
       "thanks": "Message reçu. Nous vous contactons très bientôt."
-    }
+    },
+    "searchPlaceholder": "Rechercher une agence ou une ville…",
+    "allCities": "Toutes les villes",
+    "noResults": "Aucune agence ne correspond à votre recherche",
+    "branchesCount": "agences",
+    "copyAddress": "Copier l'adresse",
+    "addressCopied": "Adresse copiée",
+    "office": "Bureau",
+    "selectHint": "Sélectionnez une agence pour la voir sur la carte",
+    "kicker": "Notre réseau",
+    "contactKicker": "Nous contacter"
   }
 }
-
