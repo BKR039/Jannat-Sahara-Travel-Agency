@@ -40,7 +40,7 @@ function BlogPage() {
                 key={a.id}
                 to="/blog/$slug"
                 params={{ slug: a.slug }}
-                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {a.cover && (
@@ -49,15 +49,15 @@ function BlogPage() {
                   </div>
                 )}
                 <div className="flex flex-1 flex-col gap-3 p-5">
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-caption text-muted-foreground">
                     {a.published_at && new Date(a.published_at).toLocaleDateString("ar-EG")}
                     {a.author && ` · ${a.author}`}
                   </div>
                   <h3 className="line-clamp-2 text-card-title text-foreground group-hover:text-primary">
                     {a.title}
                   </h3>
-                  {a.excerpt && <p className="line-clamp-3 text-sm text-muted-foreground">{a.excerpt}</p>}
-                  <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                  {a.excerpt && <p className="line-clamp-3 text-small text-muted-foreground">{a.excerpt}</p>}
+                  <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
                     {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                   </span>
                 </div>

@@ -23,15 +23,15 @@ export function ServicesSection() {
             <Link
               key={s.id}
               to={`/${s.slug}` as string}
-              className="group flex flex-col gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg ds-reveal"
+              className="group flex flex-col gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-md">
                 <DynamicIcon name={s.icon} className="h-7 w-7" />
               </div>
               <h3 className="text-card-title text-foreground">{s.title}</h3>
-              {s.description && <p className="text-sm text-muted-foreground">{s.description}</p>}
-              <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-primary">
+              {s.description && <p className="text-small text-muted-foreground">{s.description}</p>}
+              <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
                 {t("actions.learnMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
               </span>
             </Link>
@@ -53,7 +53,7 @@ export function FeaturesSection() {
         {data.map((f, i) => (
           <div
             key={f.id}
-            className="group flex gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-[220ms] ease-standard hover:border-primary/40 hover:shadow-md ds-reveal"
+            className="group flex gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:border-primary/40 hover:shadow-md ds-reveal"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="shrink-0 rounded-xl bg-primary/10 p-3 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
@@ -61,7 +61,7 @@ export function FeaturesSection() {
             </div>
             <div>
               <h3 className="mb-1 font-bold text-foreground">{f.title}</h3>
-              {f.description && <p className="text-sm text-muted-foreground">{f.description}</p>}
+              {f.description && <p className="text-small text-muted-foreground">{f.description}</p>}
             </div>
           </div>
         ))}
@@ -95,14 +95,14 @@ export function TestimonialsSection() {
                   <Star key={k} className="h-4 w-4 fill-current" />
                 ))}
               </div>
-              <blockquote className="text-sm leading-relaxed opacity-95">"{tst.content}"</blockquote>
+              <blockquote className="text-small leading-relaxed opacity-95">"{tst.content}"</blockquote>
               <figcaption className="mt-auto flex items-center gap-3 border-t border-white/15 pt-4">
                 {tst.avatar && (
                   <img src={tst.avatar} alt={tst.name} className="h-10 w-10 rounded-full object-cover" />
                 )}
                 <div>
-                  <div className="text-sm font-bold">{tst.name}</div>
-                  {tst.role && <div className="text-xs opacity-75">{tst.role}</div>}
+                  <div className="text-small font-bold">{tst.name}</div>
+                  {tst.role && <div className="text-caption opacity-75">{tst.role}</div>}
                 </div>
               </figcaption>
             </figure>
@@ -137,14 +137,14 @@ export function GalleryPreviewSection() {
             />
             {g.title && (
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
-                <span className="text-sm font-semibold text-on-dark">{g.title}</span>
+                <span className="text-small font-semibold text-on-dark">{g.title}</span>
               </div>
             )}
           </div>
         ))}
       </div>
       <div className="mt-8 text-center">
-        <Link to="/gallery" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+        <Link to="/gallery" className="inline-flex items-center gap-1 text-small font-semibold text-primary hover:underline">
           {t("actions.viewAll")} <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         </Link>
       </div>
@@ -166,7 +166,7 @@ export function LatestArticlesSection() {
               key={a.id}
               to="/blog/$slug"
               params={{ slug: a.slug }}
-              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-[220ms] ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               {a.cover && (
@@ -175,14 +175,14 @@ export function LatestArticlesSection() {
                 </div>
               )}
               <div className="flex flex-1 flex-col gap-3 p-5">
-                <div className="text-xs text-muted-foreground">
+                <div className="text-caption text-muted-foreground">
                   {a.published_at && new Date(a.published_at).toLocaleDateString("ar-EG")}
                 </div>
                 <h3 className="line-clamp-2 text-card-title text-foreground group-hover:text-primary">
                   {a.title}
                 </h3>
-                {a.excerpt && <p className="line-clamp-3 text-sm text-muted-foreground">{a.excerpt}</p>}
-                <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                {a.excerpt && <p className="line-clamp-3 text-small text-muted-foreground">{a.excerpt}</p>}
+                <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
                   {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                 </span>
               </div>
@@ -201,11 +201,11 @@ export function CtaSection() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary to-primary/80" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_50%_20%,rgba(255,255,255,0.2),transparent)]" />
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center text-primary-foreground md:px-6">
-        <h2 className="text-3xl font-extrabold md:text-5xl">{t("home.featuredPackages")}</h2>
-        <p className="max-w-2xl text-lg opacity-95">{t("brand.tagline")}</p>
+        <h2 className="text-h2 font-extrabold ">{t("home.featuredPackages")}</h2>
+        <p className="max-w-2xl text-body-lg opacity-95">{t("brand.tagline")}</p>
         <Link
           to="/contact"
-          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition-all duration-[220ms] ease-standard hover:scale-105"
+          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition-all duration-base ease-standard hover:scale-105"
         >
           {t("contact.title")}
         </Link>

@@ -52,14 +52,14 @@ function PackagePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/85" />
         </div>
         <div className="mx-auto max-w-6xl px-4 py-24 text-on-dark md:px-6">
-          <Link to={`/${pkg.category === "trip" ? "trips" : pkg.category === "flight" ? "flights" : pkg.category}`} className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-on-dark/80 hover:text-on-dark">
+          <Link to={`/${pkg.category === "trip" ? "trips" : pkg.category === "flight" ? "flights" : pkg.category}`} className="mb-4 inline-flex items-center gap-1 text-small font-semibold text-on-dark/80 hover:text-on-dark">
             <ArrowRight className="h-4 w-4 rtl:rotate-180" /> {t("actions.viewAll")}
           </Link>
-          <span className="inline-block rounded-full border border-on-dark/30 bg-on-dark/10 px-3 py-1 text-xs font-semibold backdrop-blur">
+          <span className="inline-block rounded-full border border-on-dark/30 bg-on-dark/10 px-3 py-1 text-caption font-semibold backdrop-blur">
             {t(`categories.${pkg.category}`)}
           </span>
-          <h1 className="mt-4 text-4xl font-extrabold md:text-6xl">{pkg.title}</h1>
-          {pkg.short_description && <p className="mt-3 max-w-2xl text-lg opacity-90">{pkg.short_description}</p>}
+          <h1 className="mt-4 text-h1 font-extrabold ">{pkg.title}</h1>
+          {pkg.short_description && <p className="mt-3 max-w-2xl text-body-lg opacity-90">{pkg.short_description}</p>}
         </div>
       </section>
 
@@ -73,13 +73,13 @@ function PackagePage() {
 
           {timeline.length > 0 && (
             <section>
-              <h2 className="mb-4 text-2xl font-bold">{t("package.timeline")}</h2>
+              <h2 className="mb-4 text-h3 font-bold">{t("package.timeline")}</h2>
               <ol className="space-y-4">
                 {timeline.map((step, i) => (
                   <li key={i} className="relative rounded-lg border border-border-subtle bg-card p-5">
-                    <div className="mb-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{step.day}</div>
+                    <div className="mb-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-caption font-bold text-primary">{step.day}</div>
                     <h3 className="mb-1 font-bold">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                    <p className="text-small text-muted-foreground">{step.description}</p>
                   </li>
                 ))}
               </ol>
@@ -92,7 +92,7 @@ function PackagePage() {
                 <h3 className="mb-4 flex items-center gap-2 font-bold text-primary">
                   <Check className="h-5 w-5" /> {t("package.included")}
                 </h3>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 text-small">
                   {included.map((it, i) => (
                     <li key={i} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-primary" />{it}</li>
                   ))}
@@ -104,7 +104,7 @@ function PackagePage() {
                 <h3 className="mb-4 flex items-center gap-2 font-bold text-destructive">
                   <X className="h-5 w-5" /> {t("package.excluded")}
                 </h3>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 text-small">
                   {excluded.map((it, i) => (
                     <li key={i} className="flex gap-2 text-muted-foreground"><X className="h-4 w-4 shrink-0" />{it}</li>
                   ))}
@@ -115,7 +115,7 @@ function PackagePage() {
 
           {gallery.length > 0 && (
             <section>
-              <h2 className="mb-4 text-2xl font-bold">{t("package.gallery")}</h2>
+              <h2 className="mb-4 text-h3 font-bold">{t("package.gallery")}</h2>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {gallery.map((img, i) => (
                   <img key={i} src={img} alt="" loading="lazy" className="aspect-square rounded-xl object-cover" />
@@ -128,19 +128,19 @@ function PackagePage() {
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           <div className="space-y-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm">
             <div>
-              <p className="text-xs text-muted-foreground">{t("package.from")}</p>
+              <p className="text-caption text-muted-foreground">{t("package.from")}</p>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-primary">
+                <span className="text-h2 font-extrabold text-primary">
                   {(discounted ?? Number(pkg.price)).toLocaleString()} {pkg.currency}
                 </span>
                 {discounted !== null && (
-                  <span className="text-sm text-muted-foreground line-through">
+                  <span className="text-small text-muted-foreground line-through">
                     {Number(pkg.price).toLocaleString()}
                   </span>
                 )}
               </div>
             </div>
-            <div className="space-y-2 border-t border-border pt-4 text-sm">
+            <div className="space-y-2 border-t border-border pt-4 text-small">
               {pkg.destination && (
                 <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {pkg.destination}</div>
               )}

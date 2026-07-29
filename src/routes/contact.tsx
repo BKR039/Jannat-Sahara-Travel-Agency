@@ -71,7 +71,7 @@ function ContactPage() {
                   <DynamicIcon name={c.icon} className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{c.label}</div>
+                  <div className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">{c.label}</div>
                   <div className="mt-1 font-semibold text-foreground" dir={["phone", "mobile", "email"].includes(c.key) ? "ltr" : undefined}>
                     {c.value}
                   </div>

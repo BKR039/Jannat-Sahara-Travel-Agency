@@ -32,7 +32,7 @@ export function Footer() {
           <div className="rounded-xl bg-background/10 p-3 backdrop-blur w-fit">
             <Logo className="[&_span]:text-brand-green-foreground" />
           </div>
-          <p className="text-sm opacity-80 max-w-xs">{t("brand.tagline")}</p>
+          <p className="text-small opacity-80 max-w-xs">{t("brand.tagline")}</p>
           <div className="flex gap-3">
             {info
               ?.filter((c) => ["facebook", "instagram", "whatsapp"].includes(c.key))
@@ -52,10 +52,10 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider opacity-90">
+          <h3 className="mb-4 text-small font-semibold uppercase tracking-wider opacity-90">
             {t("footer.quickLinks")}
           </h3>
-          <ul className="space-y-2 text-sm opacity-80">
+          <ul className="space-y-2 text-small opacity-80">
             {QUICK_LINKS.map((l) => (
               <li key={l.key}>
                 <Link to={l.to} className="hover:text-primary transition-colors">
@@ -67,10 +67,10 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider opacity-90">
+          <h3 className="mb-4 text-small font-semibold uppercase tracking-wider opacity-90">
             {t("footer.services")}
           </h3>
-          <ul className="space-y-2 text-sm opacity-80">
+          <ul className="space-y-2 text-small opacity-80">
             {SERVICE_LINKS.map((l) => (
               <li key={l.key}>
                 <Link to={l.to} className="hover:text-primary transition-colors">
@@ -82,10 +82,10 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider opacity-90">
+          <h3 className="mb-4 text-small font-semibold uppercase tracking-wider opacity-90">
             {t("footer.contact")}
           </h3>
-          <ul className="space-y-3 text-sm opacity-80">
+          <ul className="space-y-3 text-small opacity-80">
             {info
               ?.filter((c) => ["address", "phone", "mobile", "email", "hours"].includes(c.key))
               .map((c) => (
@@ -101,7 +101,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs opacity-70 md:flex-row md:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-caption opacity-70 md:flex-row md:px-6">
           <p>
             © {year} {t("brand.name")}. {t("footer.rights")}.
           </p>

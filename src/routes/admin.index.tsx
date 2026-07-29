@@ -38,7 +38,7 @@ export const Route = createFileRoute("/admin/")({
   component: DashboardPage,
 });
 
-const CHART_COLORS = ["#E8722C", "#0F3D2E", "#D4A574", "#8B4513", "#3A6B4F"];
+const CHART_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"];
 
 function DashboardPage() {
   const fetchStats = useServerFn(getDashboardStats);
@@ -93,7 +93,7 @@ function DashboardPage() {
                 <XAxis dataKey="month" fontSize={11} />
                 <YAxis fontSize={11} allowDecimals={false} />
                 <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)" }} />
-                <Bar dataKey="count" fill="#E8722C" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="count" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -134,12 +134,12 @@ function DashboardPage() {
               {recent.data.map((b) => (
                 <li key={b.id} className="flex items-center justify-between gap-3 px-4 sm:px-5 py-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{b.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-small font-medium truncate">{b.name}</p>
+                    <p className="text-caption text-muted-foreground truncate">
                       {b.package_title ?? "General"} · {b.package_category ?? "—"}
                     </p>
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-caption text-muted-foreground">
                     {new Date(b.created_at).toLocaleDateString()}
                   </div>
                 </li>
@@ -149,14 +149,14 @@ function DashboardPage() {
             <EmptyState title="No bookings yet" icon={Calendar} />
           )}
           <div className="mt-4 text-right">
-            <Link to="/admin/bookings" className="text-xs font-medium text-primary hover:underline">
+            <Link to="/admin/bookings" className="text-caption font-medium text-primary hover:underline">
               View all bookings →
             </Link>
           </div>
         </AdminCard>
 
         <AdminCard title="Attention needed">
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-small">
             <li className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2">
               <span className="inline-flex items-center gap-2">
                 <Users className="h-4 w-4 text-primary" />

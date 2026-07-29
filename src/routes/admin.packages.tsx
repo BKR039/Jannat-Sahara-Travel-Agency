@@ -164,12 +164,12 @@ function PackagesAdminPage() {
 
       <AdminCard>
         {list.isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-small text-muted-foreground">Loading…</p>
         ) : !list.data?.length ? (
           <EmptyState title="No packages yet" description="Create your first package to get started." icon={PackageIcon} />
         ) : (
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
-            <table className="w-full text-sm">
+            <table className="w-full text-small">
               <thead>
                 <tr className="border-b border-border text-left">
                   <th className="px-4 sm:px-5 py-2 font-semibold">Title</th>
@@ -187,9 +187,9 @@ function PackagesAdminPage() {
                   <tr key={p.id} className="border-b border-border/60 hover:bg-muted/30">
                     <td className="px-4 sm:px-5 py-3">
                       <div className="font-medium">{p.title}</div>
-                      <div className="text-xs text-muted-foreground">/{p.slug}</div>
+                      <div className="text-caption text-muted-foreground">/{p.slug}</div>
                     </td>
-                    <td className="px-4 py-3 uppercase text-xs">{p.category}</td>
+                    <td className="px-4 py-3 uppercase text-caption">{p.category}</td>
                     <td className="px-4 py-3">{p.destination ?? "—"}</td>
                     <td className="px-4 py-3 tabular-nums">
                       {p.price} {p.currency}
@@ -528,7 +528,7 @@ function PackageEditor({
           <FormField label="Cover image URL" className="sm:col-span-2">
             <div className="flex gap-2">
               <Input value={form.cover} onChange={(e) => update("cover", e.target.value)} placeholder="https://…" />
-              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-sm cursor-pointer hover:bg-accent">
+              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-small cursor-pointer hover:bg-accent">
                 <Upload className="h-4 w-4" />
                 <input type="file" accept="image/*" className="sr-only" onChange={handleCoverUpload} />
               </label>
@@ -539,7 +539,7 @@ function PackageEditor({
           <FormField label="Brochure PDF" className="sm:col-span-2">
             <div className="flex gap-2">
               <Input value={form.brochure_pdf} onChange={(e) => update("brochure_pdf", e.target.value)} placeholder="https://…/brochure.pdf" />
-              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-sm cursor-pointer hover:bg-accent">
+              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-small cursor-pointer hover:bg-accent">
                 <Upload className="h-4 w-4" />
                 <input type="file" accept="application/pdf" className="sr-only" onChange={handleBrochureUpload} />
               </label>
@@ -548,7 +548,7 @@ function PackageEditor({
 
           <FormField label="Gallery URLs (one per line)" className="sm:col-span-2">
             <Textarea rows={3} value={form.gallery} onChange={(e) => update("gallery", e.target.value)} />
-            <label className="mt-2 inline-flex items-center gap-1 rounded-md border border-input px-3 py-1.5 text-sm cursor-pointer hover:bg-accent">
+            <label className="mt-2 inline-flex items-center gap-1 rounded-md border border-input px-3 py-1.5 text-small cursor-pointer hover:bg-accent">
               <Upload className="h-4 w-4" /> Upload images
               <input type="file" accept="image/*" multiple className="sr-only" onChange={handleGalleryUpload} />
             </label>
@@ -586,7 +586,7 @@ function PackageEditor({
 function FormField({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={`grid gap-1 ${className}`}>
-      <Label className="text-xs font-semibold">{label}</Label>
+      <Label className="text-caption font-semibold">{label}</Label>
       {children}
     </div>
   );

@@ -28,7 +28,7 @@ export function BookingWidget() {
               key={k}
               type="button"
               onClick={() => setType(k)}
-              className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-150 ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+              className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-fast ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
                 type === k
                   ? "bg-primary text-primary-foreground shadow-brand-glow"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -53,12 +53,12 @@ export function BookingWidget() {
               placeholder={t("home.bookingWidget.destination")}
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full bg-transparent text-base outline-none"
+              className="w-full bg-transparent text-body outline-none"
             />
           </label>
           <label className="flex items-center gap-2 rounded-sm border border-input bg-surface px-4 py-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            <input type="date" className="w-full bg-transparent text-base outline-none" />
+            <input type="date" className="w-full bg-transparent text-body outline-none" />
           </label>
           <Button type="submit" size="lg" >
             <Search className="me-2 h-4 w-4" />

@@ -62,15 +62,15 @@ function ResetPasswordPage() {
         <Link to="/" className="mb-8 flex items-center justify-center">
           <Logo />
         </Link>
-        <div className="rounded-2xl border border-border bg-card/80 backdrop-blur shadow-lg p-6 sm:p-8">
+        <div className="rounded-lg border border-border bg-card/80 backdrop-blur shadow-lg p-6 sm:p-8">
           <div className="mb-6 text-center">
             <ShieldCheck className="mx-auto h-8 w-8 text-primary" />
-            <h1 className="mt-2 text-2xl font-bold">Set a new password</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Choose a strong password for your admin account.</p>
+            <h1 className="mt-2 text-h3 font-bold">Set a new password</h1>
+            <p className="mt-1 text-small text-muted-foreground">Choose a strong password for your admin account.</p>
           </div>
 
           {!ready ? (
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-small text-muted-foreground">
               Waiting for a valid recovery link… If this page loaded directly, request a fresh link from
               <Link to="/auth" className="text-primary hover:underline"> the sign-in page</Link>.
             </p>

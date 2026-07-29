@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
           aria-label={t("actions.changeLanguage")}
         >
           <Globe className="h-4 w-4" />
-          <span className="text-sm font-medium">{LABELS[current]}</span>
+          <span className="text-small font-medium">{LABELS[current]}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

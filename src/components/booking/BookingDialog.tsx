@@ -200,7 +200,7 @@ export function BookingDialog({ packageId, packageTitle, packageCategory, trigge
             <Label htmlFor="b-passport">{t("booking.fields.passport")}</Label>
             <label
               htmlFor="b-passport"
-              className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3 text-sm transition-all duration-[220ms] ease-standard hover:bg-muted"
+              className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3 text-small transition-all duration-base ease-standard hover:bg-muted"
             >
               {file ? (
                 <>

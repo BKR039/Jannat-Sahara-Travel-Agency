@@ -39,7 +39,7 @@ function GalleryPage() {
         <div className="mb-8 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => setCat(null)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+            className={`rounded-full px-4 py-2 text-small font-semibold transition ${
               cat === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
@@ -49,7 +49,7 @@ function GalleryPage() {
             <button
               key={c}
               onClick={() => setCat(c)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+              className={`rounded-full px-4 py-2 text-small font-semibold transition ${
                 cat === c ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
             >
@@ -78,7 +78,7 @@ function GalleryPage() {
                 />
                 {g.title && (
                   <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition group-hover:opacity-100">
-                    <span className="text-sm font-semibold text-on-dark">{g.title}</span>
+                    <span className="text-small font-semibold text-on-dark">{g.title}</span>
                   </div>
                 )}
               </div>

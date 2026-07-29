@@ -32,29 +32,29 @@ function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-brand-green/85 to-brand-green/95" />
         </div>
         <div className="mx-auto max-w-4xl px-4 py-24 text-center text-on-dark md:px-6">
-          <span className="rounded-full border border-on-dark/30 bg-on-dark/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
+          <span className="rounded-full border border-on-dark/30 bg-on-dark/10 px-4 py-1 text-caption font-semibold uppercase tracking-widest backdrop-blur">
             {data?.subtitle}
           </span>
-          <h1 className="mt-4 text-4xl font-extrabold md:text-6xl ds-reveal">
+          <h1 className="mt-4 text-h1 font-extrabold ds-reveal">
             {data?.title ?? "من نحن"}
           </h1>
         </div>
       </section>
 
       <section className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-        <p className="text-lg leading-relaxed text-foreground/90">{data?.body}</p>
+        <p className="text-body-lg leading-relaxed text-foreground/90">{data?.body}</p>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {extra.mission && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <h3 className="mb-2 text-lg font-bold text-primary">مهمتنا</h3>
-              <p className="text-sm text-muted-foreground">{extra.mission}</p>
+              <h3 className="mb-2 text-body-lg font-bold text-primary">مهمتنا</h3>
+              <p className="text-small text-muted-foreground">{extra.mission}</p>
             </div>
           )}
           {extra.vision && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <h3 className="mb-2 text-lg font-bold text-primary">رؤيتنا</h3>
-              <p className="text-sm text-muted-foreground">{extra.vision}</p>
+              <h3 className="mb-2 text-body-lg font-bold text-primary">رؤيتنا</h3>
+              <p className="text-small text-muted-foreground">{extra.vision}</p>
             </div>
           )}
         </div>
@@ -64,7 +64,7 @@ function AboutPage() {
             <SectionHeading title="قيمنا" align="start" className="mb-6" />
             <div className="flex flex-wrap gap-3">
               {extra.values.map((v) => (
-                <span key={v} className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+                <span key={v} className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-small font-semibold text-primary">
                   {v}
                 </span>
               ))}

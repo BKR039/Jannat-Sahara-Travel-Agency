@@ -64,11 +64,11 @@ function BlogAdminPage() {
     <>
       <PageHeader title="Blog" description="Articles shown on the public blog." actions={<Button onClick={() => setCreating(true)}><Plus className="me-2 h-4 w-4" /> New article</Button>} />
       <AdminCard>
-        {list.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !list.data?.length ? (
+        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
           <EmptyState title="No articles yet" icon={Newspaper} />
         ) : (
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
-            <table className="w-full text-sm">
+            <table className="w-full text-small">
               <thead><tr className="border-b border-border text-left">
                 <th className="px-4 sm:px-5 py-2 font-semibold">Title</th>
                 <th className="px-4 py-2 font-semibold">Slug</th>
@@ -84,17 +84,17 @@ function BlogAdminPage() {
                         {a.cover && <img src={a.cover} alt="" className="h-10 w-10 rounded object-cover" />}
                         <div>
                           <div className="font-medium">{a.title}</div>
-                          <div className="text-xs text-muted-foreground line-clamp-1">{a.excerpt}</div>
+                          <div className="text-caption text-muted-foreground line-clamp-1">{a.excerpt}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">/{a.slug}</td>
+                    <td className="px-4 py-3 text-caption text-muted-foreground">/{a.slug}</td>
                     <td className="px-4 py-3">
                       <button onClick={() => togglePublish.mutate(a)} title={a.published ? "Unpublish" : "Publish"}>
-                        {a.published ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+                        {a.published ? <Eye className="h-4 w-4 text-success" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-xs">{a.published_at ? new Date(a.published_at).toLocaleDateString() : "—"}</td>
+                    <td className="px-4 py-3 text-caption">{a.published_at ? new Date(a.published_at).toLocaleDateString() : "—"}</td>
                     <td className="px-4 sm:px-5 py-3 text-right">
                       <Button size="icon" variant="ghost" onClick={() => setEditing(a)}><Edit3 className="h-4 w-4" /></Button>
                       <AlertDialog>
@@ -186,7 +186,7 @@ function ArticleEditor({ initial, onClose, onSaved }: { initial: Article | null;
           <div className="grid gap-1 sm:col-span-2"><Label>Cover image</Label>
             <div className="flex gap-2">
               <Input value={f.cover} onChange={(e) => setF({ ...f, cover: e.target.value })} placeholder="https://…" />
-              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-sm cursor-pointer hover:bg-accent">
+              <label className="inline-flex items-center gap-1 rounded-md border border-input px-3 text-small cursor-pointer hover:bg-accent">
                 <Upload className="h-4 w-4" /><input type="file" accept="image/*" className="sr-only" onChange={upload} />
               </label>
             </div>

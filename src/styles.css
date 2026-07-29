@@ -594,6 +594,22 @@
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
 }
+@utility text-small {
+  font-family: var(--font-body);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-body);
+}
+@utility text-button {
+  font-family: var(--font-body);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+@utility text-input {
+  font-family: var(--font-body);
+  font-size: var(--font-size-input);
+  line-height: var(--line-height-body);
+}
 @utility text-caption {
   font-family: var(--font-body);
   font-size: var(--font-size-caption);
@@ -734,4 +750,21 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* DS motion durations as utilities (tokens/motion.css) */
+@utility duration-instant {
+  transition-duration: var(--duration-instant);
+}
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+@utility duration-base {
+  transition-duration: var(--duration-base);
+}
+@utility duration-moderate {
+  transition-duration: var(--duration-moderate);
+}
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
 }

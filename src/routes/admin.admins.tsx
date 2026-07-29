@@ -61,11 +61,11 @@ function AdminsPage() {
     <>
       <PageHeader title="Admins" description="Grant admin or staff access to your team." actions={<Button onClick={() => setInviteOpen(true)}><Plus className="me-2 h-4 w-4" /> Invite admin</Button>} />
       <AdminCard>
-        {admins.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !admins.data?.length ? (
+        {admins.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !admins.data?.length ? (
           <EmptyState title="No admins yet" icon={User} />
         ) : (
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
-            <table className="w-full text-sm">
+            <table className="w-full text-small">
               <thead><tr className="border-b border-border text-left">
                 <th className="px-4 sm:px-5 py-2 font-semibold">Email</th>
                 <th className="px-4 py-2 font-semibold">Roles</th>
@@ -84,7 +84,7 @@ function AdminsPage() {
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {u.roles.map((r) => (
-                          <span key={r} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${r === "super_admin" ? "bg-primary/15 text-primary" : r === "admin" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
+                          <span key={r} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-bold uppercase ${r === "super_admin" ? "bg-primary/15 text-primary" : r === "admin" ? "bg-emerald-500/10 text-success" : "bg-muted text-muted-foreground"}`}>
                             {r}
                             {r !== "super_admin" && (
                               <button title="Remove role" onClick={() => removeMut.mutate({ userId: u.id, role: r })}>×</button>
@@ -93,7 +93,7 @@ function AdminsPage() {
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}</td>
+                    <td className="px-4 py-3 text-caption text-muted-foreground">{u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}</td>
                     <td className="px-4 sm:px-5 py-3 text-right">
                       {!u.roles.includes("super_admin") && (
                         <AlertDialog>
@@ -130,7 +130,7 @@ function AdminsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <p className="text-xs text-muted-foreground">An invitation email will be sent. When the recipient sets a password they'll be able to access the dashboard immediately.</p>
+            <p className="text-caption text-muted-foreground">An invitation email will be sent. When the recipient sets a password they'll be able to access the dashboard immediately.</p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setInviteOpen(false)}>Cancel</Button>

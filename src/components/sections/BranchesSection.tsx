@@ -90,7 +90,7 @@ function BranchCard({
           onSelect(branch.id);
         }
       }}
-      className={`group relative cursor-pointer rounded-xl border bg-card/80 p-5 backdrop-blur-xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
+      className={`group relative cursor-pointer rounded-xl border bg-card/80 p-5 backdrop-blur-xl transition-all duration-moderate focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60
         ${
           active
             ? "-translate-y-1 border-primary shadow-2xl shadow-primary/25 ring-1 ring-primary/40"
@@ -114,18 +114,18 @@ function BranchCard({
           </div>
           <div className="min-w-0">
             <h3 className="truncate font-bold leading-tight">{branch.name}</h3>
-            <p className="text-xs text-muted-foreground">{branch.city}</p>
+            <p className="text-caption text-muted-foreground">{branch.city}</p>
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           {branch.is_main_branch && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-caption font-bold text-primary">
               <Star className="h-3 w-3 fill-primary" />
               {t("branches.mainBranch")}
             </span>
           )}
           {active && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
               <Check className="h-3 w-3" />
               {t("branches.active")}
             </span>
@@ -133,9 +133,9 @@ function BranchCard({
         </div>
       </div>
 
-      <p className="relative mt-3 text-sm text-muted-foreground">{branch.address}</p>
+      <p className="relative mt-3 text-small text-muted-foreground">{branch.address}</p>
 
-      <div className="relative mt-3 space-y-1.5 text-xs">
+      <div className="relative mt-3 space-y-1.5 text-caption">
         {branch.phone && (
           <div className="flex items-center gap-2 text-foreground/80">
             <Phone className="h-3.5 w-3.5 text-primary" />
@@ -296,12 +296,12 @@ function ContactInfoGrid() {
       {cards.map((c) => (
         <div
           key={c.key}
-          className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/70 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+          className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/70 p-5 shadow-sm backdrop-blur-xl transition-all duration-moderate hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
         >
           <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 text-primary transition-transform group-hover:scale-110">
             <c.icon className="h-5 w-5" />
           </div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
             {c.title}
           </p>
           {c.href ? (
@@ -309,19 +309,19 @@ function ContactInfoGrid() {
               href={c.href}
               target={c.href.startsWith("http") ? "_blank" : undefined}
               rel="noopener noreferrer"
-              className="mt-1 block truncate text-sm font-bold text-foreground hover:text-primary"
+              className="mt-1 block truncate text-small font-bold text-foreground hover:text-primary"
               dir={c.key === "phone" || c.key === "whatsapp" ? "ltr" : undefined}
             >
               {c.value}
             </a>
           ) : (
-            <p className="mt-1 text-sm font-bold text-foreground">{c.value}</p>
+            <p className="mt-1 text-small font-bold text-foreground">{c.value}</p>
           )}
           {c.copy && (
             <button
               type="button"
               onClick={() => copyToClipboard(c.copy!, t("branches.copied"))}
-              className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+              className="mt-3 inline-flex items-center gap-1 text-caption font-medium text-muted-foreground transition-colors hover:text-primary"
               aria-label={t("branches.copy")}
             >
               <Copy className="h-3 w-3" />
@@ -333,7 +333,7 @@ function ContactInfoGrid() {
 
       {socials.length > 0 && (
         <div className="rounded-xl border border-border/60 bg-gradient-to-br from-primary/10 via-card/70 to-card/60 p-5 shadow-sm backdrop-blur-xl sm:col-span-2 lg:col-span-1 xl:col-span-1">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-3 text-caption font-semibold uppercase tracking-wider text-muted-foreground">
             {t("branches.contactCard.follow")}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -346,7 +346,7 @@ function ContactInfoGrid() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label ?? s.key}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg bg-background/70 text-primary transition-all duration-[220ms] ease-standard hover:scale-110 hover:bg-primary hover:text-primary-foreground"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg bg-background/70 text-primary transition-all duration-base ease-standard hover:scale-110 hover:bg-primary hover:text-primary-foreground"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -396,14 +396,14 @@ function ContactForm({ branches }: { branches: Branch[] }) {
   return (
     <div className="grid gap-6 rounded-xl border border-border/60 bg-card/70 p-6 shadow-xl shadow-primary/5 backdrop-blur-xl md:p-8 lg:grid-cols-5">
       <div className="lg:col-span-2">
-        <h3 className="text-2xl font-bold">{t("branches.form.title")}</h3>
-        <p className="mt-2 text-sm text-muted-foreground">{t("branches.form.subtitle")}</p>
+        <h3 className="text-h3 font-bold">{t("branches.form.title")}</h3>
+        <p className="mt-2 text-small text-muted-foreground">{t("branches.form.subtitle")}</p>
         {whatsappItem && (
           <a
             href={whatsappHref(whatsappItem.value)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-all duration-[220ms] ease-standard hover:bg-primary hover:text-primary-foreground"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-small font-semibold text-primary transition-all duration-base ease-standard hover:bg-primary hover:text-primary-foreground"
           >
             <MessageCircle className="h-4 w-4" />
             {t("branches.form.whatsappInstead")}
@@ -417,7 +417,7 @@ function ContactForm({ branches }: { branches: Branch[] }) {
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Check className="h-5 w-5" />
             </div>
-            <div className="text-sm font-semibold">{t("branches.form.thanks")}</div>
+            <div className="text-small font-semibold">{t("branches.form.thanks")}</div>
           </div>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
@@ -592,10 +592,10 @@ export function BranchesSection() {
         <div className="mt-16">
           <div className="mb-6 flex items-end justify-between">
             <div>
-              <h3 className="text-2xl font-bold md:text-3xl">
+              <h3 className="text-h3 font-bold ">
                 {t("branches.info.title")}
               </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-small text-muted-foreground">
                 {t("branches.info.subtitle")}
               </p>
             </div>

@@ -47,7 +47,7 @@ function FaqAdminPage() {
     <>
       <PageHeader title="FAQ" actions={<Button onClick={() => setCreating(true)}><Plus className="me-2 h-4 w-4" /> New FAQ</Button>} />
       <AdminCard>
-        {list.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !list.data?.length ? (
+        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
           <EmptyState title="No FAQs yet" icon={HelpCircle} />
         ) : (
           <div className="divide-y divide-border -mx-4 sm:-mx-5">
@@ -55,8 +55,8 @@ function FaqAdminPage() {
               <div key={f.id} className="flex items-start justify-between gap-3 px-4 sm:px-5 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{f.question}</p>
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{f.answer}</p>
-                  {f.category && <p className="mt-1 text-xs text-muted-foreground">Category: {f.category}</p>}
+                  <p className="mt-1 text-small text-muted-foreground line-clamp-2">{f.answer}</p>
+                  {f.category && <p className="mt-1 text-caption text-muted-foreground">Category: {f.category}</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Switch checked={f.active} onCheckedChange={() => toggle.mutate(f)} />
