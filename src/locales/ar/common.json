@@ -160,7 +160,16 @@
       "selectBranch": "اختر الفرع",
       "whatsappInstead": "تفضل عبر واتساب",
       "thanks": "تم استلام رسالتك، سنتواصل معك قريباً."
-    }
+    },
+    "searchPlaceholder": "ابحث عن فرع أو مدينة…",
+    "allCities": "كل المدن",
+    "noResults": "لا توجد فروع مطابقة لبحثك",
+    "branchesCount": "فرع",
+    "copyAddress": "نسخ العنوان",
+    "addressCopied": "تم نسخ العنوان",
+    "office": "مكتب",
+    "selectHint": "اختر فرعاً لعرضه على الخريطة",
+    "kicker": "شبكة فروعنا",
+    "contactKicker": "تواصل معنا"
   }
 }
-
