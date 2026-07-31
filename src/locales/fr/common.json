@@ -171,5 +171,114 @@
     "selectHint": "Sélectionnez une agence pour la voir sur la carte",
     "kicker": "Notre réseau",
     "contactKicker": "Nous contacter"
+  },
+  "bookingFlow": {
+    "eyebrow": "Réservation en 5 étapes",
+    "title": "Réservez votre voyage",
+    "subtitle": "Choisissez le service puis l'offre, indiquez le nombre de voyageurs, complétez les informations et confirmez — sans paiement en ligne.",
+    "widget": {
+      "title": "Commencez votre réservation",
+      "subtitle": "Choisissez un service et découvrez les offres disponibles.",
+      "cta": "Commencer",
+      "step": "Sélectionnez une offre"
+    },
+    "steps": {
+      "service": "Service",
+      "package": "Offre",
+      "travellers": "Voyageurs",
+      "review": "Vérification",
+      "confirm": "Confirmation"
+    },
+    "service": {
+      "title": "Choisissez le service",
+      "desc": "Les offres disponibles sont filtrées automatiquement."
+    },
+    "package": {
+      "title": "Choisissez l'offre",
+      "desc": "Toutes les offres proviennent de la base de données — aucune saisie nécessaire.",
+      "empty": "Aucune offre disponible pour ce service.",
+      "from": "À partir de",
+      "available": "{{count}} offre(s) disponible(s)"
+    },
+    "travellers": {
+      "title": "Nombre de voyageurs",
+      "desc": "Indiquez les adultes, enfants et bébés.",
+      "adults": "Adultes",
+      "adultsHint": "12 ans et plus",
+      "children": "Enfants",
+      "childrenHint": "De 2 à 11 ans",
+      "infants": "Bébés",
+      "infantsHint": "Moins de 2 ans (optionnel)",
+      "formsTitle": "Informations des voyageurs",
+      "formsDesc": "Un formulaire par voyageur avec son propre passeport.",
+      "adult": "Adulte",
+      "child": "Enfant",
+      "infant": "Bébé",
+      "primaryBadge": "Contact principal"
+    },
+    "fields": {
+      "fullName": "Nom complet",
+      "passportNumber": "Numéro de passeport",
+      "nationality": "Nationalité",
+      "gender": "Genre",
+      "male": "Homme",
+      "female": "Femme",
+      "dob": "Date de naissance",
+      "passportExpiry": "Expiration du passeport",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "emergency": "Contact d'urgence",
+      "notes": "Notes (optionnel)",
+      "passportFile": "Scan du passeport",
+      "passportHint": "PDF ou image, 5 Mo maximum",
+      "uploading": "Téléversement...",
+      "comm": "Moyen de contact préféré",
+      "comm_phone": "Téléphone",
+      "comm_whatsapp": "WhatsApp",
+      "comm_email": "E-mail",
+      "bookingNotes": "Notes générales sur la réservation"
+    },
+    "summary": {
+      "title": "Récapitulatif",
+      "empty": "Choisissez une offre pour voir le prix.",
+      "package": "Offre",
+      "departure": "Départ",
+      "duration": "Durée",
+      "perAdult": "Prix adulte",
+      "perChild": "Prix enfant",
+      "perInfant": "Prix bébé",
+      "passengers": "Voyageurs",
+      "total": "Total"
+    },
+    "review": {
+      "title": "Vérifiez vos informations",
+      "desc": "Contrôlez tout avant de confirmer.",
+      "packageBlock": "Offre sélectionnée",
+      "noPassport": "Aucun passeport téléversé",
+      "terms": "J'accepte les conditions de réservation et la politique de confidentialité, et je certifie l'exactitude des informations et des passeports fournis.",
+      "termsLabel": "Accepter les conditions"
+    },
+    "confirm": {
+      "title": "Confirmer la réservation",
+      "desc": "Nous vous contacterons pour finaliser les détails.",
+      "noPayment": "Aucun paiement maintenant — notre équipe vous contactera."
+    },
+    "actions": {
+      "next": "Suivant",
+      "back": "Précédent",
+      "submit": "Confirmer la réservation",
+      "submitting": "Envoi en cours..."
+    },
+    "errors": {
+      "selectService": "Veuillez choisir un service",
+      "selectPackage": "Veuillez choisir une offre",
+      "passengerName": "Le nom complet est requis pour chaque voyageur",
+      "primaryContact": "Téléphone et e-mail du contact principal requis",
+      "terms": "Veuillez accepter les conditions",
+      "tooLarge": "Le fichier dépasse 5 Mo",
+      "badType": "Format non supporté (PDF ou image)",
+      "upload": "Échec du téléversement, réessayez",
+      "generic": "Impossible d'envoyer la réservation, réessayez"
+    }
   }
 }
