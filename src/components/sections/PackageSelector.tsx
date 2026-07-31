@@ -77,66 +77,16 @@ export function PackageSelector() {
     [available, service],
   );
 
-  const months = useMemo(() => {
-    const map = new Map<string, string>();
-    byService.forEach((p) => {
-      if (!p.departure_date) return;
-      const d = new Date(p.departure_date);
-      map.set(
-        monthKey(p.departure_date),
-        d.toLocaleDateString(i18n.language, { month: "long", year: "numeric" }),
-      );
-    });
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [byService, i18n.language]);
-
-  const filtered = useMemo(
-    () =>
-      byService.filter((p) => {
-        if (duration !== "all") {
-          const n = nights(p);
-          if (n == null) return false;
-          if (duration === "short" && n > 7) return false;
-          if (duration === "medium" && (n < 8 || n > 14)) return false;
-          if (duration === "long" && n < 15) return false;
-        }
-        if (price !== "all") {
-          const v = effectivePrice(p);
-          if (price === "low" && v >= 3000) return false;
-          if (price === "mid" && (v < 3000 || v > 7000)) return false;
-          if (price === "high" && v <= 7000) return false;
-        }
-        if (month !== "all") {
-          if (!p.departure_date || monthKey(p.departure_date) !== month) return false;
-        }
-        if (availability === "available") {
-          const s = seatsLeft(p);
-          if (s != null && s <= 0) return false;
-        }
-        return true;
-      }),
-    [byService, duration, price, month, availability],
-  );
-
   const searched = useMemo(() => {
     const q = term.trim().toLowerCase();
-    if (!q) return filtered;
-    return filtered.filter((p) => p.title.toLowerCase().includes(q));
-  }, [filtered, term]);
+    if (!q) return byService;
+    return byService.filter((p) => p.title.toLowerCase().includes(q));
+  }, [byService, term]);
 
   const selected = useMemo(
-    () => filtered.find((p) => p.id === selectedId) ?? null,
-    [filtered, selectedId],
+    () => byService.find((p) => p.id === selectedId) ?? null,
+    [byService, selectedId],
   );
-
-  const dirty = duration !== "all" || price !== "all" || month !== "all" || availability !== "all";
-
-  function resetFilters() {
-    setDuration("all");
-    setPrice("all");
-    setMonth("all");
-    setAvailability("all");
-  }
 
   // close on outside click / escape (desktop dropdown + mobile sheet)
   useEffect(() => {
