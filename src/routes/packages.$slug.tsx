@@ -4,7 +4,15 @@ import { useTranslation } from "react-i18next";
 import { Check, X, MapPin, Clock, Users, Hotel, Plane, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { packageBySlugQuery } from "@/lib/queries";
+import { PackageCard } from "@/components/common/PackageCard";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { packageBySlugQuery, packagesQuery, faqsQuery } from "@/lib/queries";
+
 
 
 export const Route = createFileRoute("/packages/$slug")({
