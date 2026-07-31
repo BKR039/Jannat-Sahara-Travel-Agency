@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Check, X, MapPin, Clock, Users, Hotel, Plane, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { BookingDialog } from "@/components/booking/BookingDialog";
 import { packageBySlugQuery } from "@/lib/queries";
 
 
