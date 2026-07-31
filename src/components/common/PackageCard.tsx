@@ -1,31 +1,43 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Clock, Users, Tag, Star } from "lucide-react";
+import { MapPin, Clock, Users, Star, CalendarDays, Hotel, Plane, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Package } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
 /**
  * Package Card — DS /components/03-cards.md § Package Card / Trip Card
- * media (scrim + price/offer badges) → content → feature row → footer (price + CTA)
+ * media (scrim + badges) → content → highlights → footer (price + Book Now / Details)
  */
 export function PackageCard({ pkg, className }: { pkg: Package; className?: string }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const discounted =
     pkg.discount && pkg.discount > 0 ? Number(pkg.price) * (1 - Number(pkg.discount) / 100) : null;
 
+  const departure = pkg.departure_date
+    ? new Date(pkg.departure_date).toLocaleDateString(i18n.language, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : null;
+
+  const highlights = [pkg.hotel, pkg.airline, pkg.transport].filter(Boolean).slice(0, 2) as string[];
+  const soldOut = pkg.status === "sold_out" || (typeof pkg.seats === "number" && pkg.seats <= 0);
+
   return (
-    <Link
-      to="/packages/$slug"
-      params={{ slug: pkg.slug }}
+    <article
       className={cn(
         "group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm",
         "transition-[box-shadow,transform] duration-base ease-standard",
         "hover:-translate-y-0.5 hover:shadow-md",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         className,
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface-sunken">
+      <Link
+        to="/packages/$slug"
+        params={{ slug: pkg.slug }}
+        className="relative block aspect-[4/3] overflow-hidden bg-surface-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      >
         {pkg.cover && (
           <img
             src={pkg.cover}
@@ -60,15 +72,26 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
             <span className="text-small font-medium">{pkg.destination}</span>
           </div>
         )}
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <h3 className="line-clamp-2 text-card-title text-foreground">{pkg.title}</h3>
+        <Link
+          to="/packages/$slug"
+          params={{ slug: pkg.slug }}
+          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <h3 className="line-clamp-2 text-card-title text-foreground">{pkg.title}</h3>
+        </Link>
         {pkg.short_description && (
           <p className="line-clamp-2 text-card-desc text-muted-foreground">{pkg.short_description}</p>
         )}
 
         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2 text-caption text-muted-foreground">
+          {departure && (
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {departure}
+            </span>
+          )}
           {pkg.duration && (
             <span className="inline-flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {pkg.duration}
@@ -76,12 +99,30 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
           )}
           {typeof pkg.seats === "number" && pkg.seats > 0 && (
             <span className="inline-flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" aria-hidden="true" /> {pkg.seats}
+              <Users className="h-3.5 w-3.5" aria-hidden="true" /> {pkg.seats} {t("package.seats")}
             </span>
           )}
         </div>
 
-        <div className="mt-auto flex items-end justify-between gap-3 border-t border-border-subtle pt-4">
+        {highlights.length > 0 && (
+          <ul className="flex flex-wrap gap-2">
+            {highlights.map((h, i) => (
+              <li
+                key={h}
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-caption font-medium text-primary"
+              >
+                {i === 0 ? (
+                  <Hotel className="h-3 w-3" aria-hidden="true" />
+                ) : (
+                  <Plane className="h-3 w-3" aria-hidden="true" />
+                )}
+                <span className="line-clamp-1 max-w-[10rem]">{h}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-auto space-y-4 border-t border-border-subtle pt-4">
           <div>
             <p className="text-caption text-muted-foreground">{t("package.from")}</p>
             <div className="flex items-baseline gap-2">
@@ -95,11 +136,30 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
               )}
             </div>
           </div>
-          <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-accent px-4 text-small font-semibold text-primary transition-colors duration-fast group-hover:bg-primary group-hover:text-primary-foreground">
-            <Tag className="h-4 w-4" aria-hidden="true" /> {t("actions.bookNow")}
-          </span>
+
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/booking"
+              search={{ pkg: pkg.slug }}
+              aria-disabled={soldOut}
+              className={cn(
+                "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md bg-primary px-4 text-small font-semibold text-primary-foreground transition-colors duration-fast hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                soldOut && "pointer-events-none opacity-50",
+              )}
+            >
+              {t("actions.bookNow")}
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+            </Link>
+            <Link
+              to="/packages/$slug"
+              params={{ slug: pkg.slug }}
+              className="inline-flex h-10 flex-1 items-center justify-center rounded-md border border-border px-4 text-small font-semibold text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {t("actions.viewDetails")}
+            </Link>
+          </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
