@@ -75,7 +75,6 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-
 function useUnreadCount() {
   return useQuery({
     queryKey: ["notifications-unread"] as const,
@@ -104,7 +103,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
     items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
   })).filter((g) => g.items.length > 0);
 
-
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -116,7 +114,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div dir="ltr" className="min-h-screen bg-muted/30">
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-background/60 backdrop-blur lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-background/60 backdrop-blur lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
       <aside
         className={cn(
@@ -128,7 +129,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Link to="/admin" onClick={() => setMobileOpen(false)}>
             <Logo />
           </Link>
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(false)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(false)}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -182,12 +188,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3">
             <p className="text-caption text-muted-foreground">Signed in as</p>
             <p className="truncate text-small font-medium">{user.email}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2 w-full"
-              onClick={signOut}
-            >
+            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={signOut}>
               <LogOut className="me-2 h-4 w-4" /> Sign out
             </Button>
           </div>
@@ -196,7 +197,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
       <div className="lg:pl-72">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(true)}
+          >
             <Menu className="h-4 w-4" />
           </Button>
           <div className="flex-1" />

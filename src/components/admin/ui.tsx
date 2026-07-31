@@ -43,7 +43,9 @@ export function StatCard({
     <div className="rounded-lg border border-border-subtle bg-card p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-caption font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+          <p className="text-caption font-medium uppercase tracking-wide text-muted-foreground">
+            {label}
+          </p>
           <p className="mt-2 text-h3 font-bold tabular-nums">{value}</p>
           {hint && <p className="mt-1 text-caption text-muted-foreground">{hint}</p>}
         </div>
@@ -99,7 +101,9 @@ export function EmptyState({
     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-surface-sunken/40 py-12 px-6 text-center">
       {Icon && <Icon className="h-8 w-8 text-muted-foreground" />}
       <p className="mt-3 text-small font-medium">{title}</p>
-      {description && <p className="mt-1 text-caption text-muted-foreground max-w-sm">{description}</p>}
+      {description && (
+        <p className="mt-1 text-caption text-muted-foreground max-w-sm">{description}</p>
+      )}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -122,7 +126,9 @@ export function StatusBadge({ status }: { status: string | null | undefined }) {
   const s = status ?? "—";
   const tone = STATUS_TONE[s] ?? "bg-muted text-muted-foreground";
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold uppercase tracking-wide ${tone}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold uppercase tracking-wide ${tone}`}
+    >
       {s.replace(/_/g, " ")}
     </span>
   );
