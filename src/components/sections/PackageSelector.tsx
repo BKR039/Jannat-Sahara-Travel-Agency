@@ -317,61 +317,9 @@ export function PackageSelector() {
           </div>
         )}
 
-        {/* ---------- optional filters */}
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <SelectField
-            label={t("explorer.month")}
-            value={month}
-            onChange={setMonth}
-            options={[
-              { value: "all", label: t("explorer.any") },
-              ...months.map(([value, label]) => ({ value, label })),
-            ]}
-          />
-          <SelectField
-            label={t("explorer.price")}
-            value={price}
-            onChange={setPrice}
-            options={PRICES.map((p) => ({
-              value: p,
-              label: p === "all" ? t("explorer.any") : t(`explorer.prices.${p}`),
-            }))}
-          />
-          <SelectField
-            label={t("explorer.duration")}
-            value={duration}
-            onChange={setDuration}
-            options={DURATIONS.map((d) => ({
-              value: d,
-              label: d === "all" ? t("explorer.any") : t(`explorer.durations.${d}`),
-            }))}
-          />
-          <SelectField
-            label={t("explorer.availability")}
-            value={availability}
-            onChange={setAvailability}
-            options={AVAILABILITY.map((a) => ({
-              value: a,
-              label: a === "all" ? t("explorer.any") : t("explorer.availableOnly"),
-            }))}
-          />
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-small text-muted-foreground">
-            {t("explorer.results", { count: filtered.length })}
-          </p>
-          {dirty && (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="inline-flex items-center gap-2 text-small font-semibold text-primary hover:underline"
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              {t("explorer.reset")}
-            </button>
-          )}
-        </div>
+        <p className="mt-4 text-small text-muted-foreground">
+          {t("explorer.results", { count: byService.length })}
+        </p>
 
         {/* ---------- selected preview */}
         {selected && (
