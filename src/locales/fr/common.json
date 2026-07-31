@@ -24,7 +24,8 @@
     "search": "Rechercher",
     "menu": "Menu",
     "toggleTheme": "Changer le thème",
-    "changeLanguage": "Changer de langue"
+    "changeLanguage": "Changer de langue",
+    "viewDetails": "Détails"
   },
   "home": {
     "featuredPackages": "Offres phares",
@@ -66,7 +67,10 @@
     "included": "Inclus",
     "excluded": "Non inclus",
     "timeline": "Programme",
-    "gallery": "Galerie"
+    "gallery": "Galerie",
+    "related": "Offres similaires",
+    "terms": "Conditions de réservation",
+    "faqTitle": "Questions fréquentes"
   },
   "contact": {
     "title": "Contactez-nous",
@@ -174,8 +178,8 @@
   },
   "bookingFlow": {
     "eyebrow": "Réservation en 5 étapes",
-    "title": "Réservez votre voyage",
-    "subtitle": "Choisissez le service puis l'offre, indiquez le nombre de voyageurs, complétez les informations et confirmez — sans paiement en ligne.",
+    "title": "Finaliser la réservation",
+    "subtitle": "L'offre est déjà sélectionnée. Indiquez les voyageurs, complétez les informations et confirmez — sans paiement en ligne.",
     "widget": {
       "title": "Commencez votre réservation",
       "subtitle": "Choisissez un service et découvrez les offres disponibles.",
@@ -187,7 +191,8 @@
       "package": "Offre",
       "travellers": "Voyageurs",
       "review": "Vérification",
-      "confirm": "Confirmation"
+      "confirm": "Confirmation",
+      "details": "Voyageurs"
     },
     "service": {
       "title": "Choisissez le service",
@@ -279,6 +284,46 @@
       "badType": "Format non supporté (PDF ou image)",
       "upload": "Échec du téléversement, réessayez",
       "generic": "Impossible d'envoyer la réservation, réessayez"
+    },
+    "packageStep": {
+      "title": "Offre sélectionnée",
+      "desc": "Vérifiez les détails de l'offre avant de continuer."
+    },
+    "missing": {
+      "title": "Choisissez d'abord une offre",
+      "desc": "Parcourez les offres disponibles, puis cliquez sur « Réserver » pour démarrer.",
+      "cta": "Parcourir les offres"
+    }
+  },
+  "explorer": {
+    "eyebrow": "Explorer les offres",
+    "title": "Des offres soigneusement sélectionnées",
+    "subtitle": "Comparez les offres disponibles et lancez votre réservation en un clic.",
+    "allServices": "Tous les services",
+    "destination": "Destination",
+    "duration": "Durée",
+    "price": "Prix",
+    "month": "Mois de départ",
+    "availability": "Disponibilité",
+    "any": "Tous",
+    "availableOnly": "Disponibles uniquement",
+    "reset": "Réinitialiser les filtres",
+    "results": "{{count}} offre(s) correspondante(s)",
+    "empty": "Aucune offre ne correspond aux filtres sélectionnés.",
+    "durations": {
+      "short": "Jusqu'à 7 jours",
+      "medium": "8 à 14 jours",
+      "long": "15 jours et plus"
+    },
+    "prices": {
+      "low": "Moins de 3000",
+      "mid": "3000 - 7000",
+      "high": "Plus de 7000"
+    },
+    "groups": {
+      "umrah": "Offres Omra en vedette",
+      "trips": "Voyages en vedette",
+      "other": "Vols et visas"
     }
   }
 }

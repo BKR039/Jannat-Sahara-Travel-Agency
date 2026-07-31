@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { BookingWidget } from "@/components/sections/BookingWidget";
+import { PackageExplorer } from "@/components/sections/PackageExplorer";
 import { StatsSection } from "@/components/sections/StatsSection";
-import { FeaturedPackagesSection } from "@/components/sections/FeaturedPackagesSection";
 import {
   ServicesSection,
   FeaturesSection,
@@ -35,22 +34,8 @@ function Index() {
   return (
     <SiteLayout>
       <HeroSection />
-      <BookingWidget />
+      <PackageExplorer />
       <StatsSection />
-      <FeaturedPackagesSection
-        category="umrah"
-        eyebrow="✦"
-        title="باقات العمرة المميزة"
-        description="مجموعة مختارة من أفضل باقات العمرة"
-        viewAllHref="/umrah"
-      />
-      <FeaturedPackagesSection
-        category="trip"
-        eyebrow="✦"
-        title="رحلات مميزة"
-        description="وجهات سياحية استثنائية"
-        viewAllHref="/trips"
-      />
       <ServicesSection />
       <FeaturesSection />
       <TestimonialsSection />

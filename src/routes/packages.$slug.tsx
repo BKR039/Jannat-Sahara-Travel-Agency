@@ -4,7 +4,15 @@ import { useTranslation } from "react-i18next";
 import { Check, X, MapPin, Clock, Users, Hotel, Plane, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { packageBySlugQuery } from "@/lib/queries";
+import { PackageCard } from "@/components/common/PackageCard";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { packageBySlugQuery, packagesQuery, faqsQuery } from "@/lib/queries";
+
 
 
 export const Route = createFileRoute("/packages/$slug")({
@@ -21,6 +29,9 @@ function PackagePage() {
   const { slug } = Route.useParams();
   const { t } = useTranslation();
   const { data: pkg, isLoading } = useQuery(packageBySlugQuery(slug));
+  const { data: allPackages } = useQuery(packagesQuery());
+  const { data: faqs } = useQuery(faqsQuery());
+
 
   if (isLoading) {
     return (
@@ -42,6 +53,11 @@ function PackagePage() {
   const discounted = pkg.discount && pkg.discount > 0
     ? Number(pkg.price) * (1 - Number(pkg.discount) / 100)
     : null;
+  const related = (allPackages ?? [])
+    .filter((p) => p.category === pkg.category && p.id !== pkg.id)
+    .slice(0, 4);
+  const faqList = (faqs ?? []).slice(0, 6);
+
 
   return (
     <SiteLayout>
@@ -122,7 +138,31 @@ function PackagePage() {
               </div>
             </section>
           )}
+
+          {faqList.length > 0 && (
+            <section>
+              <h2 className="mb-4 text-h3 font-bold">{t("package.faqTitle")}</h2>
+              <Accordion type="single" collapsible className="rounded-lg border border-border-subtle bg-card px-4">
+                {faqList.map((f) => (
+                  <AccordionItem key={f.id} value={f.id}>
+                    <AccordionTrigger className="text-start">{f.question}</AccordionTrigger>
+                    <AccordionContent className="text-small text-muted-foreground">
+                      {f.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+          )}
+
+          <section className="rounded-lg border border-border-subtle bg-muted/30 p-6">
+            <h2 className="mb-3 text-h5 font-bold">{t("package.terms")}</h2>
+            <p className="text-small leading-relaxed text-muted-foreground">
+              {t("bookingFlow.review.terms")} {t("bookingFlow.confirm.noPayment")}
+            </p>
+          </section>
         </div>
+
 
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           <div className="space-y-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm">
@@ -165,10 +205,38 @@ function PackagePage() {
                 {t("actions.bookNow")}
               </Link>
             </Button>
-
           </div>
         </aside>
+      </div>
+
+      {related.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-24 md:px-6">
+          <h2 className="mb-6 text-h3 font-bold">{t("package.related")}</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {related.map((p) => (
+              <PackageCard key={p.id} pkg={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* mobile sticky booking CTA */}
+      <div className="sticky bottom-0 z-40 border-t border-border-subtle bg-card/95 p-4 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-caption text-muted-foreground">{t("package.from")}</p>
+            <p className="text-h5 font-extrabold text-primary">
+              {(discounted ?? Number(pkg.price)).toLocaleString()} {pkg.currency}
+            </p>
+          </div>
+          <Button asChild size="lg">
+            <Link to="/booking" search={{ pkg: pkg.slug }}>
+              {t("actions.bookNow")}
+            </Link>
+          </Button>
+        </div>
       </div>
     </SiteLayout>
   );
 }
+
