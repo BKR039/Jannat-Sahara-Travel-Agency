@@ -197,7 +197,7 @@ export function LatestArticlesSection() {
 export function CtaSection() {
   const { t } = useTranslation();
   return (
-    <section className="relative overflow-hidden py-20">
+    <section className="relative isolate overflow-hidden py-14 md:py-20">
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary to-primary/80" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_50%_20%,rgba(255,255,255,0.2),transparent)]" />
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center text-primary-foreground md:px-6">
