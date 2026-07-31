@@ -43,6 +43,13 @@ const BLOCK_META: Record<string, { name: string; help: string }> = {
   },
 };
 
+const ORDER = ["hero", "about", "cta"];
+
+function rank(key: string) {
+  const i = ORDER.indexOf(key);
+  return i === -1 ? ORDER.length : i;
+}
+
 function metaFor(key: string) {
   return (
     BLOCK_META[key] ?? {
@@ -68,16 +75,18 @@ export function ContentSection() {
 
   const remote = useMemo<Block[]>(
     () =>
-      (query.data ?? []).map((r) => ({
-        id: r.id,
-        key: r.key,
-        title: r.title ?? "",
-        subtitle: r.subtitle ?? "",
-        body: r.body ?? "",
-        image: r.image ?? "",
-        cta_label: r.cta_label ?? "",
-        cta_href: r.cta_href ?? "",
-      })),
+      [...(query.data ?? [])]
+        .sort((a, b) => rank(a.key) - rank(b.key))
+        .map((r) => ({
+          id: r.id,
+          key: r.key,
+          title: r.title ?? "",
+          subtitle: r.subtitle ?? "",
+          body: r.body ?? "",
+          image: r.image ?? "",
+          cta_label: r.cta_label ?? "",
+          cta_href: r.cta_href ?? "",
+        })),
     [query.data],
   );
 
