@@ -99,7 +99,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const unread = useUnreadCount();
 
-  const visible = NAV.filter((n) => (n.superOnly ? isSuperAdmin : true));
+  const groups = NAV_GROUPS.map((g) => ({
+    ...g,
+    items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
+  })).filter((g) => g.items.length > 0);
+
 
   async function signOut() {
     await queryClient.cancelQueries();
