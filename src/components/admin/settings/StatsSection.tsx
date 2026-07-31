@@ -172,9 +172,8 @@ export function StatsSection() {
                 />
               </div>
             </div>
-
-            </div>
           </div>
+
         ))}
 
         <button
