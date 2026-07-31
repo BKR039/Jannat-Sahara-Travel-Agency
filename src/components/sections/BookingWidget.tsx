@@ -1,75 +1,59 @@
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Search, MapPin, Calendar, Compass } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Compass, Plane, Sparkles, Stamp } from "lucide-react";
 
-const TYPES = ["umrah", "trip", "flight", "visa"] as const;
+const SERVICES = [
+  { key: "umrah", icon: Sparkles },
+  { key: "trip", icon: Compass },
+  { key: "flight", icon: Plane },
+  { key: "visa", icon: Stamp },
+] as const;
 
 export function BookingWidget() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [type, setType] = useState<(typeof TYPES)[number]>("umrah");
-  const [destination, setDestination] = useState("");
-
-  const routeMap: Record<(typeof TYPES)[number], string> = {
-    umrah: "/umrah",
-    trip: "/trips",
-    flight: "/flights",
-    visa: "/visa",
-  };
 
   return (
     <div className="relative -mt-16 z-10 mx-auto max-w-6xl px-4 md:px-6">
       <div className="rounded-xl border border-border-subtle bg-card/95 p-6 shadow-xl backdrop-blur md:p-8 ds-reveal">
-        <div className="mb-5 flex flex-wrap gap-2">
-          {TYPES.map((k) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => setType(k)}
-              className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-fast ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
-                type === k
-                  ? "bg-primary text-primary-foreground shadow-brand-glow"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {t(`categories.${k}`)}
-            </button>
-          ))}
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+              {t("bookingFlow.eyebrow")}
+            </p>
+            <h2 className="mt-1 text-h4 font-extrabold">{t("bookingFlow.widget.title")}</h2>
+            <p className="mt-1 text-small text-muted-foreground">
+              {t("bookingFlow.widget.subtitle")}
+            </p>
+          </div>
+          <Link
+            to="/booking"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-small font-semibold text-primary-foreground shadow-brand-glow transition-transform duration-base ease-standard hover:-translate-y-0.5"
+          >
+            {t("bookingFlow.widget.cta")}
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+          </Link>
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            navigate({ to: routeMap[type] });
-          }}
-          className="grid gap-3 md:grid-cols-4"
-        >
-          <label className="flex items-center gap-2 rounded-sm border border-input bg-surface px-4 py-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring md:col-span-2">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={t("home.bookingWidget.destination")}
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="w-full bg-transparent text-body outline-none"
-            />
-          </label>
-          <label className="flex items-center gap-2 rounded-sm border border-input bg-surface px-4 py-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <input type="date" className="w-full bg-transparent text-body outline-none" />
-          </label>
-          <Button type="submit" size="lg" >
-            <Search className="me-2 h-4 w-4" />
-            {t("home.bookingWidget.search")}
-          </Button>
-        </form>
-
-        <p className="mt-4 flex items-center gap-2 text-caption text-muted-foreground">
-          <Compass className="h-3.5 w-3.5" />
-          {t("home.bookingWidget.title")}
-        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {SERVICES.map(({ key, icon: Icon }) => (
+            <Link
+              key={key}
+              to="/booking"
+              search={{ service: key }}
+              className="group flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-5 transition-all duration-base ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors duration-base group-hover:bg-primary group-hover:text-primary-foreground">
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-body font-bold">{t(`categories.${key}`)}</span>
+                <span className="block text-caption text-muted-foreground">
+                  {t("bookingFlow.widget.step")}
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

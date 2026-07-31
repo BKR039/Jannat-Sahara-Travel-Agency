@@ -18,6 +18,7 @@ import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
+import { Route as BookingRouteImport } from './routes/booking'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -82,6 +83,11 @@ const ContactRoute = ContactRouteImport.update({
 const BookingSuccessRoute = BookingSuccessRouteImport.update({
   id: '/booking-success',
   path: '/booking-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingRoute = BookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogRoute = BlogRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
+  '/booking': typeof BookingRoute
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
+  '/booking': typeof BookingRoute
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
+  '/booking': typeof BookingRoute
   '/booking-success': typeof BookingSuccessRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/blog'
+    | '/booking'
     | '/booking-success'
     | '/contact'
     | '/faq'
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/blog'
+    | '/booking'
     | '/booking-success'
     | '/contact'
     | '/faq'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/blog'
+    | '/booking'
     | '/booking-success'
     | '/contact'
     | '/faq'
@@ -379,6 +391,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRouteWithChildren
+  BookingRoute: typeof BookingRoute
   BookingSuccessRoute: typeof BookingSuccessRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
@@ -454,6 +467,13 @@ declare module '@tanstack/react-router' {
       path: '/booking-success'
       fullPath: '/booking-success'
       preLoaderRoute: typeof BookingSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking': {
+      id: '/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof BookingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog': {
@@ -649,6 +669,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   BlogRoute: BlogRouteWithChildren,
+  BookingRoute: BookingRoute,
   BookingSuccessRoute: BookingSuccessRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
