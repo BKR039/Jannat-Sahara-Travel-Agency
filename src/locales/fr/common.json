@@ -325,5 +325,18 @@
       "trips": "Voyages en vedette",
       "other": "Vols et visas"
     }
+  },
+  "selector": {
+    "subtitle": "Choisissez un service, parcourez les offres disponibles et réservez en un clic — sans rien saisir.",
+    "services": "Services",
+    "label": "Choisir une offre",
+    "placeholder": "Parcourir les offres disponibles",
+    "searchPlaceholder": "Rechercher une offre...",
+    "empty": "Aucune offre disponible pour le moment.",
+    "limited": "{{count}} places restantes",
+    "available": "Disponible",
+    "seatsLeft": "{{count}} places restantes",
+    "continue": "Continuer la réservation",
+    "close": "Fermer"
   }
 }
