@@ -26,7 +26,7 @@ export function Footer() {
   const { data: info } = useQuery(contactInfoQuery());
 
   return (
-    <footer className="mt-24 bg-brand-green text-brand-green-foreground">
+    <footer className="bg-brand-green text-brand-green-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-6">
         <div className="space-y-4">
           <div className="rounded-xl bg-background/10 p-3 backdrop-blur w-fit">
