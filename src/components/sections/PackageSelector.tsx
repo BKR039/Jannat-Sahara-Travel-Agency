@@ -240,7 +240,6 @@ export function PackageSelector() {
             onClick={() => {
               setService(key);
               setSelectedId(null);
-              setMonth("all");
               setOpen(false);
             }}
             className={cn(
