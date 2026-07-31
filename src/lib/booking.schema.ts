@@ -1,7 +1,6 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const PassengerInput = z.object({
+export const PassengerInput = z.object({
   type: z.enum(["adult", "child", "infant"]),
   isPrimary: z.boolean().default(false),
   fullName: z.string().trim().min(1).max(120),
@@ -17,7 +16,7 @@ const PassengerInput = z.object({
   notes: z.string().trim().max(1000).optional().nullable(),
 });
 
-const BookingInput = z.object({
+export const BookingInput = z.object({
   packageId: z.string().uuid().nullable().optional(),
   packageTitle: z.string().trim().max(200).optional().nullable(),
   packageCategory: z.string().trim().max(50).optional().nullable(),
