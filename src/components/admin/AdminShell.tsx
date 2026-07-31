@@ -132,36 +132,44 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          {visible.map((item) => {
-            const active =
-              item.to === "/admin"
-                ? location.pathname === "/admin" || location.pathname === "/admin/"
-                : location.pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-small font-medium transition-colors",
-                  active
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground/70 hover:bg-accent hover:text-foreground",
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="flex-1">{item.label}</span>
-                {item.to === "/admin/notifications" && (unread.data ?? 0) > 0 && (
-                  <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
-                    {unread.data}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          {groups.map((group) => (
+            <div key={group.group} className="mb-3 last:mb-0 space-y-0.5">
+              <p className="px-3 pb-1 pt-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
+                {group.group}
+              </p>
+              {group.items.map((item) => {
+                const active =
+                  item.to === "/admin"
+                    ? location.pathname === "/admin" || location.pathname === "/admin/"
+                    : location.pathname.startsWith(item.to);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-small font-medium transition-colors",
+                      active
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground/70 hover:bg-accent hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="flex-1">{item.label}</span>
+                    {item.to === "/admin/notifications" && (unread.data ?? 0) > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
+                        {unread.data}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
+
         <div className="border-t border-border p-3">
           <a
             href="/"
