@@ -1,220 +1,143 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Save, Trash2, Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { PageHeader, AdminCard } from "@/components/admin/ui";
+import { useState } from "react";
+import {
+  Building2,
+  Contact,
+  Layout,
+  Share2,
+  BarChart3,
+  Search,
+  Mail,
+  Bell,
+  ShieldCheck,
+  Palette,
+  ChevronRight,
+  type LucideIcon,
+} from "lucide-react";
+import { PageHeader } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
+import { GeneralSection } from "@/components/admin/settings/GeneralSection";
+import { ContentSection } from "@/components/admin/settings/ContentSection";
+import { SocialSection } from "@/components/admin/settings/SocialSection";
+import { StatsSection } from "@/components/admin/settings/StatsSection";
+import { SettingsCard, SettingsSection } from "@/components/admin/settings/parts";
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
 
+type SectionId = "general" | "brand" | "homepage" | "statistics" | "social" | "seo" | "email" | "notifications" | "security";
+
+interface NavGroup {
+  group: string;
+  items: { id: SectionId; label: string; icon: LucideIcon; hint: string }[];
+}
+
+const NAV: NavGroup[] = [
+  {
+    group: "Agency",
+    items: [
+      { id: "general", label: "General", icon: Building2, hint: "Name, contact details, hours" },
+      { id: "brand", label: "Brand", icon: Palette, hint: "Logo, colours, typography" },
+    ],
+  },
+  {
+    group: "Website",
+    items: [
+      { id: "homepage", label: "Homepage", icon: Layout, hint: "Hero, about and CTA blocks" },
+      { id: "statistics", label: "Statistics", icon: BarChart3, hint: "Achievement counters" },
+      { id: "seo", label: "SEO", icon: Search, hint: "Search appearance" },
+    ],
+  },
+  {
+    group: "Communication",
+    items: [
+      { id: "social", label: "Social media", icon: Share2, hint: "Channels and links" },
+      { id: "email", label: "Email", icon: Mail, hint: "Booking notifications" },
+      { id: "notifications", label: "Notifications", icon: Bell, hint: "Dashboard alerts" },
+    ],
+  },
+  {
+    group: "System",
+    items: [{ id: "security", label: "Security", icon: ShieldCheck, hint: "Admins and access" }],
+  },
+];
+
+const ALL_ITEMS = NAV.flatMap((g) => g.items);
+
 function SettingsPage() {
+  const [active, setActive] = useState<SectionId>("general");
+  const current = ALL_ITEMS.find((i) => i.id === active)!;
+
   return (
     <>
-      <PageHeader title="Settings" description="Agency-wide configuration: contact info, social links, hero content, and stats." />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <ContactInfoSection />
-        <SiteStatsSection />
+      <PageHeader
+        title="Settings"
+        description="Manage your agency, website content and communication channels from one place."
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+        {/* Category navigation */}
+        <nav aria-label="Settings categories" className="lg:sticky lg:top-20 lg:self-start">
+          <div className="rounded-2xl border border-border-subtle bg-card p-2 shadow-sm">
+            {NAV.map((group) => (
+              <div key={group.group} className="mb-2 last:mb-0">
+                <p className="px-3 pb-1 pt-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
+                  {group.group}
+                </p>
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = item.id === active;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setActive(item.id)}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-small transition-colors",
+                        isActive
+                          ? "bg-primary/10 font-semibold text-primary"
+                          : "text-foreground/75 hover:bg-accent hover:text-foreground",
+                      )}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                      <ChevronRight
+                        className={cn("h-3.5 w-3.5 shrink-0 transition-opacity", isActive ? "opacity-100" : "opacity-0")}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </nav>
+
+        <div className="min-w-0">
+          <p className="mb-4 flex items-center gap-1.5 text-caption text-muted-foreground lg:hidden">
+            Settings <ChevronRight className="h-3 w-3" /> {current.label}
+          </p>
+          {active === "general" && <GeneralSection />}
+          {active === "homepage" && <ContentSection />}
+          {active === "statistics" && <StatsSection />}
+          {active === "social" && <SocialSection />}
+          {(active === "brand" || active === "seo" || active === "email" || active === "notifications" || active === "security") && (
+            <ComingSoon label={current.label} hint={current.hint} />
+          )}
+        </div>
       </div>
-      <SiteContentSection />
     </>
   );
 }
 
-function ContactInfoSection() {
-  const qc = useQueryClient();
-  const list = useQuery({
-    queryKey: ["admin-contact-info"] as const,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("contact_info").select("*").order("sort_order");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  function invalidate() { qc.invalidateQueries({ queryKey: ["admin-contact-info"] }); qc.invalidateQueries({ queryKey: ["contact_info"] }); }
-
-  const upsert = useMutation({
-    mutationFn: async (row: { id?: string; key: string; label: string | null; value: string; icon: string | null; sort_order: number }) => {
-      if (row.id) {
-        const { error } = await supabase.from("contact_info").update(row).eq("id", row.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("contact_info").insert(row);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => { toast.success("Saved"); invalidate(); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const remove = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("contact_info").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { toast.success("Deleted"); invalidate(); },
-  });
-
-  const [draft, setDraft] = useState({ key: "", label: "", value: "", icon: "", sort_order: 0 });
-
+function ComingSoon({ label, hint }: { label: string; hint: string }) {
   return (
-    <AdminCard title="Contact info" description="Phone numbers, email, WhatsApp, social links.">
-      <div className="space-y-3">
-        {(list.data ?? []).map((c) => (
-          <ContactInfoRow key={c.id} row={c} onSave={(patch) => upsert.mutate({ id: c.id, ...patch })} onDelete={() => remove.mutate(c.id)} />
-        ))}
-        <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
-          <p className="text-caption font-semibold uppercase text-muted-foreground">Add new</p>
-          <div className="grid gap-2 sm:grid-cols-5">
-            <Input placeholder="key (phone, email, whatsapp, facebook…)" value={draft.key} onChange={(e) => setDraft({ ...draft, key: e.target.value })} />
-            <Input placeholder="Label" value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} />
-            <Input placeholder="Value" value={draft.value} onChange={(e) => setDraft({ ...draft, value: e.target.value })} className="sm:col-span-2" />
-            <Input placeholder="Icon" value={draft.icon} onChange={(e) => setDraft({ ...draft, icon: e.target.value })} />
-          </div>
-          <Button size="sm" onClick={() => { if (draft.key && draft.value) { upsert.mutate({ key: draft.key, label: draft.label || null, value: draft.value, icon: draft.icon || null, sort_order: draft.sort_order }); setDraft({ key: "", label: "", value: "", icon: "", sort_order: 0 }); } }}>
-            <Plus className="me-2 h-4 w-4" /> Add
-          </Button>
-        </div>
-      </div>
-    </AdminCard>
-  );
-}
-
-function ContactInfoRow({ row, onSave, onDelete }: { row: { key: string; label: string | null; value: string; icon: string | null; sort_order: number | null }; onSave: (patch: { key: string; label: string | null; value: string; icon: string | null; sort_order: number }) => void; onDelete: () => void }) {
-  const [f, setF] = useState({ key: row.key, label: row.label ?? "", value: row.value, icon: row.icon ?? "", sort_order: row.sort_order ?? 0 });
-  return (
-    <div className="grid gap-2 sm:grid-cols-6 items-center">
-      <Input value={f.key} onChange={(e) => setF({ ...f, key: e.target.value })} />
-      <Input value={f.label} onChange={(e) => setF({ ...f, label: e.target.value })} />
-      <Input value={f.value} onChange={(e) => setF({ ...f, value: e.target.value })} className="sm:col-span-2" />
-      <Input value={f.icon} onChange={(e) => setF({ ...f, icon: e.target.value })} />
-      <div className="flex gap-1">
-        <Button size="icon" onClick={() => onSave({ key: f.key, label: f.label || null, value: f.value, icon: f.icon || null, sort_order: Number(f.sort_order) || 0 })}><Save className="h-4 w-4" /></Button>
-        <Button size="icon" variant="ghost" className="text-destructive" onClick={onDelete}><Trash2 className="h-4 w-4" /></Button>
-      </div>
-    </div>
-  );
-}
-
-function SiteStatsSection() {
-  const qc = useQueryClient();
-  const list = useQuery({
-    queryKey: ["admin-site-stats"] as const,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("site_stats").select("*").order("sort_order");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  function invalidate() { qc.invalidateQueries({ queryKey: ["admin-site-stats"] }); qc.invalidateQueries({ queryKey: ["site_stats"] }); }
-
-  const upsert = useMutation({
-    mutationFn: async (row: { id?: string; label: string; value: string; icon: string | null; sort_order: number }) => {
-      if (row.id) { const { error } = await supabase.from("site_stats").update(row).eq("id", row.id); if (error) throw error; }
-      else { const { error } = await supabase.from("site_stats").insert(row); if (error) throw error; }
-    },
-    onSuccess: () => { toast.success("Saved"); invalidate(); },
-  });
-
-  const remove = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("site_stats").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { toast.success("Deleted"); invalidate(); },
-  });
-
-  const [draft, setDraft] = useState({ label: "", value: "", icon: "", sort_order: 0 });
-
-  return (
-    <AdminCard title="Impact stats" description="Numbers displayed in the homepage stats section.">
-      <div className="space-y-2">
-        {(list.data ?? []).map((s) => (
-          <StatRow key={s.id} row={s} onSave={(p) => upsert.mutate({ id: s.id, ...p })} onDelete={() => remove.mutate(s.id)} />
-        ))}
-        <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
-          <div className="grid gap-2 sm:grid-cols-4">
-            <Input placeholder="Label" value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} />
-            <Input placeholder="Value" value={draft.value} onChange={(e) => setDraft({ ...draft, value: e.target.value })} />
-            <Input placeholder="Icon" value={draft.icon} onChange={(e) => setDraft({ ...draft, icon: e.target.value })} />
-            <Button size="sm" onClick={() => { if (draft.label && draft.value) { upsert.mutate({ label: draft.label, value: draft.value, icon: draft.icon || null, sort_order: draft.sort_order }); setDraft({ label: "", value: "", icon: "", sort_order: 0 }); } }}>
-              <Plus className="me-2 h-4 w-4" /> Add
-            </Button>
-          </div>
-        </div>
-      </div>
-    </AdminCard>
-  );
-}
-
-function StatRow({ row, onSave, onDelete }: { row: { label: string; value: string; icon: string | null; sort_order: number | null }; onSave: (p: { label: string; value: string; icon: string | null; sort_order: number }) => void; onDelete: () => void }) {
-  const [f, setF] = useState({ label: row.label, value: row.value, icon: row.icon ?? "", sort_order: row.sort_order ?? 0 });
-  return (
-    <div className="grid gap-2 sm:grid-cols-5 items-center">
-      <Input value={f.label} onChange={(e) => setF({ ...f, label: e.target.value })} />
-      <Input value={f.value} onChange={(e) => setF({ ...f, value: e.target.value })} />
-      <Input value={f.icon} onChange={(e) => setF({ ...f, icon: e.target.value })} />
-      <Input type="number" value={f.sort_order} onChange={(e) => setF({ ...f, sort_order: Number(e.target.value) || 0 })} />
-      <div className="flex gap-1">
-        <Button size="icon" onClick={() => onSave({ label: f.label, value: f.value, icon: f.icon || null, sort_order: Number(f.sort_order) || 0 })}><Save className="h-4 w-4" /></Button>
-        <Button size="icon" variant="ghost" className="text-destructive" onClick={onDelete}><Trash2 className="h-4 w-4" /></Button>
-      </div>
-    </div>
-  );
-}
-
-function SiteContentSection() {
-  const qc = useQueryClient();
-  const list = useQuery({
-    queryKey: ["admin-site-content"] as const,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("site_content").select("*").order("key");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const upsert = useMutation({
-    mutationFn: async (row: { id: string; title: string | null; subtitle: string | null; body: string | null; image: string | null; cta_label: string | null; cta_href: string | null }) => {
-      const { error } = await supabase.from("site_content").update(row).eq("id", row.id);
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["admin-site-content"] }); qc.invalidateQueries({ queryKey: ["content"] }); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  return (
-    <AdminCard title="Site content" description="Hero, CTA and marketing content blocks." className="mt-6">
-      <div className="space-y-4">
-        {(list.data ?? []).map((c) => <SiteContentBlock key={c.id} row={c} onSave={(p) => upsert.mutate({ id: c.id, ...p })} />)}
-      </div>
-    </AdminCard>
-  );
-}
-
-function SiteContentBlock({ row, onSave }: { row: { key: string; title: string | null; subtitle: string | null; body: string | null; image: string | null; cta_label: string | null; cta_href: string | null }; onSave: (p: { title: string | null; subtitle: string | null; body: string | null; image: string | null; cta_label: string | null; cta_href: string | null }) => void }) {
-  const [f, setF] = useState({
-    title: row.title ?? "",
-    subtitle: row.subtitle ?? "",
-    body: row.body ?? "",
-    image: row.image ?? "",
-    cta_label: row.cta_label ?? "",
-    cta_href: row.cta_href ?? "",
-  });
-  return (
-    <div className="rounded-lg border border-border p-3 space-y-2">
-      <p className="text-caption font-semibold uppercase text-muted-foreground">Block: {row.key}</p>
-      <div className="grid gap-2 sm:grid-cols-2">
-        <div className="grid gap-1"><Label>Title</Label><Input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
-        <div className="grid gap-1"><Label>Subtitle</Label><Input value={f.subtitle} onChange={(e) => setF({ ...f, subtitle: e.target.value })} /></div>
-        <div className="grid gap-1 sm:col-span-2"><Label>Body</Label><Textarea rows={3} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} /></div>
-        <div className="grid gap-1"><Label>Image URL</Label><Input value={f.image} onChange={(e) => setF({ ...f, image: e.target.value })} /></div>
-        <div className="grid gap-1"><Label>CTA label</Label><Input value={f.cta_label} onChange={(e) => setF({ ...f, cta_label: e.target.value })} /></div>
-        <div className="grid gap-1 sm:col-span-2"><Label>CTA link</Label><Input value={f.cta_href} onChange={(e) => setF({ ...f, cta_href: e.target.value })} /></div>
-      </div>
-      <Button size="sm" onClick={() => onSave({ title: f.title || null, subtitle: f.subtitle || null, body: f.body || null, image: f.image || null, cta_label: f.cta_label || null, cta_href: f.cta_href || null })}>
-        <Save className="me-2 h-4 w-4" /> Save
-      </Button>
-    </div>
+    <SettingsSection title={label} description={hint}>
+      <SettingsCard>
+        <p className="text-small leading-relaxed text-muted-foreground">
+          This category is part of the new settings structure but isn’t connected to editable content yet. Everything you
+          can currently manage lives under General, Homepage, Statistics and Social media.
+        </p>
+      </SettingsCard>
+    </SettingsSection>
   );
 }
