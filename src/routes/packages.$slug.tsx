@@ -238,6 +238,5 @@ function PackagePage() {
       </div>
     </SiteLayout>
   );
-
-  );
 }
+
