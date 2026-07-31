@@ -138,7 +138,31 @@ function PackagePage() {
               </div>
             </section>
           )}
+
+          {faqList.length > 0 && (
+            <section>
+              <h2 className="mb-4 text-h3 font-bold">{t("package.faqTitle")}</h2>
+              <Accordion type="single" collapsible className="rounded-lg border border-border-subtle bg-card px-4">
+                {faqList.map((f) => (
+                  <AccordionItem key={f.id} value={f.id}>
+                    <AccordionTrigger className="text-start">{f.question}</AccordionTrigger>
+                    <AccordionContent className="text-small text-muted-foreground">
+                      {f.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+          )}
+
+          <section className="rounded-lg border border-border-subtle bg-muted/30 p-6">
+            <h2 className="mb-3 text-h5 font-bold">{t("package.terms")}</h2>
+            <p className="text-small leading-relaxed text-muted-foreground">
+              {t("bookingFlow.review.terms")} {t("bookingFlow.confirm.noPayment")}
+            </p>
+          </section>
         </div>
+
 
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           <div className="space-y-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm">
