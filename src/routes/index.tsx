@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { PackageExplorer } from "@/components/sections/PackageExplorer";
+import { PackageSelector } from "@/components/sections/PackageSelector";
 import { StatsSection } from "@/components/sections/StatsSection";
 import {
   ServicesSection,
@@ -34,7 +34,7 @@ function Index() {
   return (
     <SiteLayout>
       <HeroSection />
-      <PackageExplorer />
+      <PackageSelector />
       <StatsSection />
       <ServicesSection />
       <FeaturesSection />
