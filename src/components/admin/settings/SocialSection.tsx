@@ -7,13 +7,55 @@ import { Field, SaveBar, SettingsCard, SettingsSection, useLastSaved } from "./p
 import { useContactSettings, type ContactFieldSpec } from "./useContactSettings";
 
 const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
-  { key: "facebook", label: "Facebook", icon: "facebook", sort_order: 6, placeholder: "https://facebook.com/yourpage" },
-  { key: "instagram", label: "Instagram", icon: "instagram", sort_order: 7, placeholder: "https://instagram.com/yourpage" },
-  { key: "tiktok", label: "TikTok", icon: "music", sort_order: 11, placeholder: "https://tiktok.com/@yourpage" },
-  { key: "youtube", label: "YouTube", icon: "youtube", sort_order: 12, placeholder: "https://youtube.com/@yourchannel" },
-  { key: "linkedin", label: "LinkedIn", icon: "linkedin", sort_order: 13, placeholder: "https://linkedin.com/company/yourpage" },
-  { key: "telegram", label: "Telegram", icon: "send", sort_order: 14, placeholder: "https://t.me/yourchannel" },
-  { key: "whatsapp", label: "WhatsApp", icon: "message-circle", sort_order: 8, placeholder: "https://wa.me/21655123456" },
+  {
+    key: "facebook",
+    label: "Facebook",
+    icon: "facebook",
+    sort_order: 6,
+    placeholder: "https://facebook.com/yourpage",
+  },
+  {
+    key: "instagram",
+    label: "Instagram",
+    icon: "instagram",
+    sort_order: 7,
+    placeholder: "https://instagram.com/yourpage",
+  },
+  {
+    key: "tiktok",
+    label: "TikTok",
+    icon: "music",
+    sort_order: 11,
+    placeholder: "https://tiktok.com/@yourpage",
+  },
+  {
+    key: "youtube",
+    label: "YouTube",
+    icon: "youtube",
+    sort_order: 12,
+    placeholder: "https://youtube.com/@yourchannel",
+  },
+  {
+    key: "linkedin",
+    label: "LinkedIn",
+    icon: "linkedin",
+    sort_order: 13,
+    placeholder: "https://linkedin.com/company/yourpage",
+  },
+  {
+    key: "telegram",
+    label: "Telegram",
+    icon: "send",
+    sort_order: 14,
+    placeholder: "https://t.me/yourchannel",
+  },
+  {
+    key: "whatsapp",
+    label: "WhatsApp",
+    icon: "message-circle",
+    sort_order: 8,
+    placeholder: "https://wa.me/21655123456",
+  },
 ];
 
 function isValid(url: string) {
@@ -35,7 +77,10 @@ export function SocialSection() {
       title="Social media"
       description="Connect your channels once — they appear in the site footer, contact section and structured data automatically."
     >
-      <SettingsCard title="Channels" description="Leave a field empty to hide that channel from the website.">
+      <SettingsCard
+        title="Channels"
+        description="Leave a field empty to hide that channel from the website."
+      >
         <div className="grid gap-5 md:grid-cols-2">
           {SOCIALS.map((f) => {
             const value = s.form[f.key] ?? "";
@@ -64,9 +109,14 @@ export function SocialSection() {
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Preview" description="How your channel buttons will look and where they point.">
+      <SettingsCard
+        title="Preview"
+        description="How your channel buttons will look and where they point."
+      >
         {active.length === 0 ? (
-          <p className="text-small text-muted-foreground">Add at least one link to see the preview.</p>
+          <p className="text-small text-muted-foreground">
+            Add at least one link to see the preview.
+          </p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {active.map((f) => (

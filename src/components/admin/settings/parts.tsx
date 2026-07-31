@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Check, CloudUpload, Loader2, Monitor, RotateCcw, Search, Smartphone, Tablet, Trash2 } from "lucide-react";
+import {
+  Check,
+  CloudUpload,
+  Loader2,
+  Monitor,
+  RotateCcw,
+  Search,
+  Smartphone,
+  Tablet,
+  Trash2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,7 +37,9 @@ export function SettingsSection({
     <section className="space-y-6">
       <header className="max-w-2xl">
         <h2 className="text-h4 font-bold tracking-tight text-foreground">{title}</h2>
-        {description && <p className="mt-2 text-small leading-relaxed text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mt-2 text-small leading-relaxed text-muted-foreground">{description}</p>
+        )}
       </header>
       {aside}
       {children}
@@ -59,7 +71,9 @@ export function SettingsCard({
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border-subtle px-5 py-4 sm:px-6">
           <div className="min-w-0">
             {title && <h3 className="text-body font-semibold">{title}</h3>}
-            {description && <p className="mt-0.5 text-caption text-muted-foreground">{description}</p>}
+            {description && (
+              <p className="mt-0.5 text-caption text-muted-foreground">{description}</p>
+            )}
           </div>
           {actions}
         </div>
@@ -123,9 +137,19 @@ export function TextField({
 }) {
   return (
     <Field label={label} hint={hint} error={error} wide={wide}>
-      <Input type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      <Input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+      />
       {maxCount && (
-        <p className={cn("text-caption tabular-nums", value.length > maxCount ? "text-destructive" : "text-muted-foreground")}>
+        <p
+          className={cn(
+            "text-caption tabular-nums",
+            value.length > maxCount ? "text-destructive" : "text-muted-foreground",
+          )}
+        >
           {value.length} / {maxCount}
         </p>
       )}
@@ -150,7 +174,12 @@ export function TextAreaField({
 }) {
   return (
     <Field label={label} hint={hint} wide>
-      <Textarea rows={rows} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      <Textarea
+        rows={rows}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </Field>
   );
 }
@@ -219,11 +248,23 @@ export function ImageField({
             className="hidden"
             onChange={(e) => void pick(e.target.files?.[0])}
           />
-          <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => inputRef.current?.click()}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={busy}
+            onClick={() => inputRef.current?.click()}
+          >
             <CloudUpload className="me-2 h-4 w-4" /> {value ? "Replace" : "Upload"}
           </Button>
           {value && (
-            <Button type="button" variant="ghost" size="sm" className="text-destructive" onClick={() => onChange("")}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-destructive"
+              onClick={() => onChange("")}
+            >
               <Trash2 className="me-2 h-4 w-4" /> Remove
             </Button>
           )}
@@ -236,10 +277,38 @@ export function ImageField({
 /* -------------------------------- icon picker ------------------------------- */
 
 const ICON_CHOICES = [
-  "users", "user-check", "plane", "plane-takeoff", "map-pin", "map", "globe", "calendar",
-  "star", "award", "trophy", "heart", "shield-check", "sparkles", "smile", "thumbs-up",
-  "briefcase", "building-2", "phone", "mail", "message-circle", "clock", "ticket", "luggage",
-  "kaaba", "moon-star", "camera", "image", "trending-up", "badge-check", "handshake", "gem",
+  "users",
+  "user-check",
+  "plane",
+  "plane-takeoff",
+  "map-pin",
+  "map",
+  "globe",
+  "calendar",
+  "star",
+  "award",
+  "trophy",
+  "heart",
+  "shield-check",
+  "sparkles",
+  "smile",
+  "thumbs-up",
+  "briefcase",
+  "building-2",
+  "phone",
+  "mail",
+  "message-circle",
+  "clock",
+  "ticket",
+  "luggage",
+  "kaaba",
+  "moon-star",
+  "camera",
+  "image",
+  "trending-up",
+  "badge-check",
+  "handshake",
+  "gem",
 ];
 
 export function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -257,7 +326,12 @@ export function IconPicker({ value, onChange }: { value: string; onChange: (v: s
       <PopoverContent className="w-72 p-3" align="start">
         <div className="relative mb-3">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search icons" className="pl-8" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search icons"
+            className="pl-8"
+          />
         </div>
         <div className="grid max-h-56 grid-cols-6 gap-1 overflow-y-auto">
           {list.map((n) => (
@@ -330,7 +404,12 @@ export function SaveBar({
             <RotateCcw className="me-2 h-4 w-4" /> Discard
           </Button>
           <Button size="sm" disabled={!dirty || saving} onClick={onSave}>
-            {saving ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <Check className="me-2 h-4 w-4" />} Save changes
+            {saving ? (
+              <Loader2 className="me-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Check className="me-2 h-4 w-4" />
+            )}{" "}
+            Save changes
           </Button>
         </div>
       </div>
@@ -365,7 +444,9 @@ export function LivePreview({ path = "/", reloadKey }: { path?: string; reloadKe
                 aria-pressed={device === k}
                 className={cn(
                   "rounded-md p-1.5 transition-colors",
-                  device === k ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground",
+                  device === k
+                    ? "bg-card text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Icon className="h-4 w-4" />

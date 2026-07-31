@@ -67,7 +67,11 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
           } else {
             const { error } = await supabase
               .from("contact_info")
-              .update({ value: next, label: existing.label ?? spec.label, icon: existing.icon ?? spec.icon })
+              .update({
+                value: next,
+                label: existing.label ?? spec.label,
+                icon: existing.icon ?? spec.icon,
+              })
               .eq("id", existing.id);
             if (error) throw error;
           }

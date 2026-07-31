@@ -33,12 +33,23 @@ const BLOCK_META: Record<string, { name: string; help: string }> = {
     name: "Hero",
     help: "The first thing visitors see. Keep the headline under 60 characters and use a wide, bright background image.",
   },
-  about: { name: "About the agency", help: "A short story about your agency, shown on the homepage and About page." },
-  cta: { name: "Closing call to action", help: "The final nudge before the footer. One clear action performs best." },
+  about: {
+    name: "About the agency",
+    help: "A short story about your agency, shown on the homepage and About page.",
+  },
+  cta: {
+    name: "Closing call to action",
+    help: "The final nudge before the footer. One clear action performs best.",
+  },
 };
 
 function metaFor(key: string) {
-  return BLOCK_META[key] ?? { name: key.replace(/[-_]/g, " "), help: "Content block rendered on the public website." };
+  return (
+    BLOCK_META[key] ?? {
+      name: key.replace(/[-_]/g, " "),
+      help: "Content block rendered on the public website.",
+    }
+  );
 }
 
 export function ContentSection() {
@@ -127,7 +138,10 @@ export function ContentSection() {
           const expanded = open === b.key;
           const changed = JSON.stringify(remote.find((r) => r.id === b.id)) !== JSON.stringify(b);
           return (
-            <div key={b.id} className="overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm">
+            <div
+              key={b.id}
+              className="overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm"
+            >
               <button
                 type="button"
                 onClick={() => setOpen(expanded ? null : b.key)}
@@ -136,19 +150,35 @@ export function ContentSection() {
               >
                 <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-border-subtle bg-surface-sunken/60">
                   {b.image ? (
-                    <img src={b.image} alt="" loading="lazy" className="h-full w-full object-cover" />
+                    <img
+                      src={b.image}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
-                    <span className="grid h-full w-full place-items-center text-caption text-muted-foreground">—</span>
+                    <span className="grid h-full w-full place-items-center text-caption text-muted-foreground">
+                      —
+                    </span>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-2 text-body font-semibold capitalize">
                     {meta.name}
-                    {changed && <span className="h-2 w-2 rounded-full bg-warning" aria-label="Unsaved" />}
+                    {changed && (
+                      <span className="h-2 w-2 rounded-full bg-warning" aria-label="Unsaved" />
+                    )}
                   </p>
-                  <p className="truncate text-caption text-muted-foreground">{b.title || "Untitled block"}</p>
+                  <p className="truncate text-caption text-muted-foreground">
+                    {b.title || "Untitled block"}
+                  </p>
                 </div>
-                <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", expanded && "rotate-180")} />
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                    expanded && "rotate-180",
+                  )}
+                />
               </button>
 
               {expanded && (
@@ -157,9 +187,24 @@ export function ContentSection() {
                     {meta.help}
                   </p>
                   <FieldGrid>
-                    <TextField label="Title" maxCount={60} value={b.title} onChange={(v) => patch(b.id, { title: v })} />
-                    <TextField label="Subtitle" maxCount={120} value={b.subtitle} onChange={(v) => patch(b.id, { subtitle: v })} />
-                    <TextAreaField label="Body text" hint="Optional supporting paragraph." value={b.body} onChange={(v) => patch(b.id, { body: v })} />
+                    <TextField
+                      label="Title"
+                      maxCount={60}
+                      value={b.title}
+                      onChange={(v) => patch(b.id, { title: v })}
+                    />
+                    <TextField
+                      label="Subtitle"
+                      maxCount={120}
+                      value={b.subtitle}
+                      onChange={(v) => patch(b.id, { subtitle: v })}
+                    />
+                    <TextAreaField
+                      label="Body text"
+                      hint="Optional supporting paragraph."
+                      value={b.body}
+                      onChange={(v) => patch(b.id, { body: v })}
+                    />
                     <ImageField
                       label="Background / illustration"
                       hint="Upload directly — no need to paste URLs. Recommended 1920×1080."
@@ -167,7 +212,11 @@ export function ContentSection() {
                       value={b.image}
                       onChange={(v) => patch(b.id, { image: v })}
                     />
-                    <TextField label="Button label" value={b.cta_label} onChange={(v) => patch(b.id, { cta_label: v })} />
+                    <TextField
+                      label="Button label"
+                      value={b.cta_label}
+                      onChange={(v) => patch(b.id, { cta_label: v })}
+                    />
                     <TextField
                       label="Button link"
                       hint="Internal path such as /umrah or a full https link."

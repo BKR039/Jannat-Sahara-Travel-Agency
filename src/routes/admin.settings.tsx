@@ -24,7 +24,16 @@ import { SettingsCard, SettingsSection } from "@/components/admin/settings/parts
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
 
-type SectionId = "general" | "brand" | "homepage" | "statistics" | "social" | "seo" | "email" | "notifications" | "security";
+type SectionId =
+  | "general"
+  | "brand"
+  | "homepage"
+  | "statistics"
+  | "social"
+  | "seo"
+  | "email"
+  | "notifications"
+  | "security";
 
 interface NavGroup {
   group: string;
@@ -102,7 +111,10 @@ function SettingsPage() {
                       <Icon className="h-4 w-4 shrink-0" />
                       <span className="min-w-0 flex-1 truncate">{item.label}</span>
                       <ChevronRight
-                        className={cn("h-3.5 w-3.5 shrink-0 transition-opacity", isActive ? "opacity-100" : "opacity-0")}
+                        className={cn(
+                          "h-3.5 w-3.5 shrink-0 transition-opacity",
+                          isActive ? "opacity-100" : "opacity-0",
+                        )}
                       />
                     </button>
                   );
@@ -120,9 +132,11 @@ function SettingsPage() {
           {active === "homepage" && <ContentSection />}
           {active === "statistics" && <StatsSection />}
           {active === "social" && <SocialSection />}
-          {(active === "brand" || active === "seo" || active === "email" || active === "notifications" || active === "security") && (
-            <ComingSoon label={current.label} hint={current.hint} />
-          )}
+          {(active === "brand" ||
+            active === "seo" ||
+            active === "email" ||
+            active === "notifications" ||
+            active === "security") && <ComingSoon label={current.label} hint={current.hint} />}
         </div>
       </div>
     </>
@@ -134,8 +148,9 @@ function ComingSoon({ label, hint }: { label: string; hint: string }) {
     <SettingsSection title={label} description={hint}>
       <SettingsCard>
         <p className="text-small leading-relaxed text-muted-foreground">
-          This category is part of the new settings structure but isn’t connected to editable content yet. Everything you
-          can currently manage lives under General, Homepage, Statistics and Social media.
+          This category is part of the new settings structure but isn’t connected to editable
+          content yet. Everything you can currently manage lives under General, Homepage, Statistics
+          and Social media.
         </p>
       </SettingsCard>
     </SettingsSection>

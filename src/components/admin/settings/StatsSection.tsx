@@ -24,7 +24,10 @@ export function StatsSection() {
   const query = useQuery({
     queryKey: ["admin-site-stats"] as const,
     queryFn: async () => {
-      const { data, error } = await supabase.from("site_stats").select("id,label,value,icon,sort_order").order("sort_order");
+      const { data, error } = await supabase
+        .from("site_stats")
+        .select("id,label,value,icon,sort_order")
+        .order("sort_order");
       if (error) throw error;
       return data;
     },
@@ -58,7 +61,12 @@ export function StatsSection() {
       for (let i = 0; i < items.length; i++) {
         const it = items[i];
         if (!it.label.trim() || !it.value.trim()) continue;
-        const payload = { label: it.label.trim(), value: it.value.trim(), icon: it.icon || null, sort_order: i };
+        const payload = {
+          label: it.label.trim(),
+          value: it.value.trim(),
+          icon: it.icon || null,
+          sort_order: i,
+        };
         if (it.id) {
           const { error } = await supabase.from("site_stats").update(payload).eq("id", it.id);
           if (error) throw error;
@@ -118,7 +126,8 @@ export function StatsSection() {
           >
             <div className="mb-4 flex items-center justify-between">
               <span className="flex items-center gap-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
-                <GripVertical className="h-4 w-4 cursor-grab text-muted-foreground/70" /> Card {index + 1}
+                <GripVertical className="h-4 w-4 cursor-grab text-muted-foreground/70" /> Card{" "}
+                {index + 1}
               </span>
               <Button
                 size="icon"
@@ -148,14 +157,28 @@ export function StatsSection() {
               </div>
               <div className="grid gap-1.5">
                 <Label className="text-caption">Label</Label>
-                <Input value={it.label} onChange={(e) => patch(it.tempId, { label: e.target.value })} placeholder="Happy travellers" />
+                <Input
+                  value={it.label}
+                  onChange={(e) => patch(it.tempId, { label: e.target.value })}
+                  placeholder="Happy travellers"
+                />
               </div>
               <div className="grid gap-1.5">
                 <Label className="text-caption">Value</Label>
-                <Input value={it.value} onChange={(e) => patch(it.tempId, { value: e.target.value })} placeholder="12 000+" />
+                <Input
+                  value={it.value}
+                  onChange={(e) => patch(it.tempId, { value: e.target.value })}
+                  placeholder="12 000+"
+                />
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1" disabled={index === 0} onClick={() => move(index, index - 1)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  disabled={index === 0}
+                  onClick={() => move(index, index - 1)}
+                >
                   Move up
                 </Button>
                 <Button
@@ -188,11 +211,18 @@ export function StatsSection() {
 
       <SettingsCard title="Tip">
         <p className="text-small leading-relaxed text-muted-foreground">
-          Keep values short and human — “12 000+” reads better than “12034”. Three to four cards work best on mobile.
+          Keep values short and human — “12 000+” reads better than “12034”. Three to four cards
+          work best on mobile.
         </p>
       </SettingsCard>
 
-      <SaveBar dirty={dirty} saving={save.isPending} lastSaved={lastSaved} onSave={() => save.mutate()} onDiscard={() => setItems(remote)} />
+      <SaveBar
+        dirty={dirty}
+        saving={save.isPending}
+        lastSaved={lastSaved}
+        onSave={() => save.mutate()}
+        onDiscard={() => setItems(remote)}
+      />
     </SettingsSection>
   );
 }
