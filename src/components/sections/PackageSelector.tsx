@@ -406,13 +406,13 @@ export function PackageSelector() {
         <div className="mt-12">
           <SkeletonGrid count={8} />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : byService.length === 0 ? (
         <div className="mt-12">
           <EmptyState label={t("explorer.empty")} />
         </div>
       ) : (
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p, i) => (
+          {byService.map((p, i) => (
             <div key={p.id} className="ds-reveal" style={{ animationDelay: `${i * 60}ms` }}>
               <PackageCard pkg={p} />
             </div>
