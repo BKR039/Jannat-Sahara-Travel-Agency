@@ -14,13 +14,13 @@ import {
   Instagram,
   Youtube,
   Copy,
-  Share2,
   Send,
   Check,
   Building2,
   Sparkles,
   Search,
   Loader2,
+  ChevronRight,
 } from "lucide-react";
 import {
   Select,
@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-import { branchesQuery, contactInfoQuery, type Branch } from "@/lib/queries";
+import { branchesQuery, contactInfoQuery, type Branch, type ContactInfo } from "@/lib/queries";
 
 const BranchesMap = lazy(() => import("./BranchesMap"));
 
@@ -42,6 +42,8 @@ const SOCIAL_ICONS: Record<string, typeof Facebook> = {
   tiktok: Sparkles,
   whatsapp: MessageCircle,
 };
+
+const SOCIAL_KEYS = ["facebook", "instagram", "youtube", "twitter", "tiktok"];
 
 function whatsappHref(phone: string) {
   return `https://wa.me/${phone.replace(/[^\d]/g, "")}`;
@@ -56,11 +58,11 @@ async function copyToClipboard(value: string, label: string) {
   }
 }
 
-/* ---------------------------------------------------------------- atoms */
+/* ------------------------------------------------------------------ atoms */
 
 function MapSkeleton() {
   return (
-    <div className="flex h-full min-h-[420px] w-full items-center justify-center rounded-xl bg-muted/40">
+    <div className="flex h-full min-h-[320px] w-full items-center justify-center bg-muted/40">
       <Loader2 className="h-7 w-7 animate-spin text-primary/70" />
     </div>
   );
@@ -80,7 +82,7 @@ function IconAction({
   external?: boolean;
 }) {
   const cls =
-    "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground/70 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
+    "inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/60 text-foreground/70 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
   if (href) {
     return (
       <a
@@ -103,9 +105,9 @@ function IconAction({
   );
 }
 
-/* --------------------------------------------------------- branch card */
+/* ------------------------------------------------------- branch list row */
 
-function BranchCard({
+function BranchRow({
   branch,
   active,
   onSelect,
@@ -133,254 +135,266 @@ function BranchCard({
           onSelect(branch.id);
         }
       }}
-      style={{ animationDelay: `${Math.min(index, 6) * 70}ms` }}
+      style={{ animationDelay: `${Math.min(index, 6) * 60}ms` }}
       className={cn(
-        "group ds-reveal relative flex cursor-pointer flex-col overflow-hidden rounded-xl border p-6 text-start backdrop-blur-xl",
-        "transition-[transform,box-shadow,border-color] duration-moderate ease-standard",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-        active
-          ? "-translate-y-1 scale-[1.01] border-primary/70 bg-card shadow-2xl shadow-primary/20"
-          : "border-border/50 bg-card/70 shadow-sm hover:-translate-y-1.5 hover:scale-[1.01] hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10",
+        "group ds-reveal relative flex cursor-pointer gap-4 border-b border-border/50 p-5 text-start transition-colors duration-base ease-standard last:border-b-0",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60",
+        active ? "bg-primary/8" : "hover:bg-muted/50",
       )}
     >
-      {/* luxury lighting */}
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -top-24 end-[-20%] h-56 w-56 rounded-full bg-primary/15 blur-3xl transition-opacity duration-slow",
-          active ? "opacity-100" : "opacity-0 group-hover:opacity-70",
+          "absolute inset-y-0 start-0 w-[3px] rounded-full bg-primary transition-transform duration-base ease-standard",
+          active ? "scale-y-100" : "scale-y-0",
         )}
       />
+      <span
+        className={cn(
+          "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
+          active
+            ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+            : "bg-primary/10 text-primary group-hover:scale-105",
+        )}
+      >
+        {branch.is_main_branch ? (
+          <Star className={cn("h-4 w-4", active && "fill-current")} />
+        ) : (
+          <MapPin className="h-4 w-4" />
+        )}
+      </span>
 
-      <header className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary/80">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-caption font-semibold uppercase tracking-[0.16em] text-primary/80">
             {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} · {branch.city}
           </p>
-          <h3 className="mt-1.5 text-h4 font-bold leading-tight text-foreground">{branch.name}</h3>
         </div>
-        <span
-          className={cn(
-            "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
-            active
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-              : "bg-gradient-to-br from-primary/15 to-primary/5 text-primary group-hover:scale-110",
-          )}
-        >
-          {branch.is_main_branch ? (
-            <Star className={cn("h-5 w-5", active && "fill-current")} />
-          ) : (
-            <MapPin className="h-5 w-5" />
-          )}
-        </span>
-      </header>
+        <h3 className="mt-1 truncate text-h5 font-bold leading-snug text-foreground">
+          {branch.name}
+        </h3>
+        <p className="mt-1.5 line-clamp-2 text-small leading-relaxed text-muted-foreground">
+          {branch.address}
+        </p>
 
-      <dl className="relative mt-5 space-y-3 text-small">
-        <div className="flex items-start gap-3">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
-          <dd className="leading-relaxed text-muted-foreground">{branch.address}</dd>
-        </div>
-        {branch.working_hours && (
-          <div className="flex items-start gap-3">
-            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
-            <dd className="text-muted-foreground">{branch.working_hours}</dd>
+        {(branch.working_hours || branch.phone) && (
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-muted-foreground">
+            {branch.working_hours && (
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-3 w-3 text-primary/70" />
+                {branch.working_hours}
+              </span>
+            )}
+            {branch.phone && (
+              <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80" dir="ltr">
+                <Phone className="h-3 w-3 text-primary/70" />
+                {branch.phone}
+              </span>
+            )}
           </div>
         )}
-        {branch.phone && (
-          <div className="flex items-start gap-3">
-            <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
-            <dd className="font-medium text-foreground/85" dir="ltr">
-              {branch.phone}
-            </dd>
-          </div>
-        )}
-        {branch.email && (
-          <div className="flex items-start gap-3">
-            <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
-            <dd className="truncate text-muted-foreground">{branch.email}</dd>
-          </div>
-        )}
-      </dl>
 
-      <footer className="relative mt-6 flex flex-wrap items-center gap-2 border-t border-border/50 pt-5">
-        {branch.google_maps_url && (
-          <a
-            href={branch.google_maps_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex h-10 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-full bg-primary px-5 text-button font-semibold text-primary-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        <div className="mt-3 flex items-center gap-2">
+          {branch.phone && (
+            <>
+              <IconAction label={t("branches.call")} href={`tel:${branch.phone.replace(/\s+/g, "")}`}>
+                <Phone className="h-4 w-4" />
+              </IconAction>
+              <IconAction label={t("branches.whatsapp")} href={whatsappHref(branch.phone)} external>
+                <MessageCircle className="h-4 w-4" />
+              </IconAction>
+            </>
+          )}
+          {branch.google_maps_url && (
+            <IconAction label={t("branches.directions")} href={branch.google_maps_url} external>
+              <Navigation className="h-4 w-4" />
+            </IconAction>
+          )}
+          <IconAction
+            label={t("branches.copyAddress")}
+            onClick={(e) => {
+              e.stopPropagation();
+              copyToClipboard(`${branch.name} — ${branch.address}`, t("branches.addressCopied"));
+            }}
           >
-            <Navigation className="h-4 w-4" />
-            {t("branches.directions")}
-          </a>
-        )}
-        {branch.phone && (
-          <>
-            <IconAction label={t("branches.call")} href={`tel:${branch.phone.replace(/\s+/g, "")}`}>
-              <Phone className="h-4 w-4" />
-            </IconAction>
-            <IconAction label={t("branches.whatsapp")} href={whatsappHref(branch.phone)} external>
-              <MessageCircle className="h-4 w-4" />
-            </IconAction>
-          </>
-        )}
-        <IconAction
-          label={t("branches.copyAddress")}
-          onClick={(e) => {
-            e.stopPropagation();
-            copyToClipboard(`${branch.name} — ${branch.address}`, t("branches.addressCopied"));
-          }}
-        >
-          <Copy className="h-4 w-4" />
-        </IconAction>
-        <IconAction
-          label={t("branches.share")}
-          onClick={(e) => {
-            e.stopPropagation();
-            const url = branch.google_maps_url ?? "";
-            if (navigator.share) {
-              navigator
-                .share({ title: branch.name, text: branch.address, url: url || undefined })
-                .catch(() => {});
-            } else if (url) {
-              copyToClipboard(url, t("branches.linkCopied"));
-            } else {
-              copyToClipboard(branch.address, t("branches.addressCopied"));
-            }
-          }}
-        >
-          <Share2 className="h-4 w-4" />
-        </IconAction>
-      </footer>
+            <Copy className="h-4 w-4" />
+          </IconAction>
+          <span className="ms-auto hidden items-center gap-1 text-caption font-semibold text-primary opacity-0 transition-opacity duration-base group-hover:opacity-100 sm:inline-flex">
+            {t("branches.viewOnMap")}
+            <ChevronRight className="h-3 w-3 rtl:rotate-180" />
+          </span>
+        </div>
+      </div>
     </article>
   );
 }
 
-/* -------------------------------------------------------- contact cards */
+/* --------------------------------------------------------- info panel */
 
-function ContactInfoGrid() {
+type InfoRow = {
+  key: string;
+  icon: typeof Phone;
+  title: string;
+  value: string;
+  href?: string;
+  external?: boolean;
+  copy?: string;
+  ltr?: boolean;
+  actionLabel?: string;
+};
+
+function useContactRows(items: ContactInfo[]) {
   const { t } = useTranslation();
-  const { data } = useQuery(contactInfoQuery());
-  const items = data ?? [];
-
-  const phones = items.filter((i) => i.key === "phone" || i.key === "mobile");
-  const emails = items.filter((i) => i.key === "email");
+  const phone = items.find((i) => i.key === "phone" || i.key === "mobile");
   const whatsapp = items.find((i) => i.key === "whatsapp");
-  const hours = items.find((i) => i.key === "hours" || i.key === "working_hours");
+  const email = items.find((i) => i.key === "email");
   const address = items.find((i) => i.key === "address" || i.key === "headquarters");
-  const socials = items.filter((i) =>
-    ["facebook", "instagram", "youtube", "twitter", "tiktok"].includes(i.key),
-  );
+  const hours = items.find((i) => i.key === "hours" || i.key === "working_hours");
 
-  type Card = {
-    key: string;
-    icon: typeof Phone;
-    title: string;
-    value: string;
-    href?: string;
-    copy?: string;
-    ltr?: boolean;
-  };
-
-  const cards: Card[] = [];
-  if (phones[0])
-    cards.push({
-      key: "phone",
-      icon: Phone,
-      title: t("branches.info.phone"),
-      value: phones[0].value,
-      href: `tel:${phones[0].value.replace(/\s+/g, "")}`,
-      copy: phones[0].value,
-      ltr: true,
-    });
+  const rows: InfoRow[] = [];
   if (whatsapp)
-    cards.push({
+    rows.push({
       key: "whatsapp",
       icon: MessageCircle,
       title: t("branches.info.whatsapp"),
       value: whatsapp.value,
       href: whatsappHref(whatsapp.value),
-      copy: whatsapp.value,
+      external: true,
       ltr: true,
+      actionLabel: t("branches.whatsapp"),
     });
-  if (emails[0])
-    cards.push({
+  if (phone)
+    rows.push({
+      key: "phone",
+      icon: Phone,
+      title: t("branches.info.phone"),
+      value: phone.value,
+      href: `tel:${phone.value.replace(/\s+/g, "")}`,
+      copy: phone.value,
+      ltr: true,
+      actionLabel: t("branches.call"),
+    });
+  if (email)
+    rows.push({
       key: "email",
       icon: Mail,
       title: t("branches.info.email"),
-      value: emails[0].value,
-      href: `mailto:${emails[0].value}`,
-      copy: emails[0].value,
+      value: email.value,
+      href: `mailto:${email.value}`,
+      copy: email.value,
       ltr: true,
+      actionLabel: t("branches.copy"),
     });
   if (address)
-    cards.push({
-      key: "hq",
+    rows.push({
+      key: "address",
       icon: Building2,
       title: t("branches.info.headquarters"),
       value: address.value,
+      copy: address.value,
+      actionLabel: t("branches.copyAddress"),
     });
   if (hours)
-    cards.push({
+    rows.push({
       key: "hours",
       icon: Clock,
       title: t("branches.info.hours"),
       value: hours.value,
     });
+  return rows;
+}
+
+function InfoPanel({ items }: { items: ContactInfo[] }) {
+  const { t } = useTranslation();
+  const rows = useContactRows(items);
+  const socials = items.filter((i) => SOCIAL_KEYS.includes(i.key));
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {cards.map((c, i) => (
-        <div
-          key={c.key}
-          style={{ animationDelay: `${i * 60}ms` }}
-          className="group ds-reveal relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-card/85 to-card/60 p-6 shadow-sm backdrop-blur-xl transition-[transform,box-shadow,border-color] duration-moderate ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10"
-        >
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -top-16 end-[-10%] h-40 w-40 rounded-full bg-primary/10 opacity-0 blur-3xl transition-opacity duration-slow group-hover:opacity-100"
-          />
-          <div className="relative mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 text-primary transition-transform duration-base ease-standard group-hover:scale-110">
-            <c.icon className="h-5 w-5" />
-          </div>
-          <p className="relative text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            {c.title}
-          </p>
-          {c.href ? (
-            <a
-              href={c.href}
-              target={c.href.startsWith("http") ? "_blank" : undefined}
-              rel="noopener noreferrer"
-              dir={c.ltr ? "ltr" : undefined}
-              className="relative mt-1.5 block truncate text-body font-bold text-foreground transition-colors hover:text-primary"
+    <aside className="ds-reveal relative flex h-full flex-col overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card/90 to-card/60 shadow-lg shadow-primary/5 backdrop-blur-xl">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-24 end-[-15%] h-56 w-56 rounded-full bg-primary/10 blur-3xl"
+      />
+
+      <div className="relative border-b border-border/50 px-6 py-5">
+        <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+          {t("branches.contactKicker")}
+        </p>
+        <h3 className="mt-1.5 text-h4 font-bold leading-snug text-foreground">
+          {t("branches.contactCard.title")}
+        </h3>
+        <p className="mt-1 text-small leading-relaxed text-muted-foreground">
+          {t("branches.contactCard.subtitle")}
+        </p>
+      </div>
+
+      <ul className="relative flex-1 divide-y divide-border/50">
+        {rows.map((r, i) => (
+          <li
+            key={r.key}
+            style={{ animationDelay: `${i * 50}ms` }}
+            className="ds-reveal group flex items-center gap-4 px-6 py-4 transition-colors duration-base ease-standard hover:bg-muted/40"
+          >
+            <span
+              className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
+                r.key === "whatsapp"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                  : "bg-primary/10 text-primary",
+              )}
             >
-              {c.value}
-            </a>
-          ) : (
-            <p className="relative mt-1.5 text-body font-bold leading-relaxed text-foreground">
-              {c.value}
-            </p>
-          )}
-          {c.copy && (
-            <button
-              type="button"
-              onClick={() => copyToClipboard(c.copy!, t("branches.copied"))}
-              className="relative mt-4 inline-flex items-center gap-1.5 text-caption font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-            >
-              <Copy className="h-3 w-3" />
-              {t("branches.copy")}
-            </button>
-          )}
-        </div>
-      ))}
+              <r.icon className="h-4 w-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {r.title}
+              </p>
+              {r.href ? (
+                <a
+                  href={r.href}
+                  target={r.external ? "_blank" : undefined}
+                  rel={r.external ? "noopener noreferrer" : undefined}
+                  dir={r.ltr ? "ltr" : undefined}
+                  className="mt-0.5 block truncate text-body font-bold text-foreground transition-colors duration-base hover:text-primary"
+                >
+                  {r.value}
+                </a>
+              ) : (
+                <p className="mt-0.5 text-small font-semibold leading-relaxed text-foreground">
+                  {r.value}
+                </p>
+              )}
+            </div>
+            {r.href && r.actionLabel && (
+              <a
+                href={r.href}
+                target={r.external ? "_blank" : undefined}
+                rel={r.external ? "noopener noreferrer" : undefined}
+                className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/25 bg-primary/5 px-3 py-1.5 text-caption font-semibold text-primary transition-all duration-base ease-standard hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground sm:inline-flex"
+              >
+                {r.actionLabel}
+              </a>
+            )}
+            {!r.href && r.copy && (
+              <button
+                type="button"
+                onClick={() => copyToClipboard(r.copy!, t("branches.copied"))}
+                className="hidden shrink-0 items-center gap-1 rounded-full border border-border/60 px-3 py-1.5 text-caption font-semibold text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary sm:inline-flex"
+              >
+                <Copy className="h-3 w-3" />
+                {t("branches.copy")}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
 
       {socials.length > 0 && (
-        <div className="ds-reveal rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card/70 to-card/60 p-6 shadow-sm backdrop-blur-xl sm:col-span-2">
-          <p className="mb-4 text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="relative flex items-center justify-between gap-4 border-t border-border/50 bg-muted/30 px-6 py-4">
+          <p className="text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             {t("branches.contactCard.follow")}
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2">
             {socials.map((s) => {
               const Icon = SOCIAL_ICONS[s.key] ?? Sparkles;
               return (
@@ -390,16 +404,17 @@ function ContactInfoGrid() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label ?? s.key}
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-background/70 text-primary transition-all duration-base ease-standard hover:-translate-y-1 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                  title={s.label ?? s.key}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/70 text-primary transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-4 w-4" />
                 </a>
               );
             })}
           </div>
         </div>
       )}
-    </div>
+    </aside>
   );
 }
 
@@ -439,10 +454,9 @@ function Field({
   );
 }
 
-function ContactForm({ branches }: { branches: Branch[] }) {
+function ContactForm({ branches, info }: { branches: Branch[]; info: ContactInfo[] }) {
   const { t } = useTranslation();
-  const { data: info } = useQuery(contactInfoQuery());
-  const whatsappItem = info?.find((i) => i.key === "whatsapp");
+  const whatsappItem = info.find((i) => i.key === "whatsapp");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [branchId, setBranchId] = useState<string>("");
@@ -474,58 +488,60 @@ function ContactForm({ branches }: { branches: Branch[] }) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/75 p-6 shadow-2xl shadow-primary/10 backdrop-blur-xl md:p-9">
+    <div className="ds-reveal relative overflow-hidden rounded-xl border border-border/50 bg-card/80 p-6 shadow-xl shadow-primary/10 backdrop-blur-xl md:p-8">
       <span
         aria-hidden
-        className="pointer-events-none absolute -top-28 start-[-10%] h-72 w-72 rounded-full bg-primary/10 blur-3xl"
+        className="pointer-events-none absolute -top-28 start-[-10%] h-64 w-64 rounded-full bg-primary/10 blur-3xl"
       />
-      <div className="relative">
-        <h3 className="text-h3 font-bold text-foreground">{t("branches.form.title")}</h3>
-        <p className="mt-2 max-w-md text-small leading-relaxed text-muted-foreground">
-          {t("branches.form.subtitle")}
-        </p>
+      <div className="relative flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-h3 font-bold leading-snug text-foreground">
+            {t("branches.form.title")}
+          </h3>
+          <p className="mt-1.5 max-w-md text-small leading-relaxed text-muted-foreground">
+            {t("branches.form.subtitle")}
+          </p>
+        </div>
       </div>
 
       {sent && (
-        <div className="ds-reveal relative mt-6 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-4 text-primary">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Check className="h-5 w-5" />
+        <div className="ds-reveal relative mt-5 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-4 text-primary">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <Check className="h-4 w-4" />
           </span>
           <p className="text-small font-semibold">{t("branches.form.thanks")}</p>
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="relative mt-7 space-y-5">
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field name="name" label={t("contact.name")} required />
-          <Field name="phone" label={t("contact.phone")} required />
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field name="email" label={t("contact.email")} type="email" required />
-          <Field name="subject" label={t("contact.subject")} />
-        </div>
+      <form onSubmit={onSubmit} className="relative mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Field name="name" label={t("contact.name")} required />
+        <Field name="phone" label={t("contact.phone")} required />
+        <Field name="email" label={t("contact.email")} type="email" required />
+        <Field name="subject" label={t("contact.subject")} />
 
         {branches.length > 0 && (
-          <Select value={branchId} onValueChange={setBranchId}>
-            <SelectTrigger className="h-14 rounded-lg border-border/60 bg-background/60 px-4 text-input">
-              <SelectValue placeholder={t("branches.form.selectBranch")} />
-            </SelectTrigger>
-            <SelectContent className="rounded-lg">
-              {branches.map((b) => (
-                <SelectItem key={b.id} value={b.id}>
-                  {b.name} — {b.city}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="sm:col-span-2">
+            <Select value={branchId} onValueChange={setBranchId}>
+              <SelectTrigger className="h-14 w-full rounded-lg border-border/60 bg-background/60 px-4 text-input">
+                <SelectValue placeholder={t("branches.form.selectBranch")} />
+              </SelectTrigger>
+              <SelectContent className="rounded-lg">
+                {branches.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name} — {b.city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
 
-        <div className="relative">
+        <div className="relative sm:col-span-2">
           <textarea
             id="cf-message"
             name="message"
             required
-            rows={5}
+            rows={4}
             placeholder=" "
             className="peer w-full resize-none rounded-lg border border-border/60 bg-background/60 px-4 pb-3 pt-6 text-input text-foreground outline-none transition-all duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]"
           />
@@ -535,11 +551,11 @@ function ContactForm({ branches }: { branches: Branch[] }) {
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
           <button
             type="submit"
             disabled={loading}
-            className="group inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-70"
+            className="group inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -553,7 +569,7 @@ function ContactForm({ branches }: { branches: Branch[] }) {
               href={whatsappHref(whatsappItem.value)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-6 text-button font-semibold text-primary transition-all duration-base ease-standard hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
             >
               <MessageCircle className="h-4 w-4" />
               {t("branches.form.whatsappInstead")}
@@ -570,7 +586,9 @@ function ContactForm({ branches }: { branches: Branch[] }) {
 export function BranchesSection() {
   const { t } = useTranslation();
   const { data, isLoading } = useQuery(branchesQuery());
+  const { data: infoData } = useQuery(contactInfoQuery());
   const branches = useMemo(() => data ?? [], [data]);
+  const info = useMemo(() => infoData ?? [], [infoData]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [search, setSearch] = useState("");
@@ -625,12 +643,15 @@ export function BranchesSection() {
   }));
 
   const activeBranch = branches.find((b) => b.id === activeId) ?? null;
+  const quickPhone = info.find((i) => i.key === "phone" || i.key === "mobile");
+  const quickWhatsapp = info.find((i) => i.key === "whatsapp");
+  const quickEmail = info.find((i) => i.key === "email");
 
   return (
     <section
       id="branches"
       aria-labelledby="branches-heading"
-      className="relative overflow-hidden py-24 md:py-32"
+      className="relative isolate overflow-hidden pb-14 pt-20 md:pb-20 md:pt-24"
     >
       {jsonLd.length > 0 && (
         <script
@@ -639,67 +660,47 @@ export function BranchesSection() {
         />
       )}
 
-      {/* ---------- ambient background ---------- */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
-        <div className="absolute -top-32 start-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-0 end-[-10%] h-[26rem] w-[26rem] rounded-full bg-primary/5 blur-[110px]" />
+      {/* ---------- ambient background: soft gradient + subtle grid ---------- */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/25 to-background" />
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse 70% 55% at 50% 0%, black 20%, transparent 75%)",
+          }}
+        />
+        <div className="absolute -top-40 start-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
+        <div className="absolute bottom-10 end-[-8%] h-[22rem] w-[22rem] rounded-full bg-primary/5 blur-[110px]" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-        {/* ---------- section header ---------- */}
-        <header className="ds-reveal mx-auto flex max-w-3xl flex-col items-center text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-caption font-semibold uppercase tracking-[0.22em] text-primary backdrop-blur">
+      <div className="relative mx-auto grid max-w-7xl grid-cols-12 gap-x-6 gap-y-10 px-4 md:px-6 lg:px-8">
+        {/* ---------- header ---------- */}
+        <header className="ds-reveal col-span-12 flex flex-col gap-4 lg:col-span-7">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-caption font-semibold uppercase tracking-[0.22em] text-primary backdrop-blur">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
             </span>
             {t("branches.kicker")}
           </span>
-          <h2 id="branches-heading" className="mt-6 text-h1 font-bold leading-[1.15] text-foreground">
+          <h2
+            id="branches-heading"
+            className="text-h1 font-bold leading-[1.12] tracking-tight text-foreground"
+          >
             {t("branches.title")}
           </h2>
-          <p className="mt-5 max-w-2xl text-body-lg leading-relaxed text-muted-foreground">
+          <p className="max-w-xl text-body-lg leading-relaxed text-muted-foreground">
             {t("branches.subtitle")}
           </p>
-          <span
-            aria-hidden
-            className="mt-8 h-px w-24 bg-gradient-to-r from-transparent via-primary to-transparent"
-          />
         </header>
 
-        {/* ---------- map centerpiece ---------- */}
-        <div className="ds-reveal relative mt-14">
-          <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/40 p-2 shadow-2xl shadow-primary/10 backdrop-blur-xl sm:p-3">
-            <div className="relative h-[380px] overflow-hidden rounded-lg sm:h-[460px] lg:h-[560px]">
-              <Suspense fallback={<MapSkeleton />}>
-                {mounted && filtered.length > 0 ? (
-                  <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
-                ) : (
-                  <MapSkeleton />
-                )}
-              </Suspense>
-
-              {/* floating glass status card */}
-              <div className="pointer-events-none absolute bottom-6 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/75 px-5 py-4 shadow-xl backdrop-blur-xl md:block">
-                <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-                  {t("branches.ourBranches")}
-                </p>
-                <p className="mt-1 text-h5 font-bold text-foreground">
-                  {activeBranch ? activeBranch.name : `${filtered.length} ${t("branches.branchesCount")}`}
-                </p>
-                <p className="mt-1 text-caption leading-relaxed text-muted-foreground">
-                  {activeBranch ? activeBranch.address : t("branches.selectHint")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ---------- filters ---------- */}
-        <div className="ds-reveal mt-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative w-full lg:max-w-sm">
+        {/* ---------- toolbar (aligned to header baseline) ---------- */}
+        <div className="ds-reveal col-span-12 flex flex-col justify-end gap-3 lg:col-span-5">
+          <div className="relative">
             <Search className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
@@ -710,7 +711,6 @@ export function BranchesSection() {
               className="h-12 w-full rounded-full border border-border/60 bg-card/70 ps-11 pe-4 text-small text-foreground outline-none backdrop-blur transition-all duration-base ease-standard placeholder:text-muted-foreground hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_12%,transparent)]"
             />
           </div>
-
           <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0">
             {[{ id: "all", label: t("branches.allCities") }, ...cities.map((c) => ({ id: c, label: c }))].map(
               (c) => (
@@ -720,9 +720,9 @@ export function BranchesSection() {
                   onClick={() => setCity(c.id)}
                   aria-pressed={city === c.id}
                   className={cn(
-                    "h-11 shrink-0 rounded-full border px-5 text-small font-semibold transition-all duration-base ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                    "h-10 shrink-0 rounded-full border px-4 text-caption font-semibold transition-all duration-base ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                     city === c.id
-                      ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25"
                       : "border-border/60 bg-card/60 text-muted-foreground backdrop-blur hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground",
                   )}
                 >
@@ -733,63 +733,139 @@ export function BranchesSection() {
           </div>
         </div>
 
-        {/* ---------- branch cards ---------- */}
-        <div className="mt-8">
-          {isLoading ? (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-72 animate-pulse rounded-xl bg-muted/50" />
-              ))}
+        {/* ---------- branches + map: one connected surface ---------- */}
+        <div className="col-span-12">
+          <div className="ds-reveal overflow-hidden rounded-xl border border-border/50 bg-card/60 shadow-2xl shadow-primary/10 backdrop-blur-xl">
+            <div className="grid grid-cols-12">
+              {/* branch list */}
+              <div className="order-2 col-span-12 border-border/50 lg:order-1 lg:col-span-5 lg:border-e xl:col-span-4">
+                <div className="flex items-center justify-between gap-3 border-b border-border/50 bg-muted/30 px-5 py-3.5">
+                  <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+                    {t("branches.ourBranches")}
+                  </p>
+                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-caption font-bold text-primary">
+                    {filtered.length} {t("branches.branchesCount")}
+                  </span>
+                </div>
+
+                <div className="max-h-[300px] overflow-y-auto lg:max-h-[544px]">
+                  {isLoading ? (
+                    <div className="space-y-3 p-5">
+                      {[0, 1, 2].map((i) => (
+                        <div key={i} className="h-24 animate-pulse rounded-lg bg-muted/50" />
+                      ))}
+                    </div>
+                  ) : filtered.length === 0 ? (
+                    <div className="p-10 text-center">
+                      <MapPin className="mx-auto h-7 w-7 text-muted-foreground/60" />
+                      <p className="mt-3 text-small font-semibold text-foreground">
+                        {t("branches.noResults")}
+                      </p>
+                    </div>
+                  ) : (
+                    filtered.map((b, i) => (
+                      <BranchRow
+                        key={b.id}
+                        branch={b}
+                        index={i}
+                        active={b.id === activeId}
+                        onSelect={setActiveId}
+                        cardRef={(el) => {
+                          cardRefs.current[b.id] = el;
+                        }}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* map */}
+              <div className="relative order-1 col-span-12 min-h-[320px] lg:order-2 lg:col-span-7 lg:min-h-[600px] xl:col-span-8">
+                <Suspense fallback={<MapSkeleton />}>
+                  {mounted && filtered.length > 0 ? (
+                    <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
+                  ) : (
+                    <MapSkeleton />
+                  )}
+                </Suspense>
+
+                <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/80 px-5 py-3.5 shadow-xl backdrop-blur-xl md:block">
+                  <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+                    {activeBranch ? activeBranch.city : t("branches.ourBranches")}
+                  </p>
+                  <p className="mt-1 text-h5 font-bold leading-snug text-foreground">
+                    {activeBranch
+                      ? activeBranch.name
+                      : `${filtered.length} ${t("branches.branchesCount")}`}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-caption leading-relaxed text-muted-foreground">
+                    {activeBranch ? activeBranch.address : t("branches.selectHint")}
+                  </p>
+                </div>
+              </div>
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border/60 bg-card/50 p-12 text-center backdrop-blur">
-              <MapPin className="mx-auto h-8 w-8 text-muted-foreground/60" />
-              <p className="mt-4 text-body font-semibold text-foreground">
-                {t("branches.noResults")}
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((b, i) => (
-                <BranchCard
-                  key={b.id}
-                  branch={b}
-                  index={i}
-                  active={b.id === activeId}
-                  onSelect={setActiveId}
-                  cardRef={(el) => {
-                    cardRefs.current[b.id] = el;
-                  }}
-                />
-              ))}
-            </div>
-          )}
+
+            {/* ---------- quick contact strip: connects map to form ---------- */}
+            {(quickWhatsapp || quickPhone || quickEmail) && (
+              <div className="flex flex-col gap-3 border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/50 to-card/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-small font-semibold text-foreground">
+                  {t("branches.contactCard.subtitle")}
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {quickWhatsapp && (
+                    <a
+                      href={whatsappHref(quickWhatsapp.value)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-small font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/35"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      {t("branches.whatsapp")}
+                    </a>
+                  )}
+                  {quickPhone && (
+                    <a
+                      href={`tel:${quickPhone.value.replace(/\s+/g, "")}`}
+                      className="inline-flex h-11 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-5 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+                    >
+                      <Phone className="h-4 w-4" />
+                      <span dir="ltr">{quickPhone.value}</span>
+                    </a>
+                  )}
+                  {quickEmail && (
+                    <a
+                      href={`mailto:${quickEmail.value}`}
+                      className="inline-flex h-11 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-5 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+                    >
+                      <Mail className="h-4 w-4" />
+                      <span className="hidden sm:inline" dir="ltr">
+                        {quickEmail.value}
+                      </span>
+                      <span className="sm:hidden">{t("branches.info.email")}</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* ---------- contact experience ---------- */}
-        <div className="mt-28 md:mt-32">
-          <header className="ds-reveal mx-auto flex max-w-3xl flex-col items-center text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-caption font-semibold uppercase tracking-[0.22em] text-primary backdrop-blur">
-              {t("branches.contactKicker")}
-            </span>
-            <h2 className="mt-6 text-h2 font-bold leading-[1.2] text-foreground">
-              {t("branches.info.title")}
-            </h2>
-            <p className="mt-4 text-body-lg leading-relaxed text-muted-foreground">
-              {t("branches.info.subtitle")}
-            </p>
-          </header>
-
-          <div className="mt-14 grid gap-8 lg:grid-cols-12 lg:gap-10">
-            <div className="lg:col-span-5">
-              <ContactInfoGrid />
-            </div>
-            <div className="lg:col-span-7">
-              <ContactForm branches={branches} />
-            </div>
+        {/* ---------- form + information panel ---------- */}
+        <div className="col-span-12 grid grid-cols-12 gap-6">
+          <div className="col-span-12 lg:col-span-7">
+            <ContactForm branches={branches} info={info} />
+          </div>
+          <div className="col-span-12 lg:col-span-5">
+            <InfoPanel items={info} />
           </div>
         </div>
       </div>
+
+      {/* ---------- intentional transition into next section ---------- */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background"
+      />
     </section>
   );
 }
