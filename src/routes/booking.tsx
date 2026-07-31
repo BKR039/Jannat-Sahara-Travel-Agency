@@ -3,10 +3,8 @@ import { z } from "zod";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { BookingFlow } from "@/components/booking/flow/BookingFlow";
-import type { ServiceKey } from "@/components/booking/flow/model";
 
 const searchSchema = z.object({
-  service: z.enum(["umrah", "trip", "flight", "visa"]).optional(),
   pkg: z.string().max(200).optional(),
 });
 
@@ -14,19 +12,20 @@ export const Route = createFileRoute("/booking")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "احجز رحلتك — جنة الصحراء للأسفار" },
+      { title: "إتمام الحجز — جنة الصحراء للأسفار" },
       {
         name: "description",
         content:
-          "احجز باقة العمرة أو الرحلة أو التأشيرة في خطوات بسيطة: اختر الخدمة، اختر الباقة، أضف بيانات المسافرين وأكّد الحجز.",
+          "أكمل حجز الباقة التي اخترتها: عدد المسافرين، بيانات كل مسافر وجوازات السفر، مراجعة ثم تأكيد — دون أي دفع إلكتروني.",
       },
-      { property: "og:title", content: "احجز رحلتك — جنة الصحراء للأسفار" },
+      { property: "og:title", content: "إتمام الحجز — جنة الصحراء للأسفار" },
       {
         property: "og:description",
-        content: "تجربة حجز مرنة: اختر الباقة، حدد عدد المسافرين، أكمل البيانات وأكّد.",
+        content: "حجز سهل في خطوات قليلة بعد اختيار الباقة المناسبة لك.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/booking" }],
   }),
@@ -34,13 +33,10 @@ export const Route = createFileRoute("/booking")({
 });
 
 function BookingPage() {
-  const { service, pkg } = Route.useSearch();
+  const { pkg } = Route.useSearch();
   return (
     <SiteLayout>
-      <BookingFlow
-        initialService={(service as ServiceKey | undefined) ?? null}
-        initialPackageSlug={pkg ?? null}
-      />
+      <BookingFlow packageSlug={pkg ?? null} />
     </SiteLayout>
   );
 }
