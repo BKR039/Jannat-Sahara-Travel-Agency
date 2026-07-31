@@ -29,6 +29,9 @@ function PackagePage() {
   const { slug } = Route.useParams();
   const { t } = useTranslation();
   const { data: pkg, isLoading } = useQuery(packageBySlugQuery(slug));
+  const { data: allPackages } = useQuery(packagesQuery());
+  const { data: faqs } = useQuery(faqsQuery());
+
 
   if (isLoading) {
     return (
