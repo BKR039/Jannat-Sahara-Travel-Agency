@@ -52,10 +52,6 @@ export function PackageSelector() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
-  const [duration, setDuration] = useState("all");
-  const [price, setPrice] = useState("all");
-  const [month, setMonth] = useState("all");
-  const [availability, setAvailability] = useState("all");
 
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
