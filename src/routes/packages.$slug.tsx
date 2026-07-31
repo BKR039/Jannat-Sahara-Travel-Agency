@@ -205,10 +205,39 @@ function PackagePage() {
                 {t("actions.bookNow")}
               </Link>
             </Button>
-
           </div>
         </aside>
       </div>
+
+      {related.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-24 md:px-6">
+          <h2 className="mb-6 text-h3 font-bold">{t("package.related")}</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {related.map((p) => (
+              <PackageCard key={p.id} pkg={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* mobile sticky booking CTA */}
+      <div className="sticky bottom-0 z-40 border-t border-border-subtle bg-card/95 p-4 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-caption text-muted-foreground">{t("package.from")}</p>
+            <p className="text-h5 font-extrabold text-primary">
+              {(discounted ?? Number(pkg.price)).toLocaleString()} {pkg.currency}
+            </p>
+          </div>
+          <Button asChild size="lg">
+            <Link to="/booking" search={{ pkg: pkg.slug }}>
+              {t("actions.bookNow")}
+            </Link>
+          </Button>
+        </div>
+      </div>
     </SiteLayout>
+  );
+
   );
 }
