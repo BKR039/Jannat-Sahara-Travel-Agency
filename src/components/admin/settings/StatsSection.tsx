@@ -129,15 +129,38 @@ export function StatsSection() {
                 <GripVertical className="h-4 w-4 cursor-grab text-muted-foreground/70" /> Card{" "}
                 {index + 1}
               </span>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-destructive"
-                aria-label="Remove statistic"
-                onClick={() => setItems((l) => l.filter((x) => x.tempId !== it.tempId))}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-0.5">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  aria-label="Move up"
+                  disabled={index === 0}
+                  onClick={() => move(index, index - 1)}
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  aria-label="Move down"
+                  disabled={index === items.length - 1}
+                  onClick={() => move(index, index + 1)}
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-destructive"
+                  aria-label="Remove statistic"
+                  onClick={() => setItems((l) => l.filter((x) => x.tempId !== it.tempId))}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
             </div>
 
             <div className="mb-4 flex items-center gap-3 rounded-xl bg-surface-sunken/50 p-4">
