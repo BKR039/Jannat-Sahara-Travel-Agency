@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ChevronDown, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
@@ -183,17 +182,7 @@ export function ContentSection() {
         })}
       </div>
 
-      <SettingsCard
-        title="Preview on the live site"
-        description="Publish your changes first, then refresh the preview."
-        actions={
-          <Button variant="outline" size="sm" onClick={() => setPreviewKey((k) => k + 1)}>
-            <Eye className="me-2 h-4 w-4" /> Refresh
-          </Button>
-        }
-      >
-        <LivePreview path="/" reloadKey={previewKey} />
-      </SettingsCard>
+      <LivePreview path="/" reloadKey={previewKey} />
 
       <SaveBar
         dirty={dirty}
