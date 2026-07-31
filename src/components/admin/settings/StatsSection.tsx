@@ -171,26 +171,8 @@ export function StatsSection() {
                   placeholder="12 000+"
                 />
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  disabled={index === 0}
-                  onClick={() => move(index, index - 1)}
-                >
-                  Move up
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  disabled={index === items.length - 1}
-                  onClick={() => move(index, index + 1)}
-                >
-                  Move down
-                </Button>
-              </div>
+            </div>
+
             </div>
           </div>
         ))}
