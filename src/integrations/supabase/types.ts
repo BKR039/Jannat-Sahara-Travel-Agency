@@ -92,11 +92,88 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_passengers: {
+        Row: {
+          booking_id: string
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          emergency_contact: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          is_primary: boolean
+          nationality: string | null
+          notes: string | null
+          passenger_type: string
+          passport_expiry: string | null
+          passport_number: string | null
+          passport_path: string | null
+          phone: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          is_primary?: boolean
+          nationality?: string | null
+          notes?: string | null
+          passenger_type?: string
+          passport_expiry?: string | null
+          passport_number?: string | null
+          passport_path?: string | null
+          phone?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          is_primary?: boolean
+          nationality?: string | null
+          notes?: string | null
+          passenger_type?: string
+          passport_expiry?: string | null
+          passport_number?: string | null
+          passport_path?: string | null
+          phone?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_passengers_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
+          adults: number
+          children: number
+          communication_preference: string | null
           created_at: string
+          currency: string
           email: string | null
+          emergency_contact: string | null
           id: string
+          infants: number
           name: string
           notes: string | null
           package_category: string | null
@@ -106,12 +183,19 @@ export type Database = {
           people: number
           phone: string
           status: string
+          total_price: number | null
           updated_at: string
         }
         Insert: {
+          adults?: number
+          children?: number
+          communication_preference?: string | null
           created_at?: string
+          currency?: string
           email?: string | null
+          emergency_contact?: string | null
           id?: string
+          infants?: number
           name: string
           notes?: string | null
           package_category?: string | null
@@ -121,12 +205,19 @@ export type Database = {
           people?: number
           phone: string
           status?: string
+          total_price?: number | null
           updated_at?: string
         }
         Update: {
+          adults?: number
+          children?: number
+          communication_preference?: string | null
           created_at?: string
+          currency?: string
           email?: string | null
+          emergency_contact?: string | null
           id?: string
+          infants?: number
           name?: string
           notes?: string | null
           package_category?: string | null
@@ -136,6 +227,7 @@ export type Database = {
           people?: number
           phone?: string
           status?: string
+          total_price?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -408,6 +500,7 @@ export type Database = {
           airline: string | null
           brochure_pdf: string | null
           category: Database["public"]["Enums"]["package_category"]
+          child_price: number | null
           city: string | null
           country: string | null
           cover: string | null
@@ -426,6 +519,7 @@ export type Database = {
           hotel_rating: number | null
           id: string
           included: Json | null
+          infant_price: number | null
           meeting_point: string | null
           price: number
           required_documents: Json | null
@@ -448,6 +542,7 @@ export type Database = {
           airline?: string | null
           brochure_pdf?: string | null
           category: Database["public"]["Enums"]["package_category"]
+          child_price?: number | null
           city?: string | null
           country?: string | null
           cover?: string | null
@@ -466,6 +561,7 @@ export type Database = {
           hotel_rating?: number | null
           id?: string
           included?: Json | null
+          infant_price?: number | null
           meeting_point?: string | null
           price?: number
           required_documents?: Json | null
@@ -488,6 +584,7 @@ export type Database = {
           airline?: string | null
           brochure_pdf?: string | null
           category?: Database["public"]["Enums"]["package_category"]
+          child_price?: number | null
           city?: string | null
           country?: string | null
           cover?: string | null
@@ -506,6 +603,7 @@ export type Database = {
           hotel_rating?: number | null
           id?: string
           included?: Json | null
+          infant_price?: number | null
           meeting_point?: string | null
           price?: number
           required_documents?: Json | null
