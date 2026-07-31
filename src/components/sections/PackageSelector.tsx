@@ -12,7 +12,6 @@ import {
   Hotel,
   MapPin,
   Plane,
-  RotateCcw,
   Search,
   Sparkles,
   Stamp,
@@ -33,15 +32,6 @@ const SERVICES = [
   { key: "visa", icon: Stamp },
 ] as const;
 
-const DURATIONS = ["all", "short", "medium", "long"] as const;
-const PRICES = ["all", "low", "mid", "high"] as const;
-const AVAILABILITY = ["all", "available"] as const;
-
-function nights(pkg: Package): number | null {
-  const m = pkg.duration?.match(/\d+/);
-  return m ? Number(m[0]) : null;
-}
-
 function effectivePrice(pkg: Package): number {
   if (pkg.discount_price != null) return Number(pkg.discount_price);
   if (pkg.discount && pkg.discount > 0) return Number(pkg.price) * (1 - Number(pkg.discount) / 100);
@@ -50,42 +40,6 @@ function effectivePrice(pkg: Package): number {
 
 function seatsLeft(pkg: Package): number | null {
   return typeof pkg.seats === "number" ? pkg.seats : null;
-}
-
-function monthKey(date: string) {
-  const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: Array<{ value: string; label: string }>;
-}) {
-  return (
-    <label className="grid gap-1.5">
-      <span className="text-caption font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-11 rounded-xl border border-input bg-background px-3 text-small font-medium outline-none transition-colors duration-fast hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
 }
 
 export function PackageSelector() {
@@ -98,10 +52,6 @@ export function PackageSelector() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
-  const [duration, setDuration] = useState("all");
-  const [price, setPrice] = useState("all");
-  const [month, setMonth] = useState("all");
-  const [availability, setAvailability] = useState("all");
 
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -127,66 +77,16 @@ export function PackageSelector() {
     [available, service],
   );
 
-  const months = useMemo(() => {
-    const map = new Map<string, string>();
-    byService.forEach((p) => {
-      if (!p.departure_date) return;
-      const d = new Date(p.departure_date);
-      map.set(
-        monthKey(p.departure_date),
-        d.toLocaleDateString(i18n.language, { month: "long", year: "numeric" }),
-      );
-    });
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [byService, i18n.language]);
-
-  const filtered = useMemo(
-    () =>
-      byService.filter((p) => {
-        if (duration !== "all") {
-          const n = nights(p);
-          if (n == null) return false;
-          if (duration === "short" && n > 7) return false;
-          if (duration === "medium" && (n < 8 || n > 14)) return false;
-          if (duration === "long" && n < 15) return false;
-        }
-        if (price !== "all") {
-          const v = effectivePrice(p);
-          if (price === "low" && v >= 3000) return false;
-          if (price === "mid" && (v < 3000 || v > 7000)) return false;
-          if (price === "high" && v <= 7000) return false;
-        }
-        if (month !== "all") {
-          if (!p.departure_date || monthKey(p.departure_date) !== month) return false;
-        }
-        if (availability === "available") {
-          const s = seatsLeft(p);
-          if (s != null && s <= 0) return false;
-        }
-        return true;
-      }),
-    [byService, duration, price, month, availability],
-  );
-
   const searched = useMemo(() => {
     const q = term.trim().toLowerCase();
-    if (!q) return filtered;
-    return filtered.filter((p) => p.title.toLowerCase().includes(q));
-  }, [filtered, term]);
+    if (!q) return byService;
+    return byService.filter((p) => p.title.toLowerCase().includes(q));
+  }, [byService, term]);
 
   const selected = useMemo(
-    () => filtered.find((p) => p.id === selectedId) ?? null,
-    [filtered, selectedId],
+    () => byService.find((p) => p.id === selectedId) ?? null,
+    [byService, selectedId],
   );
-
-  const dirty = duration !== "all" || price !== "all" || month !== "all" || availability !== "all";
-
-  function resetFilters() {
-    setDuration("all");
-    setPrice("all");
-    setMonth("all");
-    setAvailability("all");
-  }
 
   // close on outside click / escape (desktop dropdown + mobile sheet)
   useEffect(() => {
@@ -340,7 +240,6 @@ export function PackageSelector() {
             onClick={() => {
               setService(key);
               setSelectedId(null);
-              setMonth("all");
               setOpen(false);
             }}
             className={cn(
@@ -418,61 +317,9 @@ export function PackageSelector() {
           </div>
         )}
 
-        {/* ---------- optional filters */}
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <SelectField
-            label={t("explorer.month")}
-            value={month}
-            onChange={setMonth}
-            options={[
-              { value: "all", label: t("explorer.any") },
-              ...months.map(([value, label]) => ({ value, label })),
-            ]}
-          />
-          <SelectField
-            label={t("explorer.price")}
-            value={price}
-            onChange={setPrice}
-            options={PRICES.map((p) => ({
-              value: p,
-              label: p === "all" ? t("explorer.any") : t(`explorer.prices.${p}`),
-            }))}
-          />
-          <SelectField
-            label={t("explorer.duration")}
-            value={duration}
-            onChange={setDuration}
-            options={DURATIONS.map((d) => ({
-              value: d,
-              label: d === "all" ? t("explorer.any") : t(`explorer.durations.${d}`),
-            }))}
-          />
-          <SelectField
-            label={t("explorer.availability")}
-            value={availability}
-            onChange={setAvailability}
-            options={AVAILABILITY.map((a) => ({
-              value: a,
-              label: a === "all" ? t("explorer.any") : t("explorer.availableOnly"),
-            }))}
-          />
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-small text-muted-foreground">
-            {t("explorer.results", { count: filtered.length })}
-          </p>
-          {dirty && (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="inline-flex items-center gap-2 text-small font-semibold text-primary hover:underline"
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              {t("explorer.reset")}
-            </button>
-          )}
-        </div>
+        <p className="mt-4 text-small text-muted-foreground">
+          {t("explorer.results", { count: byService.length })}
+        </p>
 
         {/* ---------- selected preview */}
         {selected && (
@@ -559,13 +406,13 @@ export function PackageSelector() {
         <div className="mt-12">
           <SkeletonGrid count={8} />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : byService.length === 0 ? (
         <div className="mt-12">
           <EmptyState label={t("explorer.empty")} />
         </div>
       ) : (
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p, i) => (
+          {byService.map((p, i) => (
             <div key={p.id} className="ds-reveal" style={{ animationDelay: `${i * 60}ms` }}>
               <PackageCard pkg={p} />
             </div>
