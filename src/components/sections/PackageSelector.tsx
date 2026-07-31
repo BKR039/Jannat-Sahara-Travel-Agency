@@ -12,7 +12,6 @@ import {
   Hotel,
   MapPin,
   Plane,
-  RotateCcw,
   Search,
   Sparkles,
   Stamp,
@@ -33,15 +32,6 @@ const SERVICES = [
   { key: "visa", icon: Stamp },
 ] as const;
 
-const DURATIONS = ["all", "short", "medium", "long"] as const;
-const PRICES = ["all", "low", "mid", "high"] as const;
-const AVAILABILITY = ["all", "available"] as const;
-
-function nights(pkg: Package): number | null {
-  const m = pkg.duration?.match(/\d+/);
-  return m ? Number(m[0]) : null;
-}
-
 function effectivePrice(pkg: Package): number {
   if (pkg.discount_price != null) return Number(pkg.discount_price);
   if (pkg.discount && pkg.discount > 0) return Number(pkg.price) * (1 - Number(pkg.discount) / 100);
@@ -50,42 +40,6 @@ function effectivePrice(pkg: Package): number {
 
 function seatsLeft(pkg: Package): number | null {
   return typeof pkg.seats === "number" ? pkg.seats : null;
-}
-
-function monthKey(date: string) {
-  const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: Array<{ value: string; label: string }>;
-}) {
-  return (
-    <label className="grid gap-1.5">
-      <span className="text-caption font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-11 rounded-xl border border-input bg-background px-3 text-small font-medium outline-none transition-colors duration-fast hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
 }
 
 export function PackageSelector() {
