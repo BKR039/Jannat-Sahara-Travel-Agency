@@ -34,7 +34,7 @@ function Index() {
   return (
     <SiteLayout>
       <HeroSection />
-      <PackageExplorer />
+      <PackageSelector />
       <StatsSection />
       <ServicesSection />
       <FeaturesSection />
