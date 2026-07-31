@@ -34,20 +34,45 @@ interface NavItem {
   superOnly?: boolean;
 }
 
-const NAV: NavItem[] = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { to: "/admin/packages", label: "Packages", icon: PackageIcon },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/branches", label: "Branches", icon: MapPin },
-  { to: "/admin/gallery", label: "Gallery", icon: ImageIcon },
-  { to: "/admin/blog", label: "Blog", icon: Newspaper },
-  { to: "/admin/testimonials", label: "Testimonials", icon: Star },
-  { to: "/admin/faq", label: "FAQ", icon: HelpCircle },
-  { to: "/admin/messages", label: "Messages", icon: MessageSquare },
-  { to: "/admin/notifications", label: "Notifications", icon: Bell },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
-  { to: "/admin/admins", label: "Admins", icon: ShieldCheck, superOnly: true },
+interface NavGroup {
+  group: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    group: "Operations",
+    items: [
+      { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin/bookings", label: "Bookings", icon: Calendar },
+      { to: "/admin/customers", label: "Customers", icon: Users },
+      { to: "/admin/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
+  {
+    group: "Catalogue",
+    items: [
+      { to: "/admin/packages", label: "Packages", icon: PackageIcon },
+      { to: "/admin/branches", label: "Branches", icon: MapPin },
+    ],
+  },
+  {
+    group: "Website",
+    items: [
+      { to: "/admin/gallery", label: "Gallery", icon: ImageIcon },
+      { to: "/admin/blog", label: "Blog", icon: Newspaper },
+      { to: "/admin/testimonials", label: "Testimonials", icon: Star },
+      { to: "/admin/faq", label: "FAQ", icon: HelpCircle },
+    ],
+  },
+  {
+    group: "System",
+    items: [
+      { to: "/admin/notifications", label: "Notifications", icon: Bell },
+      { to: "/admin/settings", label: "Settings", icon: Settings },
+      { to: "/admin/admins", label: "Admins", icon: ShieldCheck, superOnly: true },
+    ],
+  },
 ];
 
 function useUnreadCount() {
@@ -73,7 +98,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const unread = useUnreadCount();
 
-  const visible = NAV.filter((n) => (n.superOnly ? isSuperAdmin : true));
+  const groups = NAV_GROUPS.map((g) => ({
+    ...g,
+    items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
+  })).filter((g) => g.items.length > 0);
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -86,7 +114,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div dir="ltr" className="min-h-screen bg-muted/30">
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-background/60 backdrop-blur lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-background/60 backdrop-blur lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
       <aside
         className={cn(
@@ -98,40 +129,53 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Link to="/admin" onClick={() => setMobileOpen(false)}>
             <Logo />
           </Link>
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(false)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(false)}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          {visible.map((item) => {
-            const active =
-              item.to === "/admin"
-                ? location.pathname === "/admin" || location.pathname === "/admin/"
-                : location.pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-small font-medium transition-colors",
-                  active
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground/70 hover:bg-accent hover:text-foreground",
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="flex-1">{item.label}</span>
-                {item.to === "/admin/notifications" && (unread.data ?? 0) > 0 && (
-                  <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
-                    {unread.data}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          {groups.map((group) => (
+            <div key={group.group} className="mb-3 last:mb-0 space-y-0.5">
+              <p className="px-3 pb-1 pt-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
+                {group.group}
+              </p>
+              {group.items.map((item) => {
+                const active =
+                  item.to === "/admin"
+                    ? location.pathname === "/admin" || location.pathname === "/admin/"
+                    : location.pathname.startsWith(item.to);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-small font-medium transition-colors",
+                      active
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground/70 hover:bg-accent hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="flex-1">{item.label}</span>
+                    {item.to === "/admin/notifications" && (unread.data ?? 0) > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
+                        {unread.data}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
+
         <div className="border-t border-border p-3">
           <a
             href="/"
@@ -144,12 +188,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3">
             <p className="text-caption text-muted-foreground">Signed in as</p>
             <p className="truncate text-small font-medium">{user.email}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2 w-full"
-              onClick={signOut}
-            >
+            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={signOut}>
               <LogOut className="me-2 h-4 w-4" /> Sign out
             </Button>
           </div>
@@ -158,7 +197,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
       <div className="lg:pl-72">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(true)}
+          >
             <Menu className="h-4 w-4" />
           </Button>
           <div className="flex-1" />
