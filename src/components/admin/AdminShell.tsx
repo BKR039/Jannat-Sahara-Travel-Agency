@@ -34,21 +34,47 @@ interface NavItem {
   superOnly?: boolean;
 }
 
-const NAV: NavItem[] = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { to: "/admin/packages", label: "Packages", icon: PackageIcon },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/branches", label: "Branches", icon: MapPin },
-  { to: "/admin/gallery", label: "Gallery", icon: ImageIcon },
-  { to: "/admin/blog", label: "Blog", icon: Newspaper },
-  { to: "/admin/testimonials", label: "Testimonials", icon: Star },
-  { to: "/admin/faq", label: "FAQ", icon: HelpCircle },
-  { to: "/admin/messages", label: "Messages", icon: MessageSquare },
-  { to: "/admin/notifications", label: "Notifications", icon: Bell },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
-  { to: "/admin/admins", label: "Admins", icon: ShieldCheck, superOnly: true },
+interface NavGroup {
+  group: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    group: "Operations",
+    items: [
+      { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin/bookings", label: "Bookings", icon: Calendar },
+      { to: "/admin/customers", label: "Customers", icon: Users },
+      { to: "/admin/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
+  {
+    group: "Catalogue",
+    items: [
+      { to: "/admin/packages", label: "Packages", icon: PackageIcon },
+      { to: "/admin/branches", label: "Branches", icon: MapPin },
+    ],
+  },
+  {
+    group: "Website",
+    items: [
+      { to: "/admin/gallery", label: "Gallery", icon: ImageIcon },
+      { to: "/admin/blog", label: "Blog", icon: Newspaper },
+      { to: "/admin/testimonials", label: "Testimonials", icon: Star },
+      { to: "/admin/faq", label: "FAQ", icon: HelpCircle },
+    ],
+  },
+  {
+    group: "System",
+    items: [
+      { to: "/admin/notifications", label: "Notifications", icon: Bell },
+      { to: "/admin/settings", label: "Settings", icon: Settings },
+      { to: "/admin/admins", label: "Admins", icon: ShieldCheck, superOnly: true },
+    ],
+  },
 ];
+
 
 function useUnreadCount() {
   return useQuery({
