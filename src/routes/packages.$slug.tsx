@@ -53,6 +53,11 @@ function PackagePage() {
   const discounted = pkg.discount && pkg.discount > 0
     ? Number(pkg.price) * (1 - Number(pkg.discount) / 100)
     : null;
+  const related = (allPackages ?? [])
+    .filter((p) => p.category === pkg.category && p.id !== pkg.id)
+    .slice(0, 4);
+  const faqList = (faqs ?? []).slice(0, 6);
+
 
   return (
     <SiteLayout>
