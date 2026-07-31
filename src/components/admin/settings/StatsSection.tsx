@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, GripVertical, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -160,7 +160,6 @@ export function StatsSection() {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-
             </div>
 
             <div className="mb-4 flex items-center gap-3 rounded-xl bg-surface-sunken/50 p-4">
@@ -196,7 +195,6 @@ export function StatsSection() {
               </div>
             </div>
           </div>
-
         ))}
 
         <button
