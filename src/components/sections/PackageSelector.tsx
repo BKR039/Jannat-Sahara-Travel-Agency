@@ -137,7 +137,7 @@ export function PackageSelector() {
         className={cn(
           "overflow-y-auto p-2",
           "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border",
-          isMobile ? "max-h-[calc(85vh-6rem)]" : "max-h-[28rem]",
+          isMobile ? "max-h-[calc(85vh-11rem)]" : "max-h-[28rem]",
         )}
       >
         {searched.length === 0 && (
