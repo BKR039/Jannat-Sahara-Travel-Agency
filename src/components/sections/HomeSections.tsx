@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { servicesQuery, featuresQuery, testimonialsQuery, galleryQuery, articlesQuery } from "@/lib/queries";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
+import { ImageLightbox } from "@/components/common/ImageLightbox";
+import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { Link } from "@tanstack/react-router";
 import { Star, ArrowLeft } from "lucide-react";
+
 
 export function ServicesSection() {
   const { t } = useTranslation();
