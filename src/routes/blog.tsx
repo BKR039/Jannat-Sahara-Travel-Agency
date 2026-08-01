@@ -1,11 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { articlesQuery } from "@/lib/queries";
+
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -24,6 +27,7 @@ export const Route = createFileRoute("/blog")({
 function BlogPage() {
   const { t } = useTranslation();
   const { data, isLoading } = useQuery(articlesQuery());
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
 
   return (
     <SiteLayout>
@@ -36,11 +40,11 @@ function BlogPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {data.map((a, i) => (
-              <Link
+              <button
                 key={a.id}
-                to="/blog/$slug"
-                params={{ slug: a.slug }}
-                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+                type="button"
+                onClick={() => setOpenSlug(a.slug)}
+                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card text-start shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {a.cover && (
@@ -61,11 +65,13 @@ function BlogPage() {
                     {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                   </span>
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
         )}
       </section>
+      <ArticleDialog slug={openSlug} onClose={() => setOpenSlug(null)} />
     </SiteLayout>
   );
+
 }

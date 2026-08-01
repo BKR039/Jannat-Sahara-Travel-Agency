@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { ImageLightbox } from "@/components/common/ImageLightbox";
 import { galleryQuery } from "@/lib/queries";
+
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -24,7 +26,9 @@ export const Route = createFileRoute("/gallery")({
 function GalleryPage() {
   const { t } = useTranslation();
   const [cat, setCat] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
   const { data, isLoading } = useQuery(galleryQuery());
+
   const categories = useMemo(
     () => Array.from(new Set((data ?? []).map((g) => g.category).filter(Boolean) as string[])),
     [data],
@@ -65,8 +69,11 @@ function GalleryPage() {
         ) : (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
             {filtered.map((g, i) => (
-              <div
+              <button
                 key={g.id}
+                type="button"
+                onClick={() => setPreview({ src: g.image, alt: g.title ?? "" })}
+                aria-label={g.title ?? t("home.gallery")}
                 className="group relative aspect-square overflow-hidden rounded-lg bg-muted ds-reveal"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
@@ -81,11 +88,13 @@ function GalleryPage() {
                     <span className="text-small font-semibold text-on-dark">{g.title}</span>
                   </div>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         )}
       </section>
+      <ImageLightbox src={preview?.src ?? null} alt={preview?.alt} onClose={() => setPreview(null)} />
     </SiteLayout>
+
   );
 }
