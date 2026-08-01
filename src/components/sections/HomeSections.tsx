@@ -120,14 +120,18 @@ export function TestimonialsSection() {
 export function GalleryPreviewSection() {
   const { t } = useTranslation();
   const { data } = useQuery(galleryQuery());
+  const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
   if (!data?.length) return null;
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
       <SectionHeading eyebrow="📷" title={t("home.gallery")} description={t("home.galleryDesc")} />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {data.slice(0, 8).map((g, i) => (
-          <div
+          <button
             key={g.id}
+            type="button"
+            onClick={() => setPreview({ src: g.image, alt: g.title ?? "" })}
+            aria-label={g.title ?? t("home.gallery")}
             className={`group relative overflow-hidden rounded-lg bg-muted ds-reveal ${
               i === 0 || i === 5 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"
             }`}
@@ -144,7 +148,7 @@ export function GalleryPreviewSection() {
                 <span className="text-small font-semibold text-on-dark">{g.title}</span>
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
       <div className="mt-8 text-center">
@@ -152,6 +156,7 @@ export function GalleryPreviewSection() {
           {t("actions.viewAll")} <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         </Link>
       </div>
+      <ImageLightbox src={preview?.src ?? null} alt={preview?.alt} onClose={() => setPreview(null)} />
     </section>
   );
 }
@@ -159,6 +164,7 @@ export function GalleryPreviewSection() {
 export function LatestArticlesSection() {
   const { t } = useTranslation();
   const { data } = useQuery(articlesQuery(3));
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
   if (!data?.length) return null;
   return (
     <section className="bg-surface-sunken/50 py-20">
@@ -166,11 +172,11 @@ export function LatestArticlesSection() {
         <SectionHeading eyebrow="📰" title={t("home.latestArticles")} description={t("home.latestArticlesDesc")} />
         <div className="grid gap-6 md:grid-cols-3">
           {data.map((a, i) => (
-            <Link
+            <button
               key={a.id}
-              to="/blog/$slug"
-              params={{ slug: a.slug }}
-              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+              type="button"
+              onClick={() => setOpenSlug(a.slug)}
+              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card text-start shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               {a.cover && (
@@ -190,12 +196,14 @@ export function LatestArticlesSection() {
                   {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                 </span>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       </div>
+      <ArticleDialog slug={openSlug} onClose={() => setOpenSlug(null)} />
     </section>
   );
+
 }
 
 export function CtaSection() {
