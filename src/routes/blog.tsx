@@ -1,11 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { articlesQuery } from "@/lib/queries";
+
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
