@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { ImageLightbox } from "@/components/common/ImageLightbox";
 import { galleryQuery } from "@/lib/queries";
+
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
