@@ -312,6 +312,36 @@ export function PackageSelector() {
                   <X className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
+
+              {/* service switcher inside the sheet */}
+              <div
+                role="tablist"
+                aria-label={t("selector.services")}
+                className="flex gap-2 overflow-x-auto px-4 pt-3 pb-1 [&::-webkit-scrollbar]:hidden"
+              >
+                {SERVICES.map(({ key, icon: Icon }) => (
+                  <button
+                    key={key}
+                    role="tab"
+                    type="button"
+                    aria-selected={service === key}
+                    onClick={() => {
+                      setService(key);
+                      setSelectedId(null);
+                      setTerm("");
+                    }}
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-caption font-semibold transition-colors duration-base",
+                      service === key
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card text-muted-foreground",
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t(`categories.${key}`)}
+                  </button>
+                ))}
+              </div>
               {list}
             </div>
           </div>
