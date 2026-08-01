@@ -26,7 +26,9 @@ export const Route = createFileRoute("/gallery")({
 function GalleryPage() {
   const { t } = useTranslation();
   const [cat, setCat] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
   const { data, isLoading } = useQuery(galleryQuery());
+
   const categories = useMemo(
     () => Array.from(new Set((data ?? []).map((g) => g.category).filter(Boolean) as string[])),
     [data],
