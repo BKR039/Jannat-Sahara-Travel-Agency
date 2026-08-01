@@ -69,8 +69,11 @@ function GalleryPage() {
         ) : (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
             {filtered.map((g, i) => (
-              <div
+              <button
                 key={g.id}
+                type="button"
+                onClick={() => setPreview({ src: g.image, alt: g.title ?? "" })}
+                aria-label={g.title ?? t("home.gallery")}
                 className="group relative aspect-square overflow-hidden rounded-lg bg-muted ds-reveal"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
@@ -85,11 +88,13 @@ function GalleryPage() {
                     <span className="text-small font-semibold text-on-dark">{g.title}</span>
                   </div>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         )}
       </section>
+      <ImageLightbox src={preview?.src ?? null} alt={preview?.alt} onClose={() => setPreview(null)} />
     </SiteLayout>
+
   );
 }
