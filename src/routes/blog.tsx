@@ -27,6 +27,7 @@ export const Route = createFileRoute("/blog")({
 function BlogPage() {
   const { t } = useTranslation();
   const { data, isLoading } = useQuery(articlesQuery());
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
 
   return (
     <SiteLayout>
@@ -39,11 +40,11 @@ function BlogPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {data.map((a, i) => (
-              <Link
+              <button
                 key={a.id}
-                to="/blog/$slug"
-                params={{ slug: a.slug }}
-                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+                type="button"
+                onClick={() => setOpenSlug(a.slug)}
+                className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card text-start shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {a.cover && (
@@ -64,11 +65,13 @@ function BlogPage() {
                     {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                   </span>
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
         )}
       </section>
+      <ArticleDialog slug={openSlug} onClose={() => setOpenSlug(null)} />
     </SiteLayout>
   );
+
 }
