@@ -787,7 +787,7 @@ export function BranchesSection() {
                 )}
               </div>
 
-              <div className="flex max-h-[320px] flex-col gap-2.5 overflow-y-auto p-3.5 md:p-4 lg:max-h-[452px]">
+              <div className="flex max-h-[320px] flex-col gap-2.5 overflow-y-auto p-3.5 md:p-4 lg:max-h-[372px]">
                 {isLoading ? (
                   [0, 1, 2].map((i) => (
                     <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/50" />
@@ -817,7 +817,7 @@ export function BranchesSection() {
             </div>
 
             {/* map */}
-            <div className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[560px] xl:col-span-8">
+            <div className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[480px] xl:col-span-8">
               <Suspense fallback={<MapSkeleton />}>
                 {mounted && filtered.length > 0 ? (
                   <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
