@@ -100,11 +100,9 @@ export function BookingFlow({ packageSlug = null }: Props) {
   }, [counts]);
 
   const steps = [
-    t("bookingFlow.steps.package"),
-    t("bookingFlow.steps.travellers"),
     t("bookingFlow.steps.details"),
+    t("bookingFlow.steps.passports"),
     t("bookingFlow.steps.review"),
-    t("bookingFlow.steps.confirm"),
   ];
 
   const goTo = useCallback((i: number) => {
@@ -125,7 +123,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
   );
 
   function validate(current: number): boolean {
-    if (current === 2) {
+    if (current === 0) {
       if (passengers.some((p) => !p.fullName.trim())) {
         toast.error(t("bookingFlow.errors.passengerName"));
         return false;
@@ -141,8 +139,9 @@ export function BookingFlow({ packageSlug = null }: Props) {
 
   function next() {
     if (!validate(step)) return;
-    goTo(Math.min(4, step + 1));
+    goTo(Math.min(2, step + 1));
   }
+
 
   function updatePassenger(id: string, patch: Partial<Passenger>) {
     setPassengers((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
