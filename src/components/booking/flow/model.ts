@@ -54,7 +54,8 @@ export function emptyPassenger(type: PaxType): Passenger {
 export function syncPassengers(list: Passenger[], counts: Counts): Passenger[] {
   const out: Passenger[] = [];
   (["adult", "child", "infant"] as PaxType[]).forEach((type) => {
-    const needed = type === "adult" ? counts.adults : type === "child" ? counts.children : counts.infants;
+    const needed =
+      type === "adult" ? counts.adults : type === "child" ? counts.children : counts.infants;
     const existing = list.filter((p) => p.type === type);
     for (let i = 0; i < needed; i += 1) {
       out.push(existing[i] ?? emptyPassenger(type));

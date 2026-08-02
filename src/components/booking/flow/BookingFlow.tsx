@@ -3,13 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Compass,
-  FileText,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -137,7 +131,6 @@ export function BookingFlow({ packageSlug = null }: Props) {
     if (!validate(step)) return;
     goTo(Math.min(2, step + 1));
   }
-
 
   function updatePassenger(id: string, patch: Partial<Passenger>) {
     setPassengers((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
@@ -371,7 +364,10 @@ export function BookingFlow({ packageSlug = null }: Props) {
               />
               <div className="space-y-4">
                 {passengers.map((p, i) => (
-                  <div key={p.id} className="rounded-xl border border-border-subtle bg-card p-6 shadow-sm">
+                  <div
+                    key={p.id}
+                    className="rounded-xl border border-border-subtle bg-card p-6 shadow-sm"
+                  >
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                       <h3 className="text-h5 font-bold">
                         {p.fullName || t(`bookingFlow.travellers.${p.type}`)}{" "}
@@ -458,7 +454,9 @@ export function BookingFlow({ packageSlug = null }: Props) {
               {notes.trim() && (
                 <div className="rounded-xl border border-border-subtle bg-card p-6">
                   <h3 className="text-h5 font-bold">{t("bookingFlow.fields.bookingNotes")}</h3>
-                  <p className="mt-2 whitespace-pre-line text-small text-muted-foreground">{notes}</p>
+                  <p className="mt-2 whitespace-pre-line text-small text-muted-foreground">
+                    {notes}
+                  </p>
                 </div>
               )}
 
@@ -514,7 +512,6 @@ export function BookingFlow({ packageSlug = null }: Props) {
               </Button>
             )}
           </div>
-
         </div>
 
         {/* ---------------- sticky summary */}

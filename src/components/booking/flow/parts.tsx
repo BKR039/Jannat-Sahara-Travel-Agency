@@ -202,7 +202,9 @@ export function PackageOption({
           )}
         </ul>
         <div className="flex items-baseline gap-2 border-t border-border pt-3">
-          <span className="text-caption text-muted-foreground">{t("bookingFlow.package.from")}</span>
+          <span className="text-caption text-muted-foreground">
+            {t("bookingFlow.package.from")}
+          </span>
           <span className="text-h5 font-extrabold text-primary">
             {money(adultPrice(pkg), pkg.currency)}
           </span>
@@ -355,7 +357,6 @@ export function PassengerForm({
   const typeLabel = t(`bookingFlow.travellers.${passenger.type}`);
 
   return (
-
     <div className="rounded-xl border border-border-subtle bg-card p-6 shadow-sm">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-h5 font-bold">
@@ -474,7 +475,6 @@ export function PassengerForm({
             <PassportUpload passenger={passenger} onChange={onChange} />
           </div>
         )}
-
 
         <div className="grid gap-2 md:col-span-2">
           <Label htmlFor={`${uid}-notes`}>{t("bookingFlow.fields.notes")}</Label>
