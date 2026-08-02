@@ -1,28 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   CalendarDays,
-  Check,
-  ChevronDown,
   Clock,
   Compass,
   Hotel,
   MapPin,
   Plane,
-  Search,
   Sparkles,
   Stamp,
   Users,
-  X,
 } from "lucide-react";
 
 import { packagesQuery, type Package, type PackageCategory } from "@/lib/queries";
 import { PackageCard } from "@/components/common/PackageCard";
+import { PackageDropdown, effectivePrice, seatsLeft } from "@/components/common/PackageDropdown";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const SERVICES = [
@@ -32,29 +28,13 @@ const SERVICES = [
   { key: "visa", icon: Stamp },
 ] as const;
 
-function effectivePrice(pkg: Package): number {
-  if (pkg.discount_price != null) return Number(pkg.discount_price);
-  if (pkg.discount && pkg.discount > 0) return Number(pkg.price) * (1 - Number(pkg.discount) / 100);
-  return Number(pkg.price ?? 0);
-}
-
-function seatsLeft(pkg: Package): number | null {
-  return typeof pkg.seats === "number" ? pkg.seats : null;
-}
-
 export function PackageSelector() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { data, isLoading } = useQuery(packagesQuery());
 
   const [service, setService] = useState<PackageCategory>("umrah");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const [term, setTerm] = useState("");
-
-  const rootRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
 
   const fmtDate = (value: string) =>
     new Date(value).toLocaleDateString(i18n.language, { day: "numeric", month: "short" });
@@ -77,42 +57,41 @@ export function PackageSelector() {
     [available, service],
   );
 
-  const searched = useMemo(() => {
-    const q = term.trim().toLowerCase();
-    if (!q) return byService;
-    return byService.filter((p) => p.title.toLowerCase().includes(q));
-  }, [byService, term]);
-
   const selected = useMemo(
     () => byService.find((p) => p.id === selectedId) ?? null,
     [byService, selectedId],
   );
 
-  // close on outside click / escape (desktop dropdown + mobile sheet)
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (isMobile) return;
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    const raf = requestAnimationFrame(() => searchRef.current?.focus());
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-      cancelAnimationFrame(raf);
-    };
-  }, [open, isMobile]);
+  const sheetTabs = (
+    <div
+      role="tablist"
+      aria-label={t("selector.services")}
+      className="flex gap-2 overflow-x-auto px-4 pt-3 pb-1 [&::-webkit-scrollbar]:hidden"
+    >
+      {SERVICES.map(({ key, icon: Icon }) => (
+        <button
+          key={key}
+          role="tab"
+          type="button"
+          aria-selected={service === key}
+          onClick={() => {
+            setService(key);
+            setSelectedId(null);
+          }}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-caption font-semibold transition-colors duration-base",
+            service === key
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border bg-card text-muted-foreground",
+          )}
+        >
+          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+          {t(`categories.${key}`)}
+        </button>
+      ))}
+    </div>
+  );
 
-  function pick(pkg: Package) {
-    setSelectedId(pkg.id);
-    setOpen(false);
-    setTerm("");
-  }
 
   const list = (
     <>
