@@ -33,7 +33,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
   return (
     <article
       className={cn(
-        "group ds-card-hover flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-border-subtle bg-card shadow-sm",
+        "group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-border-subtle bg-card shadow-sm",
         "transition-all duration-base ease-standard",
         "hover:-translate-y-1 hover:shadow-lg",
         className,
