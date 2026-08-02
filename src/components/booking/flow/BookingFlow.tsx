@@ -425,15 +425,11 @@ export function BookingFlow({ packageSlug = null }: Props) {
                       )}
                     </div>
                     <dl className="mt-4 grid gap-2 text-small sm:grid-cols-2">
-                      <ReviewRow k={t("bookingFlow.fields.passportNumber")} v={p.passportNumber} />
-                      <ReviewRow k={t("bookingFlow.fields.nationality")} v={p.nationality} />
                       <ReviewRow
                         k={t("bookingFlow.fields.gender")}
                         v={p.gender ? t(`bookingFlow.fields.${p.gender}`) : ""}
                       />
-                      <ReviewRow k={t("bookingFlow.fields.dob")} v={p.dateOfBirth} />
-                      <ReviewRow k={t("bookingFlow.fields.passportExpiry")} v={p.passportExpiry} />
-                      <ReviewRow k={t("bookingFlow.fields.emergency")} v={p.emergencyContact} />
+
                       {i === 0 && (
                         <>
                           <ReviewRow k={t("bookingFlow.fields.phone")} v={p.phone} />
