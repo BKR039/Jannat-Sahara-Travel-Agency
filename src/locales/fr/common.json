@@ -337,6 +337,11 @@
     "available": "Disponible",
     "seatsLeft": "{{count}} places restantes",
     "continue": "Continuer la réservation",
-    "close": "Fermer"
+    "close": "Fermer",
+    "badges": {
+      "bestSeller": "Best-seller",
+      "new": "Nouveau",
+      "discount": "Promo"
+    }
   }
 }

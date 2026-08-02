@@ -1,28 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   CalendarDays,
-  Check,
-  ChevronDown,
   Clock,
   Compass,
   Hotel,
   MapPin,
   Plane,
-  Search,
   Sparkles,
   Stamp,
   Users,
-  X,
 } from "lucide-react";
 
 import { packagesQuery, type Package, type PackageCategory } from "@/lib/queries";
 import { PackageCard } from "@/components/common/PackageCard";
+import { PackageDropdown, effectivePrice, seatsLeft } from "@/components/common/PackageDropdown";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const SERVICES = [
@@ -32,29 +28,13 @@ const SERVICES = [
   { key: "visa", icon: Stamp },
 ] as const;
 
-function effectivePrice(pkg: Package): number {
-  if (pkg.discount_price != null) return Number(pkg.discount_price);
-  if (pkg.discount && pkg.discount > 0) return Number(pkg.price) * (1 - Number(pkg.discount) / 100);
-  return Number(pkg.price ?? 0);
-}
-
-function seatsLeft(pkg: Package): number | null {
-  return typeof pkg.seats === "number" ? pkg.seats : null;
-}
-
 export function PackageSelector() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { data, isLoading } = useQuery(packagesQuery());
 
   const [service, setService] = useState<PackageCategory>("umrah");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const [term, setTerm] = useState("");
-
-  const rootRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
 
   const fmtDate = (value: string) =>
     new Date(value).toLocaleDateString(i18n.language, { day: "numeric", month: "short" });
@@ -77,146 +57,39 @@ export function PackageSelector() {
     [available, service],
   );
 
-  const searched = useMemo(() => {
-    const q = term.trim().toLowerCase();
-    if (!q) return byService;
-    return byService.filter((p) => p.title.toLowerCase().includes(q));
-  }, [byService, term]);
-
   const selected = useMemo(
     () => byService.find((p) => p.id === selectedId) ?? null,
     [byService, selectedId],
   );
 
-  // close on outside click / escape (desktop dropdown + mobile sheet)
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (isMobile) return;
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    const raf = requestAnimationFrame(() => searchRef.current?.focus());
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-      cancelAnimationFrame(raf);
-    };
-  }, [open, isMobile]);
-
-  function pick(pkg: Package) {
-    setSelectedId(pkg.id);
-    setOpen(false);
-    setTerm("");
-  }
-
-  const list = (
-    <>
-      <div className="sticky top-0 z-10 border-b border-border-subtle bg-card/95 p-4 backdrop-blur">
-        <div className="relative">
-          <Search
-            className="pointer-events-none absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <input
-            ref={searchRef}
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            placeholder={t("selector.searchPlaceholder")}
-            aria-label={t("selector.searchPlaceholder")}
-            className="h-12 w-full rounded-xl border border-input bg-background ps-10 pe-3 text-small outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          />
-        </div>
-      </div>
-
-      <ul
-        className={cn(
-          "overflow-y-auto p-2",
-          "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border",
-          isMobile ? "max-h-[calc(85vh-11rem)]" : "max-h-[28rem]",
-        )}
-      >
-        {searched.length === 0 && (
-          <li className="p-8 text-center text-small text-muted-foreground">{t("selector.empty")}</li>
-        )}
-        {searched.map((p) => {
-          const s = seatsLeft(p);
-          const limited = s != null && s <= 12;
-          return (
-            <li key={p.id}>
-              <button
-                type="button"
-                onClick={() => pick(p)}
-                aria-pressed={selectedId === p.id}
-                className={cn(
-                  "flex w-full items-center gap-4 rounded-xl p-3 text-start transition-colors duration-fast",
-                  "hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                  selectedId === p.id && "bg-accent",
-                )}
-              >
-                <span className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-surface-sunken sm:h-20 sm:w-28">
-                  {p.cover && (
-                    <img
-                      src={p.cover}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </span>
-
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2">
-                    <span className="line-clamp-1 text-small font-bold text-foreground">{p.title}</span>
-                    {selectedId === p.id && <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
-                  </span>
-                  {p.destination && (
-                    <span className="mt-0.5 flex items-center gap-1 text-caption text-muted-foreground">
-                      <MapPin className="h-3 w-3" aria-hidden="true" /> {p.destination}
-                    </span>
-                  )}
-                  <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-muted-foreground">
-                    {p.duration && (
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="h-3 w-3" aria-hidden="true" /> {p.duration}
-                      </span>
-                    )}
-                    {p.departure_date && (
-                      <span className="inline-flex items-center gap-1">
-                        <CalendarDays className="h-3 w-3" aria-hidden="true" /> {fmtDate(p.departure_date)}
-                      </span>
-                    )}
-                  </span>
-                </span>
-
-                <span className="shrink-0 text-end">
-                  <span className="block text-caption text-muted-foreground">{t("package.from")}</span>
-                  <span className="block text-small font-extrabold text-primary">
-                    {effectivePrice(p).toLocaleString()} {p.currency}
-                  </span>
-                  {s != null && (
-                    <span
-                      className={cn(
-                        "mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-semibold",
-                        limited ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success",
-                      )}
-                    >
-                      <Users className="h-3 w-3" aria-hidden="true" />
-                      {limited ? t("selector.limited", { count: s }) : t("selector.available")}
-                    </span>
-                  )}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </>
+  const sheetTabs = (
+    <div
+      role="tablist"
+      aria-label={t("selector.services")}
+      className="flex gap-2 overflow-x-auto px-4 pt-3 pb-1 [&::-webkit-scrollbar]:hidden"
+    >
+      {SERVICES.map(({ key, icon: Icon }) => (
+        <button
+          key={key}
+          role="tab"
+          type="button"
+          aria-selected={service === key}
+          onClick={() => {
+            setService(key);
+            setSelectedId(null);
+          }}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-caption font-semibold transition-colors duration-base",
+            service === key
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border bg-card text-muted-foreground",
+          )}
+        >
+          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+          {t(`categories.${key}`)}
+        </button>
+      ))}
+    </div>
   );
 
   return (
@@ -240,7 +113,6 @@ export function PackageSelector() {
             onClick={() => {
               setService(key);
               setSelectedId(null);
-              setOpen(false);
             }}
             className={cn(
               "inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-small font-semibold transition-all duration-base ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
@@ -256,96 +128,14 @@ export function PackageSelector() {
       </div>
 
       {/* ---------- selector card */}
-      <div
-        ref={rootRef}
-        className="relative mt-6 rounded-2xl border border-border-subtle bg-card p-5 shadow-md md:p-7"
-      >
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          className="flex w-full items-center justify-between gap-4 rounded-2xl border border-input bg-background px-5 py-4 text-start transition-colors duration-base hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-        >
-          <span className="min-w-0">
-            <span className="block text-caption font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              {t("selector.label")}
-            </span>
-            <span className="mt-1 block truncate text-body font-bold text-foreground">
-              {selected ? selected.title : t("selector.placeholder")}
-            </span>
-          </span>
-          <ChevronDown
-            className={cn(
-              "h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-base",
-              open && "rotate-180",
-            )}
-            aria-hidden="true"
-          />
-        </button>
+      <div className="relative mt-6 rounded-2xl border border-border-subtle bg-card p-5 shadow-md md:p-7">
+        <PackageDropdown
+          packages={byService}
+          selected={selected}
+          onSelect={(p) => setSelectedId(p.id)}
+          sheetHeader={sheetTabs}
+        />
 
-        {/* desktop dropdown */}
-        {open && !isMobile && (
-          <div className="absolute inset-x-5 z-30 mt-2 origin-top overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-lg ds-reveal md:inset-x-7">
-            {list}
-          </div>
-        )}
-
-        {/* mobile bottom sheet */}
-        {open && isMobile && (
-          <div className="fixed inset-0 z-50 flex flex-col justify-end">
-            <button
-              type="button"
-              aria-label={t("selector.close")}
-              onClick={() => setOpen(false)}
-              className="absolute inset-0 bg-foreground/50 backdrop-blur-sm"
-            />
-            <div className="relative max-h-[85vh] overflow-hidden rounded-t-3xl border-t border-border-subtle bg-card shadow-lg">
-              <div className="flex items-center justify-between px-4 pt-4">
-                <p className="text-card-title">{t("selector.label")}</p>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  aria-label={t("selector.close")}
-                  className="rounded-full p-2 text-muted-foreground hover:bg-muted"
-                >
-                  <X className="h-5 w-5" aria-hidden="true" />
-                </button>
-              </div>
-
-              {/* service switcher inside the sheet */}
-              <div
-                role="tablist"
-                aria-label={t("selector.services")}
-                className="flex gap-2 overflow-x-auto px-4 pt-3 pb-1 [&::-webkit-scrollbar]:hidden"
-              >
-                {SERVICES.map(({ key, icon: Icon }) => (
-                  <button
-                    key={key}
-                    role="tab"
-                    type="button"
-                    aria-selected={service === key}
-                    onClick={() => {
-                      setService(key);
-                      setSelectedId(null);
-                      setTerm("");
-                    }}
-                    className={cn(
-                      "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-caption font-semibold transition-colors duration-base",
-                      service === key
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-card text-muted-foreground",
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t(`categories.${key}`)}
-                  </button>
-                ))}
-              </div>
-              {list}
-            </div>
-          </div>
-        )}
 
         <p className="mt-4 text-small text-muted-foreground">
           {t("explorer.results", { count: byService.length })}
