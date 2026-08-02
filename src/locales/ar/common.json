@@ -337,6 +337,11 @@
     "available": "متوفرة",
     "seatsLeft": "{{count}} مقعد متبقٍ",
     "continue": "متابعة الحجز",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "badges": {
+      "bestSeller": "الأكثر طلباً",
+      "new": "جديد",
+      "discount": "تخفيض"
+    }
   }
 }
