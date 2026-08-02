@@ -381,24 +381,7 @@ export function PassengerForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor={`${uid}-passport`}>{t("bookingFlow.fields.passportNumber")}</Label>
-          <Input
-            id={`${uid}-passport`}
-            maxLength={40}
-            value={passenger.passportNumber}
-            onChange={(e) => onChange({ passportNumber: e.target.value })}
-          />
-        </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor={`${uid}-nat`}>{t("bookingFlow.fields.nationality")}</Label>
-          <Input
-            id={`${uid}-nat`}
-            maxLength={80}
-            value={passenger.nationality}
-            onChange={(e) => onChange({ nationality: e.target.value })}
-          />
-        </div>
 
         <div className="grid gap-2">
           <Label htmlFor={`${uid}-gender`}>{t("bookingFlow.fields.gender")}</Label>
