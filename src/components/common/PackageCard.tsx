@@ -1,159 +1,154 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Clock, Users, Star, CalendarDays, Hotel, Plane, ArrowRight } from "lucide-react";
+import { MapPin, Clock, Users, Star, Hotel, Plane, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Package } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
 /**
- * Package Card — DS /components/03-cards.md § Package Card / Trip Card
- * media (scrim + badges) → content → highlights → footer (price + Book Now / Details)
+ * Package Card — compact luxury listing card
+ * Top: cover + badges + destination
+ * Middle: title + short description
+ * Bottom: hotel / airline / duration / seats + pricing + CTAs
  */
 export function PackageCard({ pkg, className }: { pkg: Package; className?: string }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const discounted =
     pkg.discount && pkg.discount > 0 ? Number(pkg.price) * (1 - Number(pkg.discount) / 100) : null;
 
-  const departure = pkg.departure_date
-    ? new Date(pkg.departure_date).toLocaleDateString(i18n.language, {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : null;
-
-  const highlights = [pkg.hotel, pkg.airline, pkg.transport].filter(Boolean).slice(0, 2) as string[];
+  const currentPrice = discounted ?? Number(pkg.price);
   const soldOut = pkg.status === "sold_out" || (typeof pkg.seats === "number" && pkg.seats <= 0);
+  const hasDiscount = pkg.discount && pkg.discount > 0;
+
+  const metaItems = [
+    { key: "hotel", icon: Hotel, value: pkg.hotel },
+    { key: "airline", icon: Plane, value: pkg.airline },
+    { key: "duration", icon: Clock, value: pkg.duration },
+    {
+      key: "seats",
+      icon: Users,
+      value: typeof pkg.seats === "number" && pkg.seats > 0 ? `${pkg.seats} ${t("package.seats")}` : null,
+    },
+  ].filter((item) => Boolean(item.value));
 
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card shadow-sm",
-        "transition-[box-shadow,transform] duration-base ease-standard",
-        "hover:-translate-y-0.5 hover:shadow-md",
+        "group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-border-subtle bg-card shadow-sm",
+        "transition-all duration-base ease-standard",
+        "hover:-translate-y-1 hover:shadow-lg",
         className,
       )}
     >
+      {/* ---------- Top: cover + badges + destination ---------- */}
       <Link
         to="/packages/$slug"
         params={{ slug: pkg.slug }}
-        className="relative block aspect-[4/3] overflow-hidden bg-surface-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className="relative block aspect-[16/10] overflow-hidden bg-surface-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
-        {pkg.cover && (
+        {pkg.cover ? (
           <img
             src={pkg.cover}
             alt={pkg.title}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-slow ease-emphasized group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition-transform duration-slow ease-emphasized group-hover:scale-[1.04]"
           />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+            <MapPin className="h-8 w-8 opacity-40" aria-hidden="true" />
+          </div>
         )}
-        <div className="absolute inset-0 bg-gradient-hero-scrim opacity-90" />
+        <div className="absolute inset-0 bg-gradient-hero-scrim opacity-80" />
 
-        <div className="absolute top-3 start-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-primary px-3 py-1 text-caption font-semibold text-primary-foreground">
+        <div className="absolute top-2.5 start-2.5 flex flex-wrap items-center gap-1.5">
+          <span className="rounded-full bg-primary px-2.5 py-1 text-caption font-semibold text-primary-foreground shadow-sm">
             {t(`categories.${pkg.category}`)}
           </span>
           {pkg.featured && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-caption font-semibold text-secondary-foreground">
+            <span
+              className="inline-flex items-center rounded-full bg-secondary px-2 py-1 text-caption font-semibold text-secondary-foreground shadow-sm"
+              aria-label={t("home.featuredPackages")}
+            >
               <Star className="h-3 w-3 fill-current" aria-hidden="true" />
             </span>
           )}
         </div>
 
-        {pkg.discount && pkg.discount > 0 && (
-          <div className="absolute top-3 end-3 rounded-full bg-destructive px-3 py-1 text-caption font-bold text-primary-foreground shadow-sm">
+        {hasDiscount && (
+          <div className="absolute top-2.5 end-2.5 rounded-full bg-destructive px-2.5 py-1 text-caption font-bold text-primary-foreground shadow-sm">
             -{Number(pkg.discount)}%
           </div>
         )}
 
         {pkg.destination && (
-          <div className="absolute bottom-3 start-3 flex items-center gap-1.5 text-on-dark">
-            <MapPin className="h-4 w-4" aria-hidden="true" />
-            <span className="text-small font-medium">{pkg.destination}</span>
+          <div className="absolute bottom-2.5 start-2.5 flex items-center gap-1 text-on-dark">
+            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="line-clamp-1 max-w-[12rem] text-small font-medium">{pkg.destination}</span>
           </div>
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col gap-3 p-6">
+      {/* ---------- Middle: title + description ---------- */}
+      <div className="flex flex-1 flex-col p-4">
         <Link
           to="/packages/$slug"
           params={{ slug: pkg.slug }}
           className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <h3 className="line-clamp-2 text-card-title text-foreground">{pkg.title}</h3>
+          <h3 className="line-clamp-1 text-card-title font-semibold text-foreground transition-colors duration-fast group-hover:text-primary">
+            {pkg.title}
+          </h3>
         </Link>
         {pkg.short_description && (
-          <p className="line-clamp-2 text-card-desc text-muted-foreground">{pkg.short_description}</p>
+          <p className="mt-1 line-clamp-2 text-card-desc text-muted-foreground">{pkg.short_description}</p>
         )}
 
-        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2 text-caption text-muted-foreground">
-          {departure && (
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {departure}
-            </span>
+        {/* ---------- Bottom: meta + price + CTAs ---------- */}
+        <div className="mt-auto pt-3">
+          {metaItems.length > 0 && (
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-b border-border-subtle pb-3">
+              {metaItems.map((item) => (
+                <div key={item.key} className="flex items-center gap-1.5 text-caption text-muted-foreground">
+                  <item.icon className="h-3.5 w-3.5 shrink-0 text-primary/80" aria-hidden="true" />
+                  <span className="line-clamp-1">{item.value}</span>
+                </div>
+              ))}
+            </div>
           )}
-          {pkg.duration && (
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {pkg.duration}
-            </span>
-          )}
-          {typeof pkg.seats === "number" && pkg.seats > 0 && (
-            <span className="inline-flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" aria-hidden="true" /> {pkg.seats} {t("package.seats")}
-            </span>
-          )}
-        </div>
 
-        {highlights.length > 0 && (
-          <ul className="flex flex-wrap gap-2">
-            {highlights.map((h, i) => (
-              <li
-                key={h}
-                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-caption font-medium text-primary"
-              >
-                {i === 0 ? (
-                  <Hotel className="h-3 w-3" aria-hidden="true" />
-                ) : (
-                  <Plane className="h-3 w-3" aria-hidden="true" />
-                )}
-                <span className="line-clamp-1 max-w-[10rem]">{h}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="mt-auto space-y-4 border-t border-border-subtle pt-4">
-          <div>
-            <p className="text-caption text-muted-foreground">{t("package.from")}</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-h4 text-primary">
-                {(discounted ?? Number(pkg.price)).toLocaleString()} {pkg.currency}
-              </span>
-              {discounted !== null && (
-                <span className="text-caption text-muted-foreground line-through">
-                  {Number(pkg.price).toLocaleString()}
+          <div className="mt-3 flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-caption text-muted-foreground">{t("package.from")}</p>
+              <div className="flex flex-wrap items-baseline gap-1.5">
+                <span className="text-h5 font-bold text-primary">
+                  {currentPrice.toLocaleString()} {pkg.currency}
                 </span>
-              )}
+                {discounted !== null && (
+                  <span className="text-caption text-muted-foreground line-through">
+                    {Number(pkg.price).toLocaleString()} {pkg.currency}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="mt-3 flex gap-2">
             <Link
               to="/booking"
               search={{ pkg: pkg.slug }}
               aria-disabled={soldOut}
               className={cn(
-                "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md bg-primary px-4 text-small font-semibold text-primary-foreground transition-colors duration-fast hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                "inline-flex h-9 flex-1 items-center justify-center gap-1 rounded-[var(--radius-button)] bg-primary px-3 text-small font-semibold text-primary-foreground transition-colors duration-fast hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                 soldOut && "pointer-events-none opacity-50",
               )}
             >
               {t("actions.bookNow")}
-              <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+              <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
             </Link>
             <Link
               to="/packages/$slug"
               params={{ slug: pkg.slug }}
-              className="inline-flex h-10 flex-1 items-center justify-center rounded-md border border-border px-4 text-small font-semibold text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="inline-flex h-9 flex-1 items-center justify-center rounded-[var(--radius-button)] border border-border px-3 text-small font-semibold text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {t("actions.viewDetails")}
             </Link>
