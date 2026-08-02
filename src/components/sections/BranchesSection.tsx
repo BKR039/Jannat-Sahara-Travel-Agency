@@ -20,7 +20,7 @@ import {
   Sparkles,
   Search,
   Loader2,
-  ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 import {
   Select,
@@ -49,6 +49,15 @@ function whatsappHref(phone: string) {
   return `https://wa.me/${phone.replace(/[^\d]/g, "")}`;
 }
 
+function mapsHref(branch: Branch) {
+  return (
+    branch.google_maps_url ??
+    `https://www.google.com/maps/search/?api=1&query=${Number(branch.latitude)},${Number(
+      branch.longitude,
+    )}`
+  );
+}
+
 async function copyToClipboard(value: string, label: string) {
   try {
     await navigator.clipboard.writeText(value);
@@ -62,52 +71,15 @@ async function copyToClipboard(value: string, label: string) {
 
 function MapSkeleton() {
   return (
-    <div className="flex h-full min-h-[320px] w-full items-center justify-center bg-muted/40">
+    <div className="flex h-full min-h-[280px] w-full items-center justify-center bg-muted/40">
       <Loader2 className="h-7 w-7 animate-spin text-primary/70" />
     </div>
   );
 }
 
-function IconAction({
-  label,
-  href,
-  onClick,
-  children,
-  external,
-}: {
-  label: string;
-  href?: string;
-  onClick?: (e: React.MouseEvent) => void;
-  children: React.ReactNode;
-  external?: boolean;
-}) {
-  const cls =
-    "inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/60 text-foreground/70 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
-  if (href) {
-    return (
-      <a
-        href={href}
-        aria-label={label}
-        title={label}
-        onClick={(e) => e.stopPropagation()}
-        target={external ? "_blank" : undefined}
-        rel={external ? "noopener noreferrer" : undefined}
-        className={cls}
-      >
-        {children}
-      </a>
-    );
-  }
-  return (
-    <button type="button" aria-label={label} title={label} onClick={onClick} className={cls}>
-      {children}
-    </button>
-  );
-}
+/* --------------------------------------------------- branch list tile */
 
-/* ------------------------------------------------------- branch list row */
-
-function BranchRow({
+function BranchTile({
   branch,
   active,
   onSelect,
@@ -135,25 +107,20 @@ function BranchRow({
           onSelect(branch.id);
         }
       }}
-      style={{ animationDelay: `${Math.min(index, 6) * 60}ms` }}
+      style={{ animationDelay: `${Math.min(index, 6) * 50}ms` }}
       className={cn(
-        "group ds-reveal relative flex cursor-pointer gap-4 border-b border-border/50 p-5 text-start transition-colors duration-base ease-standard last:border-b-0",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60",
-        active ? "bg-primary/8" : "hover:bg-muted/50",
+        "group ds-reveal relative flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 text-start transition-all duration-base ease-standard",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        active
+          ? "border-primary/50 bg-primary/8 shadow-md shadow-primary/10"
+          : "border-border/50 bg-background/50 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-muted/40",
       )}
     >
       <span
-        aria-hidden
         className={cn(
-          "absolute inset-y-0 start-0 w-[3px] rounded-full bg-primary transition-transform duration-base ease-standard",
-          active ? "scale-y-100" : "scale-y-0",
-        )}
-      />
-      <span
-        className={cn(
-          "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
           active
-            ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+            ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
             : "bg-primary/10 text-primary group-hover:scale-105",
         )}
       >
@@ -165,67 +132,125 @@ function BranchRow({
       </span>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-caption font-semibold uppercase tracking-[0.16em] text-primary/80">
-            {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} · {branch.city}
-          </p>
-        </div>
-        <h3 className="mt-1 truncate text-h5 font-bold leading-snug text-foreground">
+        <p className="truncate text-caption font-semibold uppercase tracking-[0.16em] text-primary/80">
+          {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} · {branch.city}
+        </p>
+        <h3 className="mt-0.5 truncate text-small font-bold leading-snug text-foreground">
           {branch.name}
         </h3>
-        <p className="mt-1.5 line-clamp-2 text-small leading-relaxed text-muted-foreground">
+        <p className="mt-0.5 line-clamp-1 text-caption leading-relaxed text-muted-foreground">
           {branch.address}
         </p>
+      </div>
 
-        {(branch.working_hours || branch.phone) && (
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-muted-foreground">
-            {branch.working_hours && (
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="h-3 w-3 text-primary/70" />
-                {branch.working_hours}
-              </span>
-            )}
-            {branch.phone && (
-              <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80" dir="ltr">
-                <Phone className="h-3 w-3 text-primary/70" />
-                {branch.phone}
-              </span>
-            )}
-          </div>
-        )}
+      {active && (
+        <span className="mt-1 shrink-0 rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
+          {t("branches.active")}
+        </span>
+      )}
+    </article>
+  );
+}
 
-        <div className="mt-3 flex items-center gap-2">
+/* ------------------------------------------- active branch detail panel */
+
+function ActiveBranchPanel({ branch }: { branch: Branch }) {
+  const { t } = useTranslation();
+
+  const facts = [
+    branch.working_hours
+      ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: branch.working_hours }
+      : null,
+    branch.phone
+      ? {
+          key: "phone",
+          icon: Phone,
+          label: t("branches.info.phone"),
+          value: branch.phone,
+          ltr: true,
+        }
+      : null,
+    branch.email
+      ? { key: "email", icon: Mail, label: t("branches.info.email"), value: branch.email, ltr: true }
+      : null,
+    { key: "address", icon: Building2, label: t("branches.info.headquarters"), value: branch.address },
+  ].filter(Boolean) as {
+    key: string;
+    icon: typeof Clock;
+    label: string;
+    value: string;
+    ltr?: boolean;
+  }[];
+
+  return (
+    <div
+      key={branch.id}
+      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-4 md:px-6"
+    >
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {facts.map((f) => (
+            <div key={f.key} className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <f.icon className="h-3.5 w-3.5" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  {f.label}
+                </p>
+                <p
+                  dir={f.ltr ? "ltr" : undefined}
+                  className="mt-0.5 line-clamp-2 text-small font-semibold leading-snug text-foreground"
+                >
+                  {f.value}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
           {branch.phone && (
             <>
-              <IconAction label={t("branches.call")} href={`tel:${branch.phone.replace(/\s+/g, "")}`}>
-                <Phone className="h-4 w-4" />
-              </IconAction>
-              <IconAction label={t("branches.whatsapp")} href={whatsappHref(branch.phone)} external>
+              <a
+                href={whatsappHref(branch.phone)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-small font-bold text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35"
+              >
                 <MessageCircle className="h-4 w-4" />
-              </IconAction>
+                {t("branches.whatsapp")}
+              </a>
+              <a
+                href={`tel:${branch.phone.replace(/\s+/g, "")}`}
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+              >
+                <Phone className="h-4 w-4" />
+                {t("branches.call")}
+              </a>
             </>
           )}
-          {branch.google_maps_url && (
-            <IconAction label={t("branches.directions")} href={branch.google_maps_url} external>
-              <Navigation className="h-4 w-4" />
-            </IconAction>
-          )}
-          <IconAction
-            label={t("branches.copyAddress")}
-            onClick={(e) => {
-              e.stopPropagation();
-              copyToClipboard(`${branch.name} — ${branch.address}`, t("branches.addressCopied"));
-            }}
+          <a
+            href={mapsHref(branch)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+          >
+            <Navigation className="h-4 w-4" />
+            {t("branches.directions")}
+            <ExternalLink className="h-3 w-3 opacity-60" />
+          </a>
+          <button
+            type="button"
+            onClick={() => copyToClipboard(`${branch.name} — ${branch.address}`, t("branches.addressCopied"))}
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 text-small font-semibold text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
           >
             <Copy className="h-4 w-4" />
-          </IconAction>
-          <span className="ms-auto hidden items-center gap-1 text-caption font-semibold text-primary opacity-0 transition-opacity duration-base group-hover:opacity-100 sm:inline-flex">
-            {t("branches.viewOnMap")}
-            <ChevronRight className="h-3 w-3 rtl:rotate-180" />
-          </span>
+            {t("branches.copyAddress")}
+          </button>
         </div>
       </div>
-    </article>
+    </div>
   );
 }
 
@@ -309,6 +334,8 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
   const rows = useContactRows(items);
   const socials = items.filter((i) => SOCIAL_KEYS.includes(i.key));
 
+  if (rows.length === 0 && socials.length === 0) return null;
+
   return (
     <aside className="ds-reveal relative flex h-full flex-col overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card/90 to-card/60 shadow-lg shadow-primary/5 backdrop-blur-xl">
       <span
@@ -316,16 +343,13 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
         className="pointer-events-none absolute -top-24 end-[-15%] h-56 w-56 rounded-full bg-primary/10 blur-3xl"
       />
 
-      <div className="relative border-b border-border/50 px-6 py-5">
+      <div className="relative border-b border-border/50 px-5 py-4">
         <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
           {t("branches.contactKicker")}
         </p>
-        <h3 className="mt-1.5 text-h4 font-bold leading-snug text-foreground">
-          {t("branches.contactCard.title")}
+        <h3 className="mt-1 text-h5 font-bold leading-snug text-foreground">
+          {t("branches.info.title")}
         </h3>
-        <p className="mt-1 text-small leading-relaxed text-muted-foreground">
-          {t("branches.contactCard.subtitle")}
-        </p>
       </div>
 
       <ul className="relative flex-1 divide-y divide-border/50">
@@ -333,13 +357,13 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
           <li
             key={r.key}
             style={{ animationDelay: `${i * 50}ms` }}
-            className="ds-reveal group flex items-center gap-4 px-6 py-4 transition-colors duration-base ease-standard hover:bg-muted/40"
+            className="ds-reveal group flex items-center gap-3.5 px-5 py-3.5 transition-colors duration-base ease-standard hover:bg-muted/40"
           >
             <span
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
                 r.key === "whatsapp"
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
                   : "bg-primary/10 text-primary",
               )}
             >
@@ -355,7 +379,7 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
                   target={r.external ? "_blank" : undefined}
                   rel={r.external ? "noopener noreferrer" : undefined}
                   dir={r.ltr ? "ltr" : undefined}
-                  className="mt-0.5 block truncate text-body font-bold text-foreground transition-colors duration-base hover:text-primary"
+                  className="mt-0.5 block truncate text-small font-bold text-foreground transition-colors duration-base hover:text-primary"
                 >
                   {r.value}
                 </a>
@@ -390,7 +414,7 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
       </ul>
 
       {socials.length > 0 && (
-        <div className="relative flex items-center justify-between gap-4 border-t border-border/50 bg-muted/30 px-6 py-4">
+        <div className="relative flex items-center justify-between gap-4 border-t border-border/50 bg-muted/30 px-5 py-3.5">
           <p className="text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             {t("branches.contactCard.follow")}
           </p>
@@ -454,12 +478,24 @@ function Field({
   );
 }
 
-function ContactForm({ branches, info }: { branches: Branch[]; info: ContactInfo[] }) {
+function ContactForm({
+  branches,
+  info,
+  defaultBranchId,
+}: {
+  branches: Branch[];
+  info: ContactInfo[];
+  defaultBranchId?: string | null;
+}) {
   const { t } = useTranslation();
   const whatsappItem = info.find((i) => i.key === "whatsapp");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [branchId, setBranchId] = useState<string>("");
+
+  useEffect(() => {
+    if (defaultBranchId) setBranchId(defaultBranchId);
+  }, [defaultBranchId]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -482,38 +518,38 @@ function ContactForm({ branches, info }: { branches: Branch[]; info: ContactInfo
     }
     setSent(true);
     (e.target as HTMLFormElement).reset();
-    setBranchId("");
     setTimeout(() => setSent(false), 5000);
     toast.success(t("contact.success"));
   };
 
   return (
-    <div className="ds-reveal relative overflow-hidden rounded-xl border border-border/50 bg-card/80 p-6 shadow-xl shadow-primary/10 backdrop-blur-xl md:p-8">
+    <div className="ds-reveal relative h-full overflow-hidden rounded-xl border border-border/50 bg-card/80 p-5 shadow-xl shadow-primary/10 backdrop-blur-xl md:p-7">
       <span
         aria-hidden
         className="pointer-events-none absolute -top-28 start-[-10%] h-64 w-64 rounded-full bg-primary/10 blur-3xl"
       />
-      <div className="relative flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h3 className="text-h3 font-bold leading-snug text-foreground">
-            {t("branches.form.title")}
-          </h3>
-          <p className="mt-1.5 max-w-md text-small leading-relaxed text-muted-foreground">
-            {t("branches.form.subtitle")}
-          </p>
-        </div>
+      <div className="relative">
+        <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+          {t("branches.contactKicker")}
+        </p>
+        <h3 className="mt-1 text-h4 font-bold leading-snug text-foreground">
+          {t("branches.form.title")}
+        </h3>
+        <p className="mt-1 max-w-md text-small leading-relaxed text-muted-foreground">
+          {t("branches.form.subtitle")}
+        </p>
       </div>
 
       {sent && (
-        <div className="ds-reveal relative mt-5 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-4 text-primary">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+        <div className="ds-reveal relative mt-4 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-3.5 text-primary">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Check className="h-4 w-4" />
           </span>
           <p className="text-small font-semibold">{t("branches.form.thanks")}</p>
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="relative mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <form onSubmit={onSubmit} className="relative mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <Field name="name" label={t("contact.name")} required />
         <Field name="phone" label={t("contact.phone")} required />
         <Field name="email" label={t("contact.email")} type="email" required />
@@ -555,7 +591,7 @@ function ContactForm({ branches, info }: { branches: Branch[]; info: ContactInfo
           <button
             type="submit"
             disabled={loading}
-            className="group inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-70"
+            className="group inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 disabled:pointer-events-none disabled:opacity-60"
           >
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -569,7 +605,7 @@ function ContactForm({ branches, info }: { branches: Branch[]; info: ContactInfo
               href={whatsappHref(whatsappItem.value)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 py-3.5 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
             >
               <MessageCircle className="h-4 w-4" />
               {t("branches.form.whatsappInstead")}
@@ -613,6 +649,13 @@ export function BranchesSection() {
     });
   }, [branches, search, city]);
 
+  /* keep an active branch at all times so the detail panel is never empty */
+  useEffect(() => {
+    if (!filtered.length) return;
+    if (activeId && filtered.some((b) => b.id === activeId)) return;
+    setActiveId((filtered.find((b) => b.is_main_branch) ?? filtered[0]).id);
+  }, [filtered, activeId]);
+
   useEffect(() => {
     if (!activeId) return;
     const el = cardRefs.current[activeId];
@@ -643,15 +686,12 @@ export function BranchesSection() {
   }));
 
   const activeBranch = branches.find((b) => b.id === activeId) ?? null;
-  const quickPhone = info.find((i) => i.key === "phone" || i.key === "mobile");
-  const quickWhatsapp = info.find((i) => i.key === "whatsapp");
-  const quickEmail = info.find((i) => i.key === "email");
 
   return (
     <section
       id="branches"
       aria-labelledby="branches-heading"
-      className="relative isolate overflow-hidden pb-14 pt-20 md:pb-20 md:pt-24"
+      className="relative isolate overflow-hidden py-16 md:py-20"
     >
       {jsonLd.length > 0 && (
         <script
@@ -660,7 +700,7 @@ export function BranchesSection() {
         />
       )}
 
-      {/* ---------- ambient background: soft gradient + subtle grid ---------- */}
+      {/* ---------- ambient background ---------- */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/25 to-background" />
         <div
@@ -672,14 +712,13 @@ export function BranchesSection() {
             maskImage: "radial-gradient(ellipse 70% 55% at 50% 0%, black 20%, transparent 75%)",
           }}
         />
-        <div className="absolute -top-40 start-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
-        <div className="absolute bottom-10 end-[-8%] h-[22rem] w-[22rem] rounded-full bg-primary/5 blur-[110px]" />
+        <div className="absolute -top-40 start-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-12 gap-x-6 gap-y-10 px-4 md:px-6 lg:px-8">
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-8 px-4 md:px-6 lg:px-8">
         {/* ---------- header ---------- */}
-        <header className="ds-reveal col-span-12 flex flex-col gap-4 lg:col-span-7">
+        <header className="ds-reveal flex flex-col gap-3">
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-caption font-semibold uppercase tracking-[0.22em] text-primary backdrop-blur">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
@@ -689,57 +728,22 @@ export function BranchesSection() {
           </span>
           <h2
             id="branches-heading"
-            className="text-h1 font-bold leading-[1.12] tracking-tight text-foreground"
+            className="max-w-2xl text-h1 font-bold leading-[1.15] tracking-tight text-foreground"
           >
             {t("branches.title")}
           </h2>
-          <p className="max-w-xl text-body-lg leading-relaxed text-muted-foreground">
+          <p className="max-w-xl text-body leading-relaxed text-muted-foreground">
             {t("branches.subtitle")}
           </p>
         </header>
 
-        {/* ---------- toolbar (aligned to header baseline) ---------- */}
-        <div className="ds-reveal col-span-12 flex flex-col justify-end gap-3 lg:col-span-5">
-          <div className="relative">
-            <Search className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label={t("branches.searchPlaceholder")}
-              placeholder={t("branches.searchPlaceholder")}
-              className="h-12 w-full rounded-full border border-border/60 bg-card/70 ps-11 pe-4 text-small text-foreground outline-none backdrop-blur transition-all duration-base ease-standard placeholder:text-muted-foreground hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_12%,transparent)]"
-            />
-          </div>
-          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0">
-            {[{ id: "all", label: t("branches.allCities") }, ...cities.map((c) => ({ id: c, label: c }))].map(
-              (c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setCity(c.id)}
-                  aria-pressed={city === c.id}
-                  className={cn(
-                    "h-10 shrink-0 rounded-full border px-4 text-caption font-semibold transition-all duration-base ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                    city === c.id
-                      ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25"
-                      : "border-border/60 bg-card/60 text-muted-foreground backdrop-blur hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground",
-                  )}
-                >
-                  {c.label}
-                </button>
-              ),
-            )}
-          </div>
-        </div>
-
-        {/* ---------- branches + map: one connected surface ---------- */}
-        <div className="col-span-12">
-          <div className="ds-reveal overflow-hidden rounded-xl border border-border/50 bg-card/60 shadow-2xl shadow-primary/10 backdrop-blur-xl">
-            <div className="grid grid-cols-12">
-              {/* branch list */}
-              <div className="order-2 col-span-12 border-border/50 lg:order-1 lg:col-span-5 lg:border-e xl:col-span-4">
-                <div className="flex items-center justify-between gap-3 border-b border-border/50 bg-muted/30 px-5 py-3.5">
+        {/* ---------- large contact card: branches + map + live details ---------- */}
+        <div className="ds-reveal overflow-hidden rounded-2xl border border-border/50 bg-card/60 shadow-2xl shadow-primary/10 backdrop-blur-xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12">
+            {/* branch selector */}
+            <div className="order-2 flex flex-col border-border/50 lg:order-1 lg:col-span-5 lg:border-e xl:col-span-4">
+              <div className="flex flex-col gap-3 border-b border-border/50 bg-muted/30 px-4 py-3.5 md:px-5">
+                <div className="flex items-center justify-between gap-3">
                   <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
                     {t("branches.ourBranches")}
                   </p>
@@ -747,125 +751,111 @@ export function BranchesSection() {
                     {filtered.length} {t("branches.branchesCount")}
                   </span>
                 </div>
-
-                <div className="max-h-[300px] overflow-y-auto lg:max-h-[544px]">
-                  {isLoading ? (
-                    <div className="space-y-3 p-5">
-                      {[0, 1, 2].map((i) => (
-                        <div key={i} className="h-24 animate-pulse rounded-lg bg-muted/50" />
-                      ))}
-                    </div>
-                  ) : filtered.length === 0 ? (
-                    <div className="p-10 text-center">
-                      <MapPin className="mx-auto h-7 w-7 text-muted-foreground/60" />
-                      <p className="mt-3 text-small font-semibold text-foreground">
-                        {t("branches.noResults")}
-                      </p>
-                    </div>
-                  ) : (
-                    filtered.map((b, i) => (
-                      <BranchRow
-                        key={b.id}
-                        branch={b}
-                        index={i}
-                        active={b.id === activeId}
-                        onSelect={setActiveId}
-                        cardRef={(el) => {
-                          cardRefs.current[b.id] = el;
-                        }}
-                      />
-                    ))
-                  )}
+                <div className="relative">
+                  <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    aria-label={t("branches.searchPlaceholder")}
+                    placeholder={t("branches.searchPlaceholder")}
+                    className="h-11 w-full rounded-full border border-border/60 bg-background/70 ps-10 pe-4 text-small text-foreground outline-none transition-all duration-base ease-standard placeholder:text-muted-foreground hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_12%,transparent)]"
+                  />
                 </div>
+                {cities.length > 1 && (
+                  <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
+                    {[
+                      { id: "all", label: t("branches.allCities") },
+                      ...cities.map((c) => ({ id: c, label: c })),
+                    ].map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => setCity(c.id)}
+                        aria-pressed={city === c.id}
+                        className={cn(
+                          "h-9 shrink-0 rounded-full border px-3.5 text-caption font-semibold transition-all duration-base ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                          city === c.id
+                            ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+                            : "border-border/60 bg-background/60 text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                        )}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* map */}
-              <div className="relative order-1 col-span-12 min-h-[320px] lg:order-2 lg:col-span-7 lg:min-h-[600px] xl:col-span-8">
-                <Suspense fallback={<MapSkeleton />}>
-                  {mounted && filtered.length > 0 ? (
-                    <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
-                  ) : (
-                    <MapSkeleton />
-                  )}
-                </Suspense>
-
-                <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/80 px-5 py-3.5 shadow-xl backdrop-blur-xl md:block">
-                  <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-                    {activeBranch ? activeBranch.city : t("branches.ourBranches")}
-                  </p>
-                  <p className="mt-1 text-h5 font-bold leading-snug text-foreground">
-                    {activeBranch
-                      ? activeBranch.name
-                      : `${filtered.length} ${t("branches.branchesCount")}`}
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-caption leading-relaxed text-muted-foreground">
-                    {activeBranch ? activeBranch.address : t("branches.selectHint")}
-                  </p>
-                </div>
+              <div className="flex max-h-[320px] flex-col gap-2.5 overflow-y-auto p-3.5 md:p-4 lg:max-h-[452px]">
+                {isLoading ? (
+                  [0, 1, 2].map((i) => (
+                    <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/50" />
+                  ))
+                ) : filtered.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <MapPin className="mx-auto h-7 w-7 text-muted-foreground/60" />
+                    <p className="mt-3 text-small font-semibold text-foreground">
+                      {t("branches.noResults")}
+                    </p>
+                  </div>
+                ) : (
+                  filtered.map((b, i) => (
+                    <BranchTile
+                      key={b.id}
+                      branch={b}
+                      index={i}
+                      active={b.id === activeId}
+                      onSelect={setActiveId}
+                      cardRef={(el) => {
+                        cardRefs.current[b.id] = el;
+                      }}
+                    />
+                  ))
+                )}
               </div>
             </div>
 
-            {/* ---------- quick contact strip: connects map to form ---------- */}
-            {(quickWhatsapp || quickPhone || quickEmail) && (
-              <div className="flex flex-col gap-3 border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/50 to-card/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-small font-semibold text-foreground">
-                  {t("branches.contactCard.subtitle")}
+            {/* map */}
+            <div className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[560px] xl:col-span-8">
+              <Suspense fallback={<MapSkeleton />}>
+                {mounted && filtered.length > 0 ? (
+                  <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
+                ) : (
+                  <MapSkeleton />
+                )}
+              </Suspense>
+
+              <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/85 px-4 py-3 shadow-xl backdrop-blur-xl md:block">
+                <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+                  {activeBranch ? activeBranch.city : t("branches.ourBranches")}
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  {quickWhatsapp && (
-                    <a
-                      href={whatsappHref(quickWhatsapp.value)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-small font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/35"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      {t("branches.whatsapp")}
-                    </a>
-                  )}
-                  {quickPhone && (
-                    <a
-                      href={`tel:${quickPhone.value.replace(/\s+/g, "")}`}
-                      className="inline-flex h-11 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-5 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
-                    >
-                      <Phone className="h-4 w-4" />
-                      <span dir="ltr">{quickPhone.value}</span>
-                    </a>
-                  )}
-                  {quickEmail && (
-                    <a
-                      href={`mailto:${quickEmail.value}`}
-                      className="inline-flex h-11 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-5 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
-                    >
-                      <Mail className="h-4 w-4" />
-                      <span className="hidden sm:inline" dir="ltr">
-                        {quickEmail.value}
-                      </span>
-                      <span className="sm:hidden">{t("branches.info.email")}</span>
-                    </a>
-                  )}
-                </div>
+                <p className="mt-0.5 text-small font-bold leading-snug text-foreground">
+                  {activeBranch
+                    ? activeBranch.name
+                    : `${filtered.length} ${t("branches.branchesCount")}`}
+                </p>
+                <p className="mt-0.5 line-clamp-2 text-caption leading-relaxed text-muted-foreground">
+                  {activeBranch ? activeBranch.address : t("branches.selectHint")}
+                </p>
               </div>
-            )}
+            </div>
           </div>
+
+          {/* live details for the selected branch */}
+          {activeBranch && <ActiveBranchPanel branch={activeBranch} />}
         </div>
 
-        {/* ---------- form + information panel ---------- */}
-        <div className="col-span-12 grid grid-cols-12 gap-6">
-          <div className="col-span-12 lg:col-span-7">
-            <ContactForm branches={branches} info={info} />
+        {/* ---------- form + general contact information ---------- */}
+        <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <ContactForm branches={branches} info={info} defaultBranchId={activeId} />
           </div>
-          <div className="col-span-12 lg:col-span-5">
+          <div className="lg:col-span-5">
             <InfoPanel items={info} />
           </div>
         </div>
       </div>
-
-      {/* ---------- intentional transition into next section ---------- */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background"
-      />
     </section>
   );
 }
