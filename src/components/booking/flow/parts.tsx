@@ -380,10 +380,6 @@ export function PassengerForm({
           />
         </div>
 
-        <div className="grid gap-2">
-
-
-        <div className="grid gap-2">
           <Label htmlFor={`${uid}-gender`}>{t("bookingFlow.fields.gender")}</Label>
           <select
             id={`${uid}-gender`}
