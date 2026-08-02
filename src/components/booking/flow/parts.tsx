@@ -380,6 +380,7 @@ export function PassengerForm({
           />
         </div>
 
+        <div className="grid gap-2">
           <Label htmlFor={`${uid}-gender`}>{t("bookingFlow.fields.gender")}</Label>
           <select
             id={`${uid}-gender`}
@@ -393,25 +394,6 @@ export function PassengerForm({
           </select>
         </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor={`${uid}-dob`}>{t("bookingFlow.fields.dob")}</Label>
-          <Input
-            id={`${uid}-dob`}
-            type="date"
-            value={passenger.dateOfBirth}
-            onChange={(e) => onChange({ dateOfBirth: e.target.value })}
-          />
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor={`${uid}-exp`}>{t("bookingFlow.fields.passportExpiry")}</Label>
-          <Input
-            id={`${uid}-exp`}
-            type="date"
-            value={passenger.passportExpiry}
-            onChange={(e) => onChange({ passportExpiry: e.target.value })}
-          />
-        </div>
 
         {isPrimary && (
           <>
