@@ -202,7 +202,9 @@ export function PackageOption({
           )}
         </ul>
         <div className="flex items-baseline gap-2 border-t border-border pt-3">
-          <span className="text-caption text-muted-foreground">{t("bookingFlow.package.from")}</span>
+          <span className="text-caption text-muted-foreground">
+            {t("bookingFlow.package.from")}
+          </span>
           <span className="text-h5 font-extrabold text-primary">
             {money(adultPrice(pkg), pkg.currency)}
           </span>
@@ -262,15 +264,11 @@ export function CounterRow({
 
 /* -------------------------------------------------- passenger form */
 
-export function PassengerForm({
+export function PassportUpload({
   passenger,
-  index,
-  isPrimary,
   onChange,
 }: {
   passenger: Passenger;
-  index: number;
-  isPrimary: boolean;
   onChange: (patch: Partial<Passenger>) => void;
 }) {
   const { t } = useTranslation();
@@ -304,6 +302,57 @@ export function PassengerForm({
       setUploading(false);
     }
   }
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={`${uid}-file`}>{t("bookingFlow.fields.passportFile")}</Label>
+      <label
+        htmlFor={`${uid}-file`}
+        className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3 text-small transition-all duration-base ease-standard hover:bg-muted"
+      >
+        {uploading ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-muted-foreground">{t("bookingFlow.fields.uploading")}</span>
+          </>
+        ) : passenger.passportName ? (
+          <>
+            <FileCheck2 className="h-5 w-5 text-primary" />
+            <span className="truncate">{passenger.passportName}</span>
+          </>
+        ) : (
+          <>
+            <Upload className="h-5 w-5 text-muted-foreground" />
+            <span className="text-muted-foreground">{t("bookingFlow.fields.passportHint")}</span>
+          </>
+        )}
+        <input
+          id={`${uid}-file`}
+          type="file"
+          className="sr-only"
+          accept="image/jpeg,image/png,image/webp,application/pdf"
+          onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+        />
+      </label>
+    </div>
+  );
+}
+
+export function PassengerForm({
+  passenger,
+  index,
+  isPrimary,
+  showPassport = false,
+  onChange,
+}: {
+  passenger: Passenger;
+  index: number;
+  isPrimary: boolean;
+  showPassport?: boolean;
+  onChange: (patch: Partial<Passenger>) => void;
+}) {
+  const { t } = useTranslation();
+  const uid = `pax-${passenger.id}`;
 
   const typeLabel = t(`bookingFlow.travellers.${passenger.type}`);
 
@@ -421,37 +470,11 @@ export function PassengerForm({
           />
         </div>
 
-        <div className="grid gap-2 md:col-span-2">
-          <Label htmlFor={`${uid}-file`}>{t("bookingFlow.fields.passportFile")}</Label>
-          <label
-            htmlFor={`${uid}-file`}
-            className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3 text-small transition-all duration-base ease-standard hover:bg-muted"
-          >
-            {uploading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="text-muted-foreground">{t("bookingFlow.fields.uploading")}</span>
-              </>
-            ) : passenger.passportName ? (
-              <>
-                <FileCheck2 className="h-5 w-5 text-primary" />
-                <span className="truncate">{passenger.passportName}</span>
-              </>
-            ) : (
-              <>
-                <Upload className="h-5 w-5 text-muted-foreground" />
-                <span className="text-muted-foreground">{t("bookingFlow.fields.passportHint")}</span>
-              </>
-            )}
-            <input
-              id={`${uid}-file`}
-              type="file"
-              className="sr-only"
-              accept="image/jpeg,image/png,image/webp,application/pdf"
-              onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
-        </div>
+        {showPassport && (
+          <div className="md:col-span-2">
+            <PassportUpload passenger={passenger} onChange={onChange} />
+          </div>
+        )}
 
         <div className="grid gap-2 md:col-span-2">
           <Label htmlFor={`${uid}-notes`}>{t("bookingFlow.fields.notes")}</Label>
