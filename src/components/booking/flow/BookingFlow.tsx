@@ -6,13 +6,9 @@ import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   ArrowRight,
-  CalendarDays,
-  Clock,
   Compass,
   FileText,
   Loader2,
-  MapPin,
-  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 
