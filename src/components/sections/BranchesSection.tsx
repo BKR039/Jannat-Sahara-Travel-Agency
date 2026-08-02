@@ -591,7 +591,7 @@ function ContactForm({
           <button
             type="submit"
             disabled={loading}
-            className="group inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 disabled:pointer-events-none disabled:opacity-60"
+            className="group inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 disabled:pointer-events-none disabled:opacity-60"
           >
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
