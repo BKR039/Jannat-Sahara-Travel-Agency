@@ -153,7 +153,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
       toast.error(t("bookingFlow.errors.terms"));
       return;
     }
-    if (!validate(2) || !selectedPackage) return;
+    if (!validate(0) || !selectedPackage) return;
 
     setSubmitting(true);
     try {
