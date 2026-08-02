@@ -381,26 +381,6 @@ export function PassengerForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor={`${uid}-passport`}>{t("bookingFlow.fields.passportNumber")}</Label>
-          <Input
-            id={`${uid}-passport`}
-            maxLength={40}
-            value={passenger.passportNumber}
-            onChange={(e) => onChange({ passportNumber: e.target.value })}
-          />
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor={`${uid}-nat`}>{t("bookingFlow.fields.nationality")}</Label>
-          <Input
-            id={`${uid}-nat`}
-            maxLength={80}
-            value={passenger.nationality}
-            onChange={(e) => onChange({ nationality: e.target.value })}
-          />
-        </div>
-
-        <div className="grid gap-2">
           <Label htmlFor={`${uid}-gender`}>{t("bookingFlow.fields.gender")}</Label>
           <select
             id={`${uid}-gender`}
@@ -414,25 +394,6 @@ export function PassengerForm({
           </select>
         </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor={`${uid}-dob`}>{t("bookingFlow.fields.dob")}</Label>
-          <Input
-            id={`${uid}-dob`}
-            type="date"
-            value={passenger.dateOfBirth}
-            onChange={(e) => onChange({ dateOfBirth: e.target.value })}
-          />
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor={`${uid}-exp`}>{t("bookingFlow.fields.passportExpiry")}</Label>
-          <Input
-            id={`${uid}-exp`}
-            type="date"
-            value={passenger.passportExpiry}
-            onChange={(e) => onChange({ passportExpiry: e.target.value })}
-          />
-        </div>
 
         {isPrimary && (
           <>
@@ -460,15 +421,6 @@ export function PassengerForm({
           </>
         )}
 
-        <div className="grid gap-2 md:col-span-2">
-          <Label htmlFor={`${uid}-emg`}>{t("bookingFlow.fields.emergency")}</Label>
-          <Input
-            id={`${uid}-emg`}
-            maxLength={160}
-            value={passenger.emergencyContact}
-            onChange={(e) => onChange({ emergencyContact: e.target.value })}
-          />
-        </div>
 
         {showPassport && (
           <div className="md:col-span-2">
