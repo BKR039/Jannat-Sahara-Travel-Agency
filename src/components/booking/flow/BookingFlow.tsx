@@ -243,74 +243,55 @@ export function BookingFlow({ packageSlug = null }: Props) {
 
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0 space-y-6">
-          {/* ---------------- step 1: preselected package summary */}
-          {step === 0 && selectedPackage && (
-            <section className="ds-reveal space-y-6">
-              <SectionTitle
-                title={t("bookingFlow.packageStep.title")}
-                desc={t("bookingFlow.packageStep.desc")}
-              />
-              <div className="overflow-hidden rounded-xl border border-border-subtle bg-card shadow-sm">
-                {selectedPackage.cover && (
-                  <img
-                    src={selectedPackage.cover}
-                    alt={selectedPackage.title}
-                    className="h-56 w-full object-cover"
-                  />
-                )}
-                <div className="space-y-4 p-6">
-                  <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-caption font-semibold text-primary">
-                    {t(`categories.${selectedPackage.category}`)}
-                  </span>
-                  <h3 className="text-h4 font-extrabold">{selectedPackage.title}</h3>
-                  {selectedPackage.short_description && (
-                    <p className="text-body text-muted-foreground">
-                      {selectedPackage.short_description}
-                    </p>
-                  )}
-                  <ul className="grid gap-2 text-small sm:grid-cols-2">
-                    {selectedPackage.destination && (
-                      <li className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-primary" /> {selectedPackage.destination}
-                      </li>
-                    )}
-                    {departure && (
-                      <li className="flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4 text-primary" /> {departure}
-                      </li>
-                    )}
-                    {selectedPackage.duration && (
-                      <li className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-primary" /> {selectedPackage.duration}
-                      </li>
-                    )}
-                    {typeof selectedPackage.seats === "number" && selectedPackage.seats > 0 && (
-                      <li className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-primary" /> {selectedPackage.seats}{" "}
-                        {t("package.seats")}
-                      </li>
-                    )}
-                  </ul>
-                  <Link
-                    to="/packages/$slug"
-                    params={{ slug: selectedPackage.slug }}
-                    className="inline-flex items-center gap-1 text-small font-semibold text-primary hover:underline"
-                  >
-                    {t("actions.viewDetails")}
-                    <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-                  </Link>
-                </div>
+          {/* ---------------- selected package (chosen on the landing page) */}
+          {selectedPackage && (
+            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-border-subtle bg-card p-4 shadow-sm">
+              {selectedPackage.cover && (
+                <img
+                  src={selectedPackage.cover}
+                  alt={selectedPackage.title}
+                  loading="lazy"
+                  className="h-16 w-24 shrink-0 rounded-lg object-cover"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-caption font-semibold text-primary">
+                  {t(`categories.${selectedPackage.category}`)}
+                </span>
+                <h2 className="mt-1 truncate text-body font-bold">{selectedPackage.title}</h2>
+                <p className="mt-0.5 truncate text-caption text-muted-foreground">
+                  {[selectedPackage.destination, selectedPackage.duration, departure]
+                    .filter(Boolean)
+                    .join(" • ")}
+                </p>
               </div>
-            </section>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  to="/packages/$slug"
+                  params={{ slug: selectedPackage.slug }}
+                  className="text-small font-semibold text-primary hover:underline"
+                >
+                  {t("actions.viewDetails")}
+                </Link>
+                <Link
+                  to="/"
+                  hash="packages"
+                  className="text-small font-semibold text-muted-foreground hover:underline"
+                >
+                  {t("bookingFlow.actions.changePackage")}
+                </Link>
+              </div>
+            </div>
           )}
 
-          {/* ---------------- step 2: traveller counts */}
-          {step === 1 && (
-            <section className="ds-reveal space-y-6">
+          {/* ---------------- step 1: passenger information */}
+          {step === 0 && (
+            <section className="ds-reveal space-y-8">
               <SectionTitle
-                title={t("bookingFlow.travellers.title")}
-                desc={t("bookingFlow.travellers.desc")}
+                title={t("bookingFlow.travellers.formsTitle")}
+                desc={t("bookingFlow.travellers.formsDesc")}
               />
+
               <div className="grid gap-4 md:grid-cols-3">
                 <CounterRow
                   label={t("bookingFlow.travellers.adults")}
@@ -337,16 +318,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
                   onChange={(v) => setCounts((c) => ({ ...c, infants: v }))}
                 />
               </div>
-            </section>
-          )}
 
-          {/* ---------------- step 3: passenger information */}
-          {step === 2 && (
-            <section className="ds-reveal space-y-8">
-              <SectionTitle
-                title={t("bookingFlow.travellers.formsTitle")}
-                desc={t("bookingFlow.travellers.formsDesc")}
-              />
               <div className="space-y-5">
                 {passengers.map((p, i) => (
                   <PassengerForm
@@ -394,8 +366,41 @@ export function BookingFlow({ packageSlug = null }: Props) {
             </section>
           )}
 
-          {/* ---------------- step 4: review */}
-          {step === 3 && (
+          {/* ---------------- step 2: passport upload */}
+          {step === 1 && (
+            <section className="ds-reveal space-y-6">
+              <SectionTitle
+                title={t("bookingFlow.passports.title")}
+                desc={t("bookingFlow.passports.desc")}
+              />
+              <div className="space-y-4">
+                {passengers.map((p, i) => (
+                  <div key={p.id} className="rounded-xl border border-border-subtle bg-card p-6 shadow-sm">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="text-h5 font-bold">
+                        {p.fullName || t(`bookingFlow.travellers.${p.type}`)}{" "}
+                        <span className="text-caption font-medium text-muted-foreground">
+                          ({t(`bookingFlow.travellers.${p.type}`)})
+                        </span>
+                      </h3>
+                      {i === 0 && (
+                        <span className="rounded-full bg-primary/10 px-3 py-1 text-caption font-semibold text-primary">
+                          {t("bookingFlow.travellers.primaryBadge")}
+                        </span>
+                      )}
+                    </div>
+                    <PassportUpload
+                      passenger={p}
+                      onChange={(patch) => updatePassenger(p.id, patch)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ---------------- step 3: review & confirm */}
+          {step === 2 && (
             <section className="ds-reveal space-y-6">
               <SectionTitle
                 title={t("bookingFlow.review.title")}
@@ -460,16 +465,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
                   <p className="mt-2 whitespace-pre-line text-small text-muted-foreground">{notes}</p>
                 </div>
               )}
-            </section>
-          )}
 
-          {/* ---------------- step 5: confirm */}
-          {step === 4 && (
-            <section className="ds-reveal space-y-6">
-              <SectionTitle
-                title={t("bookingFlow.confirm.title")}
-                desc={t("bookingFlow.confirm.desc")}
-              />
               <div className="rounded-xl border border-border-subtle bg-card p-6">
                 <div className="flex items-baseline justify-between">
                   <span className="text-body font-bold">{t("bookingFlow.summary.total")}</span>
@@ -505,7 +501,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
               {t("bookingFlow.actions.back")}
             </Button>
 
-            {step < 4 ? (
+            {step < 2 ? (
               <Button type="button" size="lg" onClick={next}>
                 {t("bookingFlow.actions.next")}
               </Button>
@@ -522,6 +518,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
               </Button>
             )}
           </div>
+
         </div>
 
         {/* ---------------- sticky summary */}
