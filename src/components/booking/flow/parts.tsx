@@ -421,15 +421,6 @@ export function PassengerForm({
           </>
         )}
 
-        <div className="grid gap-2 md:col-span-2">
-          <Label htmlFor={`${uid}-emg`}>{t("bookingFlow.fields.emergency")}</Label>
-          <Input
-            id={`${uid}-emg`}
-            maxLength={160}
-            value={passenger.emergencyContact}
-            onChange={(e) => onChange({ emergencyContact: e.target.value })}
-          />
-        </div>
 
         {showPassport && (
           <div className="md:col-span-2">
