@@ -262,15 +262,11 @@ export function CounterRow({
 
 /* -------------------------------------------------- passenger form */
 
-export function PassengerForm({
+export function PassportUpload({
   passenger,
-  index,
-  isPrimary,
   onChange,
 }: {
   passenger: Passenger;
-  index: number;
-  isPrimary: boolean;
   onChange: (patch: Partial<Passenger>) => void;
 }) {
   const { t } = useTranslation();
@@ -305,9 +301,61 @@ export function PassengerForm({
     }
   }
 
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={`${uid}-file`}>{t("bookingFlow.fields.passportFile")}</Label>
+      <label
+        htmlFor={`${uid}-file`}
+        className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3 text-small transition-all duration-base ease-standard hover:bg-muted"
+      >
+        {uploading ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-muted-foreground">{t("bookingFlow.fields.uploading")}</span>
+          </>
+        ) : passenger.passportName ? (
+          <>
+            <FileCheck2 className="h-5 w-5 text-primary" />
+            <span className="truncate">{passenger.passportName}</span>
+          </>
+        ) : (
+          <>
+            <Upload className="h-5 w-5 text-muted-foreground" />
+            <span className="text-muted-foreground">{t("bookingFlow.fields.passportHint")}</span>
+          </>
+        )}
+        <input
+          id={`${uid}-file`}
+          type="file"
+          className="sr-only"
+          accept="image/jpeg,image/png,image/webp,application/pdf"
+          onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+        />
+      </label>
+    </div>
+  );
+}
+
+export function PassengerForm({
+  passenger,
+  index,
+  isPrimary,
+  showPassport = false,
+  onChange,
+}: {
+  passenger: Passenger;
+  index: number;
+  isPrimary: boolean;
+  showPassport?: boolean;
+  onChange: (patch: Partial<Passenger>) => void;
+}) {
+  const { t } = useTranslation();
+  const uid = `pax-${passenger.id}`;
+
   const typeLabel = t(`bookingFlow.travellers.${passenger.type}`);
 
   return (
+
     <div className="rounded-xl border border-border-subtle bg-card p-6 shadow-sm">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-h5 font-bold">
