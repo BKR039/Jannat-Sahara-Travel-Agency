@@ -177,7 +177,7 @@
     "contactKicker": "Nous contacter"
   },
   "bookingFlow": {
-    "eyebrow": "Réservation en 5 étapes",
+    "eyebrow": "Réservation en 3 étapes",
     "title": "Finaliser la réservation",
     "subtitle": "L'offre est déjà sélectionnée. Indiquez les voyageurs, complétez les informations et confirmez — sans paiement en ligne.",
     "widget": {
@@ -192,7 +192,8 @@
       "travellers": "Voyageurs",
       "review": "Vérification",
       "confirm": "Confirmation",
-      "details": "Voyageurs"
+      "details": "Voyageurs",
+      "passports": "Passeports"
     },
     "service": {
       "title": "Choisissez le service",
@@ -272,7 +273,8 @@
       "next": "Suivant",
       "back": "Précédent",
       "submit": "Confirmer la réservation",
-      "submitting": "Envoi en cours..."
+      "submitting": "Envoi en cours...",
+      "changePackage": "Changer d'offre"
     },
     "errors": {
       "selectService": "Veuillez choisir un service",
@@ -293,6 +295,10 @@
       "title": "Choisissez d'abord une offre",
       "desc": "Parcourez les offres disponibles, puis cliquez sur « Réserver » pour démarrer.",
       "cta": "Parcourir les offres"
+    },
+    "passports": {
+      "title": "Téléversement des passeports",
+      "desc": "Ajoutez une image ou un PDF du passeport de chaque voyageur."
     }
   },
   "explorer": {

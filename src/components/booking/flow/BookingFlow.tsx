@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { packageBySlugQuery, type Package } from "@/lib/queries";
 import { submitBooking } from "@/lib/booking.functions";
 import { computeTotal, money, syncPassengers, type Counts, type Passenger } from "./model";
-import { CounterRow, PassengerForm, StepIndicator, SummaryPanel } from "./parts";
+import { CounterRow, PassengerForm, PassportUpload, StepIndicator, SummaryPanel } from "./parts";
 
 const DRAFT_KEY = "janat-booking-draft-v2";
 
@@ -69,7 +69,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
       if (raw && packageSlug) {
         const d = JSON.parse(raw) as Draft;
         if (d?.slug === packageSlug && Array.isArray(d.passengers) && d.passengers.length) {
-          setStep(Math.min(d.step ?? 0, 4));
+          setStep(Math.min(d.step ?? 0, 2));
           setCounts(d.counts ?? { adults: 1, children: 0, infants: 0 });
           setPassengers(d.passengers);
           setCommunication(d.communication ?? "phone");
