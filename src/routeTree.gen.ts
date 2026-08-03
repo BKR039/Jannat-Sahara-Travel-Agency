@@ -41,6 +41,7 @@ import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
+import { Route as AdminPackagesIdRouteImport } from './routes/admin.packages.$id'
 
 const VisaRoute = VisaRouteImport.update({
   id: '/visa',
@@ -202,6 +203,11 @@ const AdminAdminsRoute = AdminAdminsRouteImport.update({
   path: '/admins',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPackagesIdRoute = AdminPackagesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminPackagesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -228,7 +234,7 @@ export interface FileRoutesByFullPath {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/packages/$id': typeof AdminPackagesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -261,7 +268,7 @@ export interface FileRoutesByTo {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/packages/$id': typeof AdminPackagesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -296,7 +304,7 @@ export interface FileRoutesById {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRoute
+  '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/packages/$id': typeof AdminPackagesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
+    | '/admin/packages/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -373,6 +383,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin'
+    | '/admin/packages/$id'
   id:
     | '__root__'
     | '/'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
+    | '/admin/packages/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -656,8 +668,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/packages/$id': {
+      id: '/admin/packages/$id'
+      path: '/$id'
+      fullPath: '/admin/packages/$id'
+      preLoaderRoute: typeof AdminPackagesIdRouteImport
+      parentRoute: typeof AdminPackagesRoute
+    }
   }
 }
+
+interface AdminPackagesRouteChildren {
+  AdminPackagesIdRoute: typeof AdminPackagesIdRoute
+}
+
+const AdminPackagesRouteChildren: AdminPackagesRouteChildren = {
+  AdminPackagesIdRoute: AdminPackagesIdRoute,
+}
+
+const AdminPackagesRouteWithChildren = AdminPackagesRoute._addFileChildren(
+  AdminPackagesRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
@@ -669,7 +700,7 @@ interface AdminRouteChildren {
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
-  AdminPackagesRoute: typeof AdminPackagesRoute
+  AdminPackagesRoute: typeof AdminPackagesRouteWithChildren
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -685,7 +716,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGalleryRoute: AdminGalleryRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
-  AdminPackagesRoute: AdminPackagesRoute,
+  AdminPackagesRoute: AdminPackagesRouteWithChildren,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminIndexRoute: AdminIndexRoute,
