@@ -847,15 +847,19 @@ export function BranchesSection() {
               </div>
             </div>
 
-            {/* map */}
-            <div className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[480px] xl:col-span-8">
+            {/* map — chunk + tiles load only once the panel nears the viewport */}
+            <div
+              ref={mapRef}
+              className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[480px] xl:col-span-8"
+            >
               <Suspense fallback={<MapSkeleton />}>
-                {mounted && filtered.length > 0 ? (
+                {mounted && mapInView && filtered.length > 0 ? (
                   <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
                 ) : (
                   <MapSkeleton />
                 )}
               </Suspense>
+
 
               <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/85 px-4 py-3 shadow-xl backdrop-blur-xl md:block">
                 <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
