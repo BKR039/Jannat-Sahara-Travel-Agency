@@ -11,8 +11,8 @@ export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ context, params }) =>
     context.queryClient.ensureQueryData(articleBySlugQuery(params.slug)),
   head: ({ params, loaderData }) => {
-    const title = loaderData?.title ? `${loaderData.title} — جنة الصحراء` : "مقال — جنة الصحراء";
-    const description = loaderData?.excerpt ?? "قراءة مقال من مدونة جنة الصحراء للسفر والعمرة.";
+    const title = loaderData?.title ? `${loaderData.title}${i18n.t("seo.blogArticle.titleSuffix")}` : i18n.t("seo.blogArticle.defaultTitle");
+    const description = loaderData?.excerpt ?? i18n.t("seo.blogArticle.defaultDescription");
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: description },
@@ -37,12 +37,12 @@ export const Route = createFileRoute("/blog/$slug")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            headline: loaderData?.title ?? "مقال",
+            headline: loaderData?.title ?? i18n.t("seo.blogArticle.defaultHeadline"),
             description,
             datePublished: loaderData?.published_at ?? undefined,
             dateModified: loaderData?.updated_at ?? undefined,
-            author: { "@type": "Person", name: loaderData?.author ?? "جنة الصحراء" },
-            publisher: { "@type": "Organization", name: "جنة الصحراء للسفر" },
+            author: { "@type": "Person", name: loaderData?.author ?? i18n.t("seo.blogArticle.authorFallback") },
+            publisher: { "@type": "Organization", name: i18n.t("seo.blogArticle.publisherName") },
             mainEntityOfPage: `/blog/${params.slug}`,
           }),
         },
@@ -87,7 +87,7 @@ function ArticlePage() {
           to="/blog"
           className="mb-6 inline-flex items-center gap-1 text-small font-semibold text-primary hover:underline"
         >
-          <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden /> العودة إلى المدونة
+          <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden /> {t("blog.backToBlog")}
         </Link>
 
         {category && <CategoryBadge category={category} className="mb-3" />}
@@ -124,13 +124,13 @@ function ArticlePage() {
         )}
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border-subtle pt-6">
-          <span className="text-caption text-muted-foreground">{readingMinutes(article)} دقائق قراءة</span>
+          <span className="text-caption text-muted-foreground">{t("common.minutesRead", { count: readingMinutes(article) })}</span>
           <ShareButtons slug={article.slug} title={article.title} />
         </div>
 
         {related.length > 0 && (
           <section className="mt-12 border-t border-border-subtle pt-8">
-            <h2 className="mb-4 text-h4 font-bold text-foreground">مقالات ذات صلة</h2>
+            <h2 className="mb-4 text-h4 font-bold text-foreground">{t("blog.relatedArticles")}</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               {related.map((r) => (
                 <Link

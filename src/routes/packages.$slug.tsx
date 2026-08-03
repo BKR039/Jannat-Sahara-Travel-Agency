@@ -18,7 +18,7 @@ import { packageBySlugQuery, packagesQuery, faqsQuery } from "@/lib/queries";
 export const Route = createFileRoute("/packages/$slug")({
   head: () => ({
     meta: [
-      { title: "باقة — جنة الصحراء" },
+      { title: i18n.t("seo.packageDetail.title") },
       { property: "og:type", content: "product" },
     ],
   }),
