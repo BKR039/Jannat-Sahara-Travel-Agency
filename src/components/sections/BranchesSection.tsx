@@ -462,23 +462,25 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
 /* --------------------------------------------------------- contact form */
 
 const fieldBase =
-  "peer h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 pt-5 pb-1.5 text-input text-foreground outline-none transition-all duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]";
+  "peer h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 pt-5 pb-1.5 text-input text-foreground outline-none transition-[border-color,box-shadow,background-color] duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)] user-invalid:border-destructive user-invalid:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-destructive)_12%,transparent)]";
 const labelBase =
-  "pointer-events-none absolute start-4 top-4 text-small text-muted-foreground transition-all duration-base ease-standard peer-focus:top-1.5 peer-focus:text-caption peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-caption";
+  "pointer-events-none absolute start-4 top-4 text-small text-muted-foreground transition-all duration-base ease-standard peer-focus:top-1.5 peer-focus:text-caption peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-caption peer-user-invalid:text-destructive";
 
 function Field({
   name,
   label,
   type = "text",
   required,
+  className,
 }: {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <input
         id={`cf-${name}`}
         name={name}
@@ -494,6 +496,7 @@ function Field({
     </div>
   );
 }
+
 
 function ContactForm({
   branches,
