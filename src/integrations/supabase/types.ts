@@ -689,7 +689,7 @@ export type Database = {
           seo_description: string | null
           seo_description_fr: string | null
           seo_keywords: Json | null
-          seo_keywords_fr: string | null
+          seo_keywords_fr: Json | null
           seo_title: string | null
           seo_title_fr: string | null
           short_description: string | null
@@ -749,7 +749,7 @@ export type Database = {
           seo_description?: string | null
           seo_description_fr?: string | null
           seo_keywords?: Json | null
-          seo_keywords_fr?: string | null
+          seo_keywords_fr?: Json | null
           seo_title?: string | null
           seo_title_fr?: string | null
           short_description?: string | null
@@ -809,7 +809,7 @@ export type Database = {
           seo_description?: string | null
           seo_description_fr?: string | null
           seo_keywords?: Json | null
-          seo_keywords_fr?: string | null
+          seo_keywords_fr?: Json | null
           seo_title?: string | null
           seo_title_fr?: string | null
           short_description?: string | null
