@@ -1,7 +1,9 @@
+import { memo, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { MapPin, Clock, Users, Star, Hotel, Plane, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Package } from "@/lib/queries";
+import { LazyImage } from "@/components/common/LazyImage";
 import { cn } from "@/lib/utils";
 
 /**
@@ -10,7 +12,7 @@ import { cn } from "@/lib/utils";
  * Middle: title + short description
  * Bottom: hotel / airline / duration / seats + pricing + CTAs
  */
-export function PackageCard({ pkg, className }: { pkg: Package; className?: string }) {
+function PackageCardBase({ pkg, className }: { pkg: Package; className?: string }) {
   const { t } = useTranslation();
   const discounted =
     pkg.discount && pkg.discount > 0 ? Number(pkg.price) * (1 - Number(pkg.discount) / 100) : null;
@@ -19,23 +21,29 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
   const soldOut = pkg.status === "sold_out" || (typeof pkg.seats === "number" && pkg.seats <= 0);
   const hasDiscount = pkg.discount && pkg.discount > 0;
 
-  const metaItems = [
-    { key: "hotel", icon: Hotel, value: pkg.hotel },
-    { key: "airline", icon: Plane, value: pkg.airline },
-    { key: "duration", icon: Clock, value: pkg.duration },
-    {
-      key: "seats",
-      icon: Users,
-      value: typeof pkg.seats === "number" && pkg.seats > 0 ? `${pkg.seats} ${t("package.seats")}` : null,
-    },
-  ].filter((item) => Boolean(item.value));
+  const metaItems = useMemo(
+    () =>
+      [
+        { key: "hotel", icon: Hotel, value: pkg.hotel },
+        { key: "airline", icon: Plane, value: pkg.airline },
+        { key: "duration", icon: Clock, value: pkg.duration },
+        {
+          key: "seats",
+          icon: Users,
+          value:
+            typeof pkg.seats === "number" && pkg.seats > 0 ? `${pkg.seats} ${t("package.seats")}` : null,
+        },
+      ].filter((item) => Boolean(item.value)),
+    [pkg.hotel, pkg.airline, pkg.duration, pkg.seats, t],
+  );
 
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-border-subtle bg-card shadow-sm",
+        "group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-border-subtle bg-card shadow-sm",
         "transition-all duration-base ease-standard",
-        "hover:-translate-y-1 hover:shadow-lg",
+        "hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg",
+        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
         className,
       )}
     >
@@ -46,12 +54,11 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
         className="relative block aspect-[16/10] overflow-hidden bg-surface-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         {pkg.cover ? (
-          <img
+          <LazyImage
             src={pkg.cover}
             alt={pkg.title}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-slow ease-emphasized group-hover:scale-[1.04]"
+            wrapperClassName="h-full w-full"
+            className="transition-transform duration-slow ease-emphasized group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
@@ -82,7 +89,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
 
         {pkg.destination && (
           <div className="absolute bottom-2.5 start-2.5 flex items-center gap-1 text-on-dark">
-            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+            <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span className="line-clamp-1 max-w-[12rem] text-small font-medium">{pkg.destination}</span>
           </div>
         )}
@@ -93,7 +100,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
         <Link
           to="/packages/$slug"
           params={{ slug: pkg.slug }}
-          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <h3 className="line-clamp-1 text-card-title font-semibold text-foreground transition-colors duration-fast group-hover:text-primary">
             {pkg.title}
@@ -143,7 +150,7 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
               )}
             >
               {t("actions.bookNow")}
-              <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
+              <ArrowRight className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" aria-hidden="true" />
             </Link>
             <Link
               to="/packages/$slug"
@@ -158,3 +165,5 @@ export function PackageCard({ pkg, className }: { pkg: Package; className?: stri
     </article>
   );
 }
+
+export const PackageCard = memo(PackageCardBase);
