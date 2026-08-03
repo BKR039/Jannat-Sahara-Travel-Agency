@@ -79,19 +79,19 @@ export function Footer() {
 
       {/* Newsletter band */}
       <div className="relative border-b border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 md:flex-row md:items-center md:justify-between md:gap-10 md:px-6">
           <div className="max-w-md">
-            <h3 className="flex items-center gap-2 text-h5 font-bold text-on-dark">
-              <Send className="h-5 w-5 text-secondary" />
+            <h3 className="flex items-center gap-2.5 text-h5 font-bold text-on-dark">
+              <Send className="h-5 w-5 shrink-0 text-secondary" />
               {t("footer.newsletter")}
             </h3>
-            <p className="mt-1 text-small leading-relaxed opacity-80">
+            <p className="mt-2 text-small leading-relaxed opacity-80">
               {t("footer.newsletterDesc")}
             </p>
           </div>
           <form
             onSubmit={onSubscribe}
-            className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
+            className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
           >
             <Input
               type="email"
@@ -99,16 +99,16 @@ export function Footer() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t("footer.emailPlaceholder")}
-              className="h-11 w-full rounded-sm border-white/15 bg-white/8 px-4 text-on-dark placeholder:text-white/50 hover:border-white/25 focus-visible:bg-white/10 sm:w-72"
+              className="h-12 w-full rounded-sm border-white/15 bg-white/8 px-4 text-on-dark placeholder:text-white/50 hover:border-white/25 focus-visible:bg-white/10 sm:w-72"
             />
             <Button
               type="submit"
               disabled={subscribing}
-              className="h-11 whitespace-nowrap rounded-sm bg-primary px-6 text-primary-foreground hover:bg-primary-hover hover:shadow-brand-glow disabled:opacity-60"
+              className="h-12 shrink-0 whitespace-nowrap rounded-sm bg-primary px-6 text-primary-foreground hover:bg-primary-hover hover:shadow-brand-glow disabled:opacity-60"
             >
               {subscribing ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
                   {t("footer.subscribing")}
                 </>
               ) : (
@@ -120,8 +120,9 @@ export function Footer() {
       </div>
 
       {/* Main footer grid */}
-      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6">
+      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-16 md:px-6 md:pt-20">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-4">
             <div className="w-fit rounded-xl bg-white/5 p-3 backdrop-blur-sm">
