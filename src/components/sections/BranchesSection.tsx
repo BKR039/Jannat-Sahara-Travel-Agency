@@ -576,7 +576,7 @@ function ContactForm({
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="relative mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+      <form onSubmit={onSubmit} className="relative mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field name="name" label={t("contact.name")} required />
         <Field name="phone" label={t("contact.phone")} required />
         <Field name="email" label={t("contact.email")} type="email" required />
@@ -585,7 +585,7 @@ function ContactForm({
         {branches.length > 0 && (
           <div className="sm:col-span-2">
             <Select value={branchId} onValueChange={setBranchId}>
-              <SelectTrigger className="h-14 w-full rounded-lg border-border/60 bg-background/60 px-4 text-input">
+              <SelectTrigger className="h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 text-input transition-[border-color,box-shadow] duration-base ease-standard hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]">
                 <SelectValue placeholder={t("branches.form.selectBranch")} />
               </SelectTrigger>
               <SelectContent className="rounded-lg">
@@ -604,9 +604,9 @@ function ContactForm({
             id="cf-message"
             name="message"
             required
-            rows={4}
+            rows={5}
             placeholder=" "
-            className="peer w-full resize-none rounded-lg border border-border/60 bg-background/60 px-4 pb-3 pt-6 text-input text-foreground outline-none transition-all duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]"
+            className="peer block w-full resize-none rounded-lg border border-border/60 bg-background/60 px-4 pb-3.5 pt-6 text-input leading-relaxed text-foreground outline-none transition-[border-color,box-shadow,background-color] duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)] user-invalid:border-destructive user-invalid:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-destructive)_12%,transparent)]"
           />
           <label htmlFor="cf-message" className={labelBase}>
             {t("contact.message")}
@@ -614,16 +614,16 @@ function ContactForm({
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-stretch gap-3 sm:col-span-2 sm:flex-row sm:items-center">
           <button
             type="submit"
             disabled={loading}
-            className="group inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 disabled:pointer-events-none disabled:opacity-60"
+            className="group inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:opacity-60"
           >
             {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
             ) : (
-              <Send className="h-4 w-4 transition-transform duration-base ease-standard group-hover:-translate-y-0.5" />
+              <Send className="h-4 w-4 shrink-0 transition-transform duration-base ease-standard group-hover:-translate-y-0.5" />
             )}
             {loading ? t("common.loading") : t("contact.send")}
           </button>
@@ -632,13 +632,15 @@ function ContactForm({
               href={whatsappHref(whatsappItem.value)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 py-3.5 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
-              <MessageCircle className="h-4 w-4" />
+              <MessageCircle className="h-4 w-4 shrink-0" />
               {t("branches.form.whatsappInstead")}
             </a>
           )}
         </div>
+      </form>
+
       </form>
     </div>
   );
