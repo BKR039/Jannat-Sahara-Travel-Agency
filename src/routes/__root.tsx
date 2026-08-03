@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import i18n from "@/lib/i18n";
 import {
   Outlet,
   Link,
@@ -80,17 +81,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "جنة الصحراء للأسفار — Janat Sahara Travel" },
+      { title: i18n.t("seo.root.title") },
       {
         name: "description",
-        content:
-          "وكالة أسفار متخصصة في العمرة، الرحلات السياحية، تذاكر الطيران والتأشيرات. رحلتك الروحية تبدأ من هنا.",
+        content: i18n.t("seo.root.description"),
       },
       { name: "author", content: "Janat Sahara Travel" },
-      { property: "og:title", content: "جنة الصحراء للأسفار — Janat Sahara Travel" },
+      { property: "og:title", content: i18n.t("seo.root.title") },
       {
         property: "og:description",
-        content: "العمرة، الرحلات السياحية، تذاكر الطيران والتأشيرات.",
+        content: i18n.t("seo.root.ogDescription"),
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Janat Sahara Travel" },
@@ -115,7 +115,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/admin/settings/parts";
-import { EmptyState } from "@/components/admin/ui";
+import { EmptyState, MissingFrBadge, isEmptyFr } from "@/components/admin/ui";
 import { uploadMedia } from "@/lib/admin/media";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -109,6 +109,138 @@ export function ListEditor({
   );
 }
 
+/* --------------------------- paired AR/FR list editor ------------------------ */
+
+export function PairedListEditor({
+  itemsAr,
+  onChangeAr,
+  itemsFr,
+  onChangeFr,
+  placeholderAr,
+  placeholderFr,
+  addLabel = "Add item",
+  emptyTitle = "Nothing here yet",
+  emptyDescription,
+}: {
+  itemsAr: string[];
+  onChangeAr: (next: string[]) => void;
+  itemsFr: string[];
+  onChangeFr: (next: string[]) => void;
+  placeholderAr?: string;
+  placeholderFr?: string;
+  addLabel?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
+}) {
+  const fr = itemsAr.map((_, i) => itemsFr[i] ?? "");
+
+  function setAr(i: number, v: string) {
+    onChangeAr(itemsAr.map((it, idx) => (idx === i ? v : it)));
+  }
+  function setFr(i: number, v: string) {
+    onChangeFr(fr.map((it, idx) => (idx === i ? v : it)));
+  }
+  function move(i: number, dir: -1 | 1) {
+    const j = i + dir;
+    if (j < 0 || j >= itemsAr.length) return;
+    const nextAr = [...itemsAr];
+    [nextAr[i], nextAr[j]] = [nextAr[j]!, nextAr[i]!];
+    const nextFr = [...fr];
+    [nextFr[i], nextFr[j]] = [nextFr[j]!, nextFr[i]!];
+    onChangeAr(nextAr);
+    onChangeFr(nextFr);
+  }
+  function remove(i: number) {
+    onChangeAr(itemsAr.filter((_, idx) => idx !== i));
+    onChangeFr(fr.filter((_, idx) => idx !== i));
+  }
+
+  return (
+    <div className="space-y-3">
+      {itemsAr.length === 0 ? (
+        <EmptyState title={emptyTitle} description={emptyDescription} icon={Plus} />
+      ) : (
+        <ul className="space-y-2">
+          {itemsAr.map((item, i) => (
+            <li
+              key={i}
+              className="rounded-xl border border-border-subtle bg-surface-sunken/40 p-2"
+            >
+              <div className="flex items-start gap-2">
+                <GripVertical className="mt-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                  <Input
+                    dir="rtl"
+                    value={item}
+                    placeholder={placeholderAr}
+                    onChange={(e) => setAr(i, e.target.value)}
+                    className="border-transparent bg-card"
+                  />
+                  <div className="relative">
+                    <Input
+                      dir="ltr"
+                      value={fr[i] ?? ""}
+                      placeholder={placeholderFr}
+                      onChange={(e) => setFr(i, e.target.value)}
+                      className="border-transparent bg-card"
+                    />
+                    {isEmptyFr(fr[i]) && (
+                      <MissingFrBadge className="absolute -top-2 end-2 bg-card" />
+                    )}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Move up"
+                    disabled={i === 0}
+                    onClick={() => move(i, -1)}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Move down"
+                    disabled={i === itemsAr.length - 1}
+                    onClick={() => move(i, 1)}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Remove"
+                    className="text-destructive"
+                    onClick={() => remove(i)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          onChangeAr([...itemsAr, ""]);
+          onChangeFr([...fr, ""]);
+        }}
+      >
+        <Plus className="me-2 h-4 w-4" /> {addLabel}
+      </Button>
+    </div>
+  );
+}
+
 /* ------------------------------ itinerary editor ---------------------------- */
 
 export function ItineraryEditor({
@@ -186,17 +318,40 @@ export function ItineraryEditor({
                   onChange={(e) => set(i, { day: e.target.value })}
                 />
                 <Input
+                  dir="rtl"
                   value={item.title}
-                  placeholder="Arrival in Jeddah"
+                  placeholder="Arrival in Jeddah (Arabic)"
                   className="bg-card"
                   onChange={(e) => set(i, { title: e.target.value })}
                 />
                 <Textarea
+                  dir="rtl"
                   rows={2}
                   value={item.description}
-                  placeholder="What happens on this day…"
+                  placeholder="What happens on this day… (Arabic)"
                   className="bg-card md:col-span-2"
                   onChange={(e) => set(i, { description: e.target.value })}
+                />
+                <div />
+                <div className="relative">
+                  <Input
+                    dir="ltr"
+                    value={item.title_fr}
+                    placeholder="Arrival in Jeddah (French)"
+                    className="bg-card"
+                    onChange={(e) => set(i, { title_fr: e.target.value })}
+                  />
+                  {isEmptyFr(item.title_fr) && (
+                    <MissingFrBadge className="absolute -top-2 end-2 bg-card" />
+                  )}
+                </div>
+                <Textarea
+                  dir="ltr"
+                  rows={2}
+                  value={item.description_fr}
+                  placeholder="What happens on this day… (French)"
+                  className="bg-card md:col-span-2"
+                  onChange={(e) => set(i, { description_fr: e.target.value })}
                 />
               </div>
             </li>
@@ -208,7 +363,10 @@ export function ItineraryEditor({
         variant="outline"
         size="sm"
         onClick={() =>
-          onChange([...items, { day: `Day ${items.length + 1}`, title: "", description: "" }])
+          onChange([
+            ...items,
+            { day: `Day ${items.length + 1}`, title: "", description: "", title_fr: "", description_fr: "" },
+          ])
         }
       >
         <Plus className="me-2 h-4 w-4" /> Add day

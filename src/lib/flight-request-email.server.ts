@@ -1,4 +1,4 @@
-import { CABIN_LABELS_AR, type FlightRequestInputType } from "./flight-request.schema";
+import { CABIN_LABELS_EN, type FlightRequestInputType } from "./flight-request.schema";
 
 function escapeHtml(v: string | null | undefined): string {
   if (!v) return "";
@@ -32,7 +32,7 @@ export function renderFlightRequestEmail(data: {
       "Passengers",
       `${input.adults} adult(s), ${input.children} child(ren), ${input.infants} infant(s)`,
     ],
-    ["Cabin class", `${input.cabinClass} (${CABIN_LABELS_AR[input.cabinClass]})`],
+    ["Cabin class", CABIN_LABELS_EN[input.cabinClass]],
     ["Notes", input.notes || "—"],
   ];
 
