@@ -115,7 +115,13 @@ export const submitBooking = createServerFn({ method: "POST" })
             Authorization: `Bearer ${resendKey}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ from, to: [to], subject, html, text }),
+          body: JSON.stringify({
+            from,
+            to: [to],
+            subject: sanitizeHeaderValue(subject, 200),
+            html,
+            text,
+          }),
         });
         if (!res.ok) {
           const body = await res.text();
