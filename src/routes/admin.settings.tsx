@@ -94,7 +94,7 @@ const NAV: NavGroup[] = [
 
 const ALL_ITEMS = NAV.flatMap((g) => g.items);
 
-const SECTIONS: Record<SectionId, () => JSX.Element> = {
+const SECTIONS: Record<SectionId, () => React.JSX.Element> = {
   general: GeneralSection,
   brand: BrandSection,
   homepage: ContentSection,
