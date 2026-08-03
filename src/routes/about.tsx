@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -9,10 +10,10 @@ import { contentQuery } from "@/lib/queries";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "من نحن — جنة الصحراء للأسفار" },
-      { name: "description", content: "تعرف على وكالة جنة الصحراء للأسفار وقصتنا ورؤيتنا." },
-      { property: "og:title", content: "من نحن — جنة الصحراء" },
-      { property: "og:description", content: "وكالة أسفار تونسية بخبرة سنوات في العمرة والسياحة." },
+      { title: i18n.t("seo.about.title") },
+      { name: "description", content: i18n.t("seo.about.description") },
+      { property: "og:title", content: i18n.t("seo.about.ogTitle") },
+      { property: "og:description", content: i18n.t("seo.about.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/about" }],
@@ -47,7 +48,7 @@ function AboutPage() {
             {data?.subtitle}
           </span>
           <h1 className="mt-4 text-h1 font-extrabold ds-reveal">
-            {data?.title ?? "من نحن"}
+            {data?.title ?? t("about.defaultTitle")}
           </h1>
         </div>
       </section>

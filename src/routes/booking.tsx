@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { z } from "zod";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -12,16 +13,15 @@ export const Route = createFileRoute("/booking")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "إتمام الحجز — جنة الصحراء للأسفار" },
+      { title: i18n.t("seo.booking.title") },
       {
         name: "description",
-        content:
-          "أكمل حجز الباقة التي اخترتها: عدد المسافرين، بيانات كل مسافر وجوازات السفر، مراجعة ثم تأكيد — دون أي دفع إلكتروني.",
+        content: i18n.t("seo.booking.description"),
       },
-      { property: "og:title", content: "إتمام الحجز — جنة الصحراء للأسفار" },
+      { property: "og:title", content: i18n.t("seo.booking.title") },
       {
         property: "og:description",
-        content: "حجز سهل في خطوات قليلة بعد اختيار الباقة المناسبة لك.",
+        content: i18n.t("seo.booking.ogDescription"),
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -11,8 +11,8 @@ export const Route = createFileRoute("/booking-success")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "تم استلام الحجز — جنة الصحراء" },
-      { name: "description", content: "شكراً لحجزك. سنتواصل معك قريباً لتأكيد التفاصيل." },
+      { title: i18n.t("seo.bookingSuccess.title") },
+      { name: "description", content: i18n.t("seo.bookingSuccess.description") },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
