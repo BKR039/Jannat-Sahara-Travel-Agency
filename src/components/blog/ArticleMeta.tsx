@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { CalendarDays, Clock, UserRound } from "lucide-react";
 import type { Article } from "@/lib/queries";
 import { formatArticleDate, readingMinutes } from "@/lib/blog";
@@ -9,6 +10,7 @@ export function ArticleMeta({
   article: Pick<Article, "author" | "published_at" | "content" | "excerpt">;
   className?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-caption text-muted-foreground ${className}`}>
       {article.published_at && (
@@ -25,7 +27,7 @@ export function ArticleMeta({
       )}
       <span className="inline-flex items-center gap-1.5">
         <Clock className="h-3.5 w-3.5" aria-hidden />
-        {readingMinutes(article)} دقائق قراءة
+        {t("common.minutesRead", { count: readingMinutes(article) })}
       </span>
     </div>
   );
