@@ -31,7 +31,6 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
-import { Route as AdminPackagesRouteImport } from './routes/admin.packages'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
@@ -154,11 +153,6 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminPackagesRoute = AdminPackagesRouteImport.update({
-  id: '/packages',
-  path: '/packages',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -205,14 +199,14 @@ const AdminAdminsRoute = AdminAdminsRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPackagesIndexRoute = AdminPackagesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminPackagesRoute,
+  id: '/packages/',
+  path: '/packages/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminPackagesIdRoute = AdminPackagesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AdminPackagesRoute,
+  id: '/packages/$id',
+  path: '/packages/$id',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -240,7 +234,6 @@ export interface FileRoutesByFullPath {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -311,7 +304,6 @@ export interface FileRoutesById {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -349,7 +341,6 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
-    | '/admin/packages'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -419,7 +410,6 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
-    | '/admin/packages'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -608,13 +598,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/packages': {
-      id: '/admin/packages'
-      path: '/packages'
-      fullPath: '/admin/packages'
-      preLoaderRoute: typeof AdminPackagesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -680,34 +663,20 @@ declare module '@tanstack/react-router' {
     }
     '/admin/packages/': {
       id: '/admin/packages/'
-      path: '/'
+      path: '/packages'
       fullPath: '/admin/packages/'
       preLoaderRoute: typeof AdminPackagesIndexRouteImport
-      parentRoute: typeof AdminPackagesRoute
+      parentRoute: typeof AdminRoute
     }
     '/admin/packages/$id': {
       id: '/admin/packages/$id'
-      path: '/$id'
+      path: '/packages/$id'
       fullPath: '/admin/packages/$id'
       preLoaderRoute: typeof AdminPackagesIdRouteImport
-      parentRoute: typeof AdminPackagesRoute
+      parentRoute: typeof AdminRoute
     }
   }
 }
-
-interface AdminPackagesRouteChildren {
-  AdminPackagesIdRoute: typeof AdminPackagesIdRoute
-  AdminPackagesIndexRoute: typeof AdminPackagesIndexRoute
-}
-
-const AdminPackagesRouteChildren: AdminPackagesRouteChildren = {
-  AdminPackagesIdRoute: AdminPackagesIdRoute,
-  AdminPackagesIndexRoute: AdminPackagesIndexRoute,
-}
-
-const AdminPackagesRouteWithChildren = AdminPackagesRoute._addFileChildren(
-  AdminPackagesRouteChildren,
-)
 
 interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
@@ -719,10 +688,11 @@ interface AdminRouteChildren {
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
-  AdminPackagesRoute: typeof AdminPackagesRouteWithChildren
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminPackagesIdRoute: typeof AdminPackagesIdRoute
+  AdminPackagesIndexRoute: typeof AdminPackagesIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -735,10 +705,11 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGalleryRoute: AdminGalleryRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
-  AdminPackagesRoute: AdminPackagesRouteWithChildren,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminPackagesIdRoute: AdminPackagesIdRoute,
+  AdminPackagesIndexRoute: AdminPackagesIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -776,3 +747,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
