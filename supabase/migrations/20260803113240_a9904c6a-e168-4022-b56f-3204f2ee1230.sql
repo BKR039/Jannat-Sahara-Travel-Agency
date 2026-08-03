@@ -1,0 +1,1 @@
+update public.site_settings set value = '30' where key = 'notify_retention_days';
