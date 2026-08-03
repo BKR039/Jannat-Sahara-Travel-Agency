@@ -92,5 +92,5 @@ export function money(value: number, currency: string): string {
   return `${Math.round(value).toLocaleString()} ${currency}`;
 }
 
-export const MAX_PASSPORT_BYTES = 5 * 1024 * 1024;
-export const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+export const MAX_PASSPORT_BYTES = 8 * 1024 * 1024;
+export const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "application/pdf"];

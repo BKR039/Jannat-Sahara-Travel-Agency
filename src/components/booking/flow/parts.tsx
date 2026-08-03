@@ -13,11 +13,12 @@ import {
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadPassport } from "@/lib/public.functions";
 import type { Package } from "@/lib/queries";
 import {
   ALLOWED_TYPES,
@@ -26,7 +27,6 @@ import {
   childPrice,
   infantPrice,
   money,
-  randomId,
   type Counts,
   type Passenger,
   type ServiceKey,
@@ -274,6 +274,7 @@ export function PassportUpload({
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const uid = `pax-${passenger.id}`;
+  const upload = useServerFn(uploadPassport);
 
   async function handleFile(file: File | null) {
     if (!file) return;
