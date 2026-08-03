@@ -839,9 +839,8 @@ export function BranchesSection() {
                       index={i}
                       active={b.id === activeId}
                       onSelect={setActiveId}
-                      cardRef={(el) => {
-                        cardRefs.current[b.id] = el;
-                      }}
+                      refStore={cardRefs}
+
                     />
                   ))
                 )}
