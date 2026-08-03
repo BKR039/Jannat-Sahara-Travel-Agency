@@ -641,7 +641,6 @@ function ContactForm({
         </div>
       </form>
 
-      </form>
     </div>
   );
 }
