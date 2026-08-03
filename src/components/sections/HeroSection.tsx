@@ -12,9 +12,22 @@ export function HeroSection() {
 
   return (
     <section className="relative isolate overflow-hidden">
+      {/* Hero image is the LCP element: eager + high fetch priority, plus a preload hint. */}
+      {hero?.image && (
+        <link rel="preload" as="image" href={hero.image} fetchPriority="high" />
+      )}
       <div className="absolute inset-0 -z-10">
         {hero?.image && (
-          <img src={hero.image} alt="" aria-hidden="true" className="h-full w-full object-cover" />
+          <img
+            src={hero.image}
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+            sizes="100vw"
+            className="h-full w-full object-cover"
+          />
         )}
         {/* DS: --gradient-oasis-night base + --gradient-hero-scrim for legibility */}
         <div className="absolute inset-0 bg-gradient-oasis-night opacity-80" />
@@ -43,12 +56,12 @@ export function HeroSection() {
           <Button asChild size="lg" className="shadow-brand-glow">
             <Link to={hero?.cta_href ?? "/umrah"}>
               {hero?.cta_label ?? t("actions.bookNow")}
-              <ArrowLeft className="ms-2 h-5 w-5 rtl:rotate-180" />
+              <ArrowLeft className="ms-2 h-5 w-5 shrink-0 rtl:rotate-180" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="dark" className="bg-on-dark/10 backdrop-blur hover:bg-on-dark/20">
             <Link to="/about">
-              <Play className="me-2 h-5 w-5" /> {t("actions.learnMore")}
+              <Play className="me-2 h-5 w-5 shrink-0" /> {t("actions.learnMore")}
             </Link>
           </Button>
         </div>
