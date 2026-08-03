@@ -15,6 +15,7 @@ export function ArticleDialog({
   onClose: () => void;
   onOpenArticle?: (slug: string) => void;
 }) {
+  const { t } = useTranslation();
   const { data: article, isLoading } = useQuery({ ...articleBySlugQuery(slug ?? ""), enabled: !!slug });
   const { data: all } = useQuery({ ...articlesQuery(), enabled: !!slug });
 

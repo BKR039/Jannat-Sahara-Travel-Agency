@@ -13,6 +13,7 @@ export function ArticleCard({
   onOpen: (slug: string) => void;
   index?: number;
 }) {
+  const { t } = useTranslation();
   const category = articleCategory(article);
 
   return (

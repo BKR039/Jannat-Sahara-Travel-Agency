@@ -11,6 +11,7 @@ export function ImageLightbox({
   alt?: string;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   useEffect(() => {
     if (!src) return;
     const onKey = (e: KeyboardEvent) => {
