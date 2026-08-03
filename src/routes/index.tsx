@@ -67,9 +67,6 @@ function Index() {
       <LazySection minHeight="34rem">
         <BranchesSection />
       </LazySection>
-      <LazySection minHeight="18rem">
-        <CtaSection />
-      </LazySection>
     </SiteLayout>
   );
 }
