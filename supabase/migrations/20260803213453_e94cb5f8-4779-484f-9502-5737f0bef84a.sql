@@ -1,0 +1,2 @@
+ALTER TABLE public.packages ALTER COLUMN seo_keywords_fr TYPE jsonb USING CASE WHEN seo_keywords_fr IS NULL OR seo_keywords_fr = '' THEN '[]'::jsonb ELSE to_jsonb(string_to_array(seo_keywords_fr, ',')) END;
+ALTER TABLE public.packages ALTER COLUMN seo_keywords_fr SET DEFAULT '[]'::jsonb;

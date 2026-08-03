@@ -1,23 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { PackagesPage } from "@/components/sections/PackagesPage";
 
 export const Route = createFileRoute("/visa")({
   head: () => ({
     meta: [
-      { title: "خدمات التأشيرات — جنة الصحراء" },
-      { name: "description", content: "خدمات استخراج التأشيرات لمختلف الوجهات." },
-      { property: "og:title", content: "خدمات التأشيرات — جنة الصحراء" },
-      { property: "og:description", content: "استخرج تأشيرتك بسهولة وسرعة." },
+      { title: i18n.t("seo.visa.title") },
+      { name: "description", content: i18n.t("seo.visa.description") },
+      { property: "og:title", content: i18n.t("seo.visa.title") },
+      { property: "og:description", content: i18n.t("seo.visa.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/visa" }],
   }),
-  component: () => (
+  component: () => {
+    const { t } = useTranslation();
+    return (
     <PackagesPage
       category="visa"
-      title="خدمات التأشيرات"
-      description="نساعدك في استخراج تأشيرة السفر بسهولة"
+      title={t("nav.visa")}
+      description={t("seo.visa.description")}
       cover="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=80"
     />
-  ),
+  );
+  },
 });

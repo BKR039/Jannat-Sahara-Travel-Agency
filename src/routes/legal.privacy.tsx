@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -6,10 +7,10 @@ import { SectionHeading } from "@/components/common/SectionHeading";
 export const Route = createFileRoute("/legal/privacy")({
   head: () => ({
     meta: [
-      { title: "سياسة الخصوصية — جنة الصحراء" },
-      { name: "description", content: "سياسة الخصوصية لموقع جنة الصحراء للأسفار." },
-      { property: "og:title", content: "سياسة الخصوصية — جنة الصحراء" },
-      { property: "og:description", content: "كيف نحمي بياناتك ونستخدمها." },
+      { title: i18n.t("seo.legalPrivacy.title") },
+      { name: "description", content: i18n.t("seo.legalPrivacy.description") },
+      { property: "og:title", content: i18n.t("seo.legalPrivacy.title") },
+      { property: "og:description", content: i18n.t("seo.legalPrivacy.ogDescription") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -29,19 +30,10 @@ function PrivacyPage() {
           description=""
         />
         <div className="mt-10 space-y-6 text-body leading-relaxed text-foreground">
-          <p>
-            نحن في جنة الصحراء للأسفار نلتزم بحماية خصوصيتك. تُستخدم البيانات التي
-            تقدمها فقط لتأكيد الحجوزات والتواصل معك بخصوص رحلتك.
-          </p>
-          <p>
-            لا نبيع أو نشارك بياناتك الشخصية مع أطراف ثالثة لأغراض تسويقية. يمكنك
-            طلب حذف بياناتك في أي وقت عبر التواصل معنا.
-          </p>
-          <p>
-            يتم تخزين جوازات السفر ووثائق السفر في مساحة تخزين آمنة ولا يتم
-            الوصول إليها إلا من قبل الفريق المختص.
-          </p>
-          <p className="text-muted-foreground">آخر تحديث: أغسطس 2026.</p>
+          <p>{t("legalPrivacy.p1")}</p>
+          <p>{t("legalPrivacy.p2")}</p>
+          <p>{t("legalPrivacy.p3")}</p>
+          <p className="text-muted-foreground">{t("legalPrivacy.updated")}</p>
         </div>
       </section>
     </SiteLayout>

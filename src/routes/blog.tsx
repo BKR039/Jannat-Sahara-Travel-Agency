@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,15 +15,15 @@ import { articleTags } from "@/lib/blog";
 export const Route = createFileRoute("/blog")({
   head: () => ({
     meta: [
-      { title: "المدونة — نصائح السفر والعمرة | جنة الصحراء" },
-      { name: "description", content: "مقالات وأخبار ونصائح للسفر والعمرة من فريق جنة الصحراء للسفر." },
-      { property: "og:title", content: "المدونة — نصائح السفر والعمرة | جنة الصحراء" },
-      { property: "og:description", content: "نصائح للسفر ودليل العمرة والوجهات السياحية." },
+      { title: i18n.t("seo.blog.title") },
+      { name: "description", content: i18n.t("seo.blog.description") },
+      { property: "og:title", content: i18n.t("seo.blog.title") },
+      { property: "og:description", content: i18n.t("seo.blog.ogDescription") },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/blog" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "المدونة — نصائح السفر والعمرة | جنة الصحراء" },
-      { name: "twitter:description", content: "نصائح للسفر ودليل العمرة والوجهات السياحية." },
+      { name: "twitter:title", content: i18n.t("seo.blog.title") },
+      { name: "twitter:description", content: i18n.t("seo.blog.ogDescription") },
     ],
     links: [{ rel: "canonical", href: "/blog" }],
     scripts: [
@@ -31,8 +32,8 @@ export const Route = createFileRoute("/blog")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Blog",
-          name: "مدونة جنة الصحراء",
-          description: "مقالات وأخبار ونصائح للسفر والعمرة.",
+          name: i18n.t("seo.blog.jsonName"),
+          description: i18n.t("seo.blog.description"),
           url: "/blog",
         }),
       },
@@ -78,15 +79,15 @@ function BlogPage() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="ابحث في المقالات..."
-              aria-label="البحث في المقالات"
+              placeholder={t("blog.searchPlaceholder")}
+              aria-label={t("blog.searchAria")}
               className="h-12 w-full rounded-full border border-border-subtle bg-card ps-11 pe-11 text-small text-foreground shadow-sm outline-none transition-all duration-base ease-standard placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                aria-label="مسح البحث"
+                aria-label={t("blog.clearSearchAria")}
                 className="absolute top-1/2 end-4 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="h-4 w-4" />
@@ -97,7 +98,7 @@ function BlogPage() {
           {categories.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-2">
               <CategoryChip active={!category} onClick={() => setCategory(null)}>
-                الكل
+                {t("blog.all")}
               </CategoryChip>
               {categories.map((c) => (
                 <CategoryChip key={c} active={category === c} onClick={() => setCategory(c)}>

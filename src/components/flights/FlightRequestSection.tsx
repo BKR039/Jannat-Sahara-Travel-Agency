@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -19,7 +20,7 @@ import { AirportCombobox } from "./AirportCombobox";
 import { submitFlightRequest } from "@/lib/flight-request.functions";
 import {
   CABIN_CLASSES,
-  CABIN_LABELS_AR,
+  cabinLabel,
   FlightRequestInput,
   type FlightRequestInputType,
 } from "@/lib/flight-request.schema";
@@ -65,6 +66,7 @@ const fieldClass =
   "h-14 w-full rounded-[var(--radius-card)] border border-border-subtle bg-card px-4 text-body text-foreground shadow-sm transition-all duration-base ease-standard placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15";
 
 export function FlightRequestSection() {
+  const { t, i18n } = useTranslation();
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reference, setReference] = useState<string | null>(null);
@@ -91,7 +93,7 @@ export function FlightRequestSection() {
       setErrors({});
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    onError: (e: Error) => toast.error(e.message || "تعذّر إرسال الطلب، حاول مرّة أخرى."),
+    onError: (e: Error) => toast.error(e.message || t("flightRequest.errorGeneric")),
   });
 
   function onSubmit(e: React.FormEvent) {
@@ -107,7 +109,7 @@ export function FlightRequestSection() {
         if (!next[key]) next[key] = issue.message;
       }
       setErrors(next);
-      toast.error("يرجى إكمال الحقول المطلوبة.");
+      toast.error(t("flightRequest.errorValidation"));
       return;
     }
     setErrors({});
@@ -125,17 +127,17 @@ export function FlightRequestSection() {
     );
   }
 
-  const passengersLabel = `${draft.adults + draft.children + draft.infants} مسافر`;
+  const passengersLabel = t("flightRequest.passengersCount", { count: draft.adults + draft.children + draft.infants });
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-20">
       <div className="mb-10 flex flex-col items-center gap-4 text-center">
         <span className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-caption font-semibold text-primary">
-          <Sparkles className="h-3.5 w-3.5" /> تذاكر الطيران
+          <Sparkles className="h-3.5 w-3.5" /> {t("flightRequest.badge")}
         </span>
-        <h1 className="text-h2 text-foreground">احجز أي رحلة في العالم بسهولة</h1>
+        <h1 className="text-h2 text-foreground">{t("flightRequest.heading")}</h1>
         <p className="max-w-2xl text-body-lg text-muted-foreground">
-          اختر تفاصيل رحلتك وسنرسل لك أفضل خيارات الطيران المتوفرة خلال وقت قصير.
+          {t("flightRequest.subheading")}
         </p>
       </div>
 
@@ -147,13 +149,13 @@ export function FlightRequestSection() {
         {/* Trip type */}
         <div
           role="radiogroup"
-          aria-label="نوع الرحلة"
+          aria-label={t("flightRequest.tripTypeAria")}
           className="mb-8 inline-flex rounded-full bg-muted p-1"
         >
           {(
             [
-              ["one_way", "ذهاب فقط"],
-              ["round_trip", "ذهاب وعودة"],
+              ["one_way", t("flightRequest.oneWay")],
+              ["round_trip", t("flightRequest.roundTrip")],
             ] as const
           ).map(([val, label]) => (
             <button
@@ -177,22 +179,22 @@ export function FlightRequestSection() {
         <div className="grid gap-6 md:grid-cols-2">
           <AirportCombobox
             id="from-airport"
-            label="مطار المغادرة"
-            placeholder="تونس، صفاقس، جربة…"
+            label={t("flightRequest.fromLabel")}
+            placeholder={t("flightRequest.fromPlaceholder")}
             value={draft.fromAirport}
             onChange={(v) => set("fromAirport", v)}
             invalid={!!errors["fromAirport"]}
           />
           <AirportCombobox
             id="to-airport"
-            label="مطار الوصول"
-            placeholder="جدة، دبي، اسطنبول، باريس…"
+            label={t("flightRequest.toLabel")}
+            placeholder={t("flightRequest.toPlaceholder")}
             value={draft.toAirport}
             onChange={(v) => set("toAirport", v)}
             invalid={!!errors["toAirport"]}
           />
 
-          <Field label="تاريخ المغادرة" htmlFor="departure-date" error={errors["departureDate"]}>
+          <Field label={t("flightRequest.departureLabel")} htmlFor="departure-date" error={errors["departureDate"]}>
             <div className="relative">
               <span className="pointer-events-none absolute inset-y-0 end-4 flex items-center text-muted-foreground">
                 <CalendarDays className="h-5 w-5" />
@@ -209,7 +211,7 @@ export function FlightRequestSection() {
           </Field>
 
           {draft.tripType === "round_trip" && (
-            <Field label="تاريخ العودة" htmlFor="return-date" error={errors["returnDate"]}>
+            <Field label={t("flightRequest.returnLabel")} htmlFor="return-date" error={errors["returnDate"]}>
               <div className="relative ds-reveal">
                 <span className="pointer-events-none absolute inset-y-0 end-4 flex items-center text-muted-foreground">
                   <CalendarDays className="h-5 w-5" />
@@ -226,7 +228,7 @@ export function FlightRequestSection() {
             </Field>
           )}
 
-          <Field label="المسافرون" htmlFor="passengers" error={errors["adults"]}>
+          <Field label={t("flightRequest.passengersFieldLabel")} htmlFor="passengers" error={errors["adults"]}>
             <Popover>
               <PopoverTrigger asChild>
                 <button
@@ -243,21 +245,21 @@ export function FlightRequestSection() {
               <PopoverContent align="start" className="w-72 p-4">
                 <div className="flex flex-col gap-4">
                   <Stepper
-                    label="بالغون"
-                    hint="12 سنة وأكثر"
+                    label={t("flightRequest.adultsLabel")}
+                    hint={t("flightRequest.adultsHint")}
                     value={draft.adults}
                     min={1}
                     onChange={(v) => set("adults", v)}
                   />
                   <Stepper
-                    label="أطفال"
-                    hint="من 2 إلى 11 سنة"
+                    label={t("flightRequest.childrenLabel")}
+                    hint={t("flightRequest.childrenHint")}
                     value={draft.children}
                     onChange={(v) => set("children", v)}
                   />
                   <Stepper
-                    label="رُضّع"
-                    hint="أقل من سنتين"
+                    label={t("flightRequest.infantsLabel")}
+                    hint={t("flightRequest.infantsHint")}
                     value={draft.infants}
                     onChange={(v) => set("infants", v)}
                   />
@@ -266,7 +268,7 @@ export function FlightRequestSection() {
             </Popover>
           </Field>
 
-          <Field label="درجة السفر" htmlFor="cabin-class">
+          <Field label={t("flightRequest.cabinLabel")} htmlFor="cabin-class">
             <div className="relative">
               <span className="pointer-events-none absolute inset-y-0 start-4 flex items-center text-muted-foreground">
                 <Armchair className="h-5 w-5" />
@@ -279,7 +281,7 @@ export function FlightRequestSection() {
               >
                 {CABIN_CLASSES.map((c) => (
                   <option key={c} value={c}>
-                    {CABIN_LABELS_AR[c]}
+                    {cabinLabel(c, i18n.language)}
                   </option>
                 ))}
               </select>
@@ -290,16 +292,16 @@ export function FlightRequestSection() {
         <div className="my-8 h-px bg-border-subtle" />
 
         <div className="grid gap-6 md:grid-cols-3">
-          <Field label="الاسم الكامل" htmlFor="req-name" error={errors["name"]}>
+          <Field label={t("flightRequest.nameLabel")} htmlFor="req-name" error={errors["name"]}>
             <input
               id="req-name"
               value={draft.name}
               onChange={(e) => set("name", e.target.value)}
-              placeholder="الاسم واللقب"
+              placeholder={t("flightRequest.namePlaceholder")}
               className={cn(fieldClass, errors["name"] && "border-destructive")}
             />
           </Field>
-          <Field label="رقم الهاتف" htmlFor="req-phone" error={errors["phone"]}>
+          <Field label={t("flightRequest.phoneLabel")} htmlFor="req-phone" error={errors["phone"]}>
             <input
               id="req-phone"
               dir="ltr"
@@ -310,7 +312,7 @@ export function FlightRequestSection() {
               className={cn(fieldClass, errors["phone"] && "border-destructive")}
             />
           </Field>
-          <Field label="البريد الإلكتروني" htmlFor="req-email" error={errors["email"]}>
+          <Field label={t("flightRequest.emailLabel")} htmlFor="req-email" error={errors["email"]}>
             <input
               id="req-email"
               dir="ltr"
@@ -324,13 +326,13 @@ export function FlightRequestSection() {
         </div>
 
         <div className="mt-6">
-          <Field label="ملاحظات إضافية (اختياري)" htmlFor="req-notes" error={errors["notes"]}>
+          <Field label={t("flightRequest.notesLabel")} htmlFor="req-notes" error={errors["notes"]}>
             <textarea
               id="req-notes"
               rows={5}
               value={draft.notes}
               onChange={(e) => set("notes", e.target.value)}
-              placeholder="أفضّل خطوط مباشرة · أقل سعر · رحلة صباحية · إمكانية تغيير التاريخ…"
+              placeholder={t("flightRequest.notesPlaceholder")}
               className="w-full rounded-[var(--radius-card)] border border-border-subtle bg-card p-4 text-body text-foreground shadow-sm transition-all duration-base ease-standard placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
             />
           </Field>
@@ -343,14 +345,14 @@ export function FlightRequestSection() {
         >
           {mutation.isPending ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin" /> جاري إرسال الطلب…
+              <Loader2 className="h-5 w-5 animate-spin" /> {t("flightRequest.submitting")}
             </>
           ) : (
-            "اطلب أفضل العروض"
+            t("flightRequest.submitLabel")
           )}
         </button>
         <p className="mt-4 text-center text-caption text-muted-foreground">
-          لا يتم أي حجز أو دفع الآن — سيتواصل معك فريقنا بأفضل الخيارات المتوفرة.
+          {t("flightRequest.disclaimer")}
         </p>
       </form>
     </section>
@@ -394,6 +396,7 @@ function Stepper({
   max?: number;
   onChange: (v: number) => void;
 }) {
+  const { t: tt } = useTranslation();
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
@@ -403,7 +406,7 @@ function Stepper({
       <div className="flex items-center gap-3">
         <button
           type="button"
-          aria-label={`إنقاص ${label}`}
+          aria-label={tt("flightRequest.decreaseAria", { label })}
           disabled={value <= min}
           onClick={() => onChange(Math.max(min, value - 1))}
           className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-foreground transition hover:border-primary hover:text-primary disabled:opacity-40"
@@ -413,7 +416,7 @@ function Stepper({
         <span className="w-6 text-center text-small font-bold tabular-nums">{value}</span>
         <button
           type="button"
-          aria-label={`زيادة ${label}`}
+          aria-label={tt("flightRequest.increaseAria", { label })}
           disabled={value >= max}
           onClick={() => onChange(Math.min(max, value + 1))}
           className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-foreground transition hover:border-primary hover:text-primary disabled:opacity-40"
@@ -436,8 +439,9 @@ function SuccessScreen({
   whatsapp: string;
   onNew: () => void;
 }) {
+  const { t } = useTranslation();
   const waLink = `https://wa.me/${whatsapp.replace(/[^\d]/g, "")}?text=${encodeURIComponent(
-    `مرحبًا، طلب تذاكر طيران رقم ${reference}`,
+    t("flightRequest.waMessage", { reference }),
   )}`;
   return (
     <section className="mx-auto max-w-3xl px-4 py-20 md:px-6">
@@ -445,15 +449,14 @@ function SuccessScreen({
         <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-mint-muted text-brand-green">
           <CheckCircle2 className="h-10 w-10" />
         </span>
-        <h1 className="text-h2 text-foreground">تم استلام طلبك بنجاح.</h1>
+        <h1 className="text-h2 text-foreground">{t("flightRequest.successTitle")}</h1>
         <p className="max-w-xl text-body-lg text-muted-foreground">
-          سيقوم فريقنا بالبحث عن أفضل خيارات الطيران المتوفرة والتواصل معك في أقرب وقت عبر الهاتف أو
-          البريد الإلكتروني.
+          {t("flightRequest.successDesc")}
         </p>
 
         <div className="w-full rounded-[var(--radius-card)] border border-dashed border-primary/40 bg-accent/50 p-5">
           <div className="text-caption font-semibold uppercase tracking-wide text-muted-foreground">
-            رقم المرجع
+            {t("flightRequest.referenceLabel")}
           </div>
           <div className="mt-2 flex items-center justify-center gap-3">
             <span dir="ltr" className="text-h3 font-extrabold text-primary">
@@ -461,10 +464,10 @@ function SuccessScreen({
             </span>
             <button
               type="button"
-              aria-label="نسخ رقم المرجع"
+              aria-label={t("flightRequest.copyReferenceAria")}
               onClick={() => {
                 void navigator.clipboard.writeText(reference);
-                toast.success("تم نسخ رقم المرجع");
+                toast.success(t("flightRequest.referenceCopied"));
               }}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-muted-foreground transition hover:border-primary hover:text-primary"
             >
@@ -480,13 +483,13 @@ function SuccessScreen({
             rel="noreferrer"
             className="flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-brand-green text-small font-bold text-brand-green-foreground shadow-md transition hover:scale-[1.01]"
           >
-            <MessageCircle className="h-5 w-5" /> واتساب
+            <MessageCircle className="h-5 w-5" /> {t("flightRequest.whatsappCta")}
           </a>
           <a
             href={`tel:${phone.replace(/\s/g, "")}`}
             className="flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary text-small font-bold text-primary-foreground shadow-md transition hover:scale-[1.01]"
           >
-            <Phone className="h-5 w-5" /> اتصل بالوكالة
+            <Phone className="h-5 w-5" /> {t("flightRequest.callCta")}
           </a>
         </div>
 
@@ -495,7 +498,7 @@ function SuccessScreen({
           onClick={onNew}
           className="text-small font-semibold text-primary hover:underline"
         >
-          إرسال طلب آخر
+          {t("flightRequest.newRequestCta")}
         </button>
       </div>
     </section>

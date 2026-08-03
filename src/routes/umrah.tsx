@@ -1,23 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { PackagesPage } from "@/components/sections/PackagesPage";
 
 export const Route = createFileRoute("/umrah")({
   head: () => ({
     meta: [
-      { title: "باقات العمرة — جنة الصحراء" },
-      { name: "description", content: "أفضل باقات العمرة من تونس بأسعار تنافسية وخدمات متكاملة." },
-      { property: "og:title", content: "باقات العمرة — جنة الصحراء" },
-      { property: "og:description", content: "باقات عمرة شاملة الطيران والفندق والتنقل." },
+      { title: i18n.t("seo.umrah.title") },
+      { name: "description", content: i18n.t("seo.umrah.description") },
+      { property: "og:title", content: i18n.t("seo.umrah.title") },
+      { property: "og:description", content: i18n.t("seo.umrah.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/umrah" }],
   }),
-  component: () => (
+  component: UmrahRoute,
+});
+
+function UmrahRoute() {
+  const { t } = useTranslation();
+  return (
     <PackagesPage
       category="umrah"
-      title="باقات العمرة"
-      description="اختر باقة العمرة التي تناسبك من بين مجموعة مميزة من العروض"
+      title={t("nav.umrah")}
+      description={t("seo.umrah.description")}
       cover="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80"
     />
-  ),
-});
+  );
+}

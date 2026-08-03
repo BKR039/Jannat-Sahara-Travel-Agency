@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { X } from "lucide-react";
 
@@ -10,6 +11,7 @@ export function ImageLightbox({
   alt?: string;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   useEffect(() => {
     if (!src) return;
     const onKey = (e: KeyboardEvent) => {
@@ -37,7 +39,7 @@ export function ImageLightbox({
       <button
         type="button"
         onClick={onClose}
-        aria-label="إغلاق"
+        aria-label={t("common.close")}
         className="absolute end-4 top-4 rounded-full bg-on-dark/10 p-2 text-on-dark transition hover:bg-on-dark/20"
       >
         <X className="h-5 w-5" />

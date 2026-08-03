@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -6,10 +7,10 @@ import { SectionHeading } from "@/components/common/SectionHeading";
 export const Route = createFileRoute("/legal/terms")({
   head: () => ({
     meta: [
-      { title: "شروط الاستخدام — جنة الصحراء" },
-      { name: "description", content: "شروط الاستخدام لموقع جنة الصحراء للأسفار." },
-      { property: "og:title", content: "شروط الاستخدام — جنة الصحراء" },
-      { property: "og:description", content: "الشروط والأحكام الخاصة بحجوزاتنا." },
+      { title: i18n.t("seo.legalTerms.title") },
+      { name: "description", content: i18n.t("seo.legalTerms.description") },
+      { property: "og:title", content: i18n.t("seo.legalTerms.title") },
+      { property: "og:description", content: i18n.t("seo.legalTerms.ogDescription") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -29,19 +30,10 @@ function TermsPage() {
           description=""
         />
         <div className="mt-10 space-y-6 text-body leading-relaxed text-foreground">
-          <p>
-            باستخدامك لموقع جنة الصحراء للأسفار، فإنك توافق على هذه الشروط. يجب
-            أن تكون المعلومات المقدمة أثناء الحجز دقيقة وكاملة.
-          </p>
-          <p>
-            لا يتم تحصيل أي مبلغ عبر الموقع. يتم تأكيد الحجز والدفع مباشرة مع
-            فريقنا عبر الهاتف أو الواتساب أو في أقرب فرع.
-          </p>
-          <p>
-            نحتفظ بالحق في تعديل الأسعار أو البرامج بناءً على توفر الخدمات من
-            شركائنا. سيتم إبلاغك بأي تغييرات قبل تأكيد الحجز النهائي.
-          </p>
-          <p className="text-muted-foreground">آخر تحديث: أغسطس 2026.</p>
+          <p>{t("legalTerms.p1")}</p>
+          <p>{t("legalTerms.p2")}</p>
+          <p>{t("legalTerms.p3")}</p>
+          <p className="text-muted-foreground">{t("legalTerms.updated")}</p>
         </div>
       </section>
     </SiteLayout>

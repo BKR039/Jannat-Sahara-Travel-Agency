@@ -133,3 +133,24 @@ export function StatusBadge({ status }: { status: string | null | undefined }) {
     </span>
   );
 }
+
+/* ---------------------------- translation status ----------------------------- */
+
+/** Subtle pill shown next to a field/row whose French translation is empty. */
+export function MissingFrBadge({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full bg-warning-muted px-2 py-0.5 text-caption font-medium text-warning ${className}`}
+      title="No French translation yet"
+    >
+      FR missing
+    </span>
+  );
+}
+
+export function isEmptyFr(value: unknown): boolean {
+  if (value == null) return true;
+  if (typeof value === "string") return value.trim().length === 0;
+  if (Array.isArray(value)) return value.length === 0 || value.every((v) => isEmptyFr(v));
+  return false;
+}

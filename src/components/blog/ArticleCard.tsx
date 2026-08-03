@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import type { Article } from "@/lib/queries";
 import { articleCategory, readingMinutes } from "@/lib/blog";
@@ -12,6 +13,7 @@ export function ArticleCard({
   onOpen: (slug: string) => void;
   index?: number;
 }) {
+  const { t } = useTranslation();
   const category = articleCategory(article);
 
   return (
@@ -38,7 +40,7 @@ export function ArticleCard({
           </div>
         )}
         <span className="absolute bottom-3 end-3 rounded-full bg-card/90 px-2.5 py-1 text-caption font-semibold text-foreground backdrop-blur">
-          {readingMinutes(article)} د
+          {t("common.minutesShort", { count: readingMinutes(article) })}
         </span>
       </div>
 
@@ -55,7 +57,7 @@ export function ArticleCard({
           onClick={() => onOpen(article.slug)}
           className="mt-auto inline-flex items-center gap-1.5 self-start text-caption font-semibold text-primary transition-transform duration-base hover:gap-2.5"
         >
-          اقرأ المزيد
+          {t("blog.readMore")}
           <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden />
         </button>
       </div>

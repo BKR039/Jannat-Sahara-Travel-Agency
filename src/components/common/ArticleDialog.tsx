@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { articleBySlugQuery, articlesQuery } from "@/lib/queries";
@@ -14,6 +15,7 @@ export function ArticleDialog({
   onClose: () => void;
   onOpenArticle?: (slug: string) => void;
 }) {
+  const { t } = useTranslation();
   const { data: article, isLoading } = useQuery({ ...articleBySlugQuery(slug ?? ""), enabled: !!slug });
   const { data: all } = useQuery({ ...articlesQuery(), enabled: !!slug });
 
@@ -81,7 +83,7 @@ export function ArticleDialog({
 
             {related.length > 0 && (
               <div className="border-t border-border-subtle pt-4">
-                <h4 className="mb-3 text-card-title font-bold text-foreground">مقالات ذات صلة</h4>
+                <h4 className="mb-3 text-card-title font-bold text-foreground">{t("blog.relatedArticles")}</h4>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {related.map((r) => (
                     <button

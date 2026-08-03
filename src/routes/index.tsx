@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy } from "react";
+import i18n from "@/lib/i18n";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { PackageSelector } from "@/components/sections/PackageSelector";
@@ -29,13 +30,13 @@ const BranchesSection = lazy(() =>
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "جنة الصحراء للأسفار — العمرة، الرحلات والتأشيرات" },
+      { title: i18n.t("seo.home.title") },
       {
         name: "description",
-        content: "وكالة أسفار تونسية متخصصة في تنظيم رحلات العمرة، الرحلات السياحية، تذاكر الطيران وخدمات التأشيرات.",
+        content: i18n.t("seo.home.description"),
       },
-      { property: "og:title", content: "جنة الصحراء للأسفار" },
-      { property: "og:description", content: "رحلتك الروحية تبدأ من هنا. باقات العمرة والسياحة والتأشيرات." },
+      { property: "og:title", content: i18n.t("seo.home.ogTitle") },
+      { property: "og:description", content: i18n.t("seo.home.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/" }],

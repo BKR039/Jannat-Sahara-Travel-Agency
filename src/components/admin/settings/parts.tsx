@@ -96,7 +96,7 @@ export function Field({
   wide,
   children,
 }: {
-  label: string;
+  label: ReactNode;
   hint?: string;
   error?: string | null;
   wide?: boolean;
@@ -690,6 +690,114 @@ export function BrandPreview({
           Accent button
         </span>
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------ bilingual fields ----------------------------- */
+
+import { MissingFrBadge, isEmptyFr } from "@/components/admin/ui";
+
+/** Two-column Arabic/French pair for a single-line text field. */
+export function BilingualTextField({
+  label,
+  hint,
+  error,
+  wide = true,
+  valueAr,
+  onChangeAr,
+  valueFr,
+  onChangeFr,
+  placeholderAr,
+  placeholderFr,
+  type,
+}: {
+  label: string;
+  hint?: string;
+  error?: string | null;
+  wide?: boolean;
+  valueAr: string;
+  onChangeAr: (v: string) => void;
+  valueFr: string;
+  onChangeFr: (v: string) => void;
+  placeholderAr?: string;
+  placeholderFr?: string;
+  type?: string;
+}) {
+  return (
+    <div className={cn("grid gap-3 sm:grid-cols-2", wide && "md:col-span-2")}>
+      <Field label={`${label} (Arabic)`} hint={hint} error={error}>
+        <Input
+          dir="rtl"
+          type={type}
+          value={valueAr}
+          placeholder={placeholderAr}
+          onChange={(e) => onChangeAr(e.target.value)}
+        />
+      </Field>
+      <Field
+        label={
+          <span className="inline-flex items-center gap-2">
+            {`${label} (French)`}
+            {isEmptyFr(valueFr) && <MissingFrBadge />}
+          </span>
+        }
+      >
+        <Input
+          dir="ltr"
+          type={type}
+          value={valueFr}
+          placeholder={placeholderFr}
+          onChange={(e) => onChangeFr(e.target.value)}
+        />
+      </Field>
+    </div>
+  );
+}
+
+/** Two-column Arabic/French pair for a multi-line text field. */
+export function BilingualTextAreaField({
+  label,
+  hint,
+  valueAr,
+  onChangeAr,
+  valueFr,
+  onChangeFr,
+  rows = 4,
+}: {
+  label: string;
+  hint?: string;
+  valueAr: string;
+  onChangeAr: (v: string) => void;
+  valueFr: string;
+  onChangeFr: (v: string) => void;
+  rows?: number;
+}) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 md:col-span-2">
+      <Field label={`${label} (Arabic)`} hint={hint}>
+        <Textarea
+          dir="rtl"
+          rows={rows}
+          value={valueAr}
+          onChange={(e) => onChangeAr(e.target.value)}
+        />
+      </Field>
+      <Field
+        label={
+          <span className="inline-flex items-center gap-2">
+            {`${label} (French)`}
+            {isEmptyFr(valueFr) && <MissingFrBadge />}
+          </span>
+        }
+      >
+        <Textarea
+          dir="ltr"
+          rows={rows}
+          value={valueFr}
+          onChange={(e) => onChangeFr(e.target.value)}
+        />
+      </Field>
     </div>
   );
 }

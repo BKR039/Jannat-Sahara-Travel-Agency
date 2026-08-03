@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Home, Phone } from "lucide-react";
 import { z } from "zod";
+import i18n from "@/lib/i18n";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
 
@@ -11,8 +12,8 @@ export const Route = createFileRoute("/booking-success")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "تم استلام الحجز — جنة الصحراء" },
-      { name: "description", content: "شكراً لحجزك. سنتواصل معك قريباً لتأكيد التفاصيل." },
+      { title: i18n.t("seo.bookingSuccess.title") },
+      { name: "description", content: i18n.t("seo.bookingSuccess.description") },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

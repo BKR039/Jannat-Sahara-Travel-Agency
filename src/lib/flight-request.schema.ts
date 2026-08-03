@@ -18,6 +18,28 @@ export const CABIN_LABELS_AR: Record<(typeof CABIN_CLASSES)[number], string> = {
   first: "الدرجة الأولى",
 };
 
+export const CABIN_LABELS_FR: Record<(typeof CABIN_CLASSES)[number], string> = {
+  economy: "Classe économique",
+  premium_economy: "Économique premium",
+  business: "Classe affaires",
+  first: "Première classe",
+};
+
+/** Used in the internal (agency-facing) notification emails, which stay English. */
+export const CABIN_LABELS_EN: Record<(typeof CABIN_CLASSES)[number], string> = {
+  economy: "Economy",
+  premium_economy: "Premium economy",
+  business: "Business",
+  first: "First",
+};
+
+export function cabinLabel(
+  cabin: (typeof CABIN_CLASSES)[number],
+  lang: string | undefined,
+): string {
+  return (lang ?? "ar").startsWith("fr") ? CABIN_LABELS_FR[cabin] : CABIN_LABELS_AR[cabin];
+}
+
 export const STATUS_LABELS: Record<(typeof FLIGHT_REQUEST_STATUSES)[number], string> = {
   new: "New",
   contacted: "Contacted",

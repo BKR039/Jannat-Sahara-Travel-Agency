@@ -109,7 +109,11 @@
     "empty": "Aucune donnée à afficher",
     "error": "Erreur",
     "language": "Langue",
-    "currency": "TND"
+    "currency": "TND",
+    "minutesRead": "{{count}} min de lecture",
+    "clear": "Effacer",
+    "close": "Fermer",
+    "minutesShort": "{{count}} min"
   },
   "booking": {
     "title": "Réserver votre offre",
@@ -360,5 +364,184 @@
       "new": "Nouveau",
       "discount": "Promo"
     }
+  },
+  "seo": {
+    "root": {
+      "title": "Janat Sahara Travel — Omra, Voyages et Visas",
+      "description": "Agence de voyages spécialisée dans l'Omra, les voyages organisés, les billets d'avion et les visas. Votre voyage spirituel commence ici.",
+      "ogDescription": "Omra, voyages organisés, billets d'avion et visas."
+    },
+    "home": {
+      "title": "Janat Sahara Travel — Omra, voyages et visas",
+      "description": "Agence de voyages tunisienne spécialisée dans l'organisation de l'Omra, des voyages organisés, des billets d'avion et des services de visa.",
+      "ogTitle": "Janat Sahara Travel",
+      "ogDescription": "Votre voyage spirituel commence ici. Forfaits Omra, voyages et visas."
+    },
+    "umrah": {
+      "title": "Forfaits Omra — Janat Sahara",
+      "description": "Les meilleurs forfaits Omra au départ de la Tunisie, à prix compétitifs et services complets.",
+      "ogDescription": "Forfaits Omra tout compris : vol, hôtel et transferts."
+    },
+    "trips": {
+      "title": "Voyages organisés — Janat Sahara",
+      "description": "Des voyages vers les plus belles destinations du monde.",
+      "ogDescription": "Découvrez des destinations d'exception."
+    },
+    "visa": {
+      "title": "Services de visa — Janat Sahara",
+      "description": "Services d'obtention de visa pour de nombreuses destinations.",
+      "ogDescription": "Obtenez votre visa facilement et rapidement."
+    },
+    "flights": {
+      "title": "Billets d'avion — Demandez les meilleures offres | Janat Sahara",
+      "description": "Réservez n'importe quel vol dans le monde : envoyez les détails de votre voyage, notre équipe recherche les meilleures options et vous recontacte.",
+      "ogTitle": "Billets d'avion — Demandez les meilleures offres",
+      "ogDescription": "Toute compagnie, toute destination dans le monde — envoyez votre demande et obtenez les meilleurs tarifs disponibles."
+    },
+    "contact": {
+      "title": "Contact — Janat Sahara",
+      "description": "Contactez l'équipe Janat Sahara Travel par téléphone, e-mail ou via le formulaire.",
+      "ogDescription": "Nous sommes à votre service à tout moment."
+    },
+    "about": {
+      "title": "À propos — Janat Sahara Travel",
+      "description": "Découvrez l'agence Janat Sahara Travel, notre histoire et notre vision.",
+      "ogTitle": "À propos — Janat Sahara",
+      "ogDescription": "Une agence de voyages tunisienne avec des années d'expérience dans l'Omra et le tourisme."
+    },
+    "gallery": {
+      "title": "Galerie — Janat Sahara",
+      "description": "Des instants de nos voyages et de nos offres en images.",
+      "ogDescription": "Photos de voyages d'Omra et de tourisme."
+    },
+    "faq": {
+      "title": "Questions fréquentes — Janat Sahara",
+      "description": "Réponses aux questions les plus fréquentes sur nos forfaits Omra, voyages et visas.",
+      "ogDescription": "Tout ce qu'il faut savoir avant de réserver."
+    },
+    "blog": {
+      "title": "Blog — Conseils de voyage et d'Omra | Janat Sahara",
+      "description": "Articles, actualités et conseils de voyage et d'Omra par l'équipe Janat Sahara.",
+      "ogDescription": "Conseils de voyage, guide de l'Omra et destinations touristiques.",
+      "jsonName": "Blog Janat Sahara"
+    },
+    "blogArticle": {
+      "defaultTitle": "Article — Janat Sahara",
+      "defaultDescription": "Lire un article du blog de voyage et d'Omra Janat Sahara.",
+      "titleSuffix": "Janat Sahara",
+      "defaultHeadline": "Article",
+      "authorFallback": "Janat Sahara",
+      "publisherName": "Janat Sahara Voyages"
+    },
+    "booking": {
+      "title": "Finaliser la réservation — Janat Sahara Travel",
+      "description": "Terminez la réservation de l'offre choisie : nombre de voyageurs, informations de chacun et passeports, vérification puis confirmation — sans paiement en ligne.",
+      "ogDescription": "Une réservation simple en quelques étapes une fois l'offre sélectionnée."
+    },
+    "bookingSuccess": {
+      "title": "Réservation reçue — Janat Sahara",
+      "description": "Merci pour votre réservation. Nous vous recontacterons bientôt pour confirmer les détails."
+    },
+    "legalTerms": {
+      "title": "Conditions d'utilisation — Janat Sahara",
+      "description": "Conditions d'utilisation du site Janat Sahara Travel.",
+      "ogDescription": "Les conditions générales de nos réservations."
+    },
+    "legalPrivacy": {
+      "title": "Politique de confidentialité — Janat Sahara",
+      "description": "Politique de confidentialité du site Janat Sahara Travel.",
+      "ogDescription": "Comment nous protégeons et utilisons vos données."
+    },
+    "packageDetail": {
+      "title": "Offre — Janat Sahara"
+    }
+  },
+  "about": {
+    "defaultTitle": "À propos",
+    "mission": "Notre mission",
+    "vision": "Notre vision",
+    "values": "Nos valeurs"
+  },
+  "legalTerms": {
+    "p1": "En utilisant le site Janat Sahara Travel, vous acceptez les présentes conditions. Les informations fournies lors de la réservation doivent être exactes et complètes.",
+    "p2": "Aucun paiement n'est effectué via le site. La réservation et le règlement sont confirmés directement avec notre équipe, par téléphone, par WhatsApp ou dans l'agence la plus proche.",
+    "p3": "Nous nous réservons le droit de modifier les tarifs ou les programmes selon la disponibilité de nos partenaires. Vous serez informé(e) de tout changement avant la confirmation finale de votre réservation.",
+    "updated": "Dernière mise à jour : août 2026."
+  },
+  "legalPrivacy": {
+    "p1": "Chez Janat Sahara Travel, nous nous engageons à protéger votre vie privée. Les données que vous fournissez ne servent qu'à confirmer vos réservations et à communiquer avec vous au sujet de votre voyage.",
+    "p2": "Nous ne vendons ni ne partageons vos données personnelles avec des tiers à des fins commerciales. Vous pouvez demander la suppression de vos données à tout moment en nous contactant.",
+    "p3": "Les passeports et documents de voyage sont conservés dans un espace de stockage sécurisé, accessible uniquement à l'équipe habilitée.",
+    "updated": "Dernière mise à jour : août 2026."
+  },
+  "blog": {
+    "searchPlaceholder": "Rechercher dans les articles...",
+    "searchAria": "Recherche dans les articles",
+    "clearSearchAria": "Effacer la recherche",
+    "all": "Tout",
+    "backToBlog": "Retour au blog",
+    "relatedArticles": "Articles similaires",
+    "share": "Partager",
+    "shareArticle": "Partager l'article",
+    "shareWhatsapp": "Partager sur WhatsApp",
+    "shareFacebook": "Partager sur Facebook",
+    "shareX": "Partager sur X",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien de l'article copié",
+    "copyFailed": "Impossible de copier le lien",
+    "readMore": "Lire la suite"
+  },
+  "flightRequest": {
+    "badge": "Billets d'avion",
+    "heading": "Réservez n'importe quel vol dans le monde, facilement",
+    "subheading": "Indiquez les détails de votre voyage, nous vous envoyons les meilleures options de vol disponibles rapidement.",
+    "tripTypeAria": "Type de trajet",
+    "oneWay": "Aller simple",
+    "roundTrip": "Aller-retour",
+    "fromLabel": "Aéroport de départ",
+    "fromPlaceholder": "Tunis, Sfax, Djerba…",
+    "toLabel": "Aéroport d'arrivée",
+    "toPlaceholder": "Djeddah, Dubaï, Istanbul, Paris…",
+    "departureLabel": "Date de départ",
+    "returnLabel": "Date de retour",
+    "passengersFieldLabel": "Voyageurs",
+    "passengersCount": "{{count}} voyageur(s)",
+    "adultsLabel": "Adultes",
+    "adultsHint": "12 ans et plus",
+    "childrenLabel": "Enfants",
+    "childrenHint": "De 2 à 11 ans",
+    "infantsLabel": "Bébés",
+    "infantsHint": "Moins de 2 ans",
+    "decreaseAria": "Diminuer {{label}}",
+    "increaseAria": "Augmenter {{label}}",
+    "cabinLabel": "Classe de voyage",
+    "cabin": {
+      "economy": "Classe économique",
+      "premium_economy": "Économique premium",
+      "business": "Classe affaires",
+      "first": "Première classe"
+    },
+    "nameLabel": "Nom complet",
+    "namePlaceholder": "Nom et prénom",
+    "phoneLabel": "Numéro de téléphone",
+    "emailLabel": "Adresse e-mail",
+    "notesLabel": "Notes complémentaires (facultatif)",
+    "notesPlaceholder": "Vol direct de préférence · prix le plus bas · vol du matin · date modifiable…",
+    "submitLabel": "Demander les meilleures offres",
+    "submitting": "Envoi de la demande…",
+    "disclaimer": "Aucune réservation ni paiement maintenant — notre équipe vous contactera avec les meilleures options disponibles.",
+    "errorGeneric": "Impossible d'envoyer la demande, veuillez réessayer.",
+    "errorValidation": "Merci de compléter les champs obligatoires.",
+    "successTitle": "Votre demande a bien été reçue.",
+    "successDesc": "Notre équipe recherchera les meilleures options de vol disponibles et vous contactera rapidement par téléphone ou par e-mail.",
+    "referenceLabel": "Numéro de référence",
+    "copyReferenceAria": "Copier le numéro de référence",
+    "referenceCopied": "Numéro de référence copié",
+    "whatsappCta": "WhatsApp",
+    "callCta": "Appeler l'agence",
+    "newRequestCta": "Envoyer une autre demande",
+    "waMessage": "Bonjour, demande de billets d'avion n° {{ref}}",
+    "noResults": "Aucun résultat correspondant",
+    "clearAria": "Effacer"
   }
 }
