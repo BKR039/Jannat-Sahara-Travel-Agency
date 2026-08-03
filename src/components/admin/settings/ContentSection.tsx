@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import {
   FieldGrid,
   ImageField,
   LivePreview,
-  SaveBar,
+  AutoSaveBar,
   SettingsCard,
   SettingsSection,
   TextAreaField,
@@ -130,6 +130,14 @@ export function ContentSection() {
 
   const lastSaved = useLastSaved(save.isPending, save.isSuccess);
 
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(() => {
+    if (!dirty || query.isLoading) return;
+    const t = setTimeout(() => saveRef.current.mutate(), 1500);
+    return () => clearTimeout(t);
+  }, [blocks, dirty, query.isLoading]);
+
   function patch(id: string, p: Partial<Block>) {
     setBlocks((list) => list.map((b) => (b.id === id ? { ...b, ...p } : b)));
   }
@@ -242,7 +250,7 @@ export function ContentSection() {
 
       <LivePreview path="/" reloadKey={previewKey} />
 
-      <SaveBar
+      <AutoSaveBar
         dirty={dirty}
         saving={save.isPending}
         lastSaved={lastSaved}
