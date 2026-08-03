@@ -155,7 +155,8 @@ const BranchTile = memo(function BranchTile({
       )}
     </article>
   );
-}
+});
+
 
 /* ------------------------------------------- active branch detail panel */
 
