@@ -87,10 +87,21 @@
   "footer": {
     "quickLinks": "روابط سريعة",
     "services": "خدماتنا",
+    "branches": "فروعنا",
     "contact": "تواصل معنا",
+    "workingHours": "أوقات العمل",
+    "legal": "الشروط والخصوصية",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الاستخدام",
     "newsletter": "النشرة البريدية",
-    "newsletterDesc": "اشترك ليصلك جديد العروض",
+    "newsletterDesc": "اشترك ليصلك أحدث العروض والوجهات المختارة",
     "subscribe": "اشتراك",
+    "subscribing": "جاري الاشتراك...",
+    "newsletterSuccess": "تم الاشتراك بنجاح",
+    "newsletterError": "حدث خطأ، يرجى المحاولة لاحقاً",
+    "newsletterDuplicate": "أنت مشترك بالفعل في نشرتنا البريدية",
+    "emailPlaceholder": "بريدك الإلكتروني",
+    "followUs": "تابعنا",
     "rights": "جميع الحقوق محفوظة"
   },
   "common": {

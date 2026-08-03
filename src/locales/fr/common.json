@@ -87,10 +87,21 @@
   "footer": {
     "quickLinks": "Liens rapides",
     "services": "Nos services",
+    "branches": "Nos agences",
     "contact": "Nous contacter",
+    "workingHours": "Horaires",
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
     "newsletter": "Newsletter",
-    "newsletterDesc": "Abonnez-vous pour recevoir nos offres",
+    "newsletterDesc": "Recevez nos meilleures offres et destinations sélectionnées",
     "subscribe": "S'abonner",
+    "subscribing": "Inscription...",
+    "newsletterSuccess": "Inscription réussie",
+    "newsletterError": "Une erreur est survenue, réessayez plus tard",
+    "newsletterDuplicate": "Vous êtes déjà abonné à notre newsletter",
+    "emailPlaceholder": "Votre e-mail",
+    "followUs": "Suivez-nous",
     "rights": "Tous droits réservés"
   },
   "common": {
