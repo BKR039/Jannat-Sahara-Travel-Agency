@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { servicesQuery, featuresQuery, testimonialsQuery, galleryQuery, articlesQuery } from "@/lib/queries";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { ImageLightbox } from "@/components/common/ImageLightbox";
+import { LazyImage } from "@/components/common/LazyImage";
 import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { Link } from "@tanstack/react-router";
 import { Star, ArrowLeft } from "lucide-react";
 
 
-export function ServicesSection() {
+function ServicesSectionBase() {
   const { t } = useTranslation();
   const { data } = useQuery(servicesQuery());
   if (!data?.length) return null;
@@ -27,7 +28,7 @@ export function ServicesSection() {
             <Link
               key={s.id}
               to={`/${s.slug}` as string}
-              className="group flex flex-col gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg ds-reveal"
+              className="group flex flex-col gap-4 rounded-[var(--radius-card)] border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-md">
@@ -36,7 +37,7 @@ export function ServicesSection() {
               <h3 className="text-card-title text-foreground">{s.title}</h3>
               {s.description && <p className="text-small text-muted-foreground">{s.description}</p>}
               <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
-                {t("actions.learnMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
+                {t("actions.learnMore")} <ArrowLeft className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
               </span>
             </Link>
           ))}
@@ -46,7 +47,7 @@ export function ServicesSection() {
   );
 }
 
-export function FeaturesSection() {
+function FeaturesSectionBase() {
   const { t } = useTranslation();
   const { data } = useQuery(featuresQuery());
   if (!data?.length) return null;
@@ -57,7 +58,7 @@ export function FeaturesSection() {
         {data.map((f, i) => (
           <div
             key={f.id}
-            className="group flex gap-4 rounded-lg border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:border-primary/40 hover:shadow-md ds-reveal"
+            className="group flex gap-4 rounded-[var(--radius-card)] border border-border-subtle bg-card p-6 shadow-sm transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md ds-reveal"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="shrink-0 rounded-xl bg-primary/10 p-3 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
@@ -74,7 +75,7 @@ export function FeaturesSection() {
   );
 }
 
-export function TestimonialsSection() {
+function TestimonialsSectionBase() {
   const { t } = useTranslation();
   const { data } = useQuery(testimonialsQuery());
   if (!data?.length) return null;
@@ -91,7 +92,7 @@ export function TestimonialsSection() {
           {data.map((tst, i) => (
             <figure
               key={tst.id}
-              className="flex flex-col gap-4 rounded-lg bg-on-dark/10 p-6 backdrop-blur ds-reveal"
+              className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-on-dark/10 p-6 shadow-sm backdrop-blur ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="flex gap-0.5 text-primary">
@@ -102,7 +103,12 @@ export function TestimonialsSection() {
               <blockquote className="text-small leading-relaxed opacity-95">"{tst.content}"</blockquote>
               <figcaption className="mt-auto flex items-center gap-3 border-t border-white/15 pt-4">
                 {tst.avatar && (
-                  <img src={tst.avatar} alt={tst.name} className="h-10 w-10 rounded-full object-cover" />
+                  <LazyImage
+                    src={tst.avatar}
+                    alt={tst.name}
+                    wrapperClassName="h-10 w-10 shrink-0 rounded-full"
+                    sizes="40px"
+                  />
                 )}
                 <div>
                   <div className="text-small font-bold">{tst.name}</div>
@@ -117,7 +123,7 @@ export function TestimonialsSection() {
   );
 }
 
-export function GalleryPreviewSection() {
+function GalleryPreviewSectionBase() {
   const { t } = useTranslation();
   const { data } = useQuery(galleryQuery());
   const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
@@ -132,16 +138,17 @@ export function GalleryPreviewSection() {
             type="button"
             onClick={() => setPreview({ src: g.image, alt: g.title ?? "" })}
             aria-label={g.title ?? t("home.gallery")}
-            className={`group relative overflow-hidden rounded-lg bg-muted ds-reveal ${
+            className={`group relative overflow-hidden rounded-[var(--radius-card)] bg-muted shadow-sm transition-shadow duration-base ease-standard hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ds-reveal ${
               i === 0 || i === 5 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"
             }`}
             style={{ animationDelay: `${i * 60}ms` }}
           >
-            <img
+            <LazyImage
               src={g.image}
               alt={g.title ?? ""}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              wrapperClassName="h-full w-full"
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="transition-transform duration-slow ease-emphasized group-hover:scale-110"
             />
             {g.title && (
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
@@ -153,7 +160,7 @@ export function GalleryPreviewSection() {
       </div>
       <div className="mt-8 text-center">
         <Link to="/gallery" className="inline-flex items-center gap-1 text-small font-semibold text-primary hover:underline">
-          {t("actions.viewAll")} <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+          {t("actions.viewAll")} <ArrowLeft className="h-4 w-4 shrink-0 rtl:rotate-180" />
         </Link>
       </div>
       <ImageLightbox src={preview?.src ?? null} alt={preview?.alt} onClose={() => setPreview(null)} />
@@ -161,7 +168,7 @@ export function GalleryPreviewSection() {
   );
 }
 
-export function LatestArticlesSection() {
+function LatestArticlesSectionBase() {
   const { t } = useTranslation();
   const { data } = useQuery(articlesQuery(3));
   const [openSlug, setOpenSlug] = useState<string | null>(null);
@@ -176,13 +183,17 @@ export function LatestArticlesSection() {
               key={a.id}
               type="button"
               onClick={() => setOpenSlug(a.slug)}
-              className="group flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-card text-start shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:shadow-lg ds-reveal"
+              className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-border-subtle bg-card text-start shadow-sm transition-all duration-base ease-standard hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ds-reveal"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               {a.cover && (
-                <div className="aspect-[16/10] overflow-hidden">
-                  <img src={a.cover} alt={a.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
-                </div>
+                <LazyImage
+                  src={a.cover}
+                  alt={a.title}
+                  wrapperClassName="aspect-[16/10] w-full"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="transition-transform duration-slow ease-emphasized group-hover:scale-110"
+                />
               )}
               <div className="flex flex-1 flex-col gap-3 p-5">
                 <div className="text-caption text-muted-foreground">
@@ -193,7 +204,7 @@ export function LatestArticlesSection() {
                 </h3>
                 {a.excerpt && <p className="line-clamp-3 text-small text-muted-foreground">{a.excerpt}</p>}
                 <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
-                  {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
+                  {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
                 </span>
               </div>
             </button>
@@ -206,7 +217,7 @@ export function LatestArticlesSection() {
 
 }
 
-export function CtaSection() {
+function CtaSectionBase() {
   const { t } = useTranslation();
   return (
     <section className="relative isolate overflow-hidden py-14 md:py-20">
@@ -217,7 +228,7 @@ export function CtaSection() {
         <p className="max-w-2xl text-body-lg opacity-95">{t("brand.tagline")}</p>
         <Link
           to="/contact"
-          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition-all duration-base ease-standard hover:scale-105"
+          className="rounded-full bg-surface px-8 py-3 text-small font-bold text-primary shadow-lg transition-all duration-base ease-standard hover:scale-105 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-dark"
         >
           {t("contact.title")}
         </Link>
@@ -225,3 +236,10 @@ export function CtaSection() {
     </section>
   );
 }
+
+export const ServicesSection = memo(ServicesSectionBase);
+export const FeaturesSection = memo(FeaturesSectionBase);
+export const TestimonialsSection = memo(TestimonialsSectionBase);
+export const GalleryPreviewSection = memo(GalleryPreviewSectionBase);
+export const LatestArticlesSection = memo(LatestArticlesSectionBase);
+export const CtaSection = memo(CtaSectionBase);
