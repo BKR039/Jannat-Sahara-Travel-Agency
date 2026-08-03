@@ -22,6 +22,7 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const { t } = useTranslation();
   const { data } = useQuery(contentQuery("about"));
   const extra = (data?.data as { mission?: string; vision?: string; values?: string[] } | null) ?? {};
 
@@ -59,13 +60,13 @@ function AboutPage() {
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {extra.mission && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <h3 className="mb-2 text-body-lg font-bold text-primary">مهمتنا</h3>
+              <h3 className="mb-2 text-body-lg font-bold text-primary">{t("about.mission")}</h3>
               <p className="text-small text-muted-foreground">{extra.mission}</p>
             </div>
           )}
           {extra.vision && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <h3 className="mb-2 text-body-lg font-bold text-primary">رؤيتنا</h3>
+              <h3 className="mb-2 text-body-lg font-bold text-primary">{t("about.vision")}</h3>
               <p className="text-small text-muted-foreground">{extra.vision}</p>
             </div>
           )}
@@ -73,7 +74,7 @@ function AboutPage() {
 
         {extra.values && extra.values.length > 0 && (
           <div className="mt-12">
-            <SectionHeading title="قيمنا" align="start" className="mb-6" />
+            <SectionHeading title={t("about.values")} align="start" className="mb-6" />
             <div className="flex flex-wrap gap-3">
               {extra.values.map((v) => (
                 <span key={v} className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-small font-semibold text-primary">
