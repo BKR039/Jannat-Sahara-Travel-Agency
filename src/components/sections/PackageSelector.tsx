@@ -9,7 +9,6 @@ import {
   Compass,
   Hotel,
   MapPin,
-  Plane,
   Sparkles,
   Stamp,
   Users,
