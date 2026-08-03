@@ -79,19 +79,19 @@ export function Footer() {
 
       {/* Newsletter band */}
       <div className="relative border-b border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 md:flex-row md:items-center md:justify-between md:gap-10 md:px-6">
           <div className="max-w-md">
-            <h3 className="flex items-center gap-2 text-h5 font-bold text-on-dark">
-              <Send className="h-5 w-5 text-secondary" />
+            <h3 className="flex items-center gap-2.5 text-h5 font-bold text-on-dark">
+              <Send className="h-5 w-5 shrink-0 text-secondary" />
               {t("footer.newsletter")}
             </h3>
-            <p className="mt-1 text-small leading-relaxed opacity-80">
+            <p className="mt-2 text-small leading-relaxed opacity-80">
               {t("footer.newsletterDesc")}
             </p>
           </div>
           <form
             onSubmit={onSubscribe}
-            className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
+            className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
           >
             <Input
               type="email"
@@ -99,16 +99,16 @@ export function Footer() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t("footer.emailPlaceholder")}
-              className="h-11 w-full rounded-sm border-white/15 bg-white/8 px-4 text-on-dark placeholder:text-white/50 hover:border-white/25 focus-visible:bg-white/10 sm:w-72"
+              className="h-12 w-full rounded-sm border-white/15 bg-white/8 px-4 text-on-dark placeholder:text-white/50 hover:border-white/25 focus-visible:bg-white/10 sm:w-72"
             />
             <Button
               type="submit"
               disabled={subscribing}
-              className="h-11 whitespace-nowrap rounded-sm bg-primary px-6 text-primary-foreground hover:bg-primary-hover hover:shadow-brand-glow disabled:opacity-60"
+              className="h-12 shrink-0 whitespace-nowrap rounded-sm bg-primary px-6 text-primary-foreground hover:bg-primary-hover hover:shadow-brand-glow disabled:opacity-60"
             >
               {subscribing ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
                   {t("footer.subscribing")}
                 </>
               ) : (
@@ -120,8 +120,9 @@ export function Footer() {
       </div>
 
       {/* Main footer grid */}
-      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6">
+      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-16 md:px-6 md:pt-20">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-4">
             <div className="w-fit rounded-xl bg-white/5 p-3 backdrop-blur-sm">
@@ -132,10 +133,10 @@ export function Footer() {
             </p>
             {socials.length > 0 && (
               <div className="mt-6">
-                <h4 className="mb-3 text-caption font-semibold uppercase tracking-wider opacity-70">
+                <h4 className="mb-4 text-caption font-semibold uppercase tracking-wider opacity-80">
                   {t("footer.followUs")}
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {socials.map((c) => (
                     <a
                       key={c.id}
@@ -143,9 +144,9 @@ export function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={c.label ?? c.key}
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-on-dark transition-all duration-fast ease-standard hover:bg-primary hover:text-primary-foreground hover:scale-105"
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-on-dark transition-all duration-fast ease-standard hover:scale-105 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
                     >
-                      <DynamicIcon name={c.icon} className="h-4 w-4" />
+                      <DynamicIcon name={c.icon} className="h-4 w-4 shrink-0" />
                     </a>
                   ))}
                 </div>
@@ -158,14 +159,14 @@ export function Footer() {
             <h4 className="mb-4 text-caption font-semibold uppercase tracking-wider opacity-80">
               {t("footer.quickLinks")}
             </h4>
-            <ul className="space-y-2.5 text-small">
+            <ul className="space-y-3 text-small">
               {QUICK_LINKS.map((l) => (
-                <li key={l.key}>
+                <li key={l.key} className="flex">
                   <Link
                     to={l.to}
-                    className="group inline-flex items-center gap-1.5 opacity-80 transition-all duration-fast ease-standard hover:text-secondary hover:opacity-100"
+                    className="group inline-flex items-center gap-2 leading-relaxed opacity-80 transition-all duration-fast ease-standard hover:text-secondary hover:opacity-100"
                   >
-                    <span className="h-1 w-1 rounded-full bg-secondary opacity-0 transition-opacity group-hover:opacity-100" />
+                    <span className="h-1 w-1 shrink-0 rounded-full bg-secondary opacity-0 transition-opacity group-hover:opacity-100" />
                     {t(`nav.${l.key}`)}
                   </Link>
                 </li>
@@ -178,14 +179,14 @@ export function Footer() {
             <h4 className="mb-4 text-caption font-semibold uppercase tracking-wider opacity-80">
               {t("footer.services")}
             </h4>
-            <ul className="space-y-2.5 text-small">
+            <ul className="space-y-3 text-small">
               {SERVICE_LINKS.map((l) => (
-                <li key={l.key}>
+                <li key={l.key} className="flex">
                   <Link
                     to={l.to}
-                    className="group inline-flex items-center gap-1.5 opacity-80 transition-all duration-fast ease-standard hover:text-secondary hover:opacity-100"
+                    className="group inline-flex items-center gap-2 leading-relaxed opacity-80 transition-all duration-fast ease-standard hover:text-secondary hover:opacity-100"
                   >
-                    <span className="h-1 w-1 rounded-full bg-secondary opacity-0 transition-opacity group-hover:opacity-100" />
+                    <span className="h-1 w-1 shrink-0 rounded-full bg-secondary opacity-0 transition-opacity group-hover:opacity-100" />
                     {t(`nav.${l.key}`)}
                   </Link>
                 </li>
@@ -198,15 +199,15 @@ export function Footer() {
             <h4 className="mb-4 text-caption font-semibold uppercase tracking-wider opacity-80">
               {t("footer.branches")}
             </h4>
-            <ul className="space-y-2.5 text-small">
+            <ul className="space-y-3 text-small">
               {branches && branches.length > 0 ? (
                 branches.slice(0, 5).map((b) => (
-                  <li key={b.id}>
+                  <li key={b.id} className="flex">
                     <Link
                       to="/contact"
-                      className="group inline-flex items-start gap-2 opacity-80 transition-all duration-fast ease-standard hover:text-secondary hover:opacity-100"
+                      className="group inline-flex items-start gap-2 leading-relaxed opacity-80 transition-all duration-fast ease-standard hover:text-secondary hover:opacity-100"
                     >
-                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-secondary" />
+                      <MapPin className="mt-[0.2em] h-4 w-4 shrink-0 text-secondary" />
                       <span>
                         {b.city} — {b.name}
                       </span>
@@ -229,11 +230,11 @@ export function Footer() {
                 <li key={c.id} className="flex items-start gap-2.5 opacity-90">
                   <DynamicIcon
                     name={c.icon}
-                    className="mt-0.5 h-4 w-4 shrink-0 text-secondary"
+                    className="mt-[0.2em] h-4 w-4 shrink-0 text-secondary"
                   />
                   <span
                     dir={["phone", "mobile", "email"].includes(c.key) ? "ltr" : undefined}
-                    className="break-all"
+                    className="min-w-0 break-words leading-relaxed rtl:text-start"
                   >
                     {c.value}
                   </span>
@@ -243,7 +244,7 @@ export function Footer() {
             {workingHours && (
               <div className="mt-6">
                 <h4 className="mb-2 flex items-center gap-2 text-caption font-semibold uppercase tracking-wider opacity-80">
-                  <Clock className="h-3.5 w-3.5 text-secondary" />
+                  <Clock className="h-4 w-4 shrink-0 text-secondary" />
                   {t("footer.workingHours")}
                 </h4>
                 <p className="text-small leading-relaxed opacity-80">{workingHours}</p>
@@ -251,6 +252,7 @@ export function Footer() {
             )}
           </div>
         </div>
+
       </div>
 
       {/* Bottom bar */}

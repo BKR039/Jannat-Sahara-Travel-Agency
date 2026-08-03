@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, memo, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
@@ -32,6 +32,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useInView } from "@/hooks/useInView";
+
 import { supabase } from "@/integrations/supabase/client";
 import { branchesQuery, contactInfoQuery, type Branch, type ContactInfo } from "@/lib/queries";
 
@@ -81,24 +83,27 @@ function MapSkeleton() {
 
 /* --------------------------------------------------- branch list tile */
 
-function BranchTile({
+const BranchTile = memo(function BranchTile({
   branch,
   active,
   onSelect,
-  cardRef,
+  refStore,
   index,
 }: {
   branch: Branch;
   active: boolean;
   onSelect: (id: string) => void;
-  cardRef?: (el: HTMLElement | null) => void;
+  refStore: React.MutableRefObject<Record<string, HTMLElement | null>>;
   index: number;
 }) {
   const { t } = useTranslation();
 
   return (
     <article
-      ref={cardRef}
+      ref={(el) => {
+        refStore.current[branch.id] = el;
+      }}
+
       tabIndex={0}
       role="button"
       aria-pressed={active}
@@ -152,7 +157,8 @@ function BranchTile({
       )}
     </article>
   );
-}
+});
+
 
 /* ------------------------------------------- active branch detail panel */
 
@@ -202,7 +208,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                 </p>
                 <p
                   dir={f.ltr ? "ltr" : undefined}
-                  className="mt-0.5 line-clamp-2 text-small font-semibold leading-snug text-foreground"
+                  className="mt-0.5 break-words text-small font-semibold leading-snug text-foreground"
                 >
                   {f.value}
                 </p>
@@ -354,66 +360,81 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
         </h3>
       </div>
 
-      <ul className="relative flex-1 divide-y divide-border/50">
+      <ul className="relative flex flex-1 flex-col gap-1 p-3">
         {rows.map((r, i) => (
           <li
             key={r.key}
             style={{ animationDelay: `${i * 50}ms` }}
-            className="ds-reveal group flex items-center gap-3.5 px-5 py-3.5 transition-colors duration-base ease-standard hover:bg-muted/40"
+            className="ds-reveal group flex min-h-14 items-center gap-4 rounded-lg px-2.5 py-2.5 transition-colors duration-base ease-standard hover:bg-muted/40"
           >
             <span
+              aria-hidden
               className={cn(
-                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
                 r.key === "whatsapp"
                   ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
                   : "bg-primary/10 text-primary",
               )}
             >
-              <r.icon className="h-4 w-4" />
+              <r.icon className="h-[18px] w-[18px]" strokeWidth={2} />
             </span>
+
             <div className="min-w-0 flex-1">
-              <p className="text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {r.title}
-              </p>
               {r.href ? (
                 <a
                   href={r.href}
                   target={r.external ? "_blank" : undefined}
                   rel={r.external ? "noopener noreferrer" : undefined}
                   dir={r.ltr ? "ltr" : undefined}
-                  className="mt-0.5 block truncate text-small font-bold text-foreground transition-colors duration-base hover:text-primary"
+                  aria-label={`${r.title}: ${r.value}`}
+                  className={cn(
+                    "block break-words text-small font-semibold leading-relaxed text-foreground transition-colors duration-base hover:text-primary",
+                    r.ltr && "text-start",
+                  )}
                 >
                   {r.value}
                 </a>
               ) : (
-                <p className="mt-0.5 text-small font-semibold leading-relaxed text-foreground">
+                <p
+                  dir={r.ltr ? "ltr" : undefined}
+                  className={cn(
+                    "break-words text-small font-semibold leading-relaxed text-foreground",
+                    r.ltr && "text-start",
+                  )}
+                >
                   {r.value}
                 </p>
               )}
             </div>
-            {r.href && r.actionLabel && (
-              <a
-                href={r.href}
-                target={r.external ? "_blank" : undefined}
-                rel={r.external ? "noopener noreferrer" : undefined}
-                className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/25 bg-primary/5 px-3 py-1.5 text-caption font-semibold text-primary transition-all duration-base ease-standard hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground sm:inline-flex"
-              >
-                {r.actionLabel}
-              </a>
-            )}
-            {!r.href && r.copy && (
+
+            {r.copy ? (
               <button
                 type="button"
+                aria-label={t("branches.copy")}
+                title={t("branches.copy")}
                 onClick={() => copyToClipboard(r.copy!, t("branches.copied"))}
-                className="hidden shrink-0 items-center gap-1 rounded-full border border-border/60 px-3 py-1.5 text-caption font-semibold text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary sm:inline-flex"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-0 transition-all duration-base ease-standard hover:bg-primary/10 hover:text-primary focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100 sm:opacity-60"
               >
-                <Copy className="h-3 w-3" />
-                {t("branches.copy")}
+                <Copy className="h-4 w-4" />
               </button>
+            ) : r.href && r.external ? (
+              <a
+                href={r.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={r.actionLabel ?? r.title}
+                title={r.actionLabel ?? r.title}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-60 transition-all duration-base ease-standard hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            ) : (
+              <span aria-hidden className="h-9 w-9 shrink-0" />
             )}
           </li>
         ))}
       </ul>
+
 
       {socials.length > 0 && (
         <div className="relative flex items-center justify-between gap-4 border-t border-border/50 bg-muted/30 px-5 py-3.5">
@@ -447,23 +468,25 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
 /* --------------------------------------------------------- contact form */
 
 const fieldBase =
-  "peer h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 pt-5 pb-1.5 text-input text-foreground outline-none transition-all duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]";
+  "peer h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 pt-5 pb-1.5 text-input text-foreground outline-none transition-[border-color,box-shadow,background-color] duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)] user-invalid:border-destructive user-invalid:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-destructive)_12%,transparent)]";
 const labelBase =
-  "pointer-events-none absolute start-4 top-4 text-small text-muted-foreground transition-all duration-base ease-standard peer-focus:top-1.5 peer-focus:text-caption peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-caption";
+  "pointer-events-none absolute start-4 top-4 text-small text-muted-foreground transition-all duration-base ease-standard peer-focus:top-1.5 peer-focus:text-caption peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-caption peer-user-invalid:text-destructive";
 
 function Field({
   name,
   label,
   type = "text",
   required,
+  className,
 }: {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <input
         id={`cf-${name}`}
         name={name}
@@ -479,6 +502,7 @@ function Field({
     </div>
   );
 }
+
 
 function ContactForm({
   branches,
@@ -558,7 +582,7 @@ function ContactForm({
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="relative mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+      <form onSubmit={onSubmit} className="relative mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field name="name" label={t("contact.name")} required />
         <Field name="phone" label={t("contact.phone")} required />
         <Field name="email" label={t("contact.email")} type="email" required />
@@ -567,7 +591,7 @@ function ContactForm({
         {branches.length > 0 && (
           <div className="sm:col-span-2">
             <Select value={branchId} onValueChange={setBranchId}>
-              <SelectTrigger className="h-14 w-full rounded-lg border-border/60 bg-background/60 px-4 text-input">
+              <SelectTrigger className="h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 text-input transition-[border-color,box-shadow] duration-base ease-standard hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]">
                 <SelectValue placeholder={t("branches.form.selectBranch")} />
               </SelectTrigger>
               <SelectContent className="rounded-lg">
@@ -586,9 +610,9 @@ function ContactForm({
             id="cf-message"
             name="message"
             required
-            rows={4}
+            rows={5}
             placeholder=" "
-            className="peer w-full resize-none rounded-lg border border-border/60 bg-background/60 px-4 pb-3 pt-6 text-input text-foreground outline-none transition-all duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]"
+            className="peer block w-full resize-none rounded-lg border border-border/60 bg-background/60 px-4 pb-3.5 pt-6 text-input leading-relaxed text-foreground outline-none transition-[border-color,box-shadow,background-color] duration-base ease-standard placeholder:text-transparent hover:border-primary/40 focus:border-primary focus:bg-background focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)] user-invalid:border-destructive user-invalid:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-destructive)_12%,transparent)]"
           />
           <label htmlFor="cf-message" className={labelBase}>
             {t("contact.message")}
@@ -596,16 +620,16 @@ function ContactForm({
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-stretch gap-3 sm:col-span-2 sm:flex-row sm:items-center">
           <button
             type="submit"
             disabled={loading}
-            className="group inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 disabled:pointer-events-none disabled:opacity-60"
+            className="group inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:opacity-60"
           >
             {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
             ) : (
-              <Send className="h-4 w-4 transition-transform duration-base ease-standard group-hover:-translate-y-0.5" />
+              <Send className="h-4 w-4 shrink-0 transition-transform duration-base ease-standard group-hover:-translate-y-0.5" />
             )}
             {loading ? t("common.loading") : t("contact.send")}
           </button>
@@ -614,14 +638,15 @@ function ContactForm({
               href={whatsappHref(whatsappItem.value)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 py-3.5 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
-              <MessageCircle className="h-4 w-4" />
+              <MessageCircle className="h-4 w-4 shrink-0" />
               {t("branches.form.whatsappInstead")}
             </a>
           )}
         </div>
       </form>
+
     </div>
   );
 }
@@ -639,6 +664,10 @@ export function BranchesSection() {
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
   const cardRefs = useRef<Record<string, HTMLElement | null>>({});
+  const { ref: mapRef, inView: mapInView } = useInView<HTMLDivElement>({
+    rootMargin: "250px 0px",
+  });
+
 
   useEffect(() => setMounted(true), []);
 
@@ -816,24 +845,27 @@ export function BranchesSection() {
                       index={i}
                       active={b.id === activeId}
                       onSelect={setActiveId}
-                      cardRef={(el) => {
-                        cardRefs.current[b.id] = el;
-                      }}
+                      refStore={cardRefs}
+
                     />
                   ))
                 )}
               </div>
             </div>
 
-            {/* map */}
-            <div className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[480px] xl:col-span-8">
+            {/* map — chunk + tiles load only once the panel nears the viewport */}
+            <div
+              ref={mapRef}
+              className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[480px] xl:col-span-8"
+            >
               <Suspense fallback={<MapSkeleton />}>
-                {mounted && filtered.length > 0 ? (
+                {mounted && mapInView && filtered.length > 0 ? (
                   <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
                 ) : (
                   <MapSkeleton />
                 )}
               </Suspense>
+
 
               <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/85 px-4 py-3 shadow-xl backdrop-blur-xl md:block">
                 <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">

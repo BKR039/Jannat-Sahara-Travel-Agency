@@ -22,9 +22,6 @@ const GalleryPreviewSection = lazy(() =>
 const LatestArticlesSection = lazy(() =>
   import("@/components/sections/HomeSections").then((m) => ({ default: m.LatestArticlesSection })),
 );
-const CtaSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.CtaSection })),
-);
 const BranchesSection = lazy(() =>
   import("@/components/sections/BranchesSection").then((m) => ({ default: m.BranchesSection })),
 );
@@ -69,9 +66,6 @@ function Index() {
       </LazySection>
       <LazySection minHeight="34rem">
         <BranchesSection />
-      </LazySection>
-      <LazySection minHeight="18rem">
-        <CtaSection />
       </LazySection>
     </SiteLayout>
   );
