@@ -43,13 +43,13 @@ export function SecuritySection() {
           <Skeleton className="h-20 w-full rounded-xl" />
         ) : admins.data?.length ? (
           <ul className="grid gap-3 sm:grid-cols-2">
-            {admins.data.map((a: { user_id: string; email: string | null; role: string }) => (
+            {admins.data.map((a) => (
               <li
-                key={`${a.user_id}-${a.role}`}
+                key={a.id}
                 className="flex items-center gap-3 rounded-xl border border-border-subtle bg-surface-sunken/40 px-4 py-3"
               >
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent text-primary">
-                  {a.role === "super_admin" ? (
+                  {a.roles.includes("super_admin") ? (
                     <ShieldCheck className="h-4 w-4" />
                   ) : (
                     <ShieldAlert className="h-4 w-4" />
@@ -60,12 +60,13 @@ export function SecuritySection() {
                     {a.email ?? "Unknown user"}
                   </span>
                   <span className="block text-caption capitalize text-muted-foreground">
-                    {a.role.replace("_", " ")}
+                    {a.roles.map((r) => r.replace("_", " ")).join(", ") || "no role"}
                   </span>
                 </span>
               </li>
             ))}
           </ul>
+
         ) : (
           <p className="text-small text-muted-foreground">No dashboard users yet.</p>
         )}
