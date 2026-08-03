@@ -1,0 +1,1 @@
+UPDATE public.packages SET meeting_point = NULL WHERE id = '9496f1c9-5593-4051-b670-f503b5202710';

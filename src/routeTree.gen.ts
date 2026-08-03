@@ -31,7 +31,6 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
-import { Route as AdminPackagesRouteImport } from './routes/admin.packages'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
@@ -41,6 +40,8 @@ import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
+import { Route as AdminPackagesIndexRouteImport } from './routes/admin.packages.index'
+import { Route as AdminPackagesIdRouteImport } from './routes/admin.packages.$id'
 
 const VisaRoute = VisaRouteImport.update({
   id: '/visa',
@@ -152,11 +153,6 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminPackagesRoute = AdminPackagesRouteImport.update({
-  id: '/packages',
-  path: '/packages',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -202,6 +198,16 @@ const AdminAdminsRoute = AdminAdminsRouteImport.update({
   path: '/admins',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPackagesIndexRoute = AdminPackagesIndexRouteImport.update({
+  id: '/packages/',
+  path: '/packages/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPackagesIdRoute = AdminPackagesIdRouteImport.update({
+  id: '/packages/$id',
+  path: '/packages/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -228,7 +234,6 @@ export interface FileRoutesByFullPath {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -236,6 +241,8 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/packages/$id': typeof AdminPackagesIdRoute
+  '/admin/packages/': typeof AdminPackagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -261,7 +268,6 @@ export interface FileRoutesByTo {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -269,6 +275,8 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/packages/$id': typeof AdminPackagesIdRoute
+  '/admin/packages': typeof AdminPackagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -296,7 +304,6 @@ export interface FileRoutesById {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
-  '/admin/packages': typeof AdminPackagesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -304,6 +311,8 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/packages/$id': typeof AdminPackagesIdRoute
+  '/admin/packages/': typeof AdminPackagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -332,7 +341,6 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
-    | '/admin/packages'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -340,6 +348,8 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
+    | '/admin/packages/$id'
+    | '/admin/packages/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -365,7 +375,6 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
-    | '/admin/packages'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -373,6 +382,8 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin'
+    | '/admin/packages/$id'
+    | '/admin/packages'
   id:
     | '__root__'
     | '/'
@@ -399,7 +410,6 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
-    | '/admin/packages'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -407,6 +417,8 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
+    | '/admin/packages/$id'
+    | '/admin/packages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -586,13 +598,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/packages': {
-      id: '/admin/packages'
-      path: '/packages'
-      fullPath: '/admin/packages'
-      preLoaderRoute: typeof AdminPackagesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -656,6 +661,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/packages/': {
+      id: '/admin/packages/'
+      path: '/packages'
+      fullPath: '/admin/packages/'
+      preLoaderRoute: typeof AdminPackagesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/packages/$id': {
+      id: '/admin/packages/$id'
+      path: '/packages/$id'
+      fullPath: '/admin/packages/$id'
+      preLoaderRoute: typeof AdminPackagesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -669,10 +688,11 @@ interface AdminRouteChildren {
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
-  AdminPackagesRoute: typeof AdminPackagesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminPackagesIdRoute: typeof AdminPackagesIdRoute
+  AdminPackagesIndexRoute: typeof AdminPackagesIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -685,10 +705,11 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGalleryRoute: AdminGalleryRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
-  AdminPackagesRoute: AdminPackagesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminPackagesIdRoute: AdminPackagesIdRoute,
+  AdminPackagesIndexRoute: AdminPackagesIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
