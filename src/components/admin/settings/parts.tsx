@@ -100,12 +100,15 @@ export function Field({
   hint?: string;
   error?: string | null;
   wide?: boolean;
-  children: ReactNode;
+  children: ReactNode | ((id: string) => ReactNode);
 }) {
+  const id = useId();
   return (
     <div className={cn("grid gap-2", wide && "md:col-span-2")}>
-      <Label className="text-small font-medium">{label}</Label>
-      {children}
+      <Label htmlFor={id} className="text-small font-medium">
+        {label}
+      </Label>
+      {typeof children === "function" ? children(id) : children}
       {error ? (
         <p className="text-caption text-destructive">{error}</p>
       ) : (
@@ -138,21 +141,26 @@ export function TextField({
 }) {
   return (
     <Field label={label} hint={hint} error={error} wide={wide}>
-      <Input
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      {maxCount && (
-        <p
-          className={cn(
-            "text-caption tabular-nums",
-            value.length > maxCount ? "text-destructive" : "text-muted-foreground",
+      {(id) => (
+        <>
+          <Input
+            id={id}
+            type={type}
+            value={value}
+            placeholder={placeholder}
+            onChange={(e) => onChange(e.target.value)}
+          />
+          {maxCount && (
+            <p
+              className={cn(
+                "text-caption tabular-nums",
+                value.length > maxCount ? "text-destructive" : "text-muted-foreground",
+              )}
+            >
+              {value.length} / {maxCount}
+            </p>
           )}
-        >
-          {value.length} / {maxCount}
-        </p>
+        </>
       )}
     </Field>
   );
@@ -175,12 +183,15 @@ export function TextAreaField({
 }) {
   return (
     <Field label={label} hint={hint} wide>
-      <Textarea
-        rows={rows}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      {(id) => (
+        <Textarea
+          id={id}
+          rows={rows}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
     </Field>
   );
 }
