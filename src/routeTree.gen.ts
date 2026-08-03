@@ -26,6 +26,8 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -125,6 +127,16 @@ const PackagesSlugRoute = PackagesSlugRouteImport.update({
   path: '/packages/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -220,6 +232,8 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -251,6 +265,8 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -284,6 +300,8 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -318,6 +336,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -349,6 +369,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/packages/$slug'
     | '/admin'
   id:
@@ -381,6 +403,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -401,6 +425,8 @@ export interface RootRouteChildren {
   TripsRoute: typeof TripsRoute
   UmrahRoute: typeof UmrahRoute
   VisaRoute: typeof VisaRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalTermsRoute: typeof LegalTermsRoute
   PackagesSlugRoute: typeof PackagesSlugRoute
 }
 
@@ -523,6 +549,20 @@ declare module '@tanstack/react-router' {
       path: '/packages/$slug'
       fullPath: '/packages/$slug'
       preLoaderRoute: typeof PackagesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -679,6 +719,8 @@ const rootRouteChildren: RootRouteChildren = {
   TripsRoute: TripsRoute,
   UmrahRoute: UmrahRoute,
   VisaRoute: VisaRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalTermsRoute: LegalTermsRoute,
   PackagesSlugRoute: PackagesSlugRoute,
 }
 export const routeTree = rootRouteImport
