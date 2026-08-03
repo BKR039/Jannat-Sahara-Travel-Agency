@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -16,10 +17,10 @@ import { contactInfoQuery } from "@/lib/queries";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "اتصل بنا — جنة الصحراء" },
-      { name: "description", content: "تواصل مع فريق جنة الصحراء للأسفار عبر الهاتف أو البريد أو تعبئة النموذج." },
-      { property: "og:title", content: "اتصل بنا — جنة الصحراء" },
-      { property: "og:description", content: "نحن هنا لخدمتكم على مدار الساعة." },
+      { title: i18n.t("seo.contact.title") },
+      { name: "description", content: i18n.t("seo.contact.description") },
+      { property: "og:title", content: i18n.t("seo.contact.title") },
+      { property: "og:description", content: i18n.t("seo.contact.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/contact" }],

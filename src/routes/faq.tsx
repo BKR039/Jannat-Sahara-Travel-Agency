@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -15,10 +16,10 @@ import {
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "الأسئلة الشائعة — جنة الصحراء" },
-      { name: "description", content: "إجابات على أهم الأسئلة حول باقات العمرة والرحلات والتأشيرات." },
-      { property: "og:title", content: "الأسئلة الشائعة — جنة الصحراء" },
-      { property: "og:description", content: "كل ما تحتاج معرفته قبل الحجز." },
+      { title: i18n.t("seo.faq.title") },
+      { name: "description", content: i18n.t("seo.faq.description") },
+      { property: "og:title", content: i18n.t("seo.faq.title") },
+      { property: "og:description", content: i18n.t("seo.faq.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/faq" }],

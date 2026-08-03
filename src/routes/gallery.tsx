@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,10 +15,10 @@ import { galleryQuery } from "@/lib/queries";
 export const Route = createFileRoute("/gallery")({
   head: () => ({
     meta: [
-      { title: "المعرض — جنة الصحراء" },
-      { name: "description", content: "لحظات من رحلاتنا وباقاتنا في معرض الصور." },
-      { property: "og:title", content: "المعرض — جنة الصحراء" },
-      { property: "og:description", content: "صور من رحلات العمرة والسياحة." },
+      { title: i18n.t("seo.gallery.title") },
+      { name: "description", content: i18n.t("seo.gallery.description") },
+      { property: "og:title", content: i18n.t("seo.gallery.title") },
+      { property: "og:description", content: i18n.t("seo.gallery.ogDescription") },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/gallery" }],
