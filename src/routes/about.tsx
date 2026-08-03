@@ -28,7 +28,18 @@ function AboutPage() {
     <SiteLayout>
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          {data?.image && <img src={data.image} alt="" className="h-full w-full object-cover" />}
+          {data?.image && (
+            <img
+              src={data.image}
+              alt=""
+              aria-hidden="true"
+              loading="eager"
+              decoding="sync"
+              fetchPriority="high"
+              sizes="100vw"
+              className="h-full w-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-brand-green/85 to-brand-green/95" />
         </div>
         <div className="mx-auto max-w-4xl px-4 py-24 text-center text-on-dark md:px-6">

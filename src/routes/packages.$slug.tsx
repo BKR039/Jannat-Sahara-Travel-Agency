@@ -63,7 +63,18 @@ function PackagePage() {
     <SiteLayout>
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          {pkg.cover && <img src={pkg.cover} alt="" className="h-full w-full object-cover" />}
+          {pkg.cover && (
+            <img
+              src={pkg.cover}
+              alt=""
+              aria-hidden="true"
+              loading="eager"
+              decoding="sync"
+              fetchPriority="high"
+              sizes="100vw"
+              className="h-full w-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/85" />
         </div>
         <div className="mx-auto max-w-6xl px-4 py-24 text-on-dark md:px-6">
@@ -133,7 +144,15 @@ function PackagePage() {
               <h2 className="mb-4 text-h3 font-bold">{t("package.gallery")}</h2>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {gallery.map((img, i) => (
-                  <img key={i} src={img} alt="" loading="lazy" className="aspect-square rounded-xl object-cover" />
+                  <img
+                    key={i}
+                    src={img}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="aspect-square rounded-xl object-cover shadow-sm transition-shadow duration-base ease-standard hover:shadow-md"
+                  />
                 ))}
               </div>
             </section>

@@ -24,7 +24,16 @@ export function PackagesPage({
     <SiteLayout>
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <img src={cover} alt="" aria-hidden="true" className="h-full w-full object-cover" />
+          <img
+            src={cover}
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+            sizes="100vw"
+            className="h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-oasis-night opacity-85" />
           <div className="absolute inset-0 bg-gradient-hero-scrim" />
         </div>
