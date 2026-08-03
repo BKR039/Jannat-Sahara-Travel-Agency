@@ -8,7 +8,8 @@ import { Logo } from "@/components/common/Logo";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { subscribeNewsletter } from "@/lib/public.functions";
 import { contactInfoQuery, branchesQuery } from "@/lib/queries";
 import type { SupportedLanguage } from "@/lib/i18n";
 
@@ -39,6 +40,7 @@ export function Footer() {
   const { data: branches } = useQuery(branchesQuery());
   const [email, setEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
+  const subscribe = useServerFn(subscribeNewsletter);
 
   const socials = info?.filter((c) => ["facebook", "instagram", "whatsapp", "youtube", "tiktok"].includes(c.key)) ?? [];
   const contactDetails = info?.filter((c) => ["address", "phone", "mobile", "email"].includes(c.key)) ?? [];
@@ -49,20 +51,21 @@ export function Footer() {
     e.preventDefault();
     if (!email.trim()) return;
     setSubscribing(true);
-    const { error } = await supabase.from("newsletter_subscribers").insert({
-      email: email.trim().toLowerCase(),
-      locale: i18n.language as SupportedLanguage,
-    });
-    setSubscribing(false);
-    if (error) {
-      const isDuplicate =
-        error.code === "23505" ||
-        error.message?.toLowerCase().includes("duplicate") ||
-        error.message?.toLowerCase().includes("unique");
-      toast.error(isDuplicate ? t("footer.newsletterDuplicate") : t("footer.newsletterError"));
-    } else {
-      toast.success(t("footer.newsletterSuccess"));
-      setEmail("");
+    try {
+      const res = await subscribe({
+        data: { email: email.trim(), locale: i18n.language as SupportedLanguage },
+      });
+      if (res.duplicate) {
+        toast.error(t("footer.newsletterDuplicate"));
+      } else {
+        toast.success(t("footer.newsletterSuccess"));
+        setEmail("");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("footer.newsletterError"));
+    } finally {
+      setSubscribing(false);
     }
   };
 

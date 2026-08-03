@@ -6,6 +6,11 @@ export const submitBooking = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderEmail } = await import("./booking-email.server");
+    const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail, sanitizeHeaderValue } =
+      await import("./security.server");
+
+    // Throttle abusive submissions per client (fails open on infra errors).
+    await enforceRateLimit({ scope: "booking", limit: 5, windowSeconds: 900 });
 
     const primary = data.passengers.find((p) => p.isPrimary) ?? data.passengers[0];
     const totalPeople = data.adults + data.children + data.infants;
@@ -14,15 +19,25 @@ export const submitBooking = createServerFn({ method: "POST" })
       throw new Error("Primary passenger must provide phone and email");
     }
 
+    // Passport paths are issued server-side; never trust a client-supplied path.
+    const isOwnPassportPath = (path: string | null | undefined) =>
+      !!path && /^bookings\/[0-9a-f-]{36}\/passport\.[a-z0-9]{2,8}$/i.test(path);
+
+    for (const p of data.passengers) {
+      if (p.passportPath && !isOwnPassportPath(p.passportPath)) {
+        throw new Error("Invalid passport reference");
+      }
+    }
+
     const { data: row, error } = await supabaseAdmin
       .from("bookings")
       .insert({
         package_id: data.packageId ?? null,
-        package_title: data.packageTitle ?? null,
+        package_title: sanitizeOptionalText(data.packageTitle, 200),
         package_category: data.packageCategory ?? null,
-        name: primary.fullName,
-        phone: primary.phone,
-        email: primary.email,
+        name: sanitizeText(primary.fullName, 120),
+        phone: sanitizeText(primary.phone, 32),
+        email: sanitizeEmail(primary.email),
         people: totalPeople,
         adults: data.adults,
         children: data.children,
@@ -30,8 +45,8 @@ export const submitBooking = createServerFn({ method: "POST" })
         total_price: data.totalPrice ?? null,
         currency: data.currency,
         communication_preference: data.communicationPreference ?? null,
-        emergency_contact: primary.emergencyContact ?? null,
-        notes: data.notes ?? null,
+        emergency_contact: sanitizeOptionalText(primary.emergencyContact, 160),
+        notes: sanitizeOptionalText(data.notes, 2000),
         passport_path: primary.passportPath ?? null,
         status: "new",
       })
@@ -49,17 +64,17 @@ export const submitBooking = createServerFn({ method: "POST" })
         passenger_type: p.type,
         sort_order: i,
         is_primary: p.isPrimary,
-        full_name: p.fullName,
-        passport_number: p.passportNumber || null,
-        nationality: p.nationality || null,
+        full_name: sanitizeText(p.fullName, 120),
+        passport_number: sanitizeOptionalText(p.passportNumber, 40),
+        nationality: sanitizeOptionalText(p.nationality, 80),
         gender: p.gender || null,
         date_of_birth: p.dateOfBirth || null,
         passport_expiry: p.passportExpiry || null,
-        phone: p.phone || null,
-        email: p.email || null,
-        emergency_contact: p.emergencyContact || null,
+        phone: sanitizeOptionalText(p.phone, 32),
+        email: p.email ? sanitizeEmail(p.email) : null,
+        emergency_contact: sanitizeOptionalText(p.emergencyContact, 160),
         passport_path: p.passportPath || null,
-        notes: p.notes || null,
+        notes: sanitizeOptionalText(p.notes, 1000),
       })),
     );
 
@@ -100,7 +115,13 @@ export const submitBooking = createServerFn({ method: "POST" })
             Authorization: `Bearer ${resendKey}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ from, to: [to], subject, html, text }),
+          body: JSON.stringify({
+            from,
+            to: [to],
+            subject: sanitizeHeaderValue(subject, 200),
+            html,
+            text,
+          }),
         });
         if (!res.ok) {
           const body = await res.text();

@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
+import { submitContactMessage } from "@/lib/public.functions";
 import { toast } from "sonner";
 import {
   MapPin,
@@ -492,6 +494,7 @@ function ContactForm({
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [branchId, setBranchId] = useState<string>("");
+  const sendMessage = useServerFn(submitContactMessage);
 
   useEffect(() => {
     if (defaultBranchId) setBranchId(defaultBranchId);
@@ -499,25 +502,31 @@ function ContactForm({
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const form = new FormData(formEl);
     const branchName = branches.find((b) => b.id === branchId)?.name;
     const subjectRaw = String(form.get("subject") ?? "");
     const subject = branchName ? `[${branchName}] ${subjectRaw}` : subjectRaw;
     setLoading(true);
-    const { error } = await supabase.from("contact_messages").insert({
-      name: String(form.get("name") ?? ""),
-      email: String(form.get("email") ?? ""),
-      phone: String(form.get("phone") ?? ""),
-      subject,
-      message: String(form.get("message") ?? ""),
-    });
-    setLoading(false);
-    if (error) {
+    try {
+      await sendMessage({
+        data: {
+          name: String(form.get("name") ?? ""),
+          email: String(form.get("email") ?? ""),
+          phone: String(form.get("phone") ?? ""),
+          subject,
+          message: String(form.get("message") ?? ""),
+        },
+      });
+    } catch (err) {
+      console.error(err);
       toast.error(t("contact.error"));
       return;
+    } finally {
+      setLoading(false);
     }
     setSent(true);
-    (e.target as HTMLFormElement).reset();
+    formEl.reset();
     setTimeout(() => setSent(false), 5000);
     toast.success(t("contact.success"));
   };
