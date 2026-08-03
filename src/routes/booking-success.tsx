@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Home, Phone } from "lucide-react";
 import { z } from "zod";
+import i18n from "@/lib/i18n";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
 
