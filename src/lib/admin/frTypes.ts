@@ -34,7 +34,8 @@ export type PackageRowFr = Row<"packages"> & {
   required_documents_fr: Json | null;
 };
 
-export type PackageInsertFr = Partial<PackageRowFr>;
+export type PackageInsertFr = Database["public"]["Tables"]["packages"]["Insert"] &
+  Partial<Omit<PackageRowFr, keyof Database["public"]["Tables"]["packages"]["Insert"]>>;
 
 export type ArticleRowFr = Row<"articles"> & {
   title_fr: string | null;
