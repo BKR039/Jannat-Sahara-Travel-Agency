@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { Validator } from "./useSiteSettings";
 
 export interface ContactFieldSpec {
   key: string;
@@ -12,6 +13,7 @@ export interface ContactFieldSpec {
   wide?: boolean;
   multiline?: boolean;
   sort_order: number;
+  validate?: Validator;
 }
 
 interface Row {
@@ -23,9 +25,11 @@ interface Row {
   sort_order: number | null;
 }
 
+const AUTOSAVE_DELAY = 1200;
+
 /**
- * Maps the flat contact_info key/value table onto a friendly, typed form model.
- * Storage stays exactly as before — only the editing experience changes.
+ * Maps the flat contact_info key/value table onto a friendly, typed form model
+ * with validation and debounced auto-save.
  */
 export function useContactSettings(specs: ContactFieldSpec[]) {
   const qc = useQueryClient();
@@ -41,23 +45,35 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
     },
   });
 
+  const specKeys = useMemo(() => specs.map((s) => s.key).join("|"), [specs]);
+
   const remote = useMemo(() => {
     const map: Record<string, string> = {};
     for (const s of specs) map[s.key] = "";
-    for (const r of query.data ?? []) map[r.key] = r.value ?? "";
+    for (const r of query.data ?? []) if (r.key in map) map[r.key] = r.value ?? "";
     return map;
-  }, [query.data, specs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.data, specKeys]);
 
   const [form, setForm] = useState<Record<string, string>>(remote);
   useEffect(() => setForm(remote), [remote]);
 
+  const errors = useMemo(() => {
+    const out: Record<string, string | null> = {};
+    for (const s of specs) out[s.key] = s.validate ? s.validate(form[s.key] ?? "") : null;
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, specKeys]);
+
+  const hasErrors = Object.values(errors).some(Boolean);
   const dirty = specs.some((s) => (form[s.key] ?? "") !== (remote[s.key] ?? ""));
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const save = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (values: Record<string, string>) => {
       const rows = query.data ?? [];
       for (const spec of specs) {
-        const next = (form[spec.key] ?? "").trim();
+        const next = (values[spec.key] ?? "").trim();
         if (next === (remote[spec.key] ?? "").trim()) continue;
         const existing = rows.find((r) => r.key === spec.key);
         if (existing) {
@@ -88,18 +104,36 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
       }
     },
     onSuccess: () => {
-      toast.success("Settings saved");
+      setLastSaved(new Date());
       qc.invalidateQueries({ queryKey: ["admin-contact-info"] });
       qc.invalidateQueries({ queryKey: ["contact_info"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const saveRef = useRef(save);
+  saveRef.current = save;
+
+  useEffect(() => {
+    if (!dirty || hasErrors || query.isLoading) return;
+    const t = setTimeout(() => saveRef.current.mutate(form), AUTOSAVE_DELAY);
+    return () => clearTimeout(t);
+  }, [form, dirty, hasErrors, query.isLoading]);
+
+  const set = useCallback((key: string, value: string) => {
+    setForm((f) => ({ ...f, [key]: value }));
+  }, []);
+
   return {
     loading: query.isLoading,
     form,
-    set: (key: string, value: string) => setForm((f) => ({ ...f, [key]: value })),
+    set,
+    errors,
+    hasErrors,
     dirty,
+    saving: save.isPending,
+    lastSaved,
+    saveNow: () => save.mutate(form),
     discard: () => setForm(remote),
     save,
   };

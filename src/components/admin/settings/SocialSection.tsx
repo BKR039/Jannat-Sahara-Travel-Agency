@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
-import { Field, SaveBar, SettingsCard, SettingsSection, useLastSaved } from "./parts";
+import { AutoSaveBar, Field, SettingsCard, SettingsSection } from "./parts";
 import { useContactSettings, type ContactFieldSpec } from "./useContactSettings";
+import { url as urlValidator } from "./useSiteSettings";
 
 const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
   {
@@ -13,6 +14,7 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
     icon: "facebook",
     sort_order: 6,
     placeholder: "https://facebook.com/yourpage",
+    validate: urlValidator,
   },
   {
     key: "instagram",
@@ -20,6 +22,7 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
     icon: "instagram",
     sort_order: 7,
     placeholder: "https://instagram.com/yourpage",
+    validate: urlValidator,
   },
   {
     key: "tiktok",
@@ -27,6 +30,7 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
     icon: "music",
     sort_order: 11,
     placeholder: "https://tiktok.com/@yourpage",
+    validate: urlValidator,
   },
   {
     key: "youtube",
@@ -34,6 +38,7 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
     icon: "youtube",
     sort_order: 12,
     placeholder: "https://youtube.com/@yourchannel",
+    validate: urlValidator,
   },
   {
     key: "linkedin",
@@ -41,6 +46,7 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
     icon: "linkedin",
     sort_order: 13,
     placeholder: "https://linkedin.com/company/yourpage",
+    validate: urlValidator,
   },
   {
     key: "telegram",
@@ -48,25 +54,12 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
     icon: "send",
     sort_order: 14,
     placeholder: "https://t.me/yourchannel",
-  },
-  {
-    key: "whatsapp",
-    label: "WhatsApp",
-    icon: "message-circle",
-    sort_order: 8,
-    placeholder: "https://wa.me/21655123456",
+    validate: urlValidator,
   },
 ];
 
-function isValid(url: string) {
-  if (!url) return true;
-  return /^https?:\/\/\S+$/i.test(url.trim());
-}
-
 export function SocialSection() {
   const s = useContactSettings(SOCIALS);
-  const lastSaved = useLastSaved(s.save.isPending, s.save.isSuccess);
-  const invalid = SOCIALS.some((f) => !isValid(s.form[f.key] ?? ""));
 
   if (s.loading) return <Skeleton className="h-64 w-full rounded-2xl" />;
 
@@ -84,12 +77,11 @@ export function SocialSection() {
         <div className="grid gap-5 md:grid-cols-2">
           {SOCIALS.map((f) => {
             const value = s.form[f.key] ?? "";
-            const bad = !isValid(value);
             return (
               <Field
                 key={f.key}
                 label={f.label}
-                error={bad ? "Enter a full link starting with https://" : null}
+                error={s.errors[f.key]}
                 hint={`Example: ${f.placeholder}`}
               >
                 <div className="flex gap-2">
@@ -100,8 +92,14 @@ export function SocialSection() {
                     value={value}
                     placeholder={f.placeholder}
                     onChange={(e) => s.set(f.key, e.target.value)}
-                    aria-invalid={bad}
                   />
+                  {value && !s.errors[f.key] && (
+                    <Button asChild variant="ghost" size="icon" aria-label={`Open ${f.label}`}>
+                      <a href={value} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </Field>
             );
@@ -109,34 +107,32 @@ export function SocialSection() {
         </div>
       </SettingsCard>
 
-      <SettingsCard
-        title="Preview"
-        description="How your channel buttons will look and where they point."
-      >
-        {active.length === 0 ? (
-          <p className="text-small text-muted-foreground">
-            Add at least one link to see the preview.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
+      <SettingsCard title="Live preview" description="How the footer social row will look.">
+        {active.length ? (
+          <div className="flex flex-wrap gap-3">
             {active.map((f) => (
-              <Button key={f.key} asChild variant="outline" size="sm">
-                <a href={s.form[f.key]} target="_blank" rel="noreferrer noopener">
-                  <DynamicIcon name={f.icon} className="me-2 h-4 w-4" />
-                  {f.label}
-                  <ExternalLink className="ms-2 h-3.5 w-3.5 opacity-60" />
-                </a>
-              </Button>
+              <span
+                key={f.key}
+                className="flex items-center gap-2 rounded-full border border-border-subtle bg-surface-sunken/50 px-4 py-2 text-small"
+              >
+                <DynamicIcon name={f.icon} className="h-4 w-4 text-primary" />
+                {f.label}
+              </span>
             ))}
           </div>
+        ) : (
+          <p className="text-small text-muted-foreground">
+            No channels connected yet — the social row stays hidden.
+          </p>
         )}
       </SettingsCard>
 
-      <SaveBar
-        dirty={s.dirty && !invalid}
-        saving={s.save.isPending}
-        lastSaved={lastSaved}
-        onSave={() => s.save.mutate()}
+      <AutoSaveBar
+        dirty={s.dirty}
+        saving={s.saving}
+        hasErrors={s.hasErrors}
+        lastSaved={s.lastSaved}
+        onSave={s.saveNow}
         onDiscard={s.discard}
       />
     </SettingsSection>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
-import { IconPicker, SaveBar, SettingsCard, SettingsSection, useLastSaved } from "./parts";
+import { AutoSaveBar, IconPicker, SettingsCard, SettingsSection, useLastSaved } from "./parts";
 import { cn } from "@/lib/utils";
 
 interface StatDraft {
@@ -85,6 +85,14 @@ export function StatsSection() {
   });
 
   const lastSaved = useLastSaved(save.isPending, save.isSuccess);
+
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(() => {
+    if (!dirty || query.isLoading) return;
+    const t = setTimeout(() => saveRef.current.mutate(), 1500);
+    return () => clearTimeout(t);
+  }, [items, dirty, query.isLoading]);
 
   function patch(tempId: string, p: Partial<StatDraft>) {
     setItems((list) => list.map((i) => (i.tempId === tempId ? { ...i, ...p } : i)));
@@ -218,7 +226,7 @@ export function StatsSection() {
         </p>
       </SettingsCard>
 
-      <SaveBar
+      <AutoSaveBar
         dirty={dirty}
         saving={save.isPending}
         lastSaved={lastSaved}

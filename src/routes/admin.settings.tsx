@@ -11,24 +11,42 @@ import {
   Bell,
   ShieldCheck,
   Palette,
+  MapPin,
   ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { GeneralSection } from "@/components/admin/settings/GeneralSection";
+import { BrandSection } from "@/components/admin/settings/BrandSection";
 import { ContentSection } from "@/components/admin/settings/ContentSection";
-import { SocialSection } from "@/components/admin/settings/SocialSection";
 import { StatsSection } from "@/components/admin/settings/StatsSection";
-import { SettingsCard, SettingsSection } from "@/components/admin/settings/parts";
+import { ContactSection } from "@/components/admin/settings/ContactSection";
+import { BranchesSection } from "@/components/admin/settings/BranchesSection";
+import { SocialSection } from "@/components/admin/settings/SocialSection";
+import { SeoSection } from "@/components/admin/settings/SeoSection";
+import { EmailSection } from "@/components/admin/settings/EmailSection";
+import { NotificationsSection } from "@/components/admin/settings/NotificationsSection";
+import { SecuritySection } from "@/components/admin/settings/SecuritySection";
 
-export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
+export const Route = createFileRoute("/admin/settings")({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Settings — Janat Sahara Admin" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: SettingsPage,
+});
 
 type SectionId =
   | "general"
   | "brand"
   | "homepage"
   | "statistics"
+  | "contact"
+  | "branches"
   | "social"
   | "seo"
   | "email"
@@ -44,8 +62,8 @@ const NAV: NavGroup[] = [
   {
     group: "Agency",
     items: [
-      { id: "general", label: "General", icon: Building2, hint: "Name, contact details, hours" },
-      { id: "brand", label: "Brand", icon: Palette, hint: "Logo, colours, typography" },
+      { id: "general", label: "General", icon: Building2, hint: "Name, address, opening hours" },
+      { id: "brand", label: "Brand", icon: Palette, hint: "Logo, colours, tagline" },
     ],
   },
   {
@@ -53,38 +71,56 @@ const NAV: NavGroup[] = [
     items: [
       { id: "homepage", label: "Homepage", icon: Layout, hint: "Hero, about and CTA blocks" },
       { id: "statistics", label: "Statistics", icon: BarChart3, hint: "Achievement counters" },
-      { id: "seo", label: "SEO", icon: Search, hint: "Search appearance" },
+      { id: "seo", label: "SEO", icon: Search, hint: "Search and social appearance" },
     ],
   },
   {
     group: "Communication",
     items: [
+      { id: "contact", label: "Contact", icon: Contact, hint: "Phone, email, WhatsApp" },
+      { id: "branches", label: "Branches", icon: MapPin, hint: "Offices shown on the map" },
       { id: "social", label: "Social media", icon: Share2, hint: "Channels and links" },
-      { id: "email", label: "Email", icon: Mail, hint: "Booking notifications" },
+      { id: "email", label: "Email", icon: Mail, hint: "Booking notification delivery" },
       { id: "notifications", label: "Notifications", icon: Bell, hint: "Dashboard alerts" },
     ],
   },
   {
     group: "System",
-    items: [{ id: "security", label: "Security", icon: ShieldCheck, hint: "Admins and access" }],
+    items: [
+      { id: "security", label: "Security", icon: ShieldCheck, hint: "Team access and policies" },
+    ],
   },
 ];
 
 const ALL_ITEMS = NAV.flatMap((g) => g.items);
 
+const SECTIONS: Record<SectionId, () => React.JSX.Element> = {
+  general: GeneralSection,
+  brand: BrandSection,
+  homepage: ContentSection,
+  statistics: StatsSection,
+  contact: ContactSection,
+  branches: BranchesSection,
+  social: SocialSection,
+  seo: SeoSection,
+  email: EmailSection,
+  notifications: NotificationsSection,
+  security: SecuritySection,
+};
+
 function SettingsPage() {
   const [active, setActive] = useState<SectionId>("general");
   const current = ALL_ITEMS.find((i) => i.id === active)!;
+  const Section = SECTIONS[active];
 
   return (
     <>
       <PageHeader
         title="Settings"
-        description="Manage your agency, website content and communication channels from one place."
+        description="Manage your agency, website content and communication channels. Every change auto-saves."
       />
 
       <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        {/* Category navigation */}
         <nav aria-label="Settings categories" className="lg:sticky lg:top-20 lg:self-start">
           <div className="rounded-2xl border border-border-subtle bg-card p-2 shadow-sm">
             {NAV.map((group) => (
@@ -128,31 +164,9 @@ function SettingsPage() {
           <p className="mb-4 flex items-center gap-1.5 text-caption text-muted-foreground lg:hidden">
             Settings <ChevronRight className="h-3 w-3" /> {current.label}
           </p>
-          {active === "general" && <GeneralSection />}
-          {active === "homepage" && <ContentSection />}
-          {active === "statistics" && <StatsSection />}
-          {active === "social" && <SocialSection />}
-          {(active === "brand" ||
-            active === "seo" ||
-            active === "email" ||
-            active === "notifications" ||
-            active === "security") && <ComingSoon label={current.label} hint={current.hint} />}
+          <Section />
         </div>
       </div>
     </>
-  );
-}
-
-function ComingSoon({ label, hint }: { label: string; hint: string }) {
-  return (
-    <SettingsSection title={label} description={hint}>
-      <SettingsCard>
-        <p className="text-small leading-relaxed text-muted-foreground">
-          This category is part of the new settings structure but isn’t connected to editable
-          content yet. Everything you can currently manage lives under General, Homepage, Statistics
-          and Social media.
-        </p>
-      </SettingsCard>
-    </SettingsSection>
   );
 }
