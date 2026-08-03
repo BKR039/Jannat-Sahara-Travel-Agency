@@ -111,7 +111,9 @@
     "language": "اللغة",
     "currency": "د.ت",
     "minutesRead": "{{count}} دقائق قراءة",
-    "clear": "مسح"
+    "clear": "مسح",
+    "close": "إغلاق",
+    "minutesShort": "{{count}} د"
   },
   "booking": {
     "title": "احجز باقتك",
@@ -486,7 +488,8 @@
     "shareX": "مشاركة على إكس",
     "copyLink": "نسخ الرابط",
     "linkCopied": "تم نسخ رابط المقال",
-    "copyFailed": "تعذّر نسخ الرابط"
+    "copyFailed": "تعذّر نسخ الرابط",
+    "readMore": "اقرأ المزيد"
   },
   "flightRequest": {
     "badge": "تذاكر الطيران",

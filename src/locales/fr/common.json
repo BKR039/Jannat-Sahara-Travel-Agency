@@ -111,7 +111,9 @@
     "language": "Langue",
     "currency": "TND",
     "minutesRead": "{{count}} min de lecture",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "close": "Fermer",
+    "minutesShort": "{{count}} min"
   },
   "booking": {
     "title": "Réserver votre offre",
@@ -486,7 +488,8 @@
     "shareX": "Partager sur X",
     "copyLink": "Copier le lien",
     "linkCopied": "Lien de l'article copié",
-    "copyFailed": "Impossible de copier le lien"
+    "copyFailed": "Impossible de copier le lien",
+    "readMore": "Lire la suite"
   },
   "flightRequest": {
     "badge": "Billets d'avion",
