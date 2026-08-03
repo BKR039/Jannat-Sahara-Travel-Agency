@@ -9,7 +9,6 @@ import {
   Compass,
   Hotel,
   MapPin,
-  Plane,
   Sparkles,
   Stamp,
   Users,
@@ -24,7 +23,6 @@ import { cn } from "@/lib/utils";
 const SERVICES = [
   { key: "umrah", icon: Sparkles },
   { key: "trip", icon: Compass },
-  { key: "flight", icon: Plane },
   { key: "visa", icon: Stamp },
 ] as const;
 
