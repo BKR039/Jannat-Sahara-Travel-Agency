@@ -429,6 +429,81 @@ export type Database = {
         }
         Relationships: []
       }
+      flight_requests: {
+        Row: {
+          admin_reply: string | null
+          adults: number
+          assigned_to: string | null
+          cabin_class: string
+          children: number
+          completed_at: string | null
+          created_at: string
+          departure_date: string
+          email: string
+          from_airport: string
+          id: string
+          infants: number
+          internal_notes: string | null
+          name: string
+          notes: string | null
+          phone: string
+          reference: string
+          return_date: string | null
+          status: string
+          to_airport: string
+          trip_type: string
+          updated_at: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          adults?: number
+          assigned_to?: string | null
+          cabin_class?: string
+          children?: number
+          completed_at?: string | null
+          created_at?: string
+          departure_date: string
+          email: string
+          from_airport: string
+          id?: string
+          infants?: number
+          internal_notes?: string | null
+          name: string
+          notes?: string | null
+          phone: string
+          reference: string
+          return_date?: string | null
+          status?: string
+          to_airport: string
+          trip_type?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_reply?: string | null
+          adults?: number
+          assigned_to?: string | null
+          cabin_class?: string
+          children?: number
+          completed_at?: string | null
+          created_at?: string
+          departure_date?: string
+          email?: string
+          from_airport?: string
+          id?: string
+          infants?: number
+          internal_notes?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string
+          reference?: string
+          return_date?: string | null
+          status?: string
+          to_airport?: string
+          trip_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gallery_items: {
         Row: {
           active: boolean
