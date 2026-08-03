@@ -469,3 +469,215 @@ export function LivePreview({ path = "/", reloadKey }: { path?: string; reloadKe
     </SettingsCard>
   );
 }
+
+/* ------------------------------ auto-save status ---------------------------- */
+
+export function AutoSaveBar({
+  dirty,
+  saving,
+  hasErrors,
+  lastSaved,
+  onSave,
+  onDiscard,
+}: {
+  dirty: boolean;
+  saving: boolean;
+  hasErrors?: boolean;
+  lastSaved: Date | null;
+  onSave: () => void;
+  onDiscard: () => void;
+}) {
+  return (
+    <div className="sticky bottom-0 z-20 -mx-4 mt-8 border-t border-border-subtle bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="flex items-center gap-2 text-caption text-muted-foreground">
+          {hasErrors ? (
+            <>
+              <span className="h-2 w-2 rounded-full bg-destructive" /> Fix the highlighted fields to
+              save
+            </>
+          ) : saving ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
+            </>
+          ) : dirty ? (
+            <>
+              <span className="h-2 w-2 animate-pulse rounded-full bg-warning" /> Auto-saving in a
+              moment
+            </>
+          ) : (
+            <>
+              <Check className="h-3.5 w-3.5 text-success" />
+              {lastSaved ? `Auto-saved at ${lastSaved.toLocaleTimeString()}` : "All changes saved"}
+            </>
+          )}
+        </p>
+        <div className="flex gap-2">
+          <Button variant="ghost" size="sm" disabled={!dirty || saving} onClick={onDiscard}>
+            <RotateCcw className="me-2 h-4 w-4" /> Discard
+          </Button>
+          <Button size="sm" disabled={!dirty || saving || hasErrors} onClick={onSave}>
+            {saving ? (
+              <Loader2 className="me-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Check className="me-2 h-4 w-4" />
+            )}{" "}
+            Save now
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------- toggle field ------------------------------ */
+
+export function SwitchField({
+  label,
+  hint,
+  checked,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  hint?: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-sunken/40 px-4 py-3.5 transition-colors hover:bg-accent/40">
+      <span className="min-w-0">
+        <span className="block text-small font-medium text-foreground">{label}</span>
+        {hint && (
+          <span className="mt-0.5 block text-caption leading-relaxed text-muted-foreground">
+            {hint}
+          </span>
+        )}
+      </span>
+      <Switch checked={checked} onCheckedChange={onChange} disabled={disabled} />
+    </label>
+  );
+}
+
+/* --------------------------------- colour field ----------------------------- */
+
+export function ColorField({
+  label,
+  hint,
+  error,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  error?: string | null;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const safe = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) ? value : "#000000";
+  return (
+    <Field label={label} hint={hint} error={error}>
+      <div className="flex items-center gap-2">
+        <span
+          className="h-10 w-10 shrink-0 rounded-lg border border-border-subtle"
+          style={{ backgroundColor: safe }}
+          aria-hidden
+        />
+        <Input
+          type="color"
+          value={safe}
+          onChange={(e) => onChange(e.target.value.toUpperCase())}
+          className="h-10 w-14 cursor-pointer p-1"
+          aria-label={`${label} colour picker`}
+        />
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="#EE5A24"
+          className="font-mono uppercase"
+        />
+      </div>
+    </Field>
+  );
+}
+
+/* ------------------------------- search preview ----------------------------- */
+
+export function SerpPreview({
+  title,
+  description,
+  urlLabel,
+}: {
+  title: string;
+  description: string;
+  urlLabel: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border-subtle bg-surface-sunken/40 p-5">
+      <p className="mb-3 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
+        Google result preview
+      </p>
+      <div className="rounded-lg bg-card p-4 shadow-sm">
+        <p className="truncate text-caption text-success">{urlLabel}</p>
+        <p className="mt-1 line-clamp-1 text-body font-medium text-primary">
+          {title || "Your page title"}
+        </p>
+        <p className="mt-1 line-clamp-2 text-small leading-relaxed text-muted-foreground">
+          {description || "Your meta description appears here in search results."}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------- brand preview ----------------------------- */
+
+export function BrandPreview({
+  logo,
+  name,
+  tagline,
+  primary,
+  accent,
+}: {
+  logo: string;
+  name: string;
+  tagline: string;
+  primary: string;
+  accent: string;
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border-subtle">
+      <div
+        className="flex items-center gap-4 px-5 py-6"
+        style={{ background: `linear-gradient(120deg, ${primary} 0%, ${accent} 100%)` }}
+      >
+        <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/95">
+          {logo ? (
+            <img src={logo} alt="" className="h-full w-full object-contain p-1" />
+          ) : (
+            <span className="text-caption text-neutral-500">Logo</span>
+          )}
+        </span>
+        <span className="min-w-0 text-white">
+          <span className="block truncate text-h5 font-bold">{name || "Agency name"}</span>
+          <span className="block truncate text-small opacity-90">{tagline || "Your tagline"}</span>
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-2 bg-card px-5 py-4">
+        <span
+          className="rounded-lg px-4 py-2 text-small font-semibold text-white"
+          style={{ backgroundColor: primary }}
+        >
+          Primary button
+        </span>
+        <span
+          className="rounded-lg px-4 py-2 text-small font-semibold text-white"
+          style={{ backgroundColor: accent }}
+        >
+          Accent button
+        </span>
+      </div>
+    </div>
+  );
+}
