@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import i18n from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { articleBySlugQuery, articlesQuery } from "@/lib/queries";
@@ -54,6 +55,7 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function ArticlePage() {
+  const { t } = useTranslation();
   const { slug } = Route.useParams();
   const { data: article, isLoading } = useQuery(articleBySlugQuery(slug));
   const { data: all } = useQuery(articlesQuery());
