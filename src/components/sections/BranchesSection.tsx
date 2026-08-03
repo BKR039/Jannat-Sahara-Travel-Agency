@@ -81,24 +81,27 @@ function MapSkeleton() {
 
 /* --------------------------------------------------- branch list tile */
 
-function BranchTile({
+const BranchTile = memo(function BranchTile({
   branch,
   active,
   onSelect,
-  cardRef,
+  refStore,
   index,
 }: {
   branch: Branch;
   active: boolean;
   onSelect: (id: string) => void;
-  cardRef?: (el: HTMLElement | null) => void;
+  refStore: React.MutableRefObject<Record<string, HTMLElement | null>>;
   index: number;
 }) {
   const { t } = useTranslation();
 
   return (
     <article
-      ref={cardRef}
+      ref={(el) => {
+        refStore.current[branch.id] = el;
+      }}
+
       tabIndex={0}
       role="button"
       aria-pressed={active}
