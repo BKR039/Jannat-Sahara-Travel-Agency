@@ -287,13 +287,13 @@ export function PassportUpload({
     }
     setUploading(true);
     try {
-      const ext = file.name.includes(".") ? file.name.split(".").pop() : "bin";
-      const safeExt = ext?.replace(/[^a-z0-9]/gi, "").slice(0, 8) || "bin";
-      const path = `bookings/${randomId()}/passport.${safeExt}`;
-      const { error } = await supabase.storage
-        .from("passports")
-        .upload(path, file, { contentType: file.type, upsert: false });
-      if (error) throw error;
+      const { fileToBase64 } = await import("@/lib/upload");
+      const { path } = await upload({
+        data: {
+          contentType: file.type as "image/jpeg",
+          dataBase64: await fileToBase64(file),
+        },
+      });
       onChange({ passportPath: path, passportName: file.name });
     } catch (err) {
       console.error(err);
