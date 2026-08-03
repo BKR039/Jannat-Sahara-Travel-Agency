@@ -193,22 +193,25 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
   return (
     <div
       key={branch.id}
-      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-4 md:px-6"
+      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-3 md:px-6"
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
+        <div className="flex flex-1 flex-wrap items-center gap-x-5 gap-y-2">
           {facts.map((f) => (
-            <div key={f.key} className="flex items-start gap-2.5">
-              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div key={f.key} className="flex min-w-0 items-center gap-2.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <f.icon className="h-3.5 w-3.5" />
               </span>
               <div className="min-w-0">
-                <p className="text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <p className="whitespace-nowrap text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   {f.label}
                 </p>
                 <p
                   dir={f.ltr ? "ltr" : undefined}
-                  className="mt-0.5 break-words text-small font-semibold leading-snug text-foreground"
+                  className={cn(
+                    "mt-0.5 whitespace-nowrap text-small font-semibold leading-snug text-foreground",
+                    f.ltr && "text-start",
+                  )}
                 >
                   {f.value}
                 </p>
@@ -217,24 +220,26 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           {branch.phone && (
             <>
               <a
                 href={whatsappHref(branch.phone)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-small font-bold text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35"
+                title={t("branches.whatsapp")}
+                aria-label={t("branches.whatsapp")}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
-                <MessageCircle className="h-4 w-4" />
-                {t("branches.whatsapp")}
+                <MessageCircle className="h-[18px] w-[18px]" strokeWidth={2} />
               </a>
               <a
                 href={`tel:${branch.phone.replace(/\s+/g, "")}`}
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+                title={t("branches.call")}
+                aria-label={t("branches.call")}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
-                <Phone className="h-4 w-4" />
-                {t("branches.call")}
+                <Phone className="h-[18px] w-[18px]" strokeWidth={2} />
               </a>
             </>
           )}
@@ -242,19 +247,20 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
             href={mapsHref(branch)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 text-small font-semibold text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+            title={t("branches.directions")}
+            aria-label={t("branches.directions")}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
-            <Navigation className="h-4 w-4" />
-            {t("branches.directions")}
-            <ExternalLink className="h-3 w-3 opacity-60" />
+            <Navigation className="h-[18px] w-[18px]" strokeWidth={2} />
           </a>
           <button
             type="button"
+            title={t("branches.copyAddress")}
+            aria-label={t("branches.copyAddress")}
             onClick={() => copyToClipboard(`${branch.name} — ${branch.address}`, t("branches.addressCopied"))}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 text-small font-semibold text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
-            <Copy className="h-4 w-4" />
-            {t("branches.copyAddress")}
+            <Copy className="h-[18px] w-[18px]" strokeWidth={2} />
           </button>
         </div>
       </div>
