@@ -1,23 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PackagesPage } from "@/components/sections/PackagesPage";
+import { SiteLayout } from "@/components/layout/SiteLayout";
+import { FlightRequestSection } from "@/components/flights/FlightRequestSection";
 
 export const Route = createFileRoute("/flights")({
   head: () => ({
     meta: [
-      { title: "تذاكر الطيران — جنة الصحراء" },
-      { name: "description", content: "أفضل الأسعار لتذاكر الطيران الدولية والمحلية." },
-      { property: "og:title", content: "تذاكر الطيران — جنة الصحراء" },
-      { property: "og:description", content: "احجز تذاكر طيران بأسعار تنافسية." },
+      { title: "تذاكر الطيران — اطلب أفضل العروض | جنة الصحراء" },
+      {
+        name: "description",
+        content:
+          "احجز أي رحلة في العالم: أرسل تفاصيل رحلتك وسيبحث فريق جنة الصحراء عن أفضل خيارات الطيران المتوفرة ويتواصل معك.",
+      },
+      { property: "og:title", content: "تذاكر الطيران — اطلب أفضل العروض" },
+      {
+        property: "og:description",
+        content: "أي شركة طيران وأي وجهة في العالم — أرسل طلبك واحصل على أفضل الأسعار المتوفرة.",
+      },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "/flights" }],
   }),
   component: () => (
-    <PackagesPage
-      category="flight"
-      title="تذاكر الطيران"
-      description="أفضل الأسعار لجميع الوجهات"
-      cover="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&q=80"
-    />
+    <SiteLayout>
+      <FlightRequestSection />
+    </SiteLayout>
   ),
 });

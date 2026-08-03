@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Package as PackageIcon,
+  PlaneTakeoff,
+
   Calendar,
   MapPin,
   Image as ImageIcon,
@@ -45,7 +47,9 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { to: "/admin/bookings", label: "Bookings", icon: Calendar },
+      { to: "/admin/flight-requests", label: "Flight Requests", icon: PlaneTakeoff },
       { to: "/admin/customers", label: "Customers", icon: Users },
+
       { to: "/admin/messages", label: "Messages", icon: MessageSquare },
     ],
   },
