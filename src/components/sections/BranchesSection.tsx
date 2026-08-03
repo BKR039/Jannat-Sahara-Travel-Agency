@@ -354,66 +354,81 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
         </h3>
       </div>
 
-      <ul className="relative flex-1 divide-y divide-border/50">
+      <ul className="relative flex flex-1 flex-col gap-1 p-3">
         {rows.map((r, i) => (
           <li
             key={r.key}
             style={{ animationDelay: `${i * 50}ms` }}
-            className="ds-reveal group flex items-center gap-3.5 px-5 py-3.5 transition-colors duration-base ease-standard hover:bg-muted/40"
+            className="ds-reveal group flex min-h-14 items-center gap-4 rounded-lg px-2.5 py-2.5 transition-colors duration-base ease-standard hover:bg-muted/40"
           >
             <span
+              aria-hidden
               className={cn(
-                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
                 r.key === "whatsapp"
                   ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
                   : "bg-primary/10 text-primary",
               )}
             >
-              <r.icon className="h-4 w-4" />
+              <r.icon className="h-[18px] w-[18px]" strokeWidth={2} />
             </span>
+
             <div className="min-w-0 flex-1">
-              <p className="text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {r.title}
-              </p>
               {r.href ? (
                 <a
                   href={r.href}
                   target={r.external ? "_blank" : undefined}
                   rel={r.external ? "noopener noreferrer" : undefined}
                   dir={r.ltr ? "ltr" : undefined}
-                  className="mt-0.5 block truncate text-small font-bold text-foreground transition-colors duration-base hover:text-primary"
+                  aria-label={`${r.title}: ${r.value}`}
+                  className={cn(
+                    "block break-words text-small font-semibold leading-relaxed text-foreground transition-colors duration-base hover:text-primary",
+                    r.ltr && "text-start",
+                  )}
                 >
                   {r.value}
                 </a>
               ) : (
-                <p className="mt-0.5 text-small font-semibold leading-relaxed text-foreground">
+                <p
+                  dir={r.ltr ? "ltr" : undefined}
+                  className={cn(
+                    "break-words text-small font-semibold leading-relaxed text-foreground",
+                    r.ltr && "text-start",
+                  )}
+                >
                   {r.value}
                 </p>
               )}
             </div>
-            {r.href && r.actionLabel && (
-              <a
-                href={r.href}
-                target={r.external ? "_blank" : undefined}
-                rel={r.external ? "noopener noreferrer" : undefined}
-                className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/25 bg-primary/5 px-3 py-1.5 text-caption font-semibold text-primary transition-all duration-base ease-standard hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground sm:inline-flex"
-              >
-                {r.actionLabel}
-              </a>
-            )}
-            {!r.href && r.copy && (
+
+            {r.copy ? (
               <button
                 type="button"
+                aria-label={t("branches.copy")}
+                title={t("branches.copy")}
                 onClick={() => copyToClipboard(r.copy!, t("branches.copied"))}
-                className="hidden shrink-0 items-center gap-1 rounded-full border border-border/60 px-3 py-1.5 text-caption font-semibold text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary sm:inline-flex"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-0 transition-all duration-base ease-standard hover:bg-primary/10 hover:text-primary focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100 sm:opacity-60"
               >
-                <Copy className="h-3 w-3" />
-                {t("branches.copy")}
+                <Copy className="h-4 w-4" />
               </button>
+            ) : r.href && r.external ? (
+              <a
+                href={r.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={r.actionLabel ?? r.title}
+                title={r.actionLabel ?? r.title}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-60 transition-all duration-base ease-standard hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            ) : (
+              <span aria-hidden className="h-9 w-9 shrink-0" />
             )}
           </li>
         ))}
       </ul>
+
 
       {socials.length > 0 && (
         <div className="relative flex items-center justify-between gap-4 border-t border-border/50 bg-muted/30 px-5 py-3.5">
