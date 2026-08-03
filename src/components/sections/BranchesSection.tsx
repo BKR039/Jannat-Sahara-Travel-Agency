@@ -32,6 +32,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useInView } from "@/hooks/useInView";
+
 import { supabase } from "@/integrations/supabase/client";
 import { branchesQuery, contactInfoQuery, type Branch, type ContactInfo } from "@/lib/queries";
 
