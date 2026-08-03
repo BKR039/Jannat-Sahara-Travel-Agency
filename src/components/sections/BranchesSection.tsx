@@ -208,7 +208,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                 </p>
                 <p
                   dir={f.ltr ? "ltr" : undefined}
-                  className="mt-0.5 line-clamp-2 text-small font-semibold leading-snug text-foreground"
+                  className="mt-0.5 break-words text-small font-semibold leading-snug text-foreground"
                 >
                   {f.value}
                 </p>
