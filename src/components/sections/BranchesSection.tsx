@@ -662,6 +662,10 @@ export function BranchesSection() {
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
   const cardRefs = useRef<Record<string, HTMLElement | null>>({});
+  const { ref: mapRef, inView: mapInView } = useInView<HTMLDivElement>({
+    rootMargin: "250px 0px",
+  });
+
 
   useEffect(() => setMounted(true), []);
 
