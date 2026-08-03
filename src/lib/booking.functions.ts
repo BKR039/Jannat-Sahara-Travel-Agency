@@ -6,6 +6,11 @@ export const submitBooking = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderEmail } = await import("./booking-email.server");
+    const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail, sanitizeHeaderValue } =
+      await import("./security.server");
+
+    // Throttle abusive submissions per client (fails open on infra errors).
+    await enforceRateLimit({ scope: "booking", limit: 5, windowSeconds: 900 });
 
     const primary = data.passengers.find((p) => p.isPrimary) ?? data.passengers[0];
     const totalPeople = data.adults + data.children + data.infants;
@@ -14,15 +19,25 @@ export const submitBooking = createServerFn({ method: "POST" })
       throw new Error("Primary passenger must provide phone and email");
     }
 
+    // Passport paths are issued server-side; never trust a client-supplied path.
+    const isOwnPassportPath = (path: string | null | undefined) =>
+      !!path && /^bookings\/[0-9a-f-]{36}\/passport\.[a-z0-9]{2,8}$/i.test(path);
+
+    for (const p of data.passengers) {
+      if (p.passportPath && !isOwnPassportPath(p.passportPath)) {
+        throw new Error("Invalid passport reference");
+      }
+    }
+
     const { data: row, error } = await supabaseAdmin
       .from("bookings")
       .insert({
         package_id: data.packageId ?? null,
-        package_title: data.packageTitle ?? null,
+        package_title: sanitizeOptionalText(data.packageTitle, 200),
         package_category: data.packageCategory ?? null,
-        name: primary.fullName,
-        phone: primary.phone,
-        email: primary.email,
+        name: sanitizeText(primary.fullName, 120),
+        phone: sanitizeText(primary.phone, 32),
+        email: sanitizeEmail(primary.email),
         people: totalPeople,
         adults: data.adults,
         children: data.children,
@@ -30,8 +45,8 @@ export const submitBooking = createServerFn({ method: "POST" })
         total_price: data.totalPrice ?? null,
         currency: data.currency,
         communication_preference: data.communicationPreference ?? null,
-        emergency_contact: primary.emergencyContact ?? null,
-        notes: data.notes ?? null,
+        emergency_contact: sanitizeOptionalText(primary.emergencyContact, 160),
+        notes: sanitizeOptionalText(data.notes, 2000),
         passport_path: primary.passportPath ?? null,
         status: "new",
       })
