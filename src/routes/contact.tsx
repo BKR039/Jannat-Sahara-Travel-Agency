@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { submitContactMessage } from "@/lib/public.functions";
 import { contactInfoQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/contact")({
@@ -30,25 +31,30 @@ function ContactPage() {
   const { t } = useTranslation();
   const { data: info } = useQuery(contactInfoQuery());
   const [loading, setLoading] = useState(false);
+  const sendMessage = useServerFn(submitContactMessage);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const form = new FormData(e.currentTarget);
-    const payload = {
-      name: String(form.get("name") ?? ""),
-      email: String(form.get("email") ?? ""),
-      phone: String(form.get("phone") ?? ""),
-      subject: String(form.get("subject") ?? ""),
-      message: String(form.get("message") ?? ""),
-    };
-    const { error } = await supabase.from("contact_messages").insert(payload);
-    setLoading(false);
-    if (error) {
-      toast.error(t("contact.error"));
-    } else {
+    const formEl = e.currentTarget;
+    const form = new FormData(formEl);
+    try {
+      await sendMessage({
+        data: {
+          name: String(form.get("name") ?? ""),
+          email: String(form.get("email") ?? ""),
+          phone: String(form.get("phone") ?? ""),
+          subject: String(form.get("subject") ?? ""),
+          message: String(form.get("message") ?? ""),
+        },
+      });
       toast.success(t("contact.success"));
-      (e.target as HTMLFormElement).reset();
+      formEl.reset();
+    } catch (err) {
+      console.error(err);
+      toast.error(t("contact.error"));
+    } finally {
+      setLoading(false);
     }
   };
 

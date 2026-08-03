@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
+import { submitContactMessage } from "@/lib/public.functions";
 import { toast } from "sonner";
 import {
   MapPin,
@@ -492,6 +494,7 @@ function ContactForm({
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [branchId, setBranchId] = useState<string>("");
+  const sendMessage = useServerFn(submitContactMessage);
 
   useEffect(() => {
     if (defaultBranchId) setBranchId(defaultBranchId);
