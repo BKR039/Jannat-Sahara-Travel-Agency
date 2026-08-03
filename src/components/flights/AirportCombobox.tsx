@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plane, Search, X } from "lucide-react";
-import { searchAirports, formatAirport, type Airport } from "@/lib/airports";
+import { useTranslation } from "react-i18next";
+import {
+  searchAirports,
+  formatAirport,
+  airportCity,
+  airportCountry,
+  type Airport,
+} from "@/lib/airports";
 import { cn } from "@/lib/utils";
 
 /**
@@ -22,6 +29,8 @@ export function AirportCombobox({
   onChange: (value: string) => void;
   invalid?: boolean;
 }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -46,7 +55,7 @@ export function AirportCombobox({
   }, [active, open]);
 
   function select(a: Airport) {
-    onChange(formatAirport(a));
+    onChange(formatAirport(a, lang));
     setQuery("");
     setOpen(false);
   }
@@ -105,7 +114,7 @@ export function AirportCombobox({
         {value && !open && (
           <button
             type="button"
-            aria-label="مسح"
+            aria-label={t("flightRequest.clearAria")}
             onClick={() => onChange("")}
             className="absolute inset-y-0 end-3 flex items-center text-muted-foreground transition hover:text-foreground"
           >
@@ -127,7 +136,7 @@ export function AirportCombobox({
           >
             {results.length === 0 && (
               <li className="px-3 py-6 text-center text-small text-muted-foreground">
-                لا توجد نتائج مطابقة
+                {t("flightRequest.noResults")}
               </li>
             )}
             {results.map((a, i) => (
@@ -150,9 +159,11 @@ export function AirportCombobox({
                 </span>
                 <span className="min-w-0">
                   <span className="block truncate text-small font-semibold text-foreground">
-                    {a.city} · {a.country}
+                    {airportCity(a, lang)} · {airportCountry(a, lang)}
                   </span>
-                  <span className="block truncate text-caption text-muted-foreground">{a.name}</span>
+                  <span className="block truncate text-caption text-muted-foreground" dir="auto">
+                    {lang.startsWith("ar") ? a.name : `${a.cityEn} · ${a.code}`}
+                  </span>
                 </span>
               </li>
             ))}

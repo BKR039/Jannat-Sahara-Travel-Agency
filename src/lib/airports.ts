@@ -98,8 +98,54 @@ export function searchAirports(query: string, limit = 40): Airport[] {
   return scored.slice(0, limit).map((s) => s.a);
 }
 
-export function formatAirport(a: Airport): string {
-  return `${a.city} (${a.code}) — ${a.country}`;
+const COUNTRY_FR: Record<string, string> = {
+  "تونس": "Tunisie",
+  "الجزائر": "Algérie",
+  "ليبيا": "Libye",
+  "المغرب": "Maroc",
+  "السعودية": "Arabie saoudite",
+  "الإمارات": "Émirats arabes unis",
+  "قطر": "Qatar",
+  "الكويت": "Koweït",
+  "البحرين": "Bahreïn",
+  "عمان": "Oman",
+  "الأردن": "Jordanie",
+  "لبنان": "Liban",
+  "مصر": "Égypte",
+  "السودان": "Soudan",
+  "موريتانيا": "Mauritanie",
+  "السنغال": "Sénégal",
+  "تركيا": "Turquie",
+  "فرنسا": "France",
+  "إسبانيا": "Espagne",
+  "إيطاليا": "Italie",
+  "ألمانيا": "Allemagne",
+  "بلجيكا": "Belgique",
+  "هولندا": "Pays-Bas",
+  "سويسرا": "Suisse",
+  "النمسا": "Autriche",
+  "بريطانيا": "Royaume-Uni",
+  "أمريكا": "États-Unis",
+  "كندا": "Canada",
+  "الهند": "Inde",
+  "تايلاند": "Thaïlande",
+  "ماليزيا": "Malaisie",
+  "سنغافورة": "Singapour",
+};
+
+/** Latin-script city name, used when the interface language is not Arabic. */
+export function airportCity(a: Airport, lang?: string): string {
+  return lang && !lang.startsWith("ar") ? a.cityEn : a.city;
+}
+
+/** Localised country name. */
+export function airportCountry(a: Airport, lang?: string): string {
+  if (lang && !lang.startsWith("ar")) return COUNTRY_FR[a.country] ?? a.country;
+  return a.country;
+}
+
+export function formatAirport(a: Airport, lang?: string): string {
+  return `${airportCity(a, lang)} (${a.code}) — ${airportCountry(a, lang)}`;
 }
 
 export function findAirport(value: string): Airport | undefined {
