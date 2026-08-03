@@ -1,17 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { lazy } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { PackageSelector } from "@/components/sections/PackageSelector";
 import { StatsSection } from "@/components/sections/StatsSection";
-import {
-  ServicesSection,
-  FeaturesSection,
-  TestimonialsSection,
-  GalleryPreviewSection,
-  LatestArticlesSection,
-  CtaSection,
-} from "@/components/sections/HomeSections";
-import { BranchesSection } from "@/components/sections/BranchesSection";
+import { LazySection } from "@/components/common/LazySection";
+
+/* Below-the-fold sections are code-split and mounted on intersection. */
+const ServicesSection = lazy(() =>
+  import("@/components/sections/HomeSections").then((m) => ({ default: m.ServicesSection })),
+);
+const FeaturesSection = lazy(() =>
+  import("@/components/sections/HomeSections").then((m) => ({ default: m.FeaturesSection })),
+);
+const TestimonialsSection = lazy(() =>
+  import("@/components/sections/HomeSections").then((m) => ({ default: m.TestimonialsSection })),
+);
+const GalleryPreviewSection = lazy(() =>
+  import("@/components/sections/HomeSections").then((m) => ({ default: m.GalleryPreviewSection })),
+);
+const LatestArticlesSection = lazy(() =>
+  import("@/components/sections/HomeSections").then((m) => ({ default: m.LatestArticlesSection })),
+);
+const CtaSection = lazy(() =>
+  import("@/components/sections/HomeSections").then((m) => ({ default: m.CtaSection })),
+);
+const BranchesSection = lazy(() =>
+  import("@/components/sections/BranchesSection").then((m) => ({ default: m.BranchesSection })),
+);
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,13 +52,27 @@ function Index() {
       <HeroSection />
       <PackageSelector />
       <StatsSection />
-      <ServicesSection />
-      <FeaturesSection />
-      <TestimonialsSection />
-      <GalleryPreviewSection />
-      <LatestArticlesSection />
-      <BranchesSection />
-      <CtaSection />
+      <LazySection minHeight="28rem">
+        <ServicesSection />
+      </LazySection>
+      <LazySection minHeight="26rem">
+        <FeaturesSection />
+      </LazySection>
+      <LazySection minHeight="30rem">
+        <TestimonialsSection />
+      </LazySection>
+      <LazySection minHeight="32rem">
+        <GalleryPreviewSection />
+      </LazySection>
+      <LazySection minHeight="30rem">
+        <LatestArticlesSection />
+      </LazySection>
+      <LazySection minHeight="34rem">
+        <BranchesSection />
+      </LazySection>
+      <LazySection minHeight="18rem">
+        <CtaSection />
+      </LazySection>
     </SiteLayout>
   );
 }
