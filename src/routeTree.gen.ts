@@ -34,6 +34,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
+import { Route as AdminFlightRequestsRouteImport } from './routes/admin.flight-requests'
 import { Route as AdminFaqRouteImport } from './routes/admin.faq'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
@@ -168,6 +169,11 @@ const AdminGalleryRoute = AdminGalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFlightRequestsRoute = AdminFlightRequestsRouteImport.update({
+  id: '/flight-requests',
+  path: '/flight-requests',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFaqRoute = AdminFaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faq': typeof AdminFaqRoute
+  '/admin/flight-requests': typeof AdminFlightRequestsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faq': typeof AdminFaqRoute
+  '/admin/flight-requests': typeof AdminFlightRequestsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faq': typeof AdminFaqRoute
+  '/admin/flight-requests': typeof AdminFlightRequestsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
     | '/admin/branches'
     | '/admin/customers'
     | '/admin/faq'
+    | '/admin/flight-requests'
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/admin/branches'
     | '/admin/customers'
     | '/admin/faq'
+    | '/admin/flight-requests'
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/admin/branches'
     | '/admin/customers'
     | '/admin/faq'
+    | '/admin/flight-requests'
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
@@ -619,6 +631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGalleryRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/flight-requests': {
+      id: '/admin/flight-requests'
+      path: '/flight-requests'
+      fullPath: '/admin/flight-requests'
+      preLoaderRoute: typeof AdminFlightRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/faq': {
       id: '/admin/faq'
       path: '/faq'
@@ -685,6 +704,7 @@ interface AdminRouteChildren {
   AdminBranchesRoute: typeof AdminBranchesRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
   AdminFaqRoute: typeof AdminFaqRoute
+  AdminFlightRequestsRoute: typeof AdminFlightRequestsRoute
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
@@ -702,6 +722,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBranchesRoute: AdminBranchesRoute,
   AdminCustomersRoute: AdminCustomersRoute,
   AdminFaqRoute: AdminFaqRoute,
+  AdminFlightRequestsRoute: AdminFlightRequestsRoute,
   AdminGalleryRoute: AdminGalleryRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
