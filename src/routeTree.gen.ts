@@ -43,6 +43,7 @@ import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AdminPackagesIndexRouteImport } from './routes/admin.packages.index'
 import { Route as AdminPackagesIdRouteImport } from './routes/admin.packages.$id'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const VisaRoute = VisaRouteImport.update({
   id: '/visa',
@@ -214,6 +215,11 @@ const AdminPackagesIdRoute = AdminPackagesIdRouteImport.update({
   path: '/packages/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/packages/$id': typeof AdminPackagesIdRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
 }
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/packages/$id': typeof AdminPackagesIdRoute
   '/admin/packages': typeof AdminPackagesIndexRoute
 }
@@ -320,6 +328,7 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/packages/$id': typeof AdminPackagesIdRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
 }
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
+    | '/.lovable/oauth/consent'
     | '/admin/packages/$id'
     | '/admin/packages/'
   fileRoutesByTo: FileRoutesByTo
@@ -393,6 +403,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin'
+    | '/.lovable/oauth/consent'
     | '/admin/packages/$id'
     | '/admin/packages'
   id:
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/packages/$slug'
     | '/admin/'
+    | '/.lovable/oauth/consent'
     | '/admin/packages/$id'
     | '/admin/packages/'
   fileRoutesById: FileRoutesById
@@ -452,6 +464,7 @@ export interface RootRouteChildren {
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
   PackagesSlugRoute: typeof PackagesSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -694,6 +707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPackagesIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -764,6 +784,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
   PackagesSlugRoute: PackagesSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
