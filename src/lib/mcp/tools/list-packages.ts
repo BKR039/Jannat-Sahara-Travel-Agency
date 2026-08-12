@@ -21,7 +21,9 @@ export default defineTool({
     const supabase = supabaseForUser(ctx);
     let query = supabase
       .from("packages")
-      .select("id, slug, title, category, destination, duration_days, price, old_price, status, featured, seats_left")
+      .select(
+        "id, slug, title, category, destination, city, country, duration, price, discount_price, currency, seats, status, featured, departure_date, return_date",
+      )
       .order("sort_order", { ascending: true })
       .limit(limit);
     if (category) query = query.eq("category", category);
