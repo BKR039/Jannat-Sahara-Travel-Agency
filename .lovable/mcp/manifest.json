@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ujyceoiavskwckmqclgv.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "sahara-travel-foundation",
+      "version": "0.1.0",
+      "title": "Sahara Travel Foundation"
+    },
+    "tools": [
+      {
+        "name": "list_packages",
+        "title": "List travel packages",
+        "description": "List travel packages (Umrah, trips, flights, visa) with title, slug, destination, duration, price and status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "category": {
+              "description": "Filter by service category.",
+              "type": "string",
+              "enum": [
+                "umrah",
+                "trip",
+                "flight",
+                "visa"
+              ]
+            },
+            "status": {
+              "description": "Filter by publication status.",
+              "type": "string",
+              "enum": [
+                "published",
+                "draft"
+              ]
+            },
+            "search": {
+              "description": "Case-insensitive match on the package title.",
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "default": 20,
+              "description": "Maximum number of packages to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_bookings",
+        "title": "List bookings",
+        "description": "List customer bookings with contact details, package, traveller counts, total price and status. Requires an admin or staff account.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter by booking status.",
+              "type": "string",
+              "enum": [
+                "new",
+                "pending",
+                "confirmed",
+                "cancelled"
+              ]
+            },
+            "search": {
+              "description": "Case-insensitive match on the customer name.",
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "default": 20,
+              "description": "Maximum number of bookings to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_booking_status",
+        "title": "Update booking status",
+        "description": "Change the status of a booking. Requires an admin or staff account.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "booking_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "The booking id."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "new",
+                "pending",
+                "confirmed",
+                "cancelled"
+              ],
+              "description": "The new booking status."
+            }
+          },
+          "required": [
+            "booking_id",
+            "status"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_flight_requests",
+        "title": "List flight requests",
+        "description": "List customer flight quote requests with route, dates, passengers, cabin class and status. Requires an admin or staff account.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter by request status (e.g. new, in_progress, completed).",
+              "type": "string",
+              "minLength": 1
+            },
+            "reference": {
+              "description": "Look up a single request by its reference number.",
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "default": 20,
+              "description": "Maximum number of requests to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_contact_messages",
+        "title": "List contact messages",
+        "description": "List messages sent through the website contact form, including whether they have been handled. Requires an admin or staff account.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "handled": {
+              "description": "Filter by handled state.",
+              "type": "boolean"
+            },
+            "limit": {
+              "default": 20,
+              "description": "Maximum number of messages to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
