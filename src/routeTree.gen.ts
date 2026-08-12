@@ -13,6 +13,7 @@ import { Route as VisaRouteImport } from './routes/visa'
 import { Route as UmrahRouteImport } from './routes/umrah'
 import { Route as TripsRouteImport } from './routes/trips'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -41,8 +42,11 @@ import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AdminPackagesIndexRouteImport } from './routes/admin.packages.index'
 import { Route as AdminPackagesIdRouteImport } from './routes/admin.packages.$id'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const VisaRoute = VisaRouteImport.update({
@@ -63,6 +67,11 @@ const TripsRoute = TripsRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -205,6 +214,18 @@ const AdminAdminsRoute = AdminAdminsRouteImport.update({
   path: '/admins',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminPackagesIndexRoute = AdminPackagesIndexRouteImport.update({
   id: '/packages/',
   path: '/packages/',
@@ -215,6 +236,12 @@ const AdminPackagesIdRoute = AdminPackagesIdRouteImport.update({
   path: '/packages/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -233,10 +260,13 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -255,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/packages/$id': typeof AdminPackagesIdRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
 }
@@ -269,10 +300,13 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -291,6 +325,7 @@ export interface FileRoutesByTo {
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/packages/$id': typeof AdminPackagesIdRoute
   '/admin/packages': typeof AdminPackagesIndexRoute
 }
@@ -307,10 +342,13 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
   '/visa': typeof VisaRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -329,6 +367,7 @@ export interface FileRoutesById {
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/packages/$id': typeof AdminPackagesIdRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
 }
@@ -346,10 +385,13 @@ export interface FileRouteTypes {
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/mcp'
     | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/admins'
     | '/admin/blog'
     | '/admin/bookings'
@@ -368,6 +410,7 @@ export interface FileRouteTypes {
     | '/packages/$slug'
     | '/admin/'
     | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/packages/$id'
     | '/admin/packages/'
   fileRoutesByTo: FileRoutesByTo
@@ -382,10 +425,13 @@ export interface FileRouteTypes {
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/mcp'
     | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/admins'
     | '/admin/blog'
     | '/admin/bookings'
@@ -404,6 +450,7 @@ export interface FileRouteTypes {
     | '/packages/$slug'
     | '/admin'
     | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/packages/$id'
     | '/admin/packages'
   id:
@@ -419,10 +466,13 @@ export interface FileRouteTypes {
     | '/faq'
     | '/flights'
     | '/gallery'
+    | '/mcp'
     | '/reset-password'
     | '/trips'
     | '/umrah'
     | '/visa'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/admins'
     | '/admin/blog'
     | '/admin/bookings'
@@ -441,6 +491,7 @@ export interface FileRouteTypes {
     | '/packages/$slug'
     | '/admin/'
     | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/packages/$id'
     | '/admin/packages/'
   fileRoutesById: FileRoutesById
@@ -457,14 +508,18 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   FlightsRoute: typeof FlightsRoute
   GalleryRoute: typeof GalleryRoute
+  McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TripsRoute: typeof TripsRoute
   UmrahRoute: typeof UmrahRoute
   VisaRoute: typeof VisaRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
   PackagesSlugRoute: typeof PackagesSlugRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -495,6 +550,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -693,6 +755,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/packages/': {
       id: '/admin/packages/'
       path: '/packages'
@@ -706,6 +782,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/packages/$id'
       preLoaderRoute: typeof AdminPackagesIdRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
@@ -777,14 +860,19 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   FlightsRoute: FlightsRoute,
   GalleryRoute: GalleryRoute,
+  McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TripsRoute: TripsRoute,
   UmrahRoute: UmrahRoute,
   VisaRoute: VisaRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
   PackagesSlugRoute: PackagesSlugRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
