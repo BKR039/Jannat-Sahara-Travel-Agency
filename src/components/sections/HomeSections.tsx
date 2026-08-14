@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useLocalized } from "@/lib/localize";
 import { servicesQuery, featuresQuery, testimonialsQuery, galleryQuery, articlesQuery } from "@/lib/queries";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
@@ -13,6 +14,7 @@ import { Star, ArrowLeft } from "lucide-react";
 
 function ServicesSectionBase() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data } = useQuery(servicesQuery());
   if (!data?.length) return null;
   return (
@@ -34,8 +36,10 @@ function ServicesSectionBase() {
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-md">
                 <DynamicIcon name={s.icon} className="h-7 w-7" />
               </div>
-              <h3 className="text-card-title text-foreground">{s.title}</h3>
-              {s.description && <p className="text-small text-muted-foreground">{s.description}</p>}
+              <h3 className="text-card-title text-foreground">{L(s, "title", "base")}</h3>
+              {L(s, "description", "empty") && (
+                <p className="text-small text-muted-foreground">{L(s, "description", "empty")}</p>
+              )}
               <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
                 {t("actions.learnMore")} <ArrowLeft className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
               </span>
@@ -77,6 +81,7 @@ function FeaturesSectionBase() {
 
 function TestimonialsSectionBase() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data } = useQuery(testimonialsQuery());
   if (!data?.length) return null;
   return (
@@ -100,7 +105,7 @@ function TestimonialsSectionBase() {
                   <Star key={k} className="h-4 w-4 fill-current" />
                 ))}
               </div>
-              <blockquote className="text-small leading-relaxed opacity-95">"{tst.content}"</blockquote>
+              <blockquote className="text-small leading-relaxed opacity-95">"{L(tst, "content", "base")}"</blockquote>
               <figcaption className="mt-auto flex items-center gap-3 border-t border-white/15 pt-4">
                 {tst.avatar && (
                   <LazyImage
@@ -112,7 +117,9 @@ function TestimonialsSectionBase() {
                 )}
                 <div>
                   <div className="text-small font-bold">{tst.name}</div>
-                  {tst.role && <div className="text-caption opacity-75">{tst.role}</div>}
+                  {L(tst, "role", "empty") && (
+                    <div className="text-caption opacity-75">{L(tst, "role", "empty")}</div>
+                  )}
                 </div>
               </figcaption>
             </figure>
@@ -125,6 +132,7 @@ function TestimonialsSectionBase() {
 
 function GalleryPreviewSectionBase() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data } = useQuery(galleryQuery());
   const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
   if (!data?.length) return null;
@@ -136,8 +144,8 @@ function GalleryPreviewSectionBase() {
           <button
             key={g.id}
             type="button"
-            onClick={() => setPreview({ src: g.image, alt: g.title ?? "" })}
-            aria-label={g.title ?? t("home.gallery")}
+            onClick={() => setPreview({ src: g.image, alt: L(g, "title", "base") })}
+            aria-label={L(g, "title", "base") || t("home.gallery")}
             className={`group relative overflow-hidden rounded-[var(--radius-card)] bg-muted shadow-sm transition-shadow duration-base ease-standard hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ds-reveal ${
               i === 0 || i === 5 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"
             }`}
@@ -145,14 +153,14 @@ function GalleryPreviewSectionBase() {
           >
             <LazyImage
               src={g.image}
-              alt={g.title ?? ""}
+              alt={L(g, "title", "base")}
               wrapperClassName="h-full w-full"
               sizes="(max-width: 768px) 50vw, 25vw"
               className="transition-transform duration-slow ease-emphasized group-hover:scale-110"
             />
-            {g.title && (
+            {L(g, "title", "base") && (
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
-                <span className="text-small font-semibold text-on-dark">{g.title}</span>
+                <span className="text-small font-semibold text-on-dark">{L(g, "title", "base")}</span>
               </div>
             )}
           </button>
@@ -170,6 +178,7 @@ function GalleryPreviewSectionBase() {
 
 function LatestArticlesSectionBase() {
   const { t } = useTranslation();
+  const { L, date } = useLocalized();
   const { data } = useQuery(articlesQuery(3));
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   if (!data?.length) return null;
@@ -189,7 +198,7 @@ function LatestArticlesSectionBase() {
               {a.cover && (
                 <LazyImage
                   src={a.cover}
-                  alt={a.title}
+                  alt={L(a, "title", "base")}
                   wrapperClassName="aspect-[16/10] w-full"
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="transition-transform duration-slow ease-emphasized group-hover:scale-110"
@@ -197,12 +206,14 @@ function LatestArticlesSectionBase() {
               )}
               <div className="flex flex-1 flex-col gap-3 p-5">
                 <div className="text-caption text-muted-foreground">
-                  {a.published_at && new Date(a.published_at).toLocaleDateString("ar-EG")}
+                  {date(a.published_at)}
                 </div>
                 <h3 className="line-clamp-2 text-card-title text-foreground group-hover:text-primary">
-                  {a.title}
+                  {L(a, "title", "base")}
                 </h3>
-                {a.excerpt && <p className="line-clamp-3 text-small text-muted-foreground">{a.excerpt}</p>}
+                {L(a, "excerpt", "empty") && (
+                  <p className="line-clamp-3 text-small text-muted-foreground">{L(a, "excerpt", "empty")}</p>
+                )}
                 <span className="mt-auto inline-flex items-center gap-1 text-caption font-semibold text-primary">
                   {t("actions.readMore")} <ArrowLeft className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
                 </span>
