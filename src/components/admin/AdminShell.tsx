@@ -1,19 +1,17 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Package as PackageIcon,
-  PlaneTakeoff,
-
+  Inbox,
   Calendar,
   MapPin,
   Image as ImageIcon,
   Newspaper,
-  MessageSquare,
   Star,
   HelpCircle,
   Users,
-  Mail,
+  BarChart3,
   Settings,
   ShieldCheck,
   Bell,
@@ -34,6 +32,7 @@ interface NavItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   superOnly?: boolean;
+  badge?: "requests" | "notifications";
 }
 
 interface NavGroup {
@@ -41,22 +40,25 @@ interface NavGroup {
   items: NavItem[];
 }
 
+/**
+ * Navigation follows the daily workflow of the agency:
+ * what needs an answer today, then the catalogue, then the website, then setup.
+ */
 const NAV_GROUPS: NavGroup[] = [
   {
-    group: "Operations",
+    group: "Today",
     items: [
-      { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin", label: "Command center", icon: LayoutDashboard },
+      { to: "/admin/requests", label: "Requests", icon: Inbox, badge: "requests" },
       { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-      { to: "/admin/flight-requests", label: "Flight Requests", icon: PlaneTakeoff },
-      { to: "/admin/customers", label: "Customers", icon: Users },
-
-      { to: "/admin/messages", label: "Messages", icon: MessageSquare },
     ],
   },
   {
-    group: "Catalogue",
+    group: "Business",
     items: [
-      { to: "/admin/packages", label: "Packages", icon: PackageIcon },
+      { to: "/admin/packages", label: "Trips", icon: PackageIcon },
+      { to: "/admin/customers", label: "Customers", icon: Users },
+      { to: "/admin/reports", label: "Reports", icon: BarChart3 },
       { to: "/admin/branches", label: "Branches", icon: MapPin },
     ],
   },
@@ -70,11 +72,11 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: "System",
+    group: "Setup",
     items: [
-      { to: "/admin/notifications", label: "Notifications", icon: Bell },
+      { to: "/admin/notifications", label: "Notifications", icon: Bell, badge: "notifications" },
       { to: "/admin/settings", label: "Settings", icon: Settings },
-      { to: "/admin/admins", label: "Admins", icon: ShieldCheck, superOnly: true },
+      { to: "/admin/admins", label: "Team", icon: ShieldCheck, superOnly: true },
     ],
   },
 ];
@@ -94,18 +96,48 @@ function useUnreadCount() {
   });
 }
 
+function useOpenRequestCount() {
+  return useQuery({
+    queryKey: ["admin-open-requests"] as const,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const [flights, bookings, messages] = await Promise.all([
+        supabase.from("flight_requests").select("id", { count: "exact", head: true }).eq("status", "new"),
+        supabase.from("bookings").select("id", { count: "exact", head: true }).eq("status", "new"),
+        supabase.from("contact_messages").select("id", { count: "exact", head: true }).eq("handled", false),
+      ]);
+      return (flights.count ?? 0) + (bookings.count ?? 0) + (messages.count ?? 0);
+    },
+  });
+}
+
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 export function AdminShell({ children }: { children: ReactNode }) {
   const { user, isSuperAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const queryClient = useQueryClient();
   const unread = useUnreadCount();
+  const openRequests = useOpenRequestCount();
 
-  const groups = NAV_GROUPS.map((g) => ({
-    ...g,
-    items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
-  })).filter((g) => g.items.length > 0);
+  const groups = useMemo(
+    () =>
+      NAV_GROUPS.map((g) => ({
+        ...g,
+        items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
+      })).filter((g) => g.items.length > 0),
+    [isSuperAdmin],
+  );
+
+  const firstName = (user.email ?? "").split("@")[0] ?? "";
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -114,22 +146,34 @@ export function AdminShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
+  function badgeValue(kind: NavItem["badge"]): number {
+    if (kind === "requests") return openRequests.data ?? 0;
+    if (kind === "notifications") return unread.data ?? 0;
+    return 0;
+  }
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    navigate({ to: "/admin/customers", search: { q } as never });
+  }
+
   return (
-    <div dir="ltr" className="min-h-screen bg-muted/30">
-      {/* Mobile drawer */}
+    <div dir="ltr" className="min-h-screen bg-surface-sunken/60">
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-background/60 backdrop-blur lg:hidden"
+          className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border bg-card transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border-subtle bg-card transition-transform lg:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+        <div className="flex items-center justify-between border-b border-border-subtle px-6 py-5">
           <Link to="/admin" onClick={() => setMobileOpen(false)}>
             <Logo />
           </Link>
@@ -138,14 +182,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
             size="icon"
             className="lg:hidden"
             onClick={() => setMobileOpen(false)}
+            aria-label="Close navigation"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
+
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           {groups.map((group) => (
-            <div key={group.group} className="mb-3 last:mb-0 space-y-0.5">
-              <p className="px-3 pb-1 pt-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
+            <div key={group.group} className="mb-4 space-y-0.5 last:mb-0">
+              <p className="px-3 pb-1 pt-1 text-caption font-semibold uppercase tracking-wider text-muted-foreground">
                 {group.group}
               </p>
               {group.items.map((item) => {
@@ -154,13 +200,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
                     ? location.pathname === "/admin" || location.pathname === "/admin/"
                     : location.pathname.startsWith(item.to);
                 const Icon = item.icon;
+                const count = badgeValue(item.badge);
                 return (
                   <Link
                     key={item.to}
                     to={item.to}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-small font-medium transition-colors",
+                      "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-small font-medium transition-colors",
                       active
                         ? "bg-primary/10 text-primary"
                         : "text-foreground/70 hover:bg-accent hover:text-foreground",
@@ -168,9 +215,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   >
                     <Icon className="h-4 w-4" />
                     <span className="flex-1">{item.label}</span>
-                    {item.to === "/admin/notifications" && (unread.data ?? 0) > 0 && (
+                    {count > 0 && (
                       <span className="inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
-                        {unread.data}
+                        {count}
                       </span>
                     )}
                   </Link>
@@ -180,16 +227,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <div className="border-t border-border p-3">
+        <div className="border-t border-border-subtle p-3">
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-small text-muted-foreground hover:bg-accent"
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-small text-muted-foreground hover:bg-accent"
           >
             <ExternalLink className="h-4 w-4" /> View public site
           </a>
-          <div className="mt-2 rounded-lg border border-border bg-muted/30 p-3">
+          <div className="mt-2 rounded-xl border border-border-subtle bg-surface-sunken/60 p-3">
             <p className="text-caption text-muted-foreground">Signed in as</p>
             <p className="truncate text-small font-medium">{user.email}</p>
             <Button variant="outline" size="sm" className="mt-2 w-full" onClick={signOut}>
@@ -200,24 +247,46 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border-subtle bg-background/85 px-4 backdrop-blur sm:px-6">
           <Button
             variant="ghost"
             size="icon"
             className="lg:hidden"
             onClick={() => setMobileOpen(true)}
+            aria-label="Open navigation"
           >
             <Menu className="h-4 w-4" />
           </Button>
-          <div className="flex-1" />
+          <div className="hidden min-w-0 sm:block">
+            <p className="truncate text-small font-semibold capitalize">
+              {greeting()}, {firstName}
+            </p>
+            <p className="truncate text-caption text-muted-foreground">
+              {new Date().toLocaleDateString("en-GB", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
+            </p>
+          </div>
+          <form onSubmit={submitSearch} className="ms-auto w-full max-w-xs">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search customers, phone, email…"
+              aria-label="Search customers"
+              className="h-10 w-full rounded-xl border border-border bg-background px-3 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+            />
+          </form>
           <Link
             to="/admin/notifications"
-            className="relative rounded-md p-2 hover:bg-accent"
+            className="relative rounded-xl p-2 hover:bg-accent"
             aria-label="Notifications"
           >
             <Bell className="h-4 w-4" />
             {(unread.data ?? 0) > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
                 {unread.data}
               </span>
             )}

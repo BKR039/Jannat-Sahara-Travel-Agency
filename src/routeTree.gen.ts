@@ -32,6 +32,8 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
@@ -164,6 +166,16 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -277,6 +289,8 @@ export interface FileRoutesByFullPath {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -317,6 +331,8 @@ export interface FileRoutesByTo {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -359,6 +375,8 @@ export interface FileRoutesById {
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -402,6 +420,8 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
+    | '/admin/reports'
+    | '/admin/requests'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -442,6 +462,8 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
+    | '/admin/reports'
+    | '/admin/requests'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -483,6 +505,8 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/messages'
     | '/admin/notifications'
+    | '/admin/reports'
+    | '/admin/requests'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -685,6 +709,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -811,6 +849,8 @@ interface AdminRouteChildren {
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -829,6 +869,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGalleryRoute: AdminGalleryRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminIndexRoute: AdminIndexRoute,

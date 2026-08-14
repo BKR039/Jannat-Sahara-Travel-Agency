@@ -194,7 +194,9 @@ export type Database = {
           package_category: string | null
           package_id: string | null
           package_title: string | null
+          paid_amount: number | null
           passport_path: string | null
+          payment_status: string
           people: number
           phone: string
           status: string
@@ -216,7 +218,9 @@ export type Database = {
           package_category?: string | null
           package_id?: string | null
           package_title?: string | null
+          paid_amount?: number | null
           passport_path?: string | null
+          payment_status?: string
           people?: number
           phone: string
           status?: string
@@ -238,7 +242,9 @@ export type Database = {
           package_category?: string | null
           package_id?: string | null
           package_title?: string | null
+          paid_amount?: number | null
           passport_path?: string | null
+          payment_status?: string
           people?: number
           phone?: string
           status?: string
@@ -366,9 +372,11 @@ export type Database = {
           email: string
           handled: boolean
           id: string
+          last_contact_at: string | null
           message: string
           name: string
           phone: string | null
+          status: string
           subject: string | null
         }
         Insert: {
@@ -376,9 +384,11 @@ export type Database = {
           email: string
           handled?: boolean
           id?: string
+          last_contact_at?: string | null
           message: string
           name: string
           phone?: string | null
+          status?: string
           subject?: string | null
         }
         Update: {
@@ -386,10 +396,42 @@ export type Database = {
           email?: string
           handled?: boolean
           id?: string
+          last_contact_at?: string | null
           message?: string
           name?: string
           phone?: string | null
+          status?: string
           subject?: string | null
+        }
+        Relationships: []
+      }
+      customer_notes: {
+        Row: {
+          author_email: string | null
+          author_id: string | null
+          created_at: string
+          customer_key: string
+          id: string
+          note: string
+          updated_at: string
+        }
+        Insert: {
+          author_email?: string | null
+          author_id?: string | null
+          created_at?: string
+          customer_key: string
+          id?: string
+          note: string
+          updated_at?: string
+        }
+        Update: {
+          author_email?: string | null
+          author_id?: string | null
+          created_at?: string
+          customer_key?: string
+          id?: string
+          note?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -489,6 +531,7 @@ export type Database = {
           id: string
           infants: number
           internal_notes: string | null
+          last_contact_at: string | null
           name: string
           notes: string | null
           phone: string
@@ -513,6 +556,7 @@ export type Database = {
           id?: string
           infants?: number
           internal_notes?: string | null
+          last_contact_at?: string | null
           name: string
           notes?: string | null
           phone: string
@@ -537,6 +581,7 @@ export type Database = {
           id?: string
           infants?: number
           internal_notes?: string | null
+          last_contact_at?: string | null
           name?: string
           notes?: string | null
           phone?: string
@@ -647,6 +692,7 @@ export type Database = {
       }
       packages: {
         Row: {
+          accommodation: Json | null
           airline: string | null
           airline_fr: string | null
           brochure_pdf: string | null
@@ -707,6 +753,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          accommodation?: Json | null
           airline?: string | null
           airline_fr?: string | null
           brochure_pdf?: string | null
@@ -767,6 +814,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          accommodation?: Json | null
           airline?: string | null
           airline_fr?: string | null
           brochure_pdf?: string | null
