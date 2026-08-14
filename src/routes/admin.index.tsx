@@ -1,179 +1,311 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
 import {
-  Calendar,
-  Package as PackageIcon,
-  Plane,
-  ScrollText,
-  MapPin,
-  Star,
-  Newspaper,
-  Image as ImageIcon,
+  Wallet,
+  CalendarCheck,
   Users,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  Mail,
+  Plane,
+  Inbox,
+  MessageSquare,
+  ArrowRight,
+  Plus,
 } from "lucide-react";
-import { PageHeader, StatCard, AdminCard, EmptyState } from "@/components/admin/ui";
-import { getDashboardStats } from "@/lib/admin/admin.functions";
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
 } from "recharts";
-import { Link } from "@tanstack/react-router";
+import { getCommandCenter } from "@/lib/admin/command.functions";
+import {
+  Page,
+  Panel,
+  KpiCard,
+  InsightCard,
+  StatusBadge,
+  Occupancy,
+  EmptyState,
+  SkeletonKpis,
+  SkeletonRows,
+  Avatar,
+  money,
+  shortDate,
+  relativeDate,
+} from "@/components/admin/kit";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/")({
-  component: DashboardPage,
+  component: CommandCenterPage,
 });
 
-const CHART_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"];
-
-function DashboardPage() {
-  const fetchStats = useServerFn(getDashboardStats);
-  const stats = useQuery({
-    queryKey: ["admin-dashboard-stats"] as const,
-    queryFn: () => fetchStats(),
+function CommandCenterPage() {
+  const fetchData = useServerFn(getCommandCenter);
+  const q = useQuery({
+    queryKey: ["admin-command-center"] as const,
+    queryFn: () => fetchData(),
     staleTime: 60_000,
   });
 
-  const recent = useQuery({
-    queryKey: ["admin-dashboard-recent-bookings"] as const,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("id, name, phone, package_title, package_category, status, created_at")
-        .order("created_at", { ascending: false })
-        .limit(6);
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const c = stats.data?.counts;
+  const data = q.data;
+  const currency = data?.kpis.currency ?? "TND";
 
   return (
-    <>
-      <PageHeader title="Dashboard" description="Overview of your Janat Sahara Travel business." />
+    <Page
+      title="Command center"
+      description="Everything that needs your attention today, in one place."
+      actions={
+        <>
+          <Button asChild variant="outline">
+            <Link to="/admin/requests">
+              <Inbox className="me-2 h-4 w-4" /> Open requests
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/admin/packages">
+              <Plus className="me-2 h-4 w-4" /> New trip
+            </Link>
+          </Button>
+        </>
+      }
+    >
+      {/* KPIs */}
+      {q.isLoading || !data ? (
+        <SkeletonKpis />
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <KpiCard
+            label="Revenue this month"
+            value={money(data.kpis.revenue.value, currency)}
+            delta={data.kpis.revenue.delta}
+            series={data.kpis.revenue.series}
+            icon={Wallet}
+            tone="primary"
+            hint="Active bookings created this month"
+          />
+          <KpiCard
+            label="Bookings this month"
+            value={data.kpis.bookings.value}
+            delta={data.kpis.bookings.delta}
+            series={data.kpis.bookings.series}
+            icon={CalendarCheck}
+            tone="green"
+          />
+          <KpiCard
+            label="Travellers"
+            value={data.kpis.travellers.value}
+            delta={data.kpis.travellers.delta}
+            icon={Users}
+            tone="gold"
+            hint="Adults, children and infants"
+          />
+          <KpiCard
+            label="Upcoming departures"
+            value={data.kpis.upcomingTrips.value}
+            icon={Plane}
+            tone="muted"
+            hint="Trips with a future departure date"
+          />
+        </div>
+      )}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total packages" value={c?.packages ?? "—"} icon={PackageIcon} tone="primary" />
-        <StatCard label="Umrah programs" value={c?.packagesUmrah ?? "—"} icon={ScrollText} tone="green" />
-        <StatCard label="Trip packages" value={c?.packagesTrip ?? "—"} icon={MapPin} tone="gold" />
-        <StatCard label="Flight & visa" value={(c ? c.packagesFlight + c.packagesVisa : "—") as string | number} icon={Plane} tone="muted" />
-
-        <StatCard label="Total bookings" value={c?.bookings ?? "—"} icon={Calendar} tone="primary" />
-        <StatCard label="New" value={c?.bookingsNew ?? "—"} icon={Clock} tone="gold" hint="Awaiting review" />
-        <StatCard label="Confirmed" value={c?.bookingsConfirmed ?? "—"} icon={CheckCircle2} tone="green" />
-        <StatCard label="Cancelled" value={c?.bookingsCancelled ?? "—"} icon={XCircle} tone="muted" />
-
-        <StatCard label="Branches" value={c?.branches ?? "—"} icon={MapPin} tone="green" />
-        <StatCard label="Testimonials" value={c?.testimonials ?? "—"} icon={Star} tone="gold" />
-        <StatCard label="Blog posts" value={c?.articles ?? "—"} icon={Newspaper} tone="primary" />
-        <StatCard label="Gallery items" value={c?.galleryItems ?? "—"} icon={ImageIcon} tone="muted" />
+      {/* Insights */}
+      <div className="mt-6">
+        <h2 className="mb-3 text-small font-semibold text-foreground">Smart insights</h2>
+        {q.isLoading || !data ? (
+          <SkeletonRows rows={2} />
+        ) : data.insights.length === 0 ? (
+          <EmptyState
+            title="Nothing needs attention"
+            description="No capacity risks, unanswered requests or unusual trends were detected."
+          />
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {data.insights.map((i) => (
+              <InsightCard
+                key={i.id}
+                severity={i.severity}
+                title={i.title}
+                body={i.body}
+                action={
+                  i.href ? (
+                    <Button asChild size="sm" variant="outline">
+                      <Link to={i.href}>
+                        {i.actionLabel ?? "Open"} <ArrowRight className="ms-2 h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
+                  ) : undefined
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Revenue trend + queue */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <AdminCard title="Monthly bookings" description="Last 12 months" className="lg:col-span-2">
+        <Panel
+          title="Revenue trend"
+          description="Last 12 months of booking value"
+          className="lg:col-span-2"
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.data?.monthlySeries ?? []}>
-                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
-                <XAxis dataKey="month" fontSize={11} />
-                <YAxis fontSize={11} allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)" }} />
-                <Bar dataKey="count" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
-              </BarChart>
+              <AreaChart data={data?.months ?? []}>
+                <defs>
+                  <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--color-chart-1)" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="var(--color-chart-1)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.15} />
+                <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} width={48} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }}
+                  formatter={(v: number) => money(v, currency)}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="var(--color-chart-1)"
+                  strokeWidth={2}
+                  fill="url(#revenueFill)"
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
-        </AdminCard>
+        </Panel>
 
-        <AdminCard title="Bookings by service">
-          <div className="h-64">
-            {stats.data?.bookingsByCategory && stats.data.bookingsByCategory.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={stats.data.bookingsByCategory}
-                    dataKey="count"
-                    nameKey="category"
-                    innerRadius={45}
-                    outerRadius={80}
-                    paddingAngle={2}
-                  >
-                    {stats.data.bookingsByCategory.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <EmptyState title="No booking data yet" icon={Calendar} />
-            )}
-          </div>
-        </AdminCard>
+        <Panel title="Work queue" description="Waiting for a first answer">
+          <ul className="space-y-2">
+            <QueueRow
+              to="/admin/requests"
+              icon={Inbox}
+              label="New booking requests"
+              value={data?.queue.newBookings}
+            />
+            <QueueRow
+              to="/admin/requests"
+              icon={Plane}
+              label="New flight requests"
+              value={data?.queue.newRequests}
+            />
+            <QueueRow
+              to="/admin/messages"
+              icon={MessageSquare}
+              label="Unread messages"
+              value={data?.queue.unreadMessages}
+            />
+          </ul>
+        </Panel>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <AdminCard title="Recent bookings" className="lg:col-span-2">
-          {recent.data && recent.data.length > 0 ? (
-            <ul className="divide-y divide-border -mx-4 sm:-mx-5">
-              {recent.data.map((b) => (
-                <li key={b.id} className="flex items-center justify-between gap-3 px-4 sm:px-5 py-3">
-                  <div className="min-w-0">
-                    <p className="text-small font-medium truncate">{b.name}</p>
-                    <p className="text-caption text-muted-foreground truncate">
-                      {b.package_title ?? "General"} · {b.package_category ?? "—"}
+      {/* Departures + recent bookings */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <Panel
+          title="Next departures"
+          description="Occupancy of upcoming trips"
+          actions={
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/admin/packages">All trips</Link>
+            </Button>
+          }
+        >
+          {q.isLoading ? (
+            <SkeletonRows rows={3} />
+          ) : (data?.upcomingTrips.length ?? 0) === 0 ? (
+            <EmptyState title="No upcoming departures" icon={Plane} />
+          ) : (
+            <ul className="space-y-4">
+              {data!.upcomingTrips.map((t) => (
+                <li key={t.id}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-small font-medium">{t.title}</p>
+                      <p className="truncate text-caption text-muted-foreground">
+                        {t.destination ?? t.category} · {shortDate(t.departure_date)}
+                      </p>
+                    </div>
+                    <StatusBadge status={t.status} />
+                  </div>
+                  <Occupancy booked={t.booked} capacity={t.capacity} className="mt-2" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+
+        <Panel
+          title="Latest bookings"
+          actions={
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/admin/bookings">All bookings</Link>
+            </Button>
+          }
+          bodyClassName="p-0 sm:p-0"
+        >
+          {q.isLoading ? (
+            <div className="p-4">
+              <SkeletonRows rows={4} />
+            </div>
+          ) : (data?.recentBookings.length ?? 0) === 0 ? (
+            <div className="p-4">
+              <EmptyState title="No bookings yet" icon={CalendarCheck} />
+            </div>
+          ) : (
+            <ul className="divide-y divide-border-subtle">
+              {data!.recentBookings.map((b) => (
+                <li key={b.id} className="flex items-center gap-3 px-4 py-3 sm:px-5">
+                  <Avatar name={b.name} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-small font-medium">{b.name}</p>
+                    <p className="truncate text-caption text-muted-foreground">
+                      {b.trip ?? "General enquiry"} · {relativeDate(b.created_at)}
                     </p>
                   </div>
-                  <div className="text-caption text-muted-foreground">
-                    {new Date(b.created_at).toLocaleDateString()}
+                  <div className="text-end">
+                    <p className="text-small font-semibold tabular-nums">
+                      {money(b.amount, b.currency)}
+                    </p>
+                    <StatusBadge status={b.status} className="mt-1" />
                   </div>
                 </li>
               ))}
             </ul>
-          ) : (
-            <EmptyState title="No bookings yet" icon={Calendar} />
           )}
-          <div className="mt-4 text-right">
-            <Link to="/admin/bookings" className="text-caption font-medium text-primary hover:underline">
-              View all bookings →
-            </Link>
-          </div>
-        </AdminCard>
-
-        <AdminCard title="Attention needed">
-          <ul className="space-y-2 text-small">
-            <li className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2">
-              <span className="inline-flex items-center gap-2">
-                <Users className="h-4 w-4 text-primary" />
-                Pending bookings
-              </span>
-              <span className="font-bold">{c?.bookingsPending ?? "—"}</span>
-            </li>
-            <li className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2">
-              <span className="inline-flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                Unread messages
-              </span>
-              <span className="font-bold">{c?.contactMessages ?? "—"}</span>
-            </li>
-          </ul>
-        </AdminCard>
+        </Panel>
       </div>
-    </>
+    </Page>
+  );
+}
+
+function QueueRow({
+  to,
+  icon: Icon,
+  label,
+  value,
+}: {
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: number | undefined;
+}) {
+  return (
+    <li>
+      <Link
+        to={to}
+        className="flex items-center justify-between gap-3 rounded-xl border border-border-subtle bg-surface-sunken/40 px-3 py-3 transition-colors hover:border-primary/40 hover:bg-accent"
+      >
+        <span className="inline-flex items-center gap-2 text-small">
+          <Icon className="h-4 w-4 text-primary" />
+          {label}
+        </span>
+        <span className="text-small font-bold tabular-nums">{value ?? "—"}</span>
+      </Link>
+    </li>
   );
 }
