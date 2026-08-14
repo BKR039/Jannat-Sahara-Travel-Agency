@@ -418,8 +418,8 @@ export function SaveBar({
 }
 
 /**
- * Compact floating status pill — communicates Saved / Unsaved / Saving / Error
- * without eating a full-width strip of the screen.
+ * Compact save control. Renders into the focused page header slot when present
+ * (`#settings-save-slot`), otherwise as a small sticky bar under the header.
  */
 function StatusPill({
   dirty,
@@ -442,68 +442,69 @@ function StatusPill({
   savedLabel: string;
   pendingLabel: string;
 }) {
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setSlot(document.getElementById("settings-save-slot"));
+  }, []);
+
   const state = hasErrors ? "error" : saving ? "saving" : dirty ? "dirty" : "saved";
-  return (
-    <div className="pointer-events-none fixed inset-x-4 bottom-5 z-30 flex justify-center sm:inset-x-auto sm:end-8 sm:justify-end">
-      <div
-        className={cn(
-          "pointer-events-auto flex max-w-full items-center gap-3 rounded-full border bg-card/95 py-1.5 pe-1.5 ps-4 shadow-lg backdrop-blur",
-          state === "error" ? "border-destructive/40" : "border-border-subtle",
+
+  const content = (
+    <div className="flex items-center justify-end gap-2">
+      <span className="flex min-w-0 items-center gap-1.5 text-caption">
+        {state === "error" && (
+          <>
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
+            <span className="truncate text-destructive">Check highlighted fields</span>
+          </>
         )}
-      >
-        <span className="flex min-w-0 items-center gap-2 text-caption font-medium">
-          {state === "error" && (
-            <>
-              <span className="h-2 w-2 shrink-0 rounded-full bg-destructive" />
-              <span className="truncate text-destructive">Check highlighted fields</span>
-            </>
-          )}
-          {state === "saving" && (
-            <>
-              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-primary" />
-              <span className="truncate text-muted-foreground">Saving…</span>
-            </>
-          )}
-          {state === "dirty" && (
-            <>
-              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-warning" />
-              <span className="truncate text-foreground">{pendingLabel}</span>
-            </>
-          )}
-          {state === "saved" && (
-            <>
-              <Check className="h-3.5 w-3.5 shrink-0 text-success" />
-              <span className="truncate text-muted-foreground">
-                {lastSaved ? `${savedLabel} · ${lastSaved.toLocaleTimeString()}` : savedLabel}
-              </span>
-            </>
-          )}
-        </span>
-        <span className="flex items-center gap-1">
-          {(dirty || hasErrors) && !saving && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 rounded-full px-2.5"
-              onClick={onDiscard}
-              aria-label="Discard changes"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-            </Button>
-          )}
-          <Button
-            size="sm"
-            className="h-8 rounded-full px-3.5"
-            disabled={!dirty || saving || hasErrors}
-            onClick={onSave}
-          >
-            {saveLabel}
-          </Button>
-        </span>
+        {state === "saving" && (
+          <>
+            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-primary" />
+            <span className="truncate text-muted-foreground">Saving…</span>
+          </>
+        )}
+        {state === "dirty" && (
+          <>
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
+            <span className="truncate text-foreground">{pendingLabel}</span>
+          </>
+        )}
+        {state === "saved" && (
+          <>
+            <Check className="h-3.5 w-3.5 shrink-0 text-success" />
+            <span className="truncate text-muted-foreground">{savedLabel}</span>
+          </>
+        )}
+      </span>
+      {(dirty || hasErrors) && !saving && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-9 px-2.5 text-muted-foreground"
+          onClick={onDiscard}
+          aria-label="Discard changes"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+        </Button>
+      )}
+      <Button size="sm" className="h-9 px-4" disabled={!dirty || saving || hasErrors} onClick={onSave}>
+        {saveLabel}
+      </Button>
+    </div>
+  );
+
+  if (slot) return createPortal(content, slot);
+
+  return (
+    <div className="sticky bottom-4 z-30 flex justify-end">
+      <div className="rounded-full border border-border-subtle bg-card/95 px-3 py-1.5 shadow-sm backdrop-blur">
+        {content}
       </div>
     </div>
   );
 }
+
 
 
 /* ------------------------------- live preview ------------------------------- */
