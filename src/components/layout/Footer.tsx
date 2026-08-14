@@ -214,7 +214,7 @@ export function Footer() {
                     >
                       <MapPin className="mt-[0.2em] h-4 w-4 shrink-0 text-secondary" />
                       <span>
-                        {b.city} — {b.name}
+                        {L(b, "city", "base")} — {L(b, "name", "base")}
                       </span>
                     </Link>
                   </li>
@@ -241,7 +241,7 @@ export function Footer() {
                     dir={["phone", "mobile", "email"].includes(c.key) ? "ltr" : undefined}
                     className="min-w-0 break-words leading-relaxed rtl:text-start"
                   >
-                    {c.value}
+                    {L(c, "value", "base")}
                   </span>
                 </li>
               ))}
