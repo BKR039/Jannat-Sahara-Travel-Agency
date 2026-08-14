@@ -543,5 +543,78 @@
     "waMessage": "Bonjour, demande de billets d'avion n° {{ref}}",
     "noResults": "Aucun résultat correspondant",
     "clearAria": "Effacer"
+  },
+  "adminBranches": {
+    "title": "Agences",
+    "subtitle": "Gérez les bureaux et agences de votre agence de voyages.",
+    "add": "Ajouter une agence",
+    "edit": "Modifier",
+    "more": "Plus",
+    "back": "Agences",
+    "editTitle": "Modifier l'agence",
+    "newTitle": "Nouvelle agence",
+    "active": "Active",
+    "inactive": "Inactive",
+    "main": "Agence principale",
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "setMain": "Définir comme agence principale",
+    "setMainTitle": "Définir comme agence principale ?",
+    "setMainDesc": "Cette agence deviendra l'agence principale et l'ancienne perdra ce statut.",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Modifications enregistrées",
+    "unsaved": "Modifications non enregistrées",
+    "discard": "Abandonner",
+    "delete": "Supprimer l'agence",
+    "deleteTitle": "Supprimer cette agence ?",
+    "deleteDesc": "Cette agence et ses informations seront définitivement supprimées. Vous pouvez simplement la désactiver à la place.",
+    "empty": "Aucune agence pour le moment. Ajoutez votre premier bureau.",
+    "count": "agence",
+    "noAddress": "adresse manquante",
+    "untitled": "Agence sans nom",
+    "groups": {
+      "info": "Informations",
+      "contact": "Contact",
+      "location": "Localisation",
+      "business": "Affichage",
+      "translation": "Traduction française"
+    },
+    "hints": {
+      "translation": "Utilisée lorsque le site est consulté en français.",
+      "location": "Lien Google Maps et/ou coordonnées.",
+      "business": "Une agence inactive reste ici mais n'apparaît pas sur le site."
+    },
+    "fields": {
+      "name": "Nom de l'agence",
+      "city": "Ville",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "address": "Adresse complète",
+      "maps": "Lien Google Maps",
+      "hours": "Horaires d'ouverture",
+      "lat": "Latitude",
+      "lng": "Longitude",
+      "photo": "Photo de l'agence",
+      "mainBranch": "Agence principale",
+      "active": "Visible sur le site"
+    },
+    "errors": {
+      "required": "Ce champ est obligatoire",
+      "email": "Veuillez saisir un e-mail valide",
+      "phone": "Veuillez saisir un numéro de téléphone valide",
+      "url": "Veuillez saisir un lien valide",
+      "lat": "Doit être entre -90 et 90",
+      "lng": "Doit être entre -180 et 180"
+    },
+    "toast": {
+      "created": "Agence créée",
+      "deleted": "Agence supprimée",
+      "mainUpdated": "Agence principale mise à jour",
+      "activated": "L'agence est visible sur le site",
+      "deactivated": "L'agence est masquée du site"
+    }
   }
 }
