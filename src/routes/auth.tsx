@@ -182,7 +182,7 @@ function AuthPage() {
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
                   {busy ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <KeyRound className="me-2 h-4 w-4" />}
-                  Send reset link
+                  {t("auth.sendResetLink")}
                 </Button>
               </form>
             </TabsContent>
