@@ -579,46 +579,19 @@ export function AutoSaveBar({
   onDiscard: () => void;
 }) {
   return (
-    <div className="sticky bottom-0 z-20 -mx-4 mt-8 border-t border-border-subtle bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-caption text-muted-foreground">
-          {hasErrors ? (
-            <>
-              <span className="h-2 w-2 rounded-full bg-destructive" /> Fix the highlighted fields to
-              save
-            </>
-          ) : saving ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
-            </>
-          ) : dirty ? (
-            <>
-              <span className="h-2 w-2 animate-pulse rounded-full bg-warning" /> Auto-saving in a
-              moment
-            </>
-          ) : (
-            <>
-              <Check className="h-3.5 w-3.5 text-success" />
-              {lastSaved ? `Auto-saved at ${lastSaved.toLocaleTimeString()}` : "All changes saved"}
-            </>
-          )}
-        </p>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" disabled={!dirty || saving} onClick={onDiscard}>
-            <RotateCcw className="me-2 h-4 w-4" /> Discard
-          </Button>
-          <Button size="sm" disabled={!dirty || saving || hasErrors} onClick={onSave}>
-            {saving ? (
-              <Loader2 className="me-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="me-2 h-4 w-4" />
-            )}{" "}
-            Save now
-          </Button>
-        </div>
-      </div>
-    </div>
+    <StatusPill
+      dirty={dirty}
+      saving={saving}
+      hasErrors={hasErrors}
+      lastSaved={lastSaved}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      saveLabel="Save now"
+      savedLabel="All changes saved"
+      pendingLabel="Saving automatically…"
+    />
   );
+
 }
 
 /* -------------------------------- toggle field ------------------------------ */
