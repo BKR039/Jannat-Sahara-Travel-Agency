@@ -186,7 +186,9 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
   const name = L(branch, "name", "base");
 
   const facts = [
-    hours ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours } : null,
+    hours
+      ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours, tight: true }
+      : null,
     branch.phone
       ? { key: "phone", icon: Phone, label: t("branches.info.phone"), value: branch.phone, ltr: true }
       : null,
@@ -200,6 +202,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
     label: string;
     value: string;
     ltr?: boolean;
+    tight?: boolean;
   }[];
 
   return (
@@ -208,7 +211,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
       className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-3.5 md:px-6"
     >
       {/* one grid: actions + 4 info blocks; 5 intentional columns on desktop */}
-      <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-[0.8fr_1.2fr_1.1fr_1.3fr_1.7fr] lg:gap-x-5">
+      <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-[0.7fr_1.45fr_1fr_1.2fr_1.65fr] lg:gap-x-5">
         {/* actions — compact group, first column on desktop, last row on mobile */}
         <div className="order-last col-span-2 flex items-center gap-2 lg:order-first lg:col-span-1 lg:self-center">
           {branch.phone && (
@@ -271,9 +274,12 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                 dir={f.ltr ? "ltr" : undefined}
                 className={cn(
                   "mt-0.5 text-small font-semibold leading-snug text-foreground",
-                  f.ltr ? "whitespace-nowrap text-start [font-size:0.8125rem]" : "line-clamp-2",
+                  f.ltr && "text-start",
+                  f.ltr || f.tight
+                    ? "whitespace-nowrap [font-size:0.8125rem]"
+                    : "line-clamp-2",
                 )}
-                style={f.ltr ? undefined : { overflowWrap: "anywhere", wordBreak: "normal" }}
+                style={f.ltr || f.tight ? undefined : { overflowWrap: "anywhere", wordBreak: "normal" }}
               >
                 {f.value}
               </p>
