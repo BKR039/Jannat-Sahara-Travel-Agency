@@ -175,6 +175,9 @@ const BranchTile = memo(function BranchTile({
 
 /* ------------------------------------------- active branch detail panel */
 
+const ACTION_BTN =
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
+
 function ActiveBranchPanel({ branch }: { branch: Branch }) {
   const { t } = useTranslation();
   const { L } = useLocalized();
@@ -183,15 +186,11 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
   const name = L(branch, "name", "base");
 
   const facts = [
-    hours ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours } : null,
+    hours
+      ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours, tight: true }
+      : null,
     branch.phone
-      ? {
-          key: "phone",
-          icon: Phone,
-          label: t("branches.info.phone"),
-          value: branch.phone,
-          ltr: true,
-        }
+      ? { key: "phone", icon: Phone, label: t("branches.info.phone"), value: branch.phone, ltr: true }
       : null,
     branch.email
       ? { key: "email", icon: Mail, label: t("branches.info.email"), value: branch.email, ltr: true }
@@ -203,39 +202,18 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
     label: string;
     value: string;
     ltr?: boolean;
+    tight?: boolean;
   }[];
 
   return (
     <div
       key={branch.id}
-      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-3 md:px-6"
+      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-3.5 md:px-6"
     >
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
-        <div className="flex flex-1 flex-wrap items-center gap-x-5 gap-y-2">
-          {facts.map((f) => (
-            <div key={f.key} className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <f.icon className="h-3.5 w-3.5" />
-              </span>
-              <div className="min-w-0">
-                <p className="whitespace-nowrap text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  {f.label}
-                </p>
-                <p
-                  dir={f.ltr ? "ltr" : undefined}
-                  className={cn(
-                    "mt-0.5 whitespace-nowrap text-small font-semibold leading-snug text-foreground",
-                    f.ltr && "text-start",
-                  )}
-                >
-                  {f.value}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
+      {/* one grid: actions + 4 info blocks; 5 intentional columns on desktop */}
+      <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-[0.7fr_1.45fr_1fr_1.2fr_1.65fr] lg:gap-x-5">
+        {/* actions — compact group, first column on desktop, last row on mobile */}
+        <div className="order-last col-span-2 flex items-center gap-2 lg:order-first lg:col-span-1 lg:self-center">
           {branch.phone && (
             <>
               <a
@@ -244,17 +222,17 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                 rel="noopener noreferrer"
                 title={t("branches.whatsapp")}
                 aria-label={t("branches.whatsapp")}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
-                <MessageCircle className="h-[18px] w-[18px]" strokeWidth={2} />
+                <MessageCircle className="h-[17px] w-[17px]" strokeWidth={2} />
               </a>
               <a
                 href={`tel:${branch.phone.replace(/\s+/g, "")}`}
                 title={t("branches.call")}
                 aria-label={t("branches.call")}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                className={ACTION_BTN}
               >
-                <Phone className="h-[18px] w-[18px]" strokeWidth={2} />
+                <Phone className="h-[17px] w-[17px]" strokeWidth={2} />
               </a>
             </>
           )}
@@ -264,24 +242,55 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
             rel="noopener noreferrer"
             title={t("branches.directions")}
             aria-label={t("branches.directions")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className={ACTION_BTN}
           >
-            <Navigation className="h-[18px] w-[18px]" strokeWidth={2} />
+            <Navigation className="h-[17px] w-[17px]" strokeWidth={2} />
           </a>
           <button
             type="button"
             title={t("branches.copyAddress")}
             aria-label={t("branches.copyAddress")}
             onClick={() => copyToClipboard(`${name} — ${address}`, t("branches.addressCopied"))}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className={ACTION_BTN}
           >
-            <Copy className="h-[18px] w-[18px]" strokeWidth={2} />
+            <Copy className="h-[17px] w-[17px]" strokeWidth={2} />
           </button>
         </div>
+
+        {/* info blocks — identical internal structure: icon + (label / value) */}
+        {facts.map((f) => (
+          <div
+            key={f.key}
+            className="flex min-w-0 items-center gap-2.5 border-border/40 lg:border-s lg:ps-5"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-lg bg-primary/10 text-primary">
+              <f.icon className="h-3.5 w-3.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-caption font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {f.label}
+              </p>
+              <p
+                dir={f.ltr ? "ltr" : undefined}
+                className={cn(
+                  "mt-0.5 text-small font-semibold leading-snug text-foreground",
+                  f.ltr && "text-start",
+                  f.ltr || f.tight
+                    ? "whitespace-nowrap [font-size:0.8125rem]"
+                    : "lg:line-clamp-2",
+                )}
+                style={f.ltr || f.tight ? undefined : { overflowWrap: "anywhere", wordBreak: "normal" }}
+              >
+                {f.value}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
+
 
 /* --------------------------------------------------------- info panel */
 
