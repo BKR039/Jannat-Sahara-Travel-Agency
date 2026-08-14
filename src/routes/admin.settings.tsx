@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Palette,
   MapPin,
+  Users,
   ChevronRight,
   type LucideIcon,
 } from "lucide-react";
@@ -28,6 +29,7 @@ import { SeoSection } from "@/components/admin/settings/SeoSection";
 import { EmailSection } from "@/components/admin/settings/EmailSection";
 import { NotificationsSection } from "@/components/admin/settings/NotificationsSection";
 import { SecuritySection } from "@/components/admin/settings/SecuritySection";
+import { TeamSection } from "@/components/admin/settings/TeamSection";
 
 export const Route = createFileRoute("/admin/settings")({
   ssr: false,
@@ -51,7 +53,8 @@ type SectionId =
   | "seo"
   | "email"
   | "notifications"
-  | "security";
+  | "security"
+  | "team";
 
 interface NavGroup {
   group: string;
@@ -87,7 +90,8 @@ const NAV: NavGroup[] = [
   {
     group: "System",
     items: [
-      { id: "security", label: "Security", icon: ShieldCheck, hint: "Team access and policies" },
+      { id: "security", label: "Security", icon: ShieldCheck, hint: "Access policies" },
+      { id: "team", label: "Team", icon: Users, hint: "Admins and roles" },
     ],
   },
 ];
@@ -106,6 +110,7 @@ const SECTIONS: Record<SectionId, () => React.JSX.Element> = {
   email: EmailSection,
   notifications: NotificationsSection,
   security: SecuritySection,
+  team: TeamSection,
 };
 
 function SettingsPage() {
