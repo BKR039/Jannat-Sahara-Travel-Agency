@@ -133,7 +133,7 @@ function CommandCenterPage() {
                 action={
                   i.href ? (
                     <Button asChild size="sm" variant="outline">
-                      <Link to={i.href}>
+                      <Link to={i.href as never}>
                         {i.actionLabel ?? "Open"} <ArrowRight className="ms-2 h-3.5 w-3.5" />
                       </Link>
                     </Button>

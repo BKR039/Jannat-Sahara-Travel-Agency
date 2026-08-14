@@ -156,7 +156,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    navigate({ to: "/admin/customers", search: { q } });
+    navigate({ to: "/admin/customers", search: { q } as never });
   }
 
   return (
