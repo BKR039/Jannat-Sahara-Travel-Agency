@@ -406,41 +406,107 @@ export function SaveBar({
   onDiscard: () => void;
 }) {
   return (
-    <div className="sticky bottom-0 z-20 -mx-4 mt-8 border-t border-border-subtle bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-caption text-muted-foreground">
-          {saving ? (
+    <StatusPill
+      dirty={dirty}
+      saving={saving}
+      lastSaved={lastSaved}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      saveLabel="Save changes"
+      savedLabel="Saved"
+      pendingLabel="Unsaved changes"
+    />
+  );
+}
+
+/**
+ * Compact floating status pill — communicates Saved / Unsaved / Saving / Error
+ * without eating a full-width strip of the screen.
+ */
+function StatusPill({
+  dirty,
+  saving,
+  hasErrors,
+  lastSaved,
+  onSave,
+  onDiscard,
+  saveLabel,
+  savedLabel,
+  pendingLabel,
+}: {
+  dirty: boolean;
+  saving: boolean;
+  hasErrors?: boolean;
+  lastSaved: Date | null;
+  onSave: () => void;
+  onDiscard: () => void;
+  saveLabel: string;
+  savedLabel: string;
+  pendingLabel: string;
+}) {
+  const state = hasErrors ? "error" : saving ? "saving" : dirty ? "dirty" : "saved";
+  return (
+    <div className="pointer-events-none fixed inset-x-4 bottom-5 z-30 flex justify-center sm:inset-x-auto sm:end-8 sm:justify-end">
+      <div
+        className={cn(
+          "pointer-events-auto flex max-w-full items-center gap-3 rounded-full border bg-card/95 py-1.5 pe-1.5 ps-4 shadow-lg backdrop-blur",
+          state === "error" ? "border-destructive/40" : "border-border-subtle",
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-2 text-caption font-medium">
+          {state === "error" && (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving changes…
-            </>
-          ) : dirty ? (
-            <>
-              <span className="h-2 w-2 rounded-full bg-warning" /> Unsaved changes
-            </>
-          ) : (
-            <>
-              <Check className="h-3.5 w-3.5 text-success" />
-              {lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : "All changes saved"}
+              <span className="h-2 w-2 shrink-0 rounded-full bg-destructive" />
+              <span className="truncate text-destructive">Check highlighted fields</span>
             </>
           )}
-        </p>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" disabled={!dirty || saving} onClick={onDiscard}>
-            <RotateCcw className="me-2 h-4 w-4" /> Discard
+          {state === "saving" && (
+            <>
+              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-primary" />
+              <span className="truncate text-muted-foreground">Saving…</span>
+            </>
+          )}
+          {state === "dirty" && (
+            <>
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-warning" />
+              <span className="truncate text-foreground">{pendingLabel}</span>
+            </>
+          )}
+          {state === "saved" && (
+            <>
+              <Check className="h-3.5 w-3.5 shrink-0 text-success" />
+              <span className="truncate text-muted-foreground">
+                {lastSaved ? `${savedLabel} · ${lastSaved.toLocaleTimeString()}` : savedLabel}
+              </span>
+            </>
+          )}
+        </span>
+        <span className="flex items-center gap-1">
+          {(dirty || hasErrors) && !saving && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 rounded-full px-2.5"
+              onClick={onDiscard}
+              aria-label="Discard changes"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          <Button
+            size="sm"
+            className="h-8 rounded-full px-3.5"
+            disabled={!dirty || saving || hasErrors}
+            onClick={onSave}
+          >
+            {saveLabel}
           </Button>
-          <Button size="sm" disabled={!dirty || saving} onClick={onSave}>
-            {saving ? (
-              <Loader2 className="me-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="me-2 h-4 w-4" />
-            )}{" "}
-            Save changes
-          </Button>
-        </div>
+        </span>
       </div>
     </div>
   );
 }
+
 
 /* ------------------------------- live preview ------------------------------- */
 
