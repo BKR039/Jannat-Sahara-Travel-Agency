@@ -1,0 +1,522 @@
+{
+  "content": {
+    "common": {
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "add": "Ajouter",
+      "loading": "Chargement…",
+      "actions": "Actions",
+      "active": "Actif",
+      "hidden": "Masqué",
+      "uploadFailed": "Échec du téléversement",
+      "saveFailed": "Échec de l'enregistrement",
+      "deleted": "Supprimé"
+    },
+    "settings": {
+      "pageTitle": "Paramètres",
+      "pageDescription": "Gérez votre agence, votre site et votre communication.",
+      "backToSettings": "Paramètres",
+      "groups": {
+        "agency": {
+          "title": "Agence",
+          "caption": "Qui vous êtes"
+        },
+        "website": {
+          "title": "Site web",
+          "caption": "Ce que voient les visiteurs"
+        },
+        "communication": {
+          "title": "Communication",
+          "caption": "Comment les voyageurs vous contactent"
+        },
+        "system": {
+          "title": "Système",
+          "caption": "Accès et alertes"
+        }
+      },
+      "nav": {
+        "general": {
+          "label": "Général",
+          "summary": "Les informations de votre agence",
+          "detail": "Nom, adresse et horaires"
+        },
+        "brand": {
+          "label": "Marque",
+          "summary": "Votre identité visuelle",
+          "detail": "Logo, slogan et couleurs"
+        },
+        "homepage": {
+          "label": "Page d'accueil",
+          "summary": "Ce que voient les visiteurs en premier",
+          "detail": "Bannière, présentation et appel à l'action"
+        },
+        "statistics": {
+          "label": "Statistiques",
+          "summary": "Vos réalisations",
+          "detail": "Compteurs affichés sur la page d'accueil"
+        },
+        "seo": {
+          "label": "Référencement",
+          "summary": "Votre apparence sur Google",
+          "detail": "Titres, description et image de partage"
+        },
+        "contact": {
+          "label": "Contact",
+          "summary": "Téléphone, e-mail et WhatsApp",
+          "detail": "Affichés sur tout le site"
+        },
+        "branches": {
+          "label": "Agences",
+          "summary": "Bureaux et emplacements",
+          "detail": "Affichés sur la carte de contact"
+        },
+        "social": {
+          "label": "Réseaux sociaux",
+          "summary": "Instagram, Facebook et plus",
+          "detail": "Canaux liés dans le pied de page"
+        },
+        "email": {
+          "label": "E-mail",
+          "summary": "Notifications de réservation",
+          "detail": "Où les nouvelles demandes sont livrées"
+        },
+        "notifications": {
+          "label": "Notifications",
+          "summary": "Comment vous recevez les alertes",
+          "detail": "Alertes du tableau de bord et par e-mail"
+        },
+        "team": {
+          "label": "Équipe",
+          "summary": "Gérer l'accès de l'équipe",
+          "detail": "Administrateurs et leurs rôles"
+        },
+        "security": {
+          "label": "Sécurité",
+          "summary": "Protection du compte",
+          "detail": "Politiques d'accès et sessions"
+        }
+      },
+      "validation": {
+        "required": "Ce champ est obligatoire",
+        "url": "Saisissez un lien complet commençant par https://",
+        "email": "Saisissez une adresse e-mail valide",
+        "emailListInvalid": "« {{value}} » n'est pas une adresse e-mail valide",
+        "hexColor": "Utilisez une valeur hexadécimale comme #EE5A24",
+        "maxLen": "Restez sous {{max}} caractères ({{count}} actuellement)",
+        "numberInvalid": "Saisissez un nombre",
+        "numberRange": "Saisissez un nombre entre {{min}} et {{max}}"
+      },
+      "saveBar": {
+        "saveChanges": "Enregistrer les modifications",
+        "saved": "Enregistré",
+        "unsavedChanges": "Modifications non enregistrées",
+        "saveNow": "Enregistrer maintenant",
+        "allChangesSaved": "Toutes les modifications sont enregistrées",
+        "savingAutomatically": "Enregistrement automatique…",
+        "checkHighlightedFields": "Vérifiez les champs surlignés",
+        "discardChanges": "Annuler les modifications"
+      },
+      "livePreview": {
+        "title": "Aperçu en direct",
+        "description": "Découvrez comment le site public affiche votre contenu.",
+        "websiteTitle": "Aperçu du site",
+        "desktop": "Ordinateur",
+        "tablet": "Tablette",
+        "mobile": "Mobile"
+      },
+      "parts": {
+        "replace": "Remplacer",
+        "upload": "Téléverser",
+        "remove": "Retirer",
+        "uploadAnImage": "Téléverser une image",
+        "replaceLabel": "Remplacer {{label}}",
+        "uploadLabel": "Téléverser {{label}}",
+        "chooseIcon": "Choisir une icône",
+        "searchIcons": "Rechercher des icônes",
+        "colourPicker": "Sélecteur de couleur {{label}}",
+        "googleResultPreview": "Aperçu du résultat Google",
+        "yourPageTitle": "Titre de votre page",
+        "yourMetaDescription": "Votre méta-description apparaît ici dans les résultats de recherche.",
+        "primaryButton": "Bouton principal",
+        "accentButton": "Bouton secondaire",
+        "arabicSuffix": "(Arabe)",
+        "frenchSuffix": "(Français)",
+        "englishSuffix": "(Anglais)",
+        "imageUploaded": "Image téléversée"
+      },
+      "general": {
+        "title": "Général",
+        "description": "L'identité de base de votre agence. Ces informations apparaissent sur le site public, les confirmations de réservation et les moteurs de recherche.",
+        "identityTitle": "Identité de l'agence",
+        "identityDescription": "Comment votre agence est nommée partout.",
+        "agencyName": "Nom de l'agence",
+        "agencyNameHint": "Affiché dans les e-mails, le pied de page et les données structurées.",
+        "workingHours": "Horaires de travail",
+        "locationTitle": "Emplacement",
+        "locationDescription": "Où les voyageurs peuvent vous trouver.",
+        "headOfficeAddress": "Adresse du siège",
+        "addressHint": "Rue, ville et pays.",
+        "googleMapsLink": "Lien Google Maps",
+        "googleMapsHint": "Collez le lien de partage de l'emplacement de votre bureau."
+      },
+      "brand": {
+        "title": "Identité de marque",
+        "description": "Votre logo, votre ton et vos couleurs — exactement comme les voyageurs les voient sur le site public.",
+        "identityTitle": "Identité de marque",
+        "identityDescription": "Le nom et le ton de votre agence.",
+        "agencyName": "Nom de l'agence",
+        "agencyNameHint": "Hérité de votre profil d'agence — le modifier ici le met à jour partout.",
+        "tagline": "Slogan",
+        "taglineHint": "Une courte phrase sous votre logo.",
+        "assetsTitle": "Éléments de marque",
+        "assetsDescription": "PNG, SVG ou JPG.",
+        "logo": "Logo",
+        "logoHint": "Carré, fond transparent. 512×512 recommandé.",
+        "favicon": "Favicon",
+        "faviconHint": "Icône de l'onglet du navigateur. 64×64.",
+        "coloursTitle": "Couleurs de la marque",
+        "coloursDescription": "Utilisées pour les boutons, badges et mises en valeur.",
+        "resetToDefaults": "Réinitialiser aux couleurs par défaut",
+        "primaryColour": "Couleur principale",
+        "secondaryColour": "Couleur secondaire",
+        "advancedSettings": "Paramètres avancés",
+        "websiteUrl": "URL du site",
+        "websiteUrlHint": "Utilisée dans les e-mails et les données structurées.",
+        "canonicalUrl": "URL canonique",
+        "canonicalUrlHint": "Adresse préférée que les moteurs de recherche doivent indexer.",
+        "livePreview": "Aperçu en direct",
+        "livePreviewNote": "Se met à jour instantanément pendant la modification. Publié sur le site public lors de l'enregistrement.",
+        "agencyNameFallback": "Nom de l'agence",
+        "taglineFallback": "Votre slogan",
+        "navHome": "Accueil",
+        "navUmrah": "Omra",
+        "navTrips": "Voyages",
+        "bookNow": "Réserver",
+        "browseOffers": "Voir les offres",
+        "uploaded": "Téléversé"
+      },
+      "homepage": {
+        "title": "Contenu de la page d'accueil",
+        "description": "Chaque section de la page d'accueil est un bloc modifiable. Développez un bloc pour le modifier, puis publiez en une fois — sans code, sans champ de base de données.",
+        "untitledBlock": "Bloc sans titre",
+        "unsaved": "Non enregistré",
+        "titleField": "Titre",
+        "subtitleField": "Sous-titre",
+        "bodyField": "Texte du corps",
+        "bodyHint": "Paragraphe complémentaire facultatif.",
+        "imageField": "Arrière-plan / illustration",
+        "imageHint": "Téléversez directement — pas besoin de coller des URL. 1920×1080 recommandé.",
+        "buttonLabel": "Libellé du bouton",
+        "buttonLink": "Lien du bouton",
+        "buttonLinkHint": "Chemin interne comme /umrah ou un lien https complet.",
+        "published": "Contenu publié",
+        "blocks": {
+          "hero": {
+            "name": "Bannière",
+            "help": "La première chose que voient les visiteurs. Gardez le titre sous 60 caractères et utilisez une image d'arrière-plan large et lumineuse."
+          },
+          "about": {
+            "name": "À propos de l'agence",
+            "help": "Une courte histoire sur votre agence, affichée sur la page d'accueil et la page À propos."
+          },
+          "cta": {
+            "name": "Appel à l'action final",
+            "help": "Le dernier coup de pouce avant le pied de page. Une action claire fonctionne mieux."
+          },
+          "generic": "Bloc de contenu affiché sur le site public."
+        }
+      },
+      "stats": {
+        "title": "Statistiques",
+        "description": "Les compteurs de réalisations sur votre page d'accueil. Faites glisser les cartes pour changer l'ordre dans lequel les voyageurs les voient.",
+        "card": "Carte",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "removeStatistic": "Supprimer la statistique",
+        "icon": "Icône",
+        "label": "Libellé",
+        "labelPlaceholder": "Voyageurs satisfaits",
+        "value": "Valeur",
+        "valuePlaceholder": "12 000+",
+        "valueFallback": "0",
+        "labelFallback": "Libellé",
+        "addCard": "Ajouter une carte de statistique",
+        "tipTitle": "Astuce",
+        "tipBody": "Gardez les valeurs courtes et humaines — « 12 000+ » se lit mieux que « 12034 ». Trois à quatre cartes fonctionnent mieux sur mobile.",
+        "updated": "Statistiques mises à jour"
+      },
+      "seo": {
+        "title": "Référencement",
+        "description": "Comment votre site apparaît sur Google et lors du partage sur les réseaux sociaux.",
+        "searchAppearanceTitle": "Apparence dans les résultats de recherche",
+        "searchAppearanceDescription": "Titre et description de la page d'accueil.",
+        "siteTitle": "Titre du site",
+        "siteTitleHint": "Moins de 60 caractères donne de meilleurs résultats.",
+        "metaDescription": "Méta-description",
+        "metaDescriptionHint": "Moins de 160 caractères. Décrivez vos services et destinations.",
+        "keywords": "Mots-clés",
+        "keywordsHint": "Séparés par des virgules. Utilisés pour la recherche interne.",
+        "livePreviewTitle": "Aperçu en direct",
+        "livePreviewDescription": "Se met à jour au fur et à mesure de la saisie.",
+        "socialSharingTitle": "Partage social",
+        "socialSharingDescription": "Image affichée sur Facebook, WhatsApp et X.",
+        "shareImage": "Image de partage",
+        "shareImageHint": "1200×630 recommandé.",
+        "technicalTitle": "Technique",
+        "technicalDescription": "Domaine canonique, indexation et vérification.",
+        "canonicalBaseUrl": "URL canonique de base",
+        "googleVerificationCode": "Code de vérification Google",
+        "googleVerificationHint": "La valeur de contenu de la balise google-site-verification.",
+        "allowIndexing": "Autoriser les moteurs de recherche à indexer le site",
+        "allowIndexingHint": "Désactivez uniquement pendant la construction du site."
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Les canaux que les voyageurs utilisent pour vous contacter. Les canaux vides sont masqués sur le site public.",
+        "channelsTitle": "Canaux de contact",
+        "channelsDescription": "Téléphone, e-mail et messagerie.",
+        "livePreviewTitle": "Aperçu en direct",
+        "livePreviewDescription": "Comment la carte de contact s'affiche sur le site.",
+        "emptyHint": "Ajoutez au moins un canal de contact.",
+        "landline": "Fixe",
+        "mobile": "Mobile",
+        "contactEmail": "E-mail de contact",
+        "contactEmailHint": "Publié sur le site pour les voyageurs.",
+        "whatsapp": "Lien WhatsApp",
+        "whatsappHint": "Lien wa.me complet, par ex. https://wa.me/21655123456",
+        "emergency": "Contact d'urgence",
+        "emergencyHint": "Numéro facultatif hors horaires pour les voyageurs."
+      },
+      "social": {
+        "title": "Réseaux sociaux",
+        "description": "Connectez vos canaux une fois — ils apparaissent automatiquement dans le pied de page, la section contact et les données structurées.",
+        "channelsTitle": "Canaux",
+        "channelsDescription": "Laissez un champ vide pour masquer ce canal du site.",
+        "exampleHint": "Exemple : {{placeholder}}",
+        "openChannel": "Ouvrir {{label}}",
+        "livePreviewTitle": "Aperçu en direct",
+        "livePreviewDescription": "À quoi ressemblera la ligne sociale du pied de page.",
+        "noChannels": "Aucun canal connecté pour le moment — la ligne sociale reste masquée."
+      },
+      "email": {
+        "title": "E-mail",
+        "description": "Où les notifications de réservation sont livrées et comment elles sont libellées.",
+        "recipientsTitle": "Destinataires",
+        "recipientsDescription": "Qui reçoit chaque nouvelle réservation.",
+        "ownerRecipient": "Destinataire principal",
+        "ownerRecipientHint": "Boîte de réception principale pour les notifications de réservation.",
+        "ccRecipients": "Destinataires en copie",
+        "ccRecipientsHint": "Facultatif. Séparez plusieurs adresses par des virgules.",
+        "senderIdentityTitle": "Identité de l'expéditeur",
+        "senderIdentityDescription": "Comment la notification apparaît dans la boîte de réception.",
+        "fromName": "Nom de l'expéditeur",
+        "replyToAddress": "Adresse de réponse",
+        "replyToHint": "Les réponses de votre équipe arrivent ici.",
+        "subjectPrefix": "Préfixe de l'objet",
+        "subjectPrefixHint": "Aide à filtrer les e-mails, par ex. [Réservation].",
+        "livePreviewTitle": "Aperçu en direct",
+        "livePreviewDescription": "Aperçu de la ligne de la boîte de réception d'un nouvel e-mail de réservation.",
+        "sampleSubject": "Nouvelle réservation — Omra Ramadan Premium",
+        "to": "À",
+        "notConfigured": "non configuré",
+        "deliveryTitle": "Livraison",
+        "deliveryDescription": "Suspendre temporairement les notifications sortantes.",
+        "bookingEmailsToggle": "Envoyer un e-mail pour chaque nouvelle réservation",
+        "bookingEmailsHint": "Lorsque désactivé, les réservations sont toujours enregistrées et affichées dans le tableau de bord.",
+        "defaultFromName": "Janat Sahara Travel"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Choisissez quelle activité crée une alerte dans la cloche du tableau de bord admin.",
+        "dashboardAlertsTitle": "Alertes du tableau de bord",
+        "alertsEnabled": "{{count}} type(s) d'alerte sur 4 activés.",
+        "newBooking": "Nouvelle réservation reçue",
+        "newBookingHint": "Alerte l'équipe dès qu'un voyageur réserve un forfait.",
+        "newMessage": "Nouveau message de contact",
+        "newMessageHint": "Alerte lorsqu'une personne soumet le formulaire de contact.",
+        "newsletter": "Nouvel abonné à la newsletter",
+        "newsletterHint": "Utile pour développer votre liste de diffusion.",
+        "dailyDigest": "Résumé quotidien d'activité",
+        "dailyDigestHint": "Une seule alerte de synthèse au lieu de notifications individuelles.",
+        "housekeepingTitle": "Entretien",
+        "housekeepingDescription": "Combien de temps les alertes lues restent dans la cloche.",
+        "retentionLabel": "Conserver les notifications pendant (jours)",
+        "retentionHint": "Entre 1 et 365 jours."
+      },
+      "security": {
+        "title": "Sécurité",
+        "description": "Politiques d'accès pour votre équipe de tableau de bord. Seuls les super administrateurs peuvent les modifier.",
+        "teamAccessTitle": "Accès de l'équipe",
+        "teamAccessDescription": "Toutes les personnes pouvant se connecter au tableau de bord admin.",
+        "manageAdmins": "Gérer les administrateurs",
+        "unknownUser": "Utilisateur inconnu",
+        "noRole": "aucun rôle",
+        "noDashboardUsers": "Aucun utilisateur du tableau de bord pour le moment.",
+        "accessPolicyTitle": "Politique d'accès",
+        "accessPolicyDescription": "S'applique à chaque utilisateur du tableau de bord.",
+        "require2fa": "Exiger l'authentification à deux facteurs",
+        "require2faHint": "Les administrateurs doivent confirmer un second facteur avant d'accéder au tableau de bord.",
+        "auditLogging": "Conserver un journal d'audit des actions des administrateurs",
+        "auditLoggingHint": "Enregistre qui a changé quoi, et quand.",
+        "sessionLength": "Durée de session (heures)",
+        "sessionLengthHint": "Les administrateurs sont déconnectés après cette période d'inactivité. 1–720.",
+        "superAdminOnly": "Seul un super administrateur peut modifier les politiques d'accès."
+      },
+      "team": {
+        "title": "Équipe",
+        "description": "Qui peut se connecter au tableau de bord admin et ce qu'il est autorisé à faire.",
+        "membersTitle": "Membres de l'équipe",
+        "membersDescription": "Invitez des collègues, changez les rôles ou révoquez l'accès.",
+        "managedElsewhere": "L'accès à l'équipe est géré sur la page Administrateurs.",
+        "manageTeam": "Gérer l'équipe"
+      },
+      "branches": {
+        "translationGroupTitle": "Traductions",
+        "translationGroupHint": "Affiché aux voyageurs francophones et anglophones. Revient à l'arabe si vide."
+      }
+    },
+    "blog": {
+      "pageTitle": "Blog",
+      "pageDescription": "Articles affichés sur le blog public.",
+      "newArticle": "Nouvel article",
+      "table": {
+        "title": "Titre",
+        "slug": "Slug",
+        "published": "Publié",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "loading": "Chargement…",
+      "empty": "Aucun article pour le moment",
+      "unpublish": "Dépublier",
+      "publish": "Publier",
+      "deleteTitle": "Supprimer l'article ?",
+      "deleteDescription": "Supprimer « {{title}} » ?",
+      "editTitle": "Modifier l'article",
+      "newTitle": "Nouvel article",
+      "fields": {
+        "title": "Titre *",
+        "slug": "Slug *",
+        "author": "Auteur",
+        "excerpt": "Extrait",
+        "content": "Contenu (Markdown/HTML)",
+        "cover": "Image de couverture",
+        "tags": "Étiquettes (séparées par des virgules)",
+        "published": "Publié"
+      },
+      "toasts": {
+        "titleSlugRequired": "Titre et slug requis",
+        "saved": "Enregistré",
+        "saveFailed": "Échec de l'enregistrement"
+      }
+    },
+    "gallery": {
+      "pageTitle": "Galerie",
+      "pageDescription": "Photos et vidéos affichées sur la galerie publique.",
+      "bulkUpload": "Téléversement groupé",
+      "addItem": "Ajouter un élément",
+      "categoryPlaceholder": "Catégorie",
+      "allCategories": "Toutes les catégories",
+      "loading": "Chargement…",
+      "empty": "Aucun élément de galerie pour le moment",
+      "deleteTitle": "Supprimer l'image ?",
+      "deleteDescription": "Cette action est irréversible.",
+      "editTitle": "Modifier l'élément",
+      "newTitle": "Ajouter un élément à la galerie",
+      "fields": {
+        "title": "Titre",
+        "image": "Image *",
+        "category": "Catégorie",
+        "sortOrder": "Ordre de tri",
+        "active": "Actif"
+      },
+      "toasts": {
+        "uploadedCount": "{{count}} image(s) téléversée(s)",
+        "imageRequired": "Image requise",
+        "saved": "Enregistré",
+        "saveFailed": "Échec de l'enregistrement"
+      }
+    },
+    "faq": {
+      "pageTitle": "FAQ",
+      "newFaq": "Nouvelle FAQ",
+      "loading": "Chargement…",
+      "empty": "Aucune FAQ pour le moment",
+      "category": "Catégorie",
+      "deleteTitle": "Supprimer la FAQ ?",
+      "editTitle": "Modifier la FAQ",
+      "newTitle": "Nouvelle FAQ",
+      "fields": {
+        "question": "Question *",
+        "answer": "Réponse *",
+        "category": "Catégorie",
+        "sortOrder": "Ordre de tri",
+        "active": "Actif"
+      },
+      "toasts": {
+        "questionAnswerRequired": "Question et réponse requises",
+        "saved": "Enregistré",
+        "saveFailed": "Échec de l'enregistrement"
+      }
+    },
+    "testimonials": {
+      "pageTitle": "Témoignages",
+      "newTestimonial": "Nouveau témoignage",
+      "loading": "Chargement…",
+      "empty": "Aucun témoignage pour le moment",
+      "deleteTitle": "Supprimer ?",
+      "deleteDescription": "Supprimer le témoignage de « {{name}} » ?",
+      "editTitle": "Modifier le témoignage",
+      "newTitle": "Nouveau témoignage",
+      "fields": {
+        "name": "Nom *",
+        "role": "Rôle",
+        "content": "Contenu *",
+        "avatar": "Avatar",
+        "rating": "Note (1-5)",
+        "sortOrder": "Ordre de tri",
+        "active": "Actif"
+      },
+      "toasts": {
+        "nameContentRequired": "Nom et contenu requis",
+        "saved": "Enregistré",
+        "saveFailed": "Échec de l'enregistrement"
+      }
+    },
+    "admins": {
+      "pageTitle": "Administrateurs",
+      "pageDescription": "Accordez un accès administrateur ou personnel à votre équipe.",
+      "inviteAdmin": "Inviter un administrateur",
+      "superAdminOnlyTitle": "Super administrateur uniquement",
+      "superAdminOnlyDescription": "Seuls les super administrateurs peuvent gérer les comptes administrateurs.",
+      "loading": "Chargement…",
+      "empty": "Aucun administrateur pour le moment",
+      "table": {
+        "email": "E-mail",
+        "roles": "Rôles",
+        "lastSignIn": "Dernière connexion",
+        "actions": "Actions"
+      },
+      "removeRole": "Retirer le rôle",
+      "removeAllAccessTitle": "Retirer tout accès administrateur ?",
+      "removeAllAccessDescription": "{{email}} perdra tous ses rôles admin/personnel. Le compte d'authentification n'est pas supprimé.",
+      "removeAccess": "Retirer l'accès",
+      "inviteDialogTitle": "Inviter un administrateur",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "collegue@exemple.com",
+      "roleLabel": "Rôle",
+      "roleAdmin": "Administrateur (gestion complète)",
+      "roleStaff": "Personnel (lecture seule)",
+      "inviteHint": "Un e-mail d'invitation sera envoyé. Lorsque le destinataire définit un mot de passe, il pourra accéder immédiatement au tableau de bord.",
+      "sendInvite": "Envoyer l'invitation",
+      "toasts": {
+        "invitationSent": "Invitation envoyée",
+        "roleRemoved": "Rôle retiré"
+      }
+    }
+  }
+}
