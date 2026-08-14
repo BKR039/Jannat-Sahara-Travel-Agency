@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeNewsletter } from "@/lib/public.functions";
 import { contactInfoQuery, branchesQuery } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 import type { SupportedLanguage } from "@/lib/i18n";
 
 const QUICK_LINKS = [
