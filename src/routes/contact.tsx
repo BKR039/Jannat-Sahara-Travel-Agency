@@ -30,6 +30,7 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data: info } = useQuery(contactInfoQuery());
   const [loading, setLoading] = useState(false);
   const sendMessage = useServerFn(submitContactMessage);
