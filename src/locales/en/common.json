@@ -1,0 +1,661 @@
+{
+  "brand": {
+    "name": "Janat Sahara Voyages",
+    "tagline": "Your spiritual journey begins here"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "umrah": "Umrah",
+    "trips": "Trips",
+    "flights": "Flights",
+    "visa": "Visas",
+    "gallery": "Gallery",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "actions": {
+    "bookNow": "Book Now",
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "readMore": "Read More",
+    "send": "Send",
+    "search": "Search",
+    "menu": "Menu",
+    "toggleTheme": "Toggle Theme",
+    "changeLanguage": "Change Language",
+    "viewDetails": "Details"
+  },
+  "home": {
+    "featuredPackages": "Featured Offers",
+    "featuredPackagesDesc": "Our best selected Umrah packages",
+    "featuredTrips": "Featured Trips",
+    "featuredTripsDesc": "Unforgettable destinations",
+    "services": "Our Services",
+    "servicesDesc": "Comprehensive solutions for all your needs",
+    "whyUs": "Why Choose Us?",
+    "whyUsDesc": "Because we always offer the best",
+    "testimonials": "Customer Reviews",
+    "testimonialsDesc": "What our customers say about us",
+    "gallery": "Photo Gallery",
+    "galleryDesc": "Glimpses of our trips",
+    "latestArticles": "Latest Articles",
+    "latestArticlesDesc": "Tips and news",
+    "bookingWidget": {
+      "title": "Find Your Ideal Trip",
+      "type": "Service Type",
+      "destination": "Destination",
+      "date": "Date",
+      "search": "Search"
+    }
+  },
+  "categories": {
+    "umrah": "Umrah",
+    "trip": "Trip",
+    "flight": "Flight",
+    "visa": "Visa",
+    "all": "All"
+  },
+  "package": {
+    "from": "From",
+    "duration": "Duration",
+    "destination": "Destination",
+    "seats": "Available Seats",
+    "hotel": "Hotel",
+    "airline": "Airline",
+    "included": "Included",
+    "excluded": "Not Included",
+    "timeline": "Itinerary",
+    "gallery": "Gallery",
+    "related": "Similar Offers",
+    "terms": "Booking Terms",
+    "faqTitle": "Frequently Asked Questions"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to answer all your questions",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message",
+    "success": "Your message has been sent successfully",
+    "error": "An error occurred"
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "services": "Our Services",
+    "branches": "Our Branches",
+    "contact": "Contact Us",
+    "workingHours": "Working Hours",
+    "legal": "Legal Notice",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Get our best offers and selected destinations",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "newsletterSuccess": "Subscription successful",
+    "newsletterError": "An error occurred, please try again later",
+    "newsletterDuplicate": "You are already subscribed to our newsletter",
+    "emailPlaceholder": "Your email",
+    "followUs": "Follow Us",
+    "rights": "All rights reserved"
+  },
+  "common": {
+    "loading": "Loading...",
+    "empty": "No data to display",
+    "error": "Error",
+    "language": "Language",
+    "currency": "TND",
+    "minutesRead": "{{count}} min read",
+    "clear": "Clear",
+    "close": "Close",
+    "minutesShort": "{{count}} min"
+  },
+  "booking": {
+    "title": "Book Your Offer",
+    "subtitle": "Fill out the form and we will contact you to confirm {{pkg}}",
+    "cancel": "Cancel",
+    "submit": "Confirm Booking",
+    "submitting": "Sending...",
+    "fields": {
+      "name": "Full Name",
+      "phone": "Phone",
+      "email": "Email",
+      "people": "Number of People",
+      "notes": "Additional Notes",
+      "passport": "Passport Scan",
+      "passportHint": "PDF or image, 5 MB maximum"
+    },
+    "errors": {
+      "required": "Please provide your name and phone number",
+      "tooLarge": "The file exceeds 5 MB",
+      "badType": "Unsupported format (PDF or image)",
+      "upload": "Upload failed, please try again",
+      "generic": "Unable to send the booking, please try again"
+    }
+  },
+  "bookingSuccess": {
+    "title": "Booking Received Successfully",
+    "subtitle": "Thank you for choosing Janat Sahara. Our team will contact you within 24 hours to confirm the details.",
+    "reference": "Reference",
+    "home": "Back to Home",
+    "contact": "Contact Us"
+  },
+  "branches": {
+    "title": "Our Branches & Contact",
+    "subtitle": "Visit us or contact us directly — our team is here to help",
+    "ourBranches": "Our Branches",
+    "mainBranch": "Main Branch",
+    "active": "Selected",
+    "viewOnMap": "View on Map",
+    "directions": "Directions",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied",
+    "linkCopied": "Link copied",
+    "contactCard": {
+      "title": "Direct Contact",
+      "subtitle": "We answer all your questions",
+      "follow": "Follow Us"
+    },
+    "info": {
+      "title": "Contact Information",
+      "subtitle": "Other ways to reach us",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "headquarters": "Headquarters",
+      "hours": "Hours"
+    },
+    "form": {
+      "title": "Send Us a Message",
+      "subtitle": "Fill out the form and we will get back to you quickly.",
+      "selectBranch": "Choose a Branch",
+      "whatsappInstead": "Or via WhatsApp",
+      "thanks": "Message received. We will contact you very soon."
+    },
+    "searchPlaceholder": "Search for a branch or city…",
+    "allCities": "All Cities",
+    "noResults": "No branch matches your search",
+    "branchesCount": "branches",
+    "copyAddress": "Copy Address",
+    "addressCopied": "Address copied",
+    "office": "Office",
+    "selectHint": "Select a branch to view it on the map",
+    "kicker": "Our Network",
+    "contactKicker": "Contact Us"
+  },
+  "bookingFlow": {
+    "eyebrow": "3-Step Booking",
+    "title": "Complete Your Booking",
+    "subtitle": "The offer is already selected. Enter the travelers, complete the information and confirm — no online payment required.",
+    "widget": {
+      "title": "Start Your Booking",
+      "subtitle": "Choose a service and discover the available offers.",
+      "cta": "Get Started",
+      "step": "Select an Offer"
+    },
+    "steps": {
+      "service": "Service",
+      "package": "Offer",
+      "travellers": "Travelers",
+      "review": "Review",
+      "confirm": "Confirmation",
+      "details": "Travelers",
+      "passports": "Passports"
+    },
+    "service": {
+      "title": "Choose the Service",
+      "desc": "Available offers are filtered automatically."
+    },
+    "package": {
+      "title": "Choose the Offer",
+      "desc": "All offers come from the database — no manual entry required.",
+      "empty": "No offer available for this service.",
+      "from": "From",
+      "available": "{{count}} offer(s) available"
+    },
+    "travellers": {
+      "title": "Number of Travelers",
+      "desc": "Indicate the number of adults, children, and infants.",
+      "adults": "Adults",
+      "adultsHint": "12 years and older",
+      "children": "Children",
+      "childrenHint": "From 2 to 11 years",
+      "infants": "Infants",
+      "infantsHint": "Under 2 years (optional)",
+      "formsTitle": "Traveler Information",
+      "formsDesc": "One form per traveler with their own passport.",
+      "adult": "Adult",
+      "child": "Child",
+      "infant": "Infant",
+      "primaryBadge": "Primary Contact"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "passportNumber": "Passport Number",
+      "nationality": "Nationality",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "dob": "Date of Birth",
+      "passportExpiry": "Passport Expiry",
+      "phone": "Phone",
+      "email": "Email",
+      "emergency": "Emergency Contact",
+      "notes": "Notes (optional)",
+      "passportFile": "Passport Scan",
+      "passportHint": "PDF or image, 5 MB maximum",
+      "uploading": "Uploading...",
+      "comm": "Preferred Contact Method",
+      "comm_phone": "Phone",
+      "comm_whatsapp": "WhatsApp",
+      "comm_email": "Email",
+      "bookingNotes": "General Booking Notes"
+    },
+    "summary": {
+      "title": "Summary",
+      "empty": "Choose an offer to see the price.",
+      "package": "Offer",
+      "departure": "Departure",
+      "duration": "Duration",
+      "perAdult": "Adult Price",
+      "perChild": "Child Price",
+      "perInfant": "Infant Price",
+      "passengers": "Travelers",
+      "total": "Total"
+    },
+    "review": {
+      "title": "Review Your Information",
+      "desc": "Check everything before confirming.",
+      "packageBlock": "Selected Offer",
+      "noPassport": "No passport uploaded",
+      "terms": "I accept the booking terms and privacy policy, and I certify the accuracy of the information and passports provided.",
+      "termsLabel": "Accept the Terms"
+    },
+    "confirm": {
+      "title": "Confirm the Booking",
+      "desc": "We will contact you to finalize the details.",
+      "noPayment": "No payment required now — our team will contact you."
+    },
+    "actions": {
+      "next": "Next",
+      "back": "Back",
+      "submit": "Confirm Booking",
+      "submitting": "Sending...",
+      "changePackage": "Change Offer"
+    },
+    "errors": {
+      "selectService": "Please choose a service",
+      "selectPackage": "Please choose an offer",
+      "passengerName": "Full name is required for each traveler",
+      "primaryContact": "Primary contact's phone and email are required",
+      "terms": "Please accept the terms",
+      "tooLarge": "The file exceeds 5 MB",
+      "badType": "Unsupported format (PDF or image)",
+      "upload": "Upload failed, please try again",
+      "generic": "Unable to send the booking, please try again"
+    },
+    "packageStep": {
+      "title": "Selected Offer",
+      "desc": "Check the offer details before continuing."
+    },
+    "missing": {
+      "title": "Choose an Offer First",
+      "desc": "Browse the available offers, then click \"Book Now\" to get started.",
+      "cta": "Browse Offers"
+    },
+    "passports": {
+      "title": "Passport Upload",
+      "desc": "Add an image or PDF of each traveler's passport."
+    }
+  },
+  "explorer": {
+    "eyebrow": "Explore Offers",
+    "title": "Carefully Selected Offers",
+    "subtitle": "Compare available offers and start your booking in one click.",
+    "allServices": "All Services",
+    "destination": "Destination",
+    "duration": "Duration",
+    "price": "Price",
+    "month": "Departure Month",
+    "availability": "Availability",
+    "any": "All",
+    "availableOnly": "Available Only",
+    "reset": "Reset Filters",
+    "results": "{{count}} matching offer(s)",
+    "empty": "No offer matches the selected filters.",
+    "durations": {
+      "short": "Up to 7 days",
+      "medium": "8 to 14 days",
+      "long": "15 days and more"
+    },
+    "prices": {
+      "low": "Under 3000",
+      "mid": "3000 - 7000",
+      "high": "Over 7000"
+    },
+    "groups": {
+      "umrah": "Featured Umrah Offers",
+      "trips": "Featured Trips",
+      "other": "Flights and Visas"
+    }
+  },
+  "selector": {
+    "subtitle": "Choose a service, browse available offers, and book in one click — no need to fill anything in.",
+    "services": "Services",
+    "label": "Choose an Offer",
+    "placeholder": "Browse Available Offers",
+    "searchPlaceholder": "Search for an offer...",
+    "empty": "No offer currently available.",
+    "limited": "{{count}} seats remaining",
+    "available": "Available",
+    "seatsLeft": "{{count}} seats remaining",
+    "continue": "Continue Booking",
+    "close": "Close",
+    "badges": {
+      "bestSeller": "Best Seller",
+      "new": "New",
+      "discount": "Special Offer"
+    }
+  },
+  "seo": {
+    "root": {
+      "title": "Janat Sahara Travel — Umrah, Trips and Visas",
+      "description": "Travel agency specializing in Umrah, organized trips, flight tickets, and visas. Your spiritual journey begins here.",
+      "ogDescription": "Umrah, organized trips, flight tickets, and visas."
+    },
+    "home": {
+      "title": "Janat Sahara Travel — Umrah, Trips and Visas",
+      "description": "Tunisian travel agency specializing in organizing Umrah, organized trips, flight tickets, and visa services.",
+      "ogTitle": "Janat Sahara Travel",
+      "ogDescription": "Your spiritual journey begins here. Umrah packages, trips, and visas."
+    },
+    "umrah": {
+      "title": "Umrah Packages — Janat Sahara",
+      "description": "The best Umrah packages departing from Tunisia, at competitive prices with comprehensive services.",
+      "ogDescription": "All-inclusive Umrah packages: flight, hotel, and transfers."
+    },
+    "trips": {
+      "title": "Organized Trips — Janat Sahara",
+      "description": "Trips to the world's most beautiful destinations.",
+      "ogDescription": "Discover exceptional destinations."
+    },
+    "visa": {
+      "title": "Visa Services — Janat Sahara",
+      "description": "Visa acquisition services for many destinations.",
+      "ogDescription": "Get your visa easily and quickly."
+    },
+    "flights": {
+      "title": "Flight Tickets — Request the Best Deals | Janat Sahara",
+      "description": "Book any flight worldwide: send us your travel details, our team searches for the best options and gets back to you.",
+      "ogTitle": "Flight Tickets — Request the Best Deals",
+      "ogDescription": "Any airline, any destination worldwide — send your request and get the best available fares."
+    },
+    "contact": {
+      "title": "Contact — Janat Sahara",
+      "description": "Contact the Janat Sahara Travel team by phone, email, or via the form.",
+      "ogDescription": "We are at your service at all times."
+    },
+    "about": {
+      "title": "About — Janat Sahara Travel",
+      "description": "Discover Janat Sahara Travel agency, our history and our vision.",
+      "ogTitle": "About — Janat Sahara",
+      "ogDescription": "A Tunisian travel agency with years of experience in Umrah and tourism."
+    },
+    "gallery": {
+      "title": "Gallery — Janat Sahara",
+      "description": "Moments from our trips and offers in pictures.",
+      "ogDescription": "Photos from Umrah and tourism trips."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions — Janat Sahara",
+      "description": "Answers to the most frequently asked questions about our Umrah packages, trips, and visas.",
+      "ogDescription": "Everything you need to know before booking."
+    },
+    "blog": {
+      "title": "Blog — Travel and Umrah Tips | Janat Sahara",
+      "description": "Articles, news, and travel and Umrah tips from the Janat Sahara team.",
+      "ogDescription": "Travel tips, Umrah guide, and tourist destinations.",
+      "jsonName": "Janat Sahara Blog"
+    },
+    "blogArticle": {
+      "defaultTitle": "Article — Janat Sahara",
+      "defaultDescription": "Read an article from the Janat Sahara travel and Umrah blog.",
+      "titleSuffix": "Janat Sahara",
+      "defaultHeadline": "Article",
+      "authorFallback": "Janat Sahara",
+      "publisherName": "Janat Sahara Voyages"
+    },
+    "booking": {
+      "title": "Complete Your Booking — Janat Sahara Travel",
+      "description": "Complete the booking for your chosen offer: number of travelers, individual information and passports, review, and confirmation — no online payment required.",
+      "ogDescription": "A simple booking process in a few steps once the offer is selected."
+    },
+    "bookingSuccess": {
+      "title": "Booking Received — Janat Sahara",
+      "description": "Thank you for your booking. We will contact you soon to confirm the details."
+    },
+    "legalTerms": {
+      "title": "Terms of Use — Janat Sahara",
+      "description": "Terms of use of the Janat Sahara Travel website.",
+      "ogDescription": "The general terms and conditions of our bookings."
+    },
+    "legalPrivacy": {
+      "title": "Privacy Policy — Janat Sahara",
+      "description": "Privacy policy of the Janat Sahara Travel website.",
+      "ogDescription": "How we protect and use your data."
+    },
+    "packageDetail": {
+      "title": "Offer — Janat Sahara"
+    }
+  },
+  "about": {
+    "defaultTitle": "About",
+    "mission": "Our Mission",
+    "vision": "Our Vision",
+    "values": "Our Values"
+  },
+  "legalTerms": {
+    "p1": "By using the Janat Sahara Travel website, you accept these terms. The information provided during booking must be accurate and complete.",
+    "p2": "No payment is made through the website. The booking and payment are confirmed directly with our team, by phone, WhatsApp, or at the nearest branch.",
+    "p3": "We reserve the right to modify rates or itineraries based on our partners' availability. You will be informed of any changes before your booking is finally confirmed.",
+    "updated": "Last updated: August 2026."
+  },
+  "legalPrivacy": {
+    "p1": "At Janat Sahara Travel, we are committed to protecting your privacy. The data you provide is used only to confirm your bookings and communicate with you about your trip.",
+    "p2": "We do not sell or share your personal data with third parties for commercial purposes. You may request deletion of your data at any time by contacting us.",
+    "p3": "Passports and travel documents are kept in secure storage, accessible only to authorized team members.",
+    "updated": "Last updated: August 2026."
+  },
+  "blog": {
+    "searchPlaceholder": "Search articles...",
+    "searchAria": "Search articles",
+    "clearSearchAria": "Clear search",
+    "all": "All",
+    "backToBlog": "Back to Blog",
+    "relatedArticles": "Related Articles",
+    "share": "Share",
+    "shareArticle": "Share the Article",
+    "shareWhatsapp": "Share on WhatsApp",
+    "shareFacebook": "Share on Facebook",
+    "shareX": "Share on X",
+    "copyLink": "Copy Link",
+    "linkCopied": "Article link copied",
+    "copyFailed": "Unable to copy the link",
+    "readMore": "Read More"
+  },
+  "flightRequest": {
+    "badge": "Flight Tickets",
+    "heading": "Book Any Flight Worldwide, Easily",
+    "subheading": "Provide your travel details and we will quickly send you the best available flight options.",
+    "tripTypeAria": "Trip Type",
+    "oneWay": "One Way",
+    "roundTrip": "Round Trip",
+    "fromLabel": "Departure Airport",
+    "fromPlaceholder": "Tunis, Sfax, Djerba…",
+    "toLabel": "Arrival Airport",
+    "toPlaceholder": "Jeddah, Dubai, Istanbul, Paris…",
+    "departureLabel": "Departure Date",
+    "returnLabel": "Return Date",
+    "passengersFieldLabel": "Travelers",
+    "passengersCount": "{{count}} traveler(s)",
+    "adultsLabel": "Adults",
+    "adultsHint": "12 years and older",
+    "childrenLabel": "Children",
+    "childrenHint": "From 2 to 11 years",
+    "infantsLabel": "Infants",
+    "infantsHint": "Under 2 years",
+    "decreaseAria": "Decrease {{label}}",
+    "increaseAria": "Increase {{label}}",
+    "cabinLabel": "Travel Class",
+    "cabin": {
+      "economy": "Economy Class",
+      "premium_economy": "Premium Economy",
+      "business": "Business Class",
+      "first": "First Class"
+    },
+    "nameLabel": "Full Name",
+    "namePlaceholder": "First and Last Name",
+    "phoneLabel": "Phone Number",
+    "emailLabel": "Email Address",
+    "notesLabel": "Additional Notes (optional)",
+    "notesPlaceholder": "Direct flight preferred · lowest price · morning flight · flexible dates…",
+    "submitLabel": "Request the Best Deals",
+    "submitting": "Sending request…",
+    "disclaimer": "No booking or payment now — our team will contact you with the best available options.",
+    "errorGeneric": "Unable to send the request, please try again.",
+    "errorValidation": "Please fill in the required fields.",
+    "successTitle": "Your request has been received.",
+    "successDesc": "Our team will search for the best available flight options and contact you shortly by phone or email.",
+    "referenceLabel": "Reference Number",
+    "copyReferenceAria": "Copy reference number",
+    "referenceCopied": "Reference number copied",
+    "whatsappCta": "WhatsApp",
+    "callCta": "Call the Agency",
+    "newRequestCta": "Send Another Request",
+    "waMessage": "Hello, flight ticket request no. {{ref}}",
+    "noResults": "No matching results",
+    "clearAria": "Clear"
+  },
+  "adminBranches": {
+    "title": "Branches",
+    "subtitle": "Manage your travel agency's offices and branches.",
+    "add": "Add a Branch",
+    "edit": "Edit",
+    "more": "More",
+    "back": "Branches",
+    "editTitle": "Edit Branch",
+    "newTitle": "New Branch",
+    "active": "Active",
+    "inactive": "Inactive",
+    "main": "Main Branch",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "setMain": "Set as Main Branch",
+    "setMainTitle": "Set as Main Branch?",
+    "setMainDesc": "This branch will become the main branch and the previous one will lose that status.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Changes saved",
+    "unsaved": "Unsaved changes",
+    "discard": "Discard",
+    "delete": "Delete Branch",
+    "deleteTitle": "Delete this branch?",
+    "deleteDesc": "This branch and its information will be permanently deleted. You can simply deactivate it instead.",
+    "empty": "No branches yet. Add your first office.",
+    "count": "branch",
+    "noAddress": "missing address",
+    "untitled": "Unnamed Branch",
+    "groups": {
+      "info": "Information",
+      "contact": "Contact",
+      "location": "Location",
+      "business": "Display",
+      "translation": "French Translation"
+    },
+    "hints": {
+      "translation": "Used when the website is viewed in French.",
+      "location": "Google Maps link and/or coordinates.",
+      "business": "An inactive branch remains here but does not appear on the website."
+    },
+    "fields": {
+      "name": "Branch Name",
+      "city": "City",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Full Address",
+      "maps": "Google Maps Link",
+      "hours": "Opening Hours",
+      "lat": "Latitude",
+      "lng": "Longitude",
+      "photo": "Branch Photo",
+      "mainBranch": "Main Branch",
+      "active": "Visible on Website"
+    },
+    "errors": {
+      "required": "This field is required",
+      "email": "Please enter a valid email",
+      "phone": "Please enter a valid phone number",
+      "url": "Please enter a valid link",
+      "lat": "Must be between -90 and 90",
+      "lng": "Must be between -180 and 180"
+    },
+    "toast": {
+      "created": "Branch created",
+      "deleted": "Branch deleted",
+      "mainUpdated": "Main branch updated",
+      "activated": "The branch is visible on the website",
+      "deactivated": "The branch is hidden from the website"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "goHome": "Go home"
+  },
+  "errorPage": {
+    "title": "This page didn't load",
+    "description": "Something went wrong on our end. You can try refreshing or head back home.",
+    "retry": "Try again",
+    "goHome": "Go home"
+  },
+  "auth": {
+    "signInTitle": "Admin dashboard",
+    "signInSubtitle": "Sign in to manage Janat Sahara Travel",
+    "tabSignIn": "Sign in",
+    "tabForgot": "Forgot?",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "forgotHint": "Enter your admin email. We'll send a secure link to reset your password.",
+    "sendResetLink": "Send reset link",
+    "invalidEmail": "Enter a valid email",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "welcomeBack": "Welcome back",
+    "signInFailed": "Sign-in failed",
+    "resetEmailSent": "Password reset email sent",
+    "resetEmailFailed": "Failed to send reset email",
+    "newPasswordTitle": "Set a new password",
+    "newPasswordSubtitle": "Choose a strong password for your admin account.",
+    "waitingLink": "Waiting for a valid recovery link… If this page loaded directly, request a fresh link from",
+    "signInPageLink": "the sign-in page",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "updatePassword": "Update password",
+    "passwordsMismatch": "Passwords do not match",
+    "passwordMin8": "Password must be at least 8 characters",
+    "passwordUpdated": "Password updated",
+    "passwordUpdateFailed": "Failed to update password",
+    "seoTitle": "Admin sign in — Janat Sahara Travel",
+    "seoDescription": "Secure sign-in for the Janat Sahara Travel management dashboard."
+  }
+}

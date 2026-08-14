@@ -4,16 +4,14 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Play } from "lucide-react";
 import { contentQuery } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
-import { hasArabic, useLocalized } from "@/lib/localize";
+import { pickLocalizedList, useLocalized } from "@/lib/localize";
 
 export function HeroSection() {
   const { t } = useTranslation();
-  const { isFr, L } = useLocalized();
+  const { lang, L } = useLocalized();
   const { data: hero } = useQuery(contentQuery("hero"));
-  const rawBadges = ((hero?.data as { badges?: string[]; badges_fr?: string[] } | null));
-  const badges = (isFr
-    ? rawBadges?.badges_fr ?? (rawBadges?.badges ?? []).filter((b) => !hasArabic(b))
-    : rawBadges?.badges) ?? [];
+  const badges = pickLocalizedList(hero?.data as Record<string, unknown> | null, "badges", lang);
+
   const heroTitle = L(hero, "title", "empty");
   const heroSubtitle = L(hero, "subtitle", "empty");
   const heroCta = L(hero, "cta_label", "empty");

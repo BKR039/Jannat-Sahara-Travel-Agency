@@ -1,0 +1,172 @@
+{
+  "shell": {
+    "nav": {
+      "groups": {
+        "today": "Aujourd'hui",
+        "business": "Activité",
+        "website": "Site web",
+        "setup": "Configuration"
+      },
+      "commandCenter": "Centre de contrôle",
+      "requests": "Demandes",
+      "bookings": "Réservations",
+      "trips": "Voyages",
+      "customers": "Clients",
+      "reports": "Rapports",
+      "branches": "Agences",
+      "gallery": "Galerie",
+      "blog": "Blog",
+      "testimonials": "Témoignages",
+      "faq": "FAQ",
+      "notifications": "Notifications",
+      "settings": "Paramètres",
+      "team": "Équipe"
+    },
+    "closeNavigation": "Fermer la navigation",
+    "openNavigation": "Ouvrir la navigation",
+    "viewPublicSite": "Voir le site public",
+    "signedInAs": "Connecté en tant que",
+    "signOut": "Déconnexion",
+    "greeting": {
+      "morning": "Bonjour",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir"
+    },
+    "search": {
+      "placeholder": "Rechercher clients, téléphone, e-mail…",
+      "ariaLabel": "Rechercher des clients"
+    },
+    "notificationsAriaLabel": "Notifications",
+    "layout": {
+      "title": "Tableau de bord — Admin Janat Sahara",
+      "accessDeniedTitle": "Accès refusé",
+      "accessDeniedDescription": "Votre compte n'a pas la permission d'accéder au tableau de bord admin. Contactez votre super administrateur pour demander l'accès.",
+      "signOut": "Déconnexion",
+      "backToSite": "Retour au site"
+    },
+    "dashboard": {
+      "title": "Centre de contrôle",
+      "description": "Tout ce qui nécessite votre attention aujourd'hui, en un seul endroit.",
+      "openRequests": "Demandes ouvertes",
+      "newTrip": "Nouveau voyage",
+      "kpi": {
+        "revenue": "Revenus ce mois-ci",
+        "revenueHint": "Réservations actives créées ce mois-ci",
+        "bookings": "Réservations ce mois-ci",
+        "travellers": "Voyageurs",
+        "travellersHint": "Adultes, enfants et bébés",
+        "upcomingDepartures": "Départs à venir",
+        "upcomingDeparturesHint": "Voyages avec une date de départ future"
+      },
+      "insights": {
+        "title": "Analyses intelligentes",
+        "emptyTitle": "Rien ne nécessite votre attention",
+        "emptyDescription": "Aucun risque de capacité, demande sans réponse ou tendance inhabituelle détecté.",
+        "open": "Ouvrir"
+      },
+      "revenueTrend": {
+        "title": "Tendance des revenus",
+        "description": "Valeur des réservations sur les 12 derniers mois"
+      },
+      "workQueue": {
+        "title": "File d'attente",
+        "description": "En attente d'une première réponse",
+        "newBookings": "Nouvelles demandes de réservation",
+        "newRequests": "Nouvelles demandes de vol",
+        "unreadMessages": "Messages non lus"
+      },
+      "nextDepartures": {
+        "title": "Prochains départs",
+        "description": "Occupation des prochains voyages",
+        "allTrips": "Tous les voyages",
+        "emptyTitle": "Aucun départ à venir"
+      },
+      "latestBookings": {
+        "title": "Dernières réservations",
+        "allBookings": "Toutes les réservations",
+        "emptyTitle": "Aucune réservation pour l'instant",
+        "generalEnquiry": "Demande générale"
+      }
+    },
+    "reports": {
+      "title": "Rapports",
+      "description": "Réponses aux questions que vous posez chaque semaine.",
+      "kpi": {
+        "revenue": "Revenus (12 mois)",
+        "bookings": "Réservations",
+        "travellers": "Voyageurs",
+        "averageBooking": "Réservation moyenne",
+        "conversionHint": "{{value}}% des demandes confirmées"
+      },
+      "revenueAndBookings": {
+        "title": "Revenus et réservations",
+        "description": "Comparaison mensuelle"
+      },
+      "newCustomers": {
+        "title": "Nouveaux clients",
+        "description": "Clients uniques par mois"
+      },
+      "bestPerformingTrips": {
+        "title": "Voyages les plus performants",
+        "emptyTitle": "Aucune donnée pour l'instant",
+        "summary": "{{bookings}} réservations · {{travellers}} voyageurs"
+      },
+      "capacity": {
+        "title": "Capacité des prochains voyages",
+        "emptyTitle": "Aucun départ à venir"
+      },
+      "topDestinations": {
+        "title": "Meilleures destinations",
+        "emptyTitle": "Aucune donnée pour l'instant"
+      }
+    },
+    "customers": {
+      "title": "Clients",
+      "description": "Personnes issues des demandes de réservation. Contactez-les directement.",
+      "exportCsv": "Exporter en CSV",
+      "searchPlaceholder": "Rechercher par nom, téléphone, e-mail…",
+      "loading": "Chargement…",
+      "emptyTitle": "Aucun client pour l'instant",
+      "table": {
+        "name": "Nom",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "bookings": "Réservations",
+        "categories": "Catégories",
+        "lastBooking": "Dernière réservation",
+        "contact": "Contact"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Événements système, nouveaux prospects et messages.",
+      "markAllRead": "Tout marquer comme lu",
+      "markAllReadSuccess": "Tout a été marqué comme lu",
+      "loading": "Chargement…",
+      "emptyTitle": "Aucune notification pour l'instant",
+      "view": "Voir",
+      "markRead": "Marquer comme lu"
+    },
+    "kit": {
+      "insight": {
+        "info": "Information",
+        "opportunity": "Opportunité",
+        "attention": "Attention",
+        "critical": "Critique"
+      },
+      "occupancy": {
+        "travellers": "voyageurs",
+        "left": "restant(s)",
+        "noCapacity": "Aucune capacité définie"
+      },
+      "search": {
+        "placeholder": "Rechercher…"
+      },
+      "close": "Fermer",
+      "missingFr": {
+        "badge": "FR manquant",
+        "title": "Pas encore de traduction française"
+      }
+    }
+  }
+}

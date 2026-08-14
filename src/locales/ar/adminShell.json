@@ -1,0 +1,172 @@
+{
+  "shell": {
+    "nav": {
+      "groups": {
+        "today": "اليوم",
+        "business": "الأعمال",
+        "website": "الموقع الإلكتروني",
+        "setup": "الإعدادات"
+      },
+      "commandCenter": "مركز التحكم",
+      "requests": "الطلبات",
+      "bookings": "الحجوزات",
+      "trips": "الرحلات",
+      "customers": "العملاء",
+      "reports": "التقارير",
+      "branches": "الفروع",
+      "gallery": "معرض الصور",
+      "blog": "المدونة",
+      "testimonials": "آراء العملاء",
+      "faq": "الأسئلة الشائعة",
+      "notifications": "الإشعارات",
+      "settings": "الإعدادات",
+      "team": "الفريق"
+    },
+    "closeNavigation": "إغلاق القائمة",
+    "openNavigation": "فتح القائمة",
+    "viewPublicSite": "عرض الموقع العام",
+    "signedInAs": "تم تسجيل الدخول باسم",
+    "signOut": "تسجيل الخروج",
+    "greeting": {
+      "morning": "صباح الخير",
+      "afternoon": "مساء الخير",
+      "evening": "مساء الخير"
+    },
+    "search": {
+      "placeholder": "ابحث عن عميل، هاتف، بريد إلكتروني…",
+      "ariaLabel": "البحث عن العملاء"
+    },
+    "notificationsAriaLabel": "الإشعارات",
+    "layout": {
+      "title": "لوحة التحكم — إدارة جنة الصحراء",
+      "accessDeniedTitle": "تم رفض الوصول",
+      "accessDeniedDescription": "حسابك لا يملك صلاحية الوصول إلى لوحة التحكم. تواصل مع المشرف العام لطلب الوصول.",
+      "signOut": "تسجيل الخروج",
+      "backToSite": "العودة إلى الموقع"
+    },
+    "dashboard": {
+      "title": "مركز التحكم",
+      "description": "كل ما يحتاج انتباهك اليوم، في مكان واحد.",
+      "openRequests": "الطلبات المفتوحة",
+      "newTrip": "رحلة جديدة",
+      "kpi": {
+        "revenue": "إيرادات هذا الشهر",
+        "revenueHint": "الحجوزات النشطة التي تم إنشاؤها هذا الشهر",
+        "bookings": "حجوزات هذا الشهر",
+        "travellers": "المسافرون",
+        "travellersHint": "البالغون والأطفال والرضع",
+        "upcomingDepartures": "المغادرات القادمة",
+        "upcomingDeparturesHint": "رحلات بتاريخ مغادرة مستقبلي"
+      },
+      "insights": {
+        "title": "رؤى ذكية",
+        "emptyTitle": "لا شيء يحتاج انتباهك",
+        "emptyDescription": "لم يتم اكتشاف مخاطر سعة، أو طلبات دون رد، أو اتجاهات غير معتادة.",
+        "open": "فتح"
+      },
+      "revenueTrend": {
+        "title": "اتجاه الإيرادات",
+        "description": "قيمة الحجوزات خلال آخر 12 شهرًا"
+      },
+      "workQueue": {
+        "title": "قائمة الانتظار",
+        "description": "في انتظار الرد الأول",
+        "newBookings": "طلبات حجز جديدة",
+        "newRequests": "طلبات رحلات جديدة",
+        "unreadMessages": "رسائل غير مقروءة"
+      },
+      "nextDepartures": {
+        "title": "المغادرات القادمة",
+        "description": "إشغال الرحلات القادمة",
+        "allTrips": "جميع الرحلات",
+        "emptyTitle": "لا توجد مغادرات قادمة"
+      },
+      "latestBookings": {
+        "title": "أحدث الحجوزات",
+        "allBookings": "جميع الحجوزات",
+        "emptyTitle": "لا توجد حجوزات بعد",
+        "generalEnquiry": "استفسار عام"
+      }
+    },
+    "reports": {
+      "title": "التقارير",
+      "description": "إجابات عن الأسئلة التي تطرحها كل أسبوع.",
+      "kpi": {
+        "revenue": "الإيرادات (12 شهرًا)",
+        "bookings": "الحجوزات",
+        "travellers": "المسافرون",
+        "averageBooking": "متوسط الحجز",
+        "conversionHint": "{{value}}٪ من الاستفسارات تم تأكيدها"
+      },
+      "revenueAndBookings": {
+        "title": "الإيرادات والحجوزات",
+        "description": "مقارنة شهرية"
+      },
+      "newCustomers": {
+        "title": "عملاء جدد",
+        "description": "العملاء الفريدون شهريًا"
+      },
+      "bestPerformingTrips": {
+        "title": "الرحلات الأفضل أداءً",
+        "emptyTitle": "لا توجد بيانات بعد",
+        "summary": "{{bookings}} حجوزات · {{travellers}} مسافرين"
+      },
+      "capacity": {
+        "title": "سعة الرحلات القادمة",
+        "emptyTitle": "لا توجد مغادرات قادمة"
+      },
+      "topDestinations": {
+        "title": "أفضل الوجهات",
+        "emptyTitle": "لا توجد بيانات بعد"
+      }
+    },
+    "customers": {
+      "title": "العملاء",
+      "description": "أشخاص مستخرجون من طلبات الحجز. تواصل معهم مباشرة.",
+      "exportCsv": "تصدير CSV",
+      "searchPlaceholder": "ابحث بالاسم أو الهاتف أو البريد الإلكتروني…",
+      "loading": "جارٍ التحميل…",
+      "emptyTitle": "لا يوجد عملاء بعد",
+      "table": {
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "bookings": "الحجوزات",
+        "categories": "الفئات",
+        "lastBooking": "آخر حجز",
+        "contact": "تواصل"
+      }
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "description": "أحداث النظام، عملاء محتملون جدد ورسائل.",
+      "markAllRead": "تعليم الكل كمقروء",
+      "markAllReadSuccess": "تم تعليم الكل كمقروء",
+      "loading": "جارٍ التحميل…",
+      "emptyTitle": "لا توجد إشعارات بعد",
+      "view": "عرض",
+      "markRead": "تعليم كمقروء"
+    },
+    "kit": {
+      "insight": {
+        "info": "معلومة",
+        "opportunity": "فرصة",
+        "attention": "انتباه",
+        "critical": "حرج"
+      },
+      "occupancy": {
+        "travellers": "مسافرين",
+        "left": "متبقٍ",
+        "noCapacity": "لم يتم تحديد السعة"
+      },
+      "search": {
+        "placeholder": "بحث…"
+      },
+      "close": "إغلاق",
+      "missingFr": {
+        "badge": "الفرنسية ناقصة",
+        "title": "لا توجد ترجمة فرنسية بعد"
+      }
+    }
+  }
+}

@@ -37,12 +37,14 @@ import {
   relativeDate,
 } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/")({
   component: CommandCenterPage,
 });
 
 function CommandCenterPage() {
+  const { t } = useTranslation("admin");
   const fetchData = useServerFn(getCommandCenter);
   const q = useQuery({
     queryKey: ["admin-command-center"] as const,
@@ -55,18 +57,18 @@ function CommandCenterPage() {
 
   return (
     <Page
-      title="Command center"
-      description="Everything that needs your attention today, in one place."
+      title={t("shell.dashboard.title")}
+      description={t("shell.dashboard.description")}
       actions={
         <>
           <Button asChild variant="outline">
             <Link to="/admin/requests">
-              <Inbox className="me-2 h-4 w-4" /> Open requests
+              <Inbox className="me-2 h-4 w-4" /> {t("shell.dashboard.openRequests")}
             </Link>
           </Button>
           <Button asChild>
             <Link to="/admin/packages">
-              <Plus className="me-2 h-4 w-4" /> New trip
+              <Plus className="me-2 h-4 w-4" /> {t("shell.dashboard.newTrip")}
             </Link>
           </Button>
         </>
@@ -78,16 +80,16 @@ function CommandCenterPage() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <KpiCard
-            label="Revenue this month"
+            label={t("shell.dashboard.kpi.revenue")}
             value={money(data.kpis.revenue.value, currency)}
             delta={data.kpis.revenue.delta}
             series={data.kpis.revenue.series}
             icon={Wallet}
             tone="primary"
-            hint="Active bookings created this month"
+            hint={t("shell.dashboard.kpi.revenueHint")}
           />
           <KpiCard
-            label="Bookings this month"
+            label={t("shell.dashboard.kpi.bookings")}
             value={data.kpis.bookings.value}
             delta={data.kpis.bookings.delta}
             series={data.kpis.bookings.series}
@@ -95,32 +97,32 @@ function CommandCenterPage() {
             tone="green"
           />
           <KpiCard
-            label="Travellers"
+            label={t("shell.dashboard.kpi.travellers")}
             value={data.kpis.travellers.value}
             delta={data.kpis.travellers.delta}
             icon={Users}
             tone="gold"
-            hint="Adults, children and infants"
+            hint={t("shell.dashboard.kpi.travellersHint")}
           />
           <KpiCard
-            label="Upcoming departures"
+            label={t("shell.dashboard.kpi.upcomingDepartures")}
             value={data.kpis.upcomingTrips.value}
             icon={Plane}
             tone="muted"
-            hint="Trips with a future departure date"
+            hint={t("shell.dashboard.kpi.upcomingDeparturesHint")}
           />
         </div>
       )}
 
       {/* Insights */}
       <div className="mt-6">
-        <h2 className="mb-3 text-small font-semibold text-foreground">Smart insights</h2>
+        <h2 className="mb-3 text-small font-semibold text-foreground">{t("shell.dashboard.insights.title")}</h2>
         {q.isLoading || !data ? (
           <SkeletonRows rows={2} />
         ) : data.insights.length === 0 ? (
           <EmptyState
-            title="Nothing needs attention"
-            description="No capacity risks, unanswered requests or unusual trends were detected."
+            title={t("shell.dashboard.insights.emptyTitle")}
+            description={t("shell.dashboard.insights.emptyDescription")}
           />
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
@@ -134,7 +136,7 @@ function CommandCenterPage() {
                   i.href ? (
                     <Button asChild size="sm" variant="outline">
                       <Link to={i.href as never}>
-                        {i.actionLabel ?? "Open"} <ArrowRight className="ms-2 h-3.5 w-3.5" />
+                        {i.actionLabel ?? t("shell.dashboard.insights.open")} <ArrowRight className="ms-2 h-3.5 w-3.5" />
                       </Link>
                     </Button>
                   ) : undefined
@@ -148,8 +150,8 @@ function CommandCenterPage() {
       {/* Revenue trend + queue */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Panel
-          title="Revenue trend"
-          description="Last 12 months of booking value"
+          title={t("shell.dashboard.revenueTrend.title")}
+          description={t("shell.dashboard.revenueTrend.description")}
           className="lg:col-span-2"
         >
           <div className="h-64">
@@ -180,24 +182,24 @@ function CommandCenterPage() {
           </div>
         </Panel>
 
-        <Panel title="Work queue" description="Waiting for a first answer">
+        <Panel title={t("shell.dashboard.workQueue.title")} description={t("shell.dashboard.workQueue.description")}>
           <ul className="space-y-2">
             <QueueRow
               to="/admin/requests"
               icon={Inbox}
-              label="New booking requests"
+              label={t("shell.dashboard.workQueue.newBookings")}
               value={data?.queue.newBookings}
             />
             <QueueRow
               to="/admin/requests"
               icon={Plane}
-              label="New flight requests"
+              label={t("shell.dashboard.workQueue.newRequests")}
               value={data?.queue.newRequests}
             />
             <QueueRow
               to="/admin/messages"
               icon={MessageSquare}
-              label="Unread messages"
+              label={t("shell.dashboard.workQueue.unreadMessages")}
               value={data?.queue.unreadMessages}
             />
           </ul>
@@ -207,18 +209,18 @@ function CommandCenterPage() {
       {/* Departures + recent bookings */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Panel
-          title="Next departures"
-          description="Occupancy of upcoming trips"
+          title={t("shell.dashboard.nextDepartures.title")}
+          description={t("shell.dashboard.nextDepartures.description")}
           actions={
             <Button asChild size="sm" variant="ghost">
-              <Link to="/admin/packages">All trips</Link>
+              <Link to="/admin/packages">{t("shell.dashboard.nextDepartures.allTrips")}</Link>
             </Button>
           }
         >
           {q.isLoading ? (
             <SkeletonRows rows={3} />
           ) : (data?.upcomingTrips.length ?? 0) === 0 ? (
-            <EmptyState title="No upcoming departures" icon={Plane} />
+            <EmptyState title={t("shell.dashboard.nextDepartures.emptyTitle")} icon={Plane} />
           ) : (
             <ul className="space-y-4">
               {data!.upcomingTrips.map((t) => (
@@ -240,10 +242,10 @@ function CommandCenterPage() {
         </Panel>
 
         <Panel
-          title="Latest bookings"
+          title={t("shell.dashboard.latestBookings.title")}
           actions={
             <Button asChild size="sm" variant="ghost">
-              <Link to="/admin/bookings">All bookings</Link>
+              <Link to="/admin/bookings">{t("shell.dashboard.latestBookings.allBookings")}</Link>
             </Button>
           }
           bodyClassName="p-0 sm:p-0"
@@ -254,7 +256,7 @@ function CommandCenterPage() {
             </div>
           ) : (data?.recentBookings.length ?? 0) === 0 ? (
             <div className="p-4">
-              <EmptyState title="No bookings yet" icon={CalendarCheck} />
+              <EmptyState title={t("shell.dashboard.latestBookings.emptyTitle")} icon={CalendarCheck} />
             </div>
           ) : (
             <ul className="divide-y divide-border-subtle">
@@ -264,7 +266,7 @@ function CommandCenterPage() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-small font-medium">{b.name}</p>
                     <p className="truncate text-caption text-muted-foreground">
-                      {b.trip ?? "General enquiry"} · {relativeDate(b.created_at)}
+                      {b.trip ?? t("shell.dashboard.latestBookings.generalEnquiry")} · {relativeDate(b.created_at)}
                     </p>
                   </div>
                   <div className="text-end">

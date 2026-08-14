@@ -1,0 +1,172 @@
+{
+  "shell": {
+    "nav": {
+      "groups": {
+        "today": "Today",
+        "business": "Business",
+        "website": "Website",
+        "setup": "Setup"
+      },
+      "commandCenter": "Command center",
+      "requests": "Requests",
+      "bookings": "Bookings",
+      "trips": "Trips",
+      "customers": "Customers",
+      "reports": "Reports",
+      "branches": "Branches",
+      "gallery": "Gallery",
+      "blog": "Blog",
+      "testimonials": "Testimonials",
+      "faq": "FAQ",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "team": "Team"
+    },
+    "closeNavigation": "Close navigation",
+    "openNavigation": "Open navigation",
+    "viewPublicSite": "View public site",
+    "signedInAs": "Signed in as",
+    "signOut": "Sign out",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "search": {
+      "placeholder": "Search customers, phone, email…",
+      "ariaLabel": "Search customers"
+    },
+    "notificationsAriaLabel": "Notifications",
+    "layout": {
+      "title": "Dashboard — Janat Sahara Admin",
+      "accessDeniedTitle": "Access denied",
+      "accessDeniedDescription": "Your account doesn't have permission to access the admin dashboard. Contact your super admin to request access.",
+      "signOut": "Sign out",
+      "backToSite": "Back to site"
+    },
+    "dashboard": {
+      "title": "Command center",
+      "description": "Everything that needs your attention today, in one place.",
+      "openRequests": "Open requests",
+      "newTrip": "New trip",
+      "kpi": {
+        "revenue": "Revenue this month",
+        "revenueHint": "Active bookings created this month",
+        "bookings": "Bookings this month",
+        "travellers": "Travellers",
+        "travellersHint": "Adults, children and infants",
+        "upcomingDepartures": "Upcoming departures",
+        "upcomingDeparturesHint": "Trips with a future departure date"
+      },
+      "insights": {
+        "title": "Smart insights",
+        "emptyTitle": "Nothing needs attention",
+        "emptyDescription": "No capacity risks, unanswered requests or unusual trends were detected.",
+        "open": "Open"
+      },
+      "revenueTrend": {
+        "title": "Revenue trend",
+        "description": "Last 12 months of booking value"
+      },
+      "workQueue": {
+        "title": "Work queue",
+        "description": "Waiting for a first answer",
+        "newBookings": "New booking requests",
+        "newRequests": "New flight requests",
+        "unreadMessages": "Unread messages"
+      },
+      "nextDepartures": {
+        "title": "Next departures",
+        "description": "Occupancy of upcoming trips",
+        "allTrips": "All trips",
+        "emptyTitle": "No upcoming departures"
+      },
+      "latestBookings": {
+        "title": "Latest bookings",
+        "allBookings": "All bookings",
+        "emptyTitle": "No bookings yet",
+        "generalEnquiry": "General enquiry"
+      }
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Answers to the questions you ask every week.",
+      "kpi": {
+        "revenue": "Revenue (12 months)",
+        "bookings": "Bookings",
+        "travellers": "Travellers",
+        "averageBooking": "Average booking",
+        "conversionHint": "{{value}}% of enquiries confirmed"
+      },
+      "revenueAndBookings": {
+        "title": "Revenue and bookings",
+        "description": "Monthly comparison"
+      },
+      "newCustomers": {
+        "title": "New customers",
+        "description": "Unique customers per month"
+      },
+      "bestPerformingTrips": {
+        "title": "Best performing trips",
+        "emptyTitle": "No data yet",
+        "summary": "{{bookings}} bookings · {{travellers}} travellers"
+      },
+      "capacity": {
+        "title": "Capacity of upcoming trips",
+        "emptyTitle": "No upcoming departures"
+      },
+      "topDestinations": {
+        "title": "Top destinations",
+        "emptyTitle": "No data yet"
+      }
+    },
+    "customers": {
+      "title": "Customers",
+      "description": "People derived from booking requests. Contact them directly.",
+      "exportCsv": "Export CSV",
+      "searchPlaceholder": "Search by name, phone, email…",
+      "loading": "Loading…",
+      "emptyTitle": "No customers yet",
+      "table": {
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email",
+        "bookings": "Bookings",
+        "categories": "Categories",
+        "lastBooking": "Last booking",
+        "contact": "Contact"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "System events, new leads and messages.",
+      "markAllRead": "Mark all read",
+      "markAllReadSuccess": "All marked as read",
+      "loading": "Loading…",
+      "emptyTitle": "No notifications yet",
+      "view": "View",
+      "markRead": "Mark read"
+    },
+    "kit": {
+      "insight": {
+        "info": "Information",
+        "opportunity": "Opportunity",
+        "attention": "Attention",
+        "critical": "Critical"
+      },
+      "occupancy": {
+        "travellers": "travellers",
+        "left": "left",
+        "noCapacity": "No capacity set"
+      },
+      "search": {
+        "placeholder": "Search…"
+      },
+      "close": "Close",
+      "missingFr": {
+        "badge": "FR missing",
+        "title": "No French translation yet"
+      }
+    }
+  }
+}

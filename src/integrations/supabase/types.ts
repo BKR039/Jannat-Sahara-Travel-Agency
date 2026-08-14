@@ -17,58 +17,73 @@ export type Database = {
       articles: {
         Row: {
           author: string | null
+          author_en: string | null
           author_fr: string | null
           content: string | null
+          content_en: string | null
           content_fr: string | null
           cover: string | null
           created_at: string
           excerpt: string | null
+          excerpt_en: string | null
           excerpt_fr: string | null
           id: string
           published: boolean
           published_at: string | null
           slug: string
           tags: Json | null
+          tags_en: Json | null
           tags_fr: Json | null
           title: string
+          title_en: string | null
           title_fr: string | null
           updated_at: string
         }
         Insert: {
           author?: string | null
+          author_en?: string | null
           author_fr?: string | null
           content?: string | null
+          content_en?: string | null
           content_fr?: string | null
           cover?: string | null
           created_at?: string
           excerpt?: string | null
+          excerpt_en?: string | null
           excerpt_fr?: string | null
           id?: string
           published?: boolean
           published_at?: string | null
           slug: string
           tags?: Json | null
+          tags_en?: Json | null
           tags_fr?: Json | null
           title: string
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
         Update: {
           author?: string | null
+          author_en?: string | null
           author_fr?: string | null
           content?: string | null
+          content_en?: string | null
           content_fr?: string | null
           cover?: string | null
           created_at?: string
           excerpt?: string | null
+          excerpt_en?: string | null
           excerpt_fr?: string | null
           id?: string
           published?: boolean
           published_at?: string | null
           slug?: string
           tags?: Json | null
+          tags_en?: Json | null
           tags_fr?: Json | null
           title?: string
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -264,8 +279,10 @@ export type Database = {
       branches: {
         Row: {
           address: string
+          address_en: string | null
           address_fr: string | null
           city: string
+          city_en: string | null
           city_fr: string | null
           created_at: string
           email: string | null
@@ -277,17 +294,21 @@ export type Database = {
           latitude: number
           longitude: number
           name: string
+          name_en: string | null
           name_fr: string | null
           phone: string | null
           sort_order: number
           updated_at: string
           working_hours: string | null
+          working_hours_en: string | null
           working_hours_fr: string | null
         }
         Insert: {
           address: string
+          address_en?: string | null
           address_fr?: string | null
           city: string
+          city_en?: string | null
           city_fr?: string | null
           created_at?: string
           email?: string | null
@@ -299,17 +320,21 @@ export type Database = {
           latitude: number
           longitude: number
           name: string
+          name_en?: string | null
           name_fr?: string | null
           phone?: string | null
           sort_order?: number
           updated_at?: string
           working_hours?: string | null
+          working_hours_en?: string | null
           working_hours_fr?: string | null
         }
         Update: {
           address?: string
+          address_en?: string | null
           address_fr?: string | null
           city?: string
+          city_en?: string | null
           city_fr?: string | null
           created_at?: string
           email?: string | null
@@ -321,11 +346,13 @@ export type Database = {
           latitude?: number
           longitude?: number
           name?: string
+          name_en?: string | null
           name_fr?: string | null
           phone?: string | null
           sort_order?: number
           updated_at?: string
           working_hours?: string | null
+          working_hours_en?: string | null
           working_hours_fr?: string | null
         }
         Relationships: []
@@ -337,10 +364,12 @@ export type Database = {
           id: string
           key: string
           label: string | null
+          label_en: string | null
           label_fr: string | null
           sort_order: number | null
           updated_at: string
           value: string
+          value_en: string | null
           value_fr: string | null
         }
         Insert: {
@@ -349,10 +378,12 @@ export type Database = {
           id?: string
           key: string
           label?: string | null
+          label_en?: string | null
           label_fr?: string | null
           sort_order?: number | null
           updated_at?: string
           value: string
+          value_en?: string | null
           value_fr?: string | null
         }
         Update: {
@@ -361,10 +392,12 @@ export type Database = {
           id?: string
           key?: string
           label?: string | null
+          label_en?: string | null
           label_fr?: string | null
           sort_order?: number | null
           updated_at?: string
           value?: string
+          value_en?: string | null
           value_fr?: string | null
         }
         Relationships: []
@@ -442,12 +475,15 @@ export type Database = {
         Row: {
           active: boolean
           answer: string
+          answer_en: string | null
           answer_fr: string | null
           category: string | null
+          category_en: string | null
           category_fr: string | null
           created_at: string
           id: string
           question: string
+          question_en: string | null
           question_fr: string | null
           sort_order: number | null
           updated_at: string
@@ -455,12 +491,15 @@ export type Database = {
         Insert: {
           active?: boolean
           answer: string
+          answer_en?: string | null
           answer_fr?: string | null
           category?: string | null
+          category_en?: string | null
           category_fr?: string | null
           created_at?: string
           id?: string
           question: string
+          question_en?: string | null
           question_fr?: string | null
           sort_order?: number | null
           updated_at?: string
@@ -468,12 +507,15 @@ export type Database = {
         Update: {
           active?: boolean
           answer?: string
+          answer_en?: string | null
           answer_fr?: string | null
           category?: string | null
+          category_en?: string | null
           category_fr?: string | null
           created_at?: string
           id?: string
           question?: string
+          question_en?: string | null
           question_fr?: string | null
           sort_order?: number | null
           updated_at?: string
@@ -485,11 +527,13 @@ export type Database = {
           active: boolean
           created_at: string
           description: string | null
+          description_en: string | null
           description_fr: string | null
           icon: string | null
           id: string
           sort_order: number | null
           title: string
+          title_en: string | null
           title_fr: string | null
           updated_at: string
         }
@@ -497,11 +541,13 @@ export type Database = {
           active?: boolean
           created_at?: string
           description?: string | null
+          description_en?: string | null
           description_fr?: string | null
           icon?: string | null
           id?: string
           sort_order?: number | null
           title: string
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -509,11 +555,13 @@ export type Database = {
           active?: boolean
           created_at?: string
           description?: string | null
+          description_en?: string | null
           description_fr?: string | null
           icon?: string | null
           id?: string
           sort_order?: number | null
           title?: string
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -601,36 +649,42 @@ export type Database = {
         Row: {
           active: boolean
           category: string | null
+          category_en: string | null
           category_fr: string | null
           created_at: string
           id: string
           image: string
           sort_order: number | null
           title: string | null
+          title_en: string | null
           title_fr: string | null
           updated_at: string
         }
         Insert: {
           active?: boolean
           category?: string | null
+          category_en?: string | null
           category_fr?: string | null
           created_at?: string
           id?: string
           image: string
           sort_order?: number | null
           title?: string | null
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
         Update: {
           active?: boolean
           category?: string | null
+          category_en?: string | null
           category_fr?: string | null
           created_at?: string
           id?: string
           image?: string
           sort_order?: number | null
           title?: string | null
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -697,183 +751,237 @@ export type Database = {
         Row: {
           accommodation: Json | null
           airline: string | null
+          airline_en: string | null
           airline_fr: string | null
           brochure_pdf: string | null
           category: Database["public"]["Enums"]["package_category"]
           child_price: number | null
           city: string | null
+          city_en: string | null
           city_fr: string | null
           country: string | null
+          country_en: string | null
           country_fr: string | null
           cover: string | null
           created_at: string
           currency: string
           departure_date: string | null
           description: string | null
+          description_en: string | null
           description_fr: string | null
           destination: string | null
+          destination_en: string | null
           destination_fr: string | null
           discount: number | null
           discount_price: number | null
           duration: string | null
+          duration_en: string | null
           duration_fr: string | null
           excluded: Json | null
+          excluded_en: Json | null
           excluded_fr: Json | null
           featured: boolean
           gallery: Json | null
           hotel: string | null
+          hotel_en: string | null
           hotel_fr: string | null
           hotel_rating: number | null
           id: string
           included: Json | null
+          included_en: Json | null
           included_fr: Json | null
           infant_price: number | null
           meeting_point: string | null
+          meeting_point_en: string | null
           meeting_point_fr: string | null
           price: number
           required_documents: Json | null
+          required_documents_en: Json | null
           required_documents_fr: Json | null
           return_date: string | null
           seats: number | null
           seo_description: string | null
+          seo_description_en: string | null
           seo_description_fr: string | null
           seo_keywords: Json | null
+          seo_keywords_en: Json | null
           seo_keywords_fr: Json | null
           seo_title: string | null
+          seo_title_en: string | null
           seo_title_fr: string | null
           short_description: string | null
+          short_description_en: string | null
           short_description_fr: string | null
           slug: string
           sort_order: number | null
           status: Database["public"]["Enums"]["package_status"]
           timeline: Json | null
+          timeline_en: Json | null
           timeline_fr: Json | null
           title: string
+          title_en: string | null
           title_fr: string | null
           total_seats: number | null
           transport: string | null
+          transport_en: string | null
           transport_fr: string | null
           updated_at: string
         }
         Insert: {
           accommodation?: Json | null
           airline?: string | null
+          airline_en?: string | null
           airline_fr?: string | null
           brochure_pdf?: string | null
           category: Database["public"]["Enums"]["package_category"]
           child_price?: number | null
           city?: string | null
+          city_en?: string | null
           city_fr?: string | null
           country?: string | null
+          country_en?: string | null
           country_fr?: string | null
           cover?: string | null
           created_at?: string
           currency?: string
           departure_date?: string | null
           description?: string | null
+          description_en?: string | null
           description_fr?: string | null
           destination?: string | null
+          destination_en?: string | null
           destination_fr?: string | null
           discount?: number | null
           discount_price?: number | null
           duration?: string | null
+          duration_en?: string | null
           duration_fr?: string | null
           excluded?: Json | null
+          excluded_en?: Json | null
           excluded_fr?: Json | null
           featured?: boolean
           gallery?: Json | null
           hotel?: string | null
+          hotel_en?: string | null
           hotel_fr?: string | null
           hotel_rating?: number | null
           id?: string
           included?: Json | null
+          included_en?: Json | null
           included_fr?: Json | null
           infant_price?: number | null
           meeting_point?: string | null
+          meeting_point_en?: string | null
           meeting_point_fr?: string | null
           price?: number
           required_documents?: Json | null
+          required_documents_en?: Json | null
           required_documents_fr?: Json | null
           return_date?: string | null
           seats?: number | null
           seo_description?: string | null
+          seo_description_en?: string | null
           seo_description_fr?: string | null
           seo_keywords?: Json | null
+          seo_keywords_en?: Json | null
           seo_keywords_fr?: Json | null
           seo_title?: string | null
+          seo_title_en?: string | null
           seo_title_fr?: string | null
           short_description?: string | null
+          short_description_en?: string | null
           short_description_fr?: string | null
           slug: string
           sort_order?: number | null
           status?: Database["public"]["Enums"]["package_status"]
           timeline?: Json | null
+          timeline_en?: Json | null
           timeline_fr?: Json | null
           title: string
+          title_en?: string | null
           title_fr?: string | null
           total_seats?: number | null
           transport?: string | null
+          transport_en?: string | null
           transport_fr?: string | null
           updated_at?: string
         }
         Update: {
           accommodation?: Json | null
           airline?: string | null
+          airline_en?: string | null
           airline_fr?: string | null
           brochure_pdf?: string | null
           category?: Database["public"]["Enums"]["package_category"]
           child_price?: number | null
           city?: string | null
+          city_en?: string | null
           city_fr?: string | null
           country?: string | null
+          country_en?: string | null
           country_fr?: string | null
           cover?: string | null
           created_at?: string
           currency?: string
           departure_date?: string | null
           description?: string | null
+          description_en?: string | null
           description_fr?: string | null
           destination?: string | null
+          destination_en?: string | null
           destination_fr?: string | null
           discount?: number | null
           discount_price?: number | null
           duration?: string | null
+          duration_en?: string | null
           duration_fr?: string | null
           excluded?: Json | null
+          excluded_en?: Json | null
           excluded_fr?: Json | null
           featured?: boolean
           gallery?: Json | null
           hotel?: string | null
+          hotel_en?: string | null
           hotel_fr?: string | null
           hotel_rating?: number | null
           id?: string
           included?: Json | null
+          included_en?: Json | null
           included_fr?: Json | null
           infant_price?: number | null
           meeting_point?: string | null
+          meeting_point_en?: string | null
           meeting_point_fr?: string | null
           price?: number
           required_documents?: Json | null
+          required_documents_en?: Json | null
           required_documents_fr?: Json | null
           return_date?: string | null
           seats?: number | null
           seo_description?: string | null
+          seo_description_en?: string | null
           seo_description_fr?: string | null
           seo_keywords?: Json | null
+          seo_keywords_en?: Json | null
           seo_keywords_fr?: Json | null
           seo_title?: string | null
+          seo_title_en?: string | null
           seo_title_fr?: string | null
           short_description?: string | null
+          short_description_en?: string | null
           short_description_fr?: string | null
           slug?: string
           sort_order?: number | null
           status?: Database["public"]["Enums"]["package_status"]
           timeline?: Json | null
+          timeline_en?: Json | null
           timeline_fr?: Json | null
           title?: string
+          title_en?: string | null
           title_fr?: string | null
           total_seats?: number | null
           transport?: string | null
+          transport_en?: string | null
           transport_fr?: string | null
           updated_at?: string
         }
@@ -906,12 +1014,14 @@ export type Database = {
           cover: string | null
           created_at: string
           description: string | null
+          description_en: string | null
           description_fr: string | null
           icon: string | null
           id: string
           slug: string
           sort_order: number | null
           title: string
+          title_en: string | null
           title_fr: string | null
           updated_at: string
         }
@@ -920,12 +1030,14 @@ export type Database = {
           cover?: string | null
           created_at?: string
           description?: string | null
+          description_en?: string | null
           description_fr?: string | null
           icon?: string | null
           id?: string
           slug: string
           sort_order?: number | null
           title: string
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -934,12 +1046,14 @@ export type Database = {
           cover?: string | null
           created_at?: string
           description?: string | null
+          description_en?: string | null
           description_fr?: string | null
           icon?: string | null
           id?: string
           slug?: string
           sort_order?: number | null
           title?: string
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -948,52 +1062,64 @@ export type Database = {
       site_content: {
         Row: {
           body: string | null
+          body_en: string | null
           body_fr: string | null
           created_at: string
           cta_href: string | null
           cta_label: string | null
+          cta_label_en: string | null
           cta_label_fr: string | null
           data: Json | null
           id: string
           image: string | null
           key: string
           subtitle: string | null
+          subtitle_en: string | null
           subtitle_fr: string | null
           title: string | null
+          title_en: string | null
           title_fr: string | null
           updated_at: string
         }
         Insert: {
           body?: string | null
+          body_en?: string | null
           body_fr?: string | null
           created_at?: string
           cta_href?: string | null
           cta_label?: string | null
+          cta_label_en?: string | null
           cta_label_fr?: string | null
           data?: Json | null
           id?: string
           image?: string | null
           key: string
           subtitle?: string | null
+          subtitle_en?: string | null
           subtitle_fr?: string | null
           title?: string | null
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
         Update: {
           body?: string | null
+          body_en?: string | null
           body_fr?: string | null
           created_at?: string
           cta_href?: string | null
           cta_label?: string | null
+          cta_label_en?: string | null
           cta_label_fr?: string | null
           data?: Json | null
           id?: string
           image?: string | null
           key?: string
           subtitle?: string | null
+          subtitle_en?: string | null
           subtitle_fr?: string | null
           title?: string | null
+          title_en?: string | null
           title_fr?: string | null
           updated_at?: string
         }
@@ -1032,6 +1158,7 @@ export type Database = {
           icon: string | null
           id: string
           label: string
+          label_en: string | null
           label_fr: string | null
           sort_order: number | null
           updated_at: string
@@ -1042,6 +1169,7 @@ export type Database = {
           icon?: string | null
           id?: string
           label: string
+          label_en?: string | null
           label_fr?: string | null
           sort_order?: number | null
           updated_at?: string
@@ -1052,6 +1180,7 @@ export type Database = {
           icon?: string | null
           id?: string
           label?: string
+          label_en?: string | null
           label_fr?: string | null
           sort_order?: number | null
           updated_at?: string
@@ -1064,13 +1193,16 @@ export type Database = {
           active: boolean
           avatar: string | null
           content: string
+          content_en: string | null
           content_fr: string | null
           created_at: string
           id: string
           name: string
+          name_en: string | null
           name_fr: string | null
           rating: number
           role: string | null
+          role_en: string | null
           role_fr: string | null
           sort_order: number | null
           updated_at: string
@@ -1079,13 +1211,16 @@ export type Database = {
           active?: boolean
           avatar?: string | null
           content: string
+          content_en?: string | null
           content_fr?: string | null
           created_at?: string
           id?: string
           name: string
+          name_en?: string | null
           name_fr?: string | null
           rating?: number
           role?: string | null
+          role_en?: string | null
           role_fr?: string | null
           sort_order?: number | null
           updated_at?: string
@@ -1094,13 +1229,16 @@ export type Database = {
           active?: boolean
           avatar?: string | null
           content?: string
+          content_en?: string | null
           content_fr?: string | null
           created_at?: string
           id?: string
           name?: string
+          name_en?: string | null
           name_fr?: string | null
           rating?: number
           role?: string | null
+          role_en?: string | null
           role_fr?: string | null
           sort_order?: number | null
           updated_at?: string

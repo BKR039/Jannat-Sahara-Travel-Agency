@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/common/SectionHeading";
 import { FeaturesSection, TestimonialsSection } from "@/components/sections/HomeSections";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { contentQuery } from "@/lib/queries";
-import { hasArabic, useLocalized } from "@/lib/localize";
+import { pickLocalized, pickLocalizedList, useLocalized } from "@/lib/localize";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -25,24 +25,15 @@ export const Route = createFileRoute("/about")({
 
 function AboutPage() {
   const { t } = useTranslation();
-  const { isFr, L } = useLocalized();
+  const { lang, L } = useLocalized();
   const { data } = useQuery(contentQuery("about"));
-  const raw = (data?.data as {
-    mission?: string;
-    vision?: string;
-    values?: string[];
-    mission_fr?: string;
-    vision_fr?: string;
-    values_fr?: string[];
-  } | null) ?? {};
-  const keep = (value?: string) => (isFr && hasArabic(value) ? undefined : value);
-  const extra = isFr
-    ? {
-        mission: raw.mission_fr ?? keep(raw.mission),
-        vision: raw.vision_fr ?? keep(raw.vision),
-        values: raw.values_fr ?? (raw.values ?? []).filter((v) => !hasArabic(v)),
-      }
-    : raw;
+  const raw = (data?.data as Record<string, unknown> | null) ?? {};
+  const extra = {
+    mission: pickLocalized(raw, "mission", lang),
+    vision: pickLocalized(raw, "vision", lang),
+    values: pickLocalizedList(raw, "values", lang),
+  };
+
 
   return (
     <SiteLayout>

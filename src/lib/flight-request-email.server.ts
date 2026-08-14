@@ -1,4 +1,10 @@
-import { CABIN_LABELS_EN, type FlightRequestInputType } from "./flight-request.schema";
+import { cabinLabel, type FlightRequestInputType } from "./flight-request.schema";
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  ar: "Arabic (العربية)",
+  fr: "French (Français)",
+  en: "English",
+};
 
 function escapeHtml(v: string | null | undefined): string {
   if (!v) return "";
@@ -32,7 +38,8 @@ export function renderFlightRequestEmail(data: {
       "Passengers",
       `${input.adults} adult(s), ${input.children} child(ren), ${input.infants} infant(s)`,
     ],
-    ["Cabin class", CABIN_LABELS_EN[input.cabinClass]],
+    ["Cabin class", cabinLabel(input.cabinClass, "en")],
+    ["Customer language", LANGUAGE_NAMES[input.locale ?? "ar"] ?? "Arabic (العربية)"],
     ["Notes", input.notes || "—"],
   ];
 

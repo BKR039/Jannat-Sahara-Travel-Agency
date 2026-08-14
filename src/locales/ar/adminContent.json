@@ -1,0 +1,522 @@
+{
+  "content": {
+    "common": {
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "add": "إضافة",
+      "loading": "جارٍ التحميل…",
+      "actions": "الإجراءات",
+      "active": "نشط",
+      "hidden": "مخفي",
+      "uploadFailed": "فشل الرفع",
+      "saveFailed": "فشل الحفظ",
+      "deleted": "تم الحذف"
+    },
+    "settings": {
+      "pageTitle": "الإعدادات",
+      "pageDescription": "أدر وكالتك وموقعك الإلكتروني وتواصلك.",
+      "backToSettings": "الإعدادات",
+      "groups": {
+        "agency": {
+          "title": "الوكالة",
+          "caption": "من أنتم"
+        },
+        "website": {
+          "title": "الموقع الإلكتروني",
+          "caption": "ما يراه الزوار"
+        },
+        "communication": {
+          "title": "التواصل",
+          "caption": "كيف يصل إليكم المسافرون"
+        },
+        "system": {
+          "title": "النظام",
+          "caption": "الوصول والتنبيهات"
+        }
+      },
+      "nav": {
+        "general": {
+          "label": "عام",
+          "summary": "معلومات وكالتك",
+          "detail": "الاسم والعنوان وساعات العمل"
+        },
+        "brand": {
+          "label": "العلامة التجارية",
+          "summary": "هويتكم البصرية",
+          "detail": "الشعار والشعار النصي والألوان"
+        },
+        "homepage": {
+          "label": "الصفحة الرئيسية",
+          "summary": "ما يراه الزوار أولًا",
+          "detail": "القسم الرئيسي ونبذة عنّا ودعوة لاتخاذ إجراء"
+        },
+        "statistics": {
+          "label": "الإحصائيات",
+          "summary": "إنجازاتكم",
+          "detail": "العدادات المعروضة في الصفحة الرئيسية"
+        },
+        "seo": {
+          "label": "ظهور البحث",
+          "summary": "كيف تظهرون في جوجل",
+          "detail": "العناوين والوصف وصورة المشاركة"
+        },
+        "contact": {
+          "label": "التواصل",
+          "summary": "الهاتف والبريد الإلكتروني وواتساب",
+          "detail": "تظهر عبر الموقع بأكمله"
+        },
+        "branches": {
+          "label": "الفروع",
+          "summary": "المكاتب والمواقع",
+          "detail": "تُعرض على خريطة التواصل"
+        },
+        "social": {
+          "label": "وسائل التواصل الاجتماعي",
+          "summary": "إنستغرام وفيسبوك والمزيد",
+          "detail": "القنوات المرتبطة في التذييل"
+        },
+        "email": {
+          "label": "البريد الإلكتروني",
+          "summary": "إشعارات الحجز",
+          "detail": "أين تُرسل الطلبات الجديدة"
+        },
+        "notifications": {
+          "label": "الإشعارات",
+          "summary": "كيف تستلمون التنبيهات",
+          "detail": "تنبيهات لوحة التحكم والبريد الإلكتروني"
+        },
+        "team": {
+          "label": "الفريق",
+          "summary": "إدارة صلاحيات الفريق",
+          "detail": "المسؤولون وأدوارهم"
+        },
+        "security": {
+          "label": "الأمان",
+          "summary": "حماية الحساب",
+          "detail": "سياسات الوصول والجلسات"
+        }
+      },
+      "validation": {
+        "required": "هذا الحقل مطلوب",
+        "url": "أدخل رابطًا كاملاً يبدأ بـ https://",
+        "email": "أدخل بريدًا إلكترونيًا صالحًا",
+        "emailListInvalid": "“{{value}}” ليس بريدًا إلكترونيًا صالحًا",
+        "hexColor": "استخدم قيمة سداسية مثل #EE5A24",
+        "maxLen": "حافظ على أقل من {{max}} حرفًا ({{count}} حاليًا)",
+        "numberInvalid": "أدخل رقمًا",
+        "numberRange": "أدخل رقمًا بين {{min}} و{{max}}"
+      },
+      "saveBar": {
+        "saveChanges": "حفظ التغييرات",
+        "saved": "تم الحفظ",
+        "unsavedChanges": "تغييرات غير محفوظة",
+        "saveNow": "احفظ الآن",
+        "allChangesSaved": "تم حفظ جميع التغييرات",
+        "savingAutomatically": "جارٍ الحفظ تلقائيًا…",
+        "checkHighlightedFields": "تحقق من الحقول المميزة",
+        "discardChanges": "تجاهل التغييرات"
+      },
+      "livePreview": {
+        "title": "معاينة مباشرة",
+        "description": "شاهد كيف يعرض الموقع العام محتواك.",
+        "websiteTitle": "معاينة الموقع",
+        "desktop": "سطح المكتب",
+        "tablet": "الجهاز اللوحي",
+        "mobile": "الهاتف"
+      },
+      "parts": {
+        "replace": "استبدال",
+        "upload": "رفع",
+        "remove": "إزالة",
+        "uploadAnImage": "رفع صورة",
+        "replaceLabel": "استبدال {{label}}",
+        "uploadLabel": "رفع {{label}}",
+        "chooseIcon": "اختر أيقونة",
+        "searchIcons": "بحث عن أيقونات",
+        "colourPicker": "منتقي لون {{label}}",
+        "googleResultPreview": "معاينة نتيجة جوجل",
+        "yourPageTitle": "عنوان صفحتك",
+        "yourMetaDescription": "يظهر وصف الميتا الخاص بك هنا في نتائج البحث.",
+        "primaryButton": "الزر الأساسي",
+        "accentButton": "الزر الثانوي",
+        "arabicSuffix": "(عربي)",
+        "frenchSuffix": "(فرنسي)",
+        "englishSuffix": "(إنجليزي)",
+        "imageUploaded": "تم رفع الصورة"
+      },
+      "general": {
+        "title": "عام",
+        "description": "الهوية الأساسية لوكالتك. تظهر هذه التفاصيل عبر الموقع العام وتأكيدات الحجز ومحركات البحث.",
+        "identityTitle": "هوية الوكالة",
+        "identityDescription": "كيف تُسمّى وكالتك في كل مكان.",
+        "agencyName": "اسم الوكالة",
+        "agencyNameHint": "يظهر في الرسائل الإلكترونية والتذييل والبيانات المنظمة.",
+        "workingHours": "ساعات العمل",
+        "locationTitle": "الموقع",
+        "locationDescription": "أين يمكن للمسافرين إيجادكم.",
+        "headOfficeAddress": "عنوان المكتب الرئيسي",
+        "addressHint": "الشارع والمدينة والبلد.",
+        "googleMapsLink": "رابط خرائط جوجل",
+        "googleMapsHint": "الصق رابط مشاركة موقع مكتبك."
+      },
+      "brand": {
+        "title": "هوية العلامة التجارية",
+        "description": "شعارك وأسلوبك وألوانك — تمامًا كما يراها المسافرون على الموقع العام.",
+        "identityTitle": "هوية العلامة التجارية",
+        "identityDescription": "اسم وكالتك وأسلوبها.",
+        "agencyName": "اسم الوكالة",
+        "agencyNameHint": "موروث من ملف وكالتك — تعديله هنا يحدّثه في كل مكان.",
+        "tagline": "الشعار النصي",
+        "taglineHint": "سطر قصير تحت شعارك.",
+        "assetsTitle": "عناصر العلامة التجارية",
+        "assetsDescription": "PNG أو SVG أو JPG.",
+        "logo": "الشعار",
+        "logoHint": "مربع بخلفية شفافة. يُفضّل 512×512.",
+        "favicon": "أيقونة المتصفح",
+        "faviconHint": "أيقونة تبويب المتصفح. 64×64.",
+        "coloursTitle": "ألوان العلامة التجارية",
+        "coloursDescription": "تُستخدم للأزرار والشارات والتمييز.",
+        "resetToDefaults": "إعادة التعيين إلى الألوان الافتراضية",
+        "primaryColour": "اللون الأساسي",
+        "secondaryColour": "اللون الثانوي",
+        "advancedSettings": "إعدادات متقدمة",
+        "websiteUrl": "رابط الموقع",
+        "websiteUrlHint": "يُستخدم في الرسائل الإلكترونية والبيانات المنظمة.",
+        "canonicalUrl": "الرابط الأساسي",
+        "canonicalUrlHint": "العنوان المفضل الذي يجب أن تفهرسه محركات البحث.",
+        "livePreview": "معاينة مباشرة",
+        "livePreviewNote": "تتحدث فورًا أثناء التعديل. تُنشر على الموقع العام عند الحفظ.",
+        "agencyNameFallback": "اسم الوكالة",
+        "taglineFallback": "شعارك النصي",
+        "navHome": "الرئيسية",
+        "navUmrah": "العمرة",
+        "navTrips": "الرحلات",
+        "bookNow": "احجز الآن",
+        "browseOffers": "تصفح العروض",
+        "uploaded": "تم الرفع"
+      },
+      "homepage": {
+        "title": "محتوى الصفحة الرئيسية",
+        "description": "كل قسم في الصفحة الرئيسية عبارة عن كتلة قابلة للتعديل. وسّع كتلة لتعديلها، ثم انشر مرة واحدة — بدون كود، بدون حقول قاعدة بيانات.",
+        "untitledBlock": "كتلة بلا عنوان",
+        "unsaved": "غير محفوظ",
+        "titleField": "العنوان",
+        "subtitleField": "العنوان الفرعي",
+        "bodyField": "نص المحتوى",
+        "bodyHint": "فقرة داعمة اختيارية.",
+        "imageField": "الخلفية / الرسم التوضيحي",
+        "imageHint": "ارفع مباشرة — لا حاجة للصق روابط. يُفضّل 1920×1080.",
+        "buttonLabel": "نص الزر",
+        "buttonLink": "رابط الزر",
+        "buttonLinkHint": "مسار داخلي مثل /umrah أو رابط https كامل.",
+        "published": "تم نشر المحتوى",
+        "blocks": {
+          "hero": {
+            "name": "القسم الرئيسي",
+            "help": "أول ما يراه الزوار. حافظ على العنوان أقل من 60 حرفًا واستخدم صورة خلفية عريضة ومشرقة."
+          },
+          "about": {
+            "name": "عن الوكالة",
+            "help": "قصة قصيرة عن وكالتك، تظهر في الصفحة الرئيسية وصفحة من نحن."
+          },
+          "cta": {
+            "name": "دعوة ختامية لاتخاذ إجراء",
+            "help": "الحافز الأخير قبل التذييل. إجراء واضح واحد يعمل بشكل أفضل."
+          },
+          "generic": "كتلة محتوى تُعرض على الموقع العام."
+        }
+      },
+      "stats": {
+        "title": "الإحصائيات",
+        "description": "عدادات الإنجازات في صفحتك الرئيسية. اسحب البطاقات لتغيير الترتيب الذي يراها به المسافرون.",
+        "card": "بطاقة",
+        "moveUp": "تحريك لأعلى",
+        "moveDown": "تحريك لأسفل",
+        "removeStatistic": "إزالة الإحصائية",
+        "icon": "الأيقونة",
+        "label": "النص",
+        "labelPlaceholder": "مسافرون سعداء",
+        "value": "القيمة",
+        "valuePlaceholder": "+12,000",
+        "valueFallback": "0",
+        "labelFallback": "النص",
+        "addCard": "إضافة بطاقة إحصائية",
+        "tipTitle": "نصيحة",
+        "tipBody": "اجعل القيم قصيرة وبشرية — «+12,000» أفضل من «12034». من ثلاث إلى أربع بطاقات تعمل بشكل أفضل على الهاتف.",
+        "updated": "تم تحديث الإحصائيات"
+      },
+      "seo": {
+        "title": "تحسين محركات البحث",
+        "description": "كيف يظهر موقعك في جوجل وعند المشاركة على وسائل التواصل الاجتماعي.",
+        "searchAppearanceTitle": "ظهور البحث",
+        "searchAppearanceDescription": "العنوان والوصف للصفحة الرئيسية.",
+        "siteTitle": "عنوان الموقع",
+        "siteTitleHint": "أقل من 60 حرفًا يعطي أفضل أداء.",
+        "metaDescription": "وصف الميتا",
+        "metaDescriptionHint": "أقل من 160 حرفًا. صف خدماتك ووجهاتك.",
+        "keywords": "الكلمات المفتاحية",
+        "keywordsHint": "مفصولة بفواصل. تُستخدم لتلميحات البحث الداخلي.",
+        "livePreviewTitle": "معاينة مباشرة",
+        "livePreviewDescription": "تتحدث أثناء الكتابة.",
+        "socialSharingTitle": "المشاركة الاجتماعية",
+        "socialSharingDescription": "الصورة المعروضة على فيسبوك وواتساب و X.",
+        "shareImage": "صورة المشاركة",
+        "shareImageHint": "يُفضّل 1200×630.",
+        "technicalTitle": "تقني",
+        "technicalDescription": "النطاق الأساسي، الفهرسة والتحقق.",
+        "canonicalBaseUrl": "الرابط الأساسي الرئيسي",
+        "googleVerificationCode": "رمز تحقق جوجل",
+        "googleVerificationHint": "قيمة محتوى وسم google-site-verification.",
+        "allowIndexing": "السماح لمحركات البحث بفهرسة الموقع",
+        "allowIndexingHint": "عطّل هذا فقط أثناء إنشاء الموقع."
+      },
+      "contact": {
+        "title": "التواصل",
+        "description": "القنوات التي يستخدمها المسافرون للتواصل معكم. تُخفى القنوات الفارغة من الموقع العام.",
+        "channelsTitle": "قنوات التواصل",
+        "channelsDescription": "الهاتف والبريد الإلكتروني والمراسلة.",
+        "livePreviewTitle": "معاينة مباشرة",
+        "livePreviewDescription": "كيف تظهر بطاقة التواصل على الموقع.",
+        "emptyHint": "أضف قناة تواصل واحدة على الأقل.",
+        "landline": "الهاتف الثابت",
+        "mobile": "الهاتف المحمول",
+        "contactEmail": "بريد التواصل",
+        "contactEmailHint": "يُنشر على الموقع للمسافرين.",
+        "whatsapp": "رابط واتساب",
+        "whatsappHint": "رابط wa.me كامل، مثل https://wa.me/21655123456",
+        "emergency": "جهة اتصال الطوارئ",
+        "emergencyHint": "رقم اختياري خارج ساعات العمل للمسافرين."
+      },
+      "social": {
+        "title": "وسائل التواصل الاجتماعي",
+        "description": "اربط قنواتك مرة واحدة — تظهر تلقائيًا في تذييل الموقع وقسم التواصل والبيانات المنظمة.",
+        "channelsTitle": "القنوات",
+        "channelsDescription": "اترك الحقل فارغًا لإخفاء تلك القناة من الموقع.",
+        "exampleHint": "مثال: {{placeholder}}",
+        "openChannel": "فتح {{label}}",
+        "livePreviewTitle": "معاينة مباشرة",
+        "livePreviewDescription": "كيف سيبدو صف التواصل الاجتماعي في التذييل.",
+        "noChannels": "لم يتم ربط أي قناة بعد — يبقى صف التواصل الاجتماعي مخفيًا."
+      },
+      "email": {
+        "title": "البريد الإلكتروني",
+        "description": "أين تُرسل إشعارات الحجز وكيف تُوسم.",
+        "recipientsTitle": "المستلمون",
+        "recipientsDescription": "من يستلم كل حجز جديد.",
+        "ownerRecipient": "المستلم الرئيسي",
+        "ownerRecipientHint": "صندوق الوارد الرئيسي لإشعارات الحجز.",
+        "ccRecipients": "نسخة إلى",
+        "ccRecipientsHint": "اختياري. افصل بين عدة عناوين بفواصل.",
+        "senderIdentityTitle": "هوية المرسل",
+        "senderIdentityDescription": "كيف يظهر الإشعار في صندوق الوارد.",
+        "fromName": "اسم المرسل",
+        "replyToAddress": "عنوان الرد",
+        "replyToHint": "تصل ردود فريقك إلى هنا.",
+        "subjectPrefix": "بادئة الموضوع",
+        "subjectPrefixHint": "يساعد في تصفية الرسائل، مثل [حجز].",
+        "livePreviewTitle": "معاينة مباشرة",
+        "livePreviewDescription": "معاينة صف صندوق الوارد لرسالة حجز جديدة.",
+        "sampleSubject": "حجز جديد — عمرة رمضان بريميوم",
+        "to": "إلى",
+        "notConfigured": "غير مُعد",
+        "deliveryTitle": "التسليم",
+        "deliveryDescription": "إيقاف الإشعارات الصادرة مؤقتًا.",
+        "bookingEmailsToggle": "إرسال بريد إلكتروني عن كل حجز جديد",
+        "bookingEmailsHint": "عند الإيقاف، تُحفظ الحجوزات وتظهر في لوحة التحكم كالمعتاد.",
+        "defaultFromName": "جنات الصحراء للسفر"
+      },
+      "notifications": {
+        "title": "الإشعارات",
+        "description": "اختر أي نشاط ينشئ تنبيهًا في جرس لوحة تحكم المسؤول.",
+        "dashboardAlertsTitle": "تنبيهات لوحة التحكم",
+        "alertsEnabled": "{{count}} من أصل 4 أنواع تنبيهات مفعّلة.",
+        "newBooking": "تم استلام حجز جديد",
+        "newBookingHint": "ينبّه الفريق فور حجز مسافر لباقة.",
+        "newMessage": "رسالة تواصل جديدة",
+        "newMessageHint": "ينبّه عند إرسال شخص ما لنموذج التواصل.",
+        "newsletter": "مشترك جديد في النشرة البريدية",
+        "newsletterHint": "مفيد أثناء تنمية قائمتك البريدية.",
+        "dailyDigest": "ملخص النشاط اليومي",
+        "dailyDigestHint": "تنبيه ملخص واحد بدلًا من إشعارات فردية.",
+        "housekeepingTitle": "الصيانة",
+        "housekeepingDescription": "مدة بقاء التنبيهات المقروءة في الجرس.",
+        "retentionLabel": "الاحتفاظ بالإشعارات لمدة (أيام)",
+        "retentionHint": "بين 1 و365 يومًا."
+      },
+      "security": {
+        "title": "الأمان",
+        "description": "سياسات الوصول لفريق لوحة تحكمك. يمكن للمسؤولين الرئيسيين فقط تغييرها.",
+        "teamAccessTitle": "وصول الفريق",
+        "teamAccessDescription": "كل من يمكنه تسجيل الدخول إلى لوحة تحكم المسؤول.",
+        "manageAdmins": "إدارة المسؤولين",
+        "unknownUser": "مستخدم غير معروف",
+        "noRole": "لا يوجد دور",
+        "noDashboardUsers": "لا يوجد مستخدمون في لوحة التحكم بعد.",
+        "accessPolicyTitle": "سياسة الوصول",
+        "accessPolicyDescription": "تنطبق على كل مستخدم في لوحة التحكم.",
+        "require2fa": "طلب المصادقة الثنائية",
+        "require2faHint": "يجب على المسؤولين تأكيد عامل ثانٍ قبل الوصول إلى لوحة التحكم.",
+        "auditLogging": "الاحتفاظ بسجل تدقيق لإجراءات المسؤولين",
+        "auditLoggingHint": "يسجّل من غيّر ماذا، ومتى.",
+        "sessionLength": "مدة الجلسة (ساعات)",
+        "sessionLengthHint": "يُسجَّل خروج المسؤولين بعد هذه الفترة من عدم النشاط. 1–720.",
+        "superAdminOnly": "يمكن للمسؤول الرئيسي فقط تغيير سياسات الوصول."
+      },
+      "team": {
+        "title": "الفريق",
+        "description": "من يمكنه تسجيل الدخول إلى لوحة تحكم المسؤول وما المسموح له بفعله.",
+        "membersTitle": "أعضاء الفريق",
+        "membersDescription": "ادعُ زملاء، أو غيّر الأدوار، أو ألغِ الوصول.",
+        "managedElsewhere": "تُدار صلاحيات الفريق في صفحة المسؤولين.",
+        "manageTeam": "إدارة الفريق"
+      },
+      "branches": {
+        "translationGroupTitle": "الترجمات",
+        "translationGroupHint": "تُعرض للمسافرين الناطقين بالفرنسية والإنجليزية. تعود إلى العربية عند تركها فارغة."
+      }
+    },
+    "blog": {
+      "pageTitle": "المدونة",
+      "pageDescription": "المقالات المعروضة في المدونة العامة.",
+      "newArticle": "مقال جديد",
+      "table": {
+        "title": "العنوان",
+        "slug": "الرابط المختصر",
+        "published": "منشور",
+        "date": "التاريخ",
+        "actions": "الإجراءات"
+      },
+      "loading": "جارٍ التحميل…",
+      "empty": "لا توجد مقالات بعد",
+      "unpublish": "إلغاء النشر",
+      "publish": "نشر",
+      "deleteTitle": "حذف المقال؟",
+      "deleteDescription": "حذف \"{{title}}\"؟",
+      "editTitle": "تعديل المقال",
+      "newTitle": "مقال جديد",
+      "fields": {
+        "title": "العنوان *",
+        "slug": "الرابط المختصر *",
+        "author": "الكاتب",
+        "excerpt": "المقتطف",
+        "content": "المحتوى (ماركداون/HTML)",
+        "cover": "صورة الغلاف",
+        "tags": "الوسوم (مفصولة بفواصل)",
+        "published": "منشور"
+      },
+      "toasts": {
+        "titleSlugRequired": "العنوان والرابط المختصر مطلوبان",
+        "saved": "تم الحفظ",
+        "saveFailed": "فشل الحفظ"
+      }
+    },
+    "gallery": {
+      "pageTitle": "معرض الصور",
+      "pageDescription": "الصور ومقاطع الفيديو المعروضة في المعرض العام.",
+      "bulkUpload": "رفع جماعي",
+      "addItem": "إضافة عنصر",
+      "categoryPlaceholder": "التصنيف",
+      "allCategories": "جميع التصنيفات",
+      "loading": "جارٍ التحميل…",
+      "empty": "لا توجد عناصر في المعرض بعد",
+      "deleteTitle": "حذف الصورة؟",
+      "deleteDescription": "لا يمكن التراجع عن هذا الإجراء.",
+      "editTitle": "تعديل العنصر",
+      "newTitle": "إضافة عنصر إلى المعرض",
+      "fields": {
+        "title": "العنوان",
+        "image": "الصورة *",
+        "category": "التصنيف",
+        "sortOrder": "ترتيب العرض",
+        "active": "نشط"
+      },
+      "toasts": {
+        "uploadedCount": "تم رفع {{count}} صورة",
+        "imageRequired": "الصورة مطلوبة",
+        "saved": "تم الحفظ",
+        "saveFailed": "فشل الحفظ"
+      }
+    },
+    "faq": {
+      "pageTitle": "الأسئلة الشائعة",
+      "newFaq": "سؤال جديد",
+      "loading": "جارٍ التحميل…",
+      "empty": "لا توجد أسئلة شائعة بعد",
+      "category": "التصنيف",
+      "deleteTitle": "حذف السؤال؟",
+      "editTitle": "تعديل السؤال",
+      "newTitle": "سؤال جديد",
+      "fields": {
+        "question": "السؤال *",
+        "answer": "الإجابة *",
+        "category": "التصنيف",
+        "sortOrder": "ترتيب العرض",
+        "active": "نشط"
+      },
+      "toasts": {
+        "questionAnswerRequired": "السؤال والإجابة مطلوبان",
+        "saved": "تم الحفظ",
+        "saveFailed": "فشل الحفظ"
+      }
+    },
+    "testimonials": {
+      "pageTitle": "آراء العملاء",
+      "newTestimonial": "رأي جديد",
+      "loading": "جارٍ التحميل…",
+      "empty": "لا توجد آراء بعد",
+      "deleteTitle": "حذف؟",
+      "deleteDescription": "حذف رأي \"{{name}}\"؟",
+      "editTitle": "تعديل الرأي",
+      "newTitle": "رأي جديد",
+      "fields": {
+        "name": "الاسم *",
+        "role": "الصفة",
+        "content": "المحتوى *",
+        "avatar": "الصورة الرمزية",
+        "rating": "التقييم (1-5)",
+        "sortOrder": "ترتيب العرض",
+        "active": "نشط"
+      },
+      "toasts": {
+        "nameContentRequired": "الاسم والمحتوى مطلوبان",
+        "saved": "تم الحفظ",
+        "saveFailed": "فشل الحفظ"
+      }
+    },
+    "admins": {
+      "pageTitle": "المسؤولون",
+      "pageDescription": "امنح صلاحيات إدارية أو صلاحيات موظف لفريقك.",
+      "inviteAdmin": "دعوة مسؤول",
+      "superAdminOnlyTitle": "المسؤول الرئيسي فقط",
+      "superAdminOnlyDescription": "يمكن للمسؤولين الرئيسيين فقط إدارة حسابات المسؤولين.",
+      "loading": "جارٍ التحميل…",
+      "empty": "لا يوجد مسؤولون بعد",
+      "table": {
+        "email": "البريد الإلكتروني",
+        "roles": "الأدوار",
+        "lastSignIn": "آخر تسجيل دخول",
+        "actions": "الإجراءات"
+      },
+      "removeRole": "إزالة الدور",
+      "removeAllAccessTitle": "إزالة جميع صلاحيات الإدارة؟",
+      "removeAllAccessDescription": "سيفقد {{email}} جميع أدوار المسؤول/الموظف. لن يُحذف حساب المصادقة.",
+      "removeAccess": "إزالة الوصول",
+      "inviteDialogTitle": "دعوة مسؤول",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "colleague@example.com",
+      "roleLabel": "الدور",
+      "roleAdmin": "مسؤول (إدارة كاملة)",
+      "roleStaff": "موظف (قراءة فقط)",
+      "inviteHint": "سيُرسل بريد دعوة. عند تعيين المستلم لكلمة مرور، سيتمكن من الوصول إلى لوحة التحكم فورًا.",
+      "sendInvite": "إرسال الدعوة",
+      "toasts": {
+        "invitationSent": "تم إرسال الدعوة",
+        "roleRemoved": "تمت إزالة الدور"
+      }
+    }
+  }
+}

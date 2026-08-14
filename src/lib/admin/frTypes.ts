@@ -32,6 +32,24 @@ export type PackageRowFr = Row<"packages"> & {
   excluded_fr: Json | null;
   timeline_fr: Json | null;
   required_documents_fr: Json | null;
+  title_en: string | null;
+  short_description_en: string | null;
+  description_en: string | null;
+  destination_en: string | null;
+  city_en: string | null;
+  country_en: string | null;
+  hotel_en: string | null;
+  airline_en: string | null;
+  transport_en: string | null;
+  duration_en: string | null;
+  meeting_point_en: string | null;
+  seo_title_en: string | null;
+  seo_description_en: string | null;
+  seo_keywords_en: Json | null;
+  included_en: Json | null;
+  excluded_en: Json | null;
+  timeline_en: Json | null;
+  required_documents_en: Json | null;
 };
 
 export type PackageInsertFr = Database["public"]["Tables"]["packages"]["Insert"] &
@@ -43,22 +61,34 @@ export type ArticleRowFr = Row<"articles"> & {
   content_fr: string | null;
   author_fr: string | null;
   tags_fr: Json | null;
+  title_en: string | null;
+  excerpt_en: string | null;
+  content_en: string | null;
+  author_en: string | null;
+  tags_en: Json | null;
 };
 
 export type FaqRowFr = Row<"faqs"> & {
   question_fr: string | null;
   answer_fr: string | null;
   category_fr: string | null;
+  question_en: string | null;
+  answer_en: string | null;
+  category_en: string | null;
 };
 
 export type TestimonialRowFr = Row<"testimonials"> & {
   role_fr: string | null;
   content_fr: string | null;
+  role_en: string | null;
+  content_en: string | null;
 };
 
 export type GalleryItemRowFr = Row<"gallery_items"> & {
   title_fr: string | null;
   category_fr: string | null;
+  title_en: string | null;
+  category_en: string | null;
 };
 
 export type BranchRowFr = Row<"branches"> & {
@@ -66,6 +96,10 @@ export type BranchRowFr = Row<"branches"> & {
   address_fr: string | null;
   city_fr: string | null;
   working_hours_fr: string | null;
+  name_en: string | null;
+  address_en: string | null;
+  city_en: string | null;
+  working_hours_en: string | null;
 };
 
 export type SiteContentRowFr = Row<"site_content"> & {
@@ -73,14 +107,20 @@ export type SiteContentRowFr = Row<"site_content"> & {
   subtitle_fr: string | null;
   body_fr: string | null;
   cta_label_fr: string | null;
+  title_en: string | null;
+  subtitle_en: string | null;
+  body_en: string | null;
+  cta_label_en: string | null;
 };
 
 export type SiteStatRowFr = Row<"site_stats"> & {
   label_fr: string | null;
+  label_en: string | null;
 };
 
 export type ContactInfoRowFr = Row<"contact_info"> & {
   label_fr: string | null;
+  label_en: string | null;
 };
 
 /** Cast a Supabase query result (or payload) to a `_fr`-aware shape. */

@@ -28,6 +28,8 @@ export const BookingInput = z.object({
   communicationPreference: z.string().trim().max(30).optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
   passengers: z.array(PassengerInput).min(1).max(60),
+  /** Language the visitor used when submitting (ar | fr | en). */
+  locale: z.enum(["ar", "fr", "en"]).optional(),
 });
 
 export type PassengerInput = z.infer<typeof PassengerInput>;

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { normalizeLang } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, Compass, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -159,6 +160,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
           totalPrice: total,
           currency: selectedPackage.currency,
           communicationPreference: communication,
+          locale: normalizeLang(i18n.language),
           notes: notes.trim() || null,
           passengers: passengers.map((p, i) => ({
             type: p.type,
