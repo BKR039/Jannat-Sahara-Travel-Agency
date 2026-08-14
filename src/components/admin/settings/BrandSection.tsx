@@ -277,7 +277,6 @@ export function BrandSection() {
                 label="Tagline"
                 hint="One short line under your logo."
                 error={s.errors.brand_tagline}
-                maxCount={80}
                 value={s.form.brand_tagline ?? ""}
                 onChange={(v) => s.set("brand_tagline", v)}
               />
