@@ -8,6 +8,7 @@ import { articleBySlugQuery, articlesQuery } from "@/lib/queries";
 import { articleCategory, articleTags, readingMinutes } from "@/lib/blog";
 import { ArticleMeta, CategoryBadge } from "@/components/blog/ArticleMeta";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { useLocalized } from "@/lib/localize";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ context, params }) =>
@@ -56,6 +57,7 @@ export const Route = createFileRoute("/blog/$slug")({
 
 function ArticlePage() {
   const { t } = useTranslation();
+  const { lang, L } = useLocalized();
   const { slug } = Route.useParams();
   const { data: article, isLoading } = useQuery(articleBySlugQuery(slug));
   const { data: all } = useQuery(articlesQuery());
@@ -77,10 +79,13 @@ function ArticlePage() {
 
   if (!article) throw notFound();
 
-  const category = articleCategory(article);
-  const tags = articleTags(article);
+  const category = articleCategory(article, lang);
+  const tags = articleTags(article, lang);
+  const title = L(article, "title");
+  const excerpt = L(article, "excerpt", "empty");
+  const content = L(article, "content", "empty");
   const related = (all ?? [])
-    .filter((a) => a.slug !== slug && (!tags.length || articleTags(a).some((tag) => tags.includes(tag))))
+    .filter((a) => a.slug !== slug && (!tags.length || articleTags(a, lang).some((tag) => tags.includes(tag))))
     .slice(0, 3);
 
   return (
@@ -94,25 +99,25 @@ function ArticlePage() {
         </Link>
 
         {category && <CategoryBadge category={category} className="mb-3" />}
-        <h1 className="text-h2 font-extrabold leading-tight text-foreground">{article.title}</h1>
+        <h1 className="text-h2 font-extrabold leading-tight text-foreground">{title}</h1>
         <ArticleMeta article={article} className="mt-4" />
-        {article.excerpt && (
-          <p className="mt-4 text-body-lg leading-relaxed text-muted-foreground">{article.excerpt}</p>
+        {excerpt && (
+          <p className="mt-4 text-body-lg leading-relaxed text-muted-foreground">{excerpt}</p>
         )}
 
         {article.cover && (
           <img
             src={article.cover}
-            alt={article.title}
+            alt={title}
             loading="lazy"
             decoding="async"
             className="mt-8 aspect-[16/9] w-full rounded-xl object-cover shadow-sm"
           />
         )}
 
-        {article.content && (
+        {content && (
           <div className="mt-8 max-w-[68ch] whitespace-pre-wrap text-body-lg leading-loose text-foreground/90">
-            {article.content}
+            {content}
           </div>
         )}
 
@@ -128,7 +133,7 @@ function ArticlePage() {
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border-subtle pt-6">
           <span className="text-caption text-muted-foreground">{t("common.minutesRead", { count: readingMinutes(article) })}</span>
-          <ShareButtons slug={article.slug} title={article.title} />
+          <ShareButtons slug={article.slug} title={title} />
         </div>
 
         {related.length > 0 && (
@@ -145,13 +150,13 @@ function ArticlePage() {
                   {r.cover && (
                     <img
                       src={r.cover}
-                      alt={r.title}
+                      alt={L(r, "title")}
                       loading="lazy"
                       className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   )}
                   <p className="line-clamp-2 p-3 text-caption font-semibold leading-snug text-foreground group-hover:text-primary">
-                    {r.title}
+                    {L(r, "title")}
                   </p>
                 </Link>
               ))}

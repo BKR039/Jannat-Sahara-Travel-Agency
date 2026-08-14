@@ -5,6 +5,7 @@ import { articleBySlugQuery, articlesQuery } from "@/lib/queries";
 import { articleCategory, articleTags } from "@/lib/blog";
 import { ArticleMeta, CategoryBadge } from "@/components/blog/ArticleMeta";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { useLocalized } from "@/lib/localize";
 
 export function ArticleDialog({
   slug,
@@ -16,13 +17,17 @@ export function ArticleDialog({
   onOpenArticle?: (slug: string) => void;
 }) {
   const { t } = useTranslation();
+  const { lang, L } = useLocalized();
   const { data: article, isLoading } = useQuery({ ...articleBySlugQuery(slug ?? ""), enabled: !!slug });
   const { data: all } = useQuery({ ...articlesQuery(), enabled: !!slug });
 
-  const category = article ? articleCategory(article) : null;
-  const tags = article ? articleTags(article) : [];
+  const category = article ? articleCategory(article, lang) : null;
+  const tags = article ? articleTags(article, lang) : [];
+  const title = L(article, "title");
+  const excerpt = L(article, "excerpt", "empty");
+  const content = L(article, "content", "empty");
   const related = (all ?? [])
-    .filter((a) => a.slug !== slug && (!tags.length || articleTags(a).some((tag) => tags.includes(tag))))
+    .filter((a) => a.slug !== slug && (!tags.length || articleTags(a, lang).some((tag) => tags.includes(tag))))
     .slice(0, 3);
 
   return (
@@ -40,12 +45,12 @@ export function ArticleDialog({
             <DialogHeader className="space-y-3 text-start">
               {category && <CategoryBadge category={category} className="w-fit" />}
               <DialogTitle className="text-h3 font-extrabold leading-tight text-foreground">
-                {article.title}
+                {title}
               </DialogTitle>
               <ArticleMeta article={article} />
-              {article.excerpt && (
+              {excerpt && (
                 <DialogDescription className="text-body leading-relaxed text-muted-foreground">
-                  {article.excerpt}
+                  {excerpt}
                 </DialogDescription>
               )}
             </DialogHeader>
@@ -53,16 +58,16 @@ export function ArticleDialog({
             {article.cover && (
               <img
                 src={article.cover}
-                alt={article.title}
+                alt={title}
                 loading="lazy"
                 decoding="async"
                 className="aspect-[16/9] w-full rounded-xl object-cover"
               />
             )}
 
-            {article.content && (
+            {content && (
               <div className="whitespace-pre-wrap text-body leading-loose tracking-normal text-foreground/90 [word-spacing:0.05em]">
-                {article.content}
+                {content}
               </div>
             )}
 
@@ -79,7 +84,7 @@ export function ArticleDialog({
               </div>
             )}
 
-            <ShareButtons slug={article.slug} title={article.title} className="border-t border-border-subtle pt-4" />
+            <ShareButtons slug={article.slug} title={title} className="border-t border-border-subtle pt-4" />
 
             {related.length > 0 && (
               <div className="border-t border-border-subtle pt-4">
@@ -95,13 +100,13 @@ export function ArticleDialog({
                       {r.cover && (
                         <img
                           src={r.cover}
-                          alt={r.title}
+                          alt={L(r, "title")}
                           loading="lazy"
                           className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       )}
                       <p className="line-clamp-2 p-3 text-caption font-semibold leading-snug text-foreground group-hover:text-primary">
-                        {r.title}
+                        {L(r, "title")}
                       </p>
                     </button>
                   ))}

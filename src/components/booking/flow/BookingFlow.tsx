@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { packageBySlugQuery, type Package } from "@/lib/queries";
 import { submitBooking } from "@/lib/booking.functions";
+import { useLocalized } from "@/lib/localize";
 import { computeTotal, money, syncPassengers, type Counts, type Passenger } from "./model";
 import { CounterRow, PassengerForm, PassportUpload, StepIndicator, SummaryPanel } from "./parts";
 
@@ -30,6 +31,7 @@ interface Props {
 
 export function BookingFlow({ packageSlug = null }: Props) {
   const { t, i18n } = useTranslation();
+  const { L } = useLocalized();
   const navigate = useNavigate();
   const submit = useServerFn(submitBooking);
   const topRef = useRef<HTMLDivElement>(null);
@@ -238,7 +240,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
               {selectedPackage.cover && (
                 <img
                   src={selectedPackage.cover}
-                  alt={selectedPackage.title}
+                  alt={L(selectedPackage, "title")}
                   loading="lazy"
                   className="h-16 w-24 shrink-0 rounded-lg object-cover"
                 />
@@ -247,9 +249,9 @@ export function BookingFlow({ packageSlug = null }: Props) {
                 <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-caption font-semibold text-primary">
                   {t(`categories.${selectedPackage.category}`)}
                 </span>
-                <h2 className="mt-1 truncate text-body font-bold">{selectedPackage.title}</h2>
+                <h2 className="mt-1 truncate text-body font-bold">{L(selectedPackage, "title")}</h2>
                 <p className="mt-0.5 truncate text-caption text-muted-foreground">
-                  {[selectedPackage.destination, selectedPackage.duration, departure]
+                  {[L(selectedPackage, "destination", "empty"), L(selectedPackage, "duration", "empty"), departure]
                     .filter(Boolean)
                     .join(" • ")}
                 </p>
@@ -400,9 +402,9 @@ export function BookingFlow({ packageSlug = null }: Props) {
               />
               <div className="rounded-xl border border-border-subtle bg-card p-6">
                 <h3 className="text-h5 font-bold">{t("bookingFlow.review.packageBlock")}</h3>
-                <p className="mt-2 text-body font-semibold">{selectedPackage?.title}</p>
+                <p className="mt-2 text-body font-semibold">{L(selectedPackage, "title")}</p>
                 <p className="text-small text-muted-foreground">
-                  {[selectedPackage?.destination, selectedPackage?.duration, departure]
+                  {[L(selectedPackage, "destination", "empty"), L(selectedPackage, "duration", "empty"), departure]
                     .filter(Boolean)
                     .join(" • ")}
                 </p>

@@ -11,6 +11,7 @@ import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { ArticleCard } from "@/components/blog/ArticleCard";
 import { articlesQuery } from "@/lib/queries";
 import { articleTags } from "@/lib/blog";
+import { useLocalized } from "@/lib/localize";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/blog")({
 
 function BlogPage() {
   const { t } = useTranslation();
+  const { lang, L } = useLocalized();
   const { data, isLoading } = useQuery(articlesQuery());
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -51,18 +53,18 @@ function BlogPage() {
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    data?.forEach((a) => articleTags(a).forEach((tag) => set.add(tag)));
+    data?.forEach((a) => articleTags(a, lang).forEach((tag) => set.add(tag)));
     return Array.from(set);
-  }, [data]);
+  }, [data, lang]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (data ?? []).filter((a) => {
-      const matchesCategory = !category || articleTags(a).includes(category);
-      const haystack = `${a.title} ${a.excerpt ?? ""} ${a.author ?? ""}`.toLowerCase();
+      const matchesCategory = !category || articleTags(a, lang).includes(category);
+      const haystack = `${L(a, "title", "base")} ${L(a, "excerpt", "base")} ${L(a, "author", "base")}`.toLowerCase();
       return matchesCategory && (!q || haystack.includes(q));
     });
-  }, [data, search, category]);
+  }, [data, search, category, lang, L]);
 
   return (
     <SiteLayout>

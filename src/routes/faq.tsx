@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { EmptyState } from "@/components/common/SkeletonGrid";
 import { faqsQuery } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 import {
   Accordion,
   AccordionContent,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/faq")({
 
 function FaqPage() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data } = useQuery(faqsQuery());
 
   return (
@@ -47,10 +49,10 @@ function FaqPage() {
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <AccordionTrigger className="text-start text-body font-semibold">
-                  {f.question}
+                  {L(f, "question")}
                 </AccordionTrigger>
                 <AccordionContent className="text-small leading-relaxed text-muted-foreground">
-                  {f.answer}
+                  {L(f, "answer")}
                 </AccordionContent>
               </AccordionItem>
             ))}

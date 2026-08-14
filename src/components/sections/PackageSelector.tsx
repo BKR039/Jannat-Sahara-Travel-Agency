@@ -19,6 +19,7 @@ import { PackageCard } from "@/components/common/PackageCard";
 import { PackageDropdown, effectivePrice, seatsLeft } from "@/components/common/PackageDropdown";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
 import { cn } from "@/lib/utils";
+import { useLocalized } from "@/lib/localize";
 
 const SERVICES = [
   { key: "umrah", icon: Sparkles },
@@ -28,6 +29,7 @@ const SERVICES = [
 
 export function PackageSelector() {
   const { t, i18n } = useTranslation();
+  const { L, price } = useLocalized();
   const navigate = useNavigate();
   const { data, isLoading } = useQuery(packagesQuery());
 
@@ -146,7 +148,7 @@ export function PackageSelector() {
               {selected.cover && (
                 <img
                   src={selected.cover}
-                  alt={selected.title}
+                  alt={L(selected, "title")}
                   loading="lazy"
                   decoding="async"
                   className="h-full w-full object-cover"
@@ -155,10 +157,10 @@ export function PackageSelector() {
             </div>
             <div className="flex flex-col gap-3">
               <div>
-                <h3 className="text-card-title">{selected.title}</h3>
-                {selected.destination && (
+                <h3 className="text-card-title">{L(selected, "title")}</h3>
+                {L(selected, "destination", "empty") && (
                   <p className="mt-1 inline-flex items-center gap-1.5 text-small text-muted-foreground">
-                    <MapPin className="h-4 w-4" aria-hidden="true" /> {selected.destination}
+                    <MapPin className="h-4 w-4" aria-hidden="true" /> {L(selected, "destination", "empty")}
                   </p>
                 )}
               </div>
@@ -170,15 +172,15 @@ export function PackageSelector() {
                     {fmtDate(selected.departure_date)}
                   </div>
                 )}
-                {selected.duration && (
+                {L(selected, "duration", "empty") && (
                   <div className="inline-flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {selected.duration}
+                    <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {L(selected, "duration", "empty")}
                   </div>
                 )}
-                {selected.hotel && (
+                {L(selected, "hotel", "base") && (
                   <div className="inline-flex items-center gap-1.5">
                     <Hotel className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span className="line-clamp-1">{selected.hotel}</span>
+                    <span className="line-clamp-1">{L(selected, "hotel", "base")}</span>
                   </div>
                 )}
                 {seatsLeft(selected) != null && (
@@ -193,7 +195,7 @@ export function PackageSelector() {
                 <div>
                   <p className="text-caption text-muted-foreground">{t("package.from")}</p>
                   <p className="text-h4 text-primary">
-                    {effectivePrice(selected).toLocaleString()} {selected.currency}
+                    {price(effectivePrice(selected), selected.currency ?? "TND")}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">

@@ -1068,6 +1068,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          name_fr: string | null
           rating: number
           role: string | null
           role_fr: string | null
@@ -1082,6 +1083,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          name_fr?: string | null
           rating?: number
           role?: string | null
           role_fr?: string | null
@@ -1096,6 +1098,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          name_fr?: string | null
           rating?: number
           role?: string | null
           role_fr?: string | null

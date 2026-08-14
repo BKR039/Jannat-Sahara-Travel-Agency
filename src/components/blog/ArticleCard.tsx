@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Article } from "@/lib/queries";
 import { articleCategory, readingMinutes } from "@/lib/blog";
 import { ArticleMeta, CategoryBadge } from "./ArticleMeta";
+import { useLocalized } from "@/lib/localize";
 
 export function ArticleCard({
   article,
@@ -14,7 +15,10 @@ export function ArticleCard({
   index?: number;
 }) {
   const { t } = useTranslation();
-  const category = articleCategory(article);
+  const { lang, L } = useLocalized();
+  const category = articleCategory(article, lang);
+  const title = L(article, "title");
+  const excerpt = L(article, "excerpt", "empty");
 
   return (
     <article
@@ -25,7 +29,7 @@ export function ArticleCard({
         {article.cover ? (
           <img
             src={article.cover}
-            alt={article.title}
+            alt={title}
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-700 ease-standard group-hover:scale-105"
@@ -47,10 +51,10 @@ export function ArticleCard({
       <div className="flex flex-1 flex-col gap-3 p-5">
         <ArticleMeta article={article} />
         <h3 className="line-clamp-2 text-card-title font-bold leading-snug text-foreground transition-colors duration-base group-hover:text-primary">
-          {article.title}
+          {title}
         </h3>
-        {article.excerpt && (
-          <p className="line-clamp-3 text-small leading-relaxed text-muted-foreground">{article.excerpt}</p>
+        {excerpt && (
+          <p className="line-clamp-3 text-small leading-relaxed text-muted-foreground">{excerpt}</p>
         )}
         <button
           type="button"
