@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Disclosure } from "@/components/admin/kit";
 import { uploadMedia } from "@/lib/admin/media";
 import { cn } from "@/lib/utils";
-import { SettingsCard, SettingsSection, TextField } from "./parts";
+import { AutoSaveBar, SettingsCard, SettingsSection, TextField } from "./parts";
 import { hexColor, maxLen, url, useSiteSettings, type SettingSpec } from "./useSiteSettings";
 import { useContactSettings } from "./useContactSettings";
 
