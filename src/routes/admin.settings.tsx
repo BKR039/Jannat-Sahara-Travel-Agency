@@ -18,7 +18,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/common/Logo";
 import { GeneralSection } from "@/components/admin/settings/GeneralSection";
 import { BrandSection } from "@/components/admin/settings/BrandSection";
 import { ContentSection } from "@/components/admin/settings/ContentSection";
@@ -123,7 +122,7 @@ function SettingsPage() {
   return (
     <div className="mx-auto max-w-6xl">
       {/* Editorial masthead — quiet, branded, no oversized heading */}
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border-subtle pb-6">
+      <header className="mb-8 border-b border-border-subtle pb-6">
         <div className="min-w-0">
           <p className="flex items-center gap-2 text-caption font-medium text-primary">
             <SettingsIcon className="h-3.5 w-3.5" />
@@ -136,9 +135,6 @@ function SettingsPage() {
             Update your agency details, website content and contact channels. Changes are saved as
             you work.
           </p>
-        </div>
-        <div className="hidden shrink-0 sm:block">
-          <Logo />
         </div>
       </header>
 
