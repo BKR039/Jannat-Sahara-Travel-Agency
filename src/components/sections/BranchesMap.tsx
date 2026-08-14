@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { useTranslation } from "react-i18next";
 import { Navigation, Phone } from "lucide-react";
 import type { Branch } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 
 const brandMarkerIcon = (highlighted: boolean) =>
   L.divIcon({
@@ -64,6 +65,7 @@ interface Props {
 
 export default function BranchesMap({ branches, activeId, onSelect }: Props) {
   const { t } = useTranslation();
+  const { L: loc, isFr } = useLocalized();
   const markerRefs = useRef<Record<string, L.Marker | null>>({});
   const active = useMemo(
     () => branches.find((b) => b.id === activeId) ?? null,
@@ -110,13 +112,18 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
           }}
         >
           <Popup>
-            <div className="min-w-[230px] space-y-2 p-1 text-right" dir="rtl">
-              <div className="text-body font-bold text-primary">{b.name}</div>
-              <div className="text-caption leading-relaxed text-muted-foreground">{b.address}</div>
+            <div
+              className="min-w-[230px] space-y-2 p-1 text-start"
+              dir={isFr ? "ltr" : "rtl"}
+            >
+              <div className="text-body font-bold text-primary">{loc(b, "name", "base")}</div>
+              <div className="text-caption leading-relaxed text-muted-foreground">
+                {loc(b, "address", "base")}
+              </div>
               {b.phone && (
                 <a
                   href={`tel:${b.phone.replace(/\s+/g, "")}`}
-                  className="flex items-center justify-end gap-1.5 text-caption font-medium"
+                  className="flex items-center gap-1.5 text-caption font-medium"
                   dir="ltr"
                 >
                   <Phone className="h-3 w-3" />

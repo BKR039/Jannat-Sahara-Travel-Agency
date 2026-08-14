@@ -33,8 +33,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useInView } from "@/hooks/useInView";
+import { useLocalized } from "@/lib/localize";
 
-import { supabase } from "@/integrations/supabase/client";
 import { branchesQuery, contactInfoQuery, type Branch, type ContactInfo } from "@/lib/queries";
 
 const BranchesMap = lazy(() => import("./BranchesMap"));
@@ -51,6 +51,17 @@ const SOCIAL_KEYS = ["facebook", "instagram", "youtube", "twitter", "tiktok"];
 
 function whatsappHref(phone: string) {
   return `https://wa.me/${phone.replace(/[^\d]/g, "")}`;
+}
+
+/** Turns a raw wa.me link (or any digits) into a readable +216 55 123 456. */
+function prettyPhone(raw: string) {
+  const digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("216") && digits.length >= 11) {
+    const local = digits.slice(3);
+    return `+216 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 8)}`;
+  }
+  return `+${digits}`;
 }
 
 function mapsHref(branch: Branch) {
@@ -97,6 +108,7 @@ const BranchTile = memo(function BranchTile({
   index: number;
 }) {
   const { t } = useTranslation();
+  const { L } = useLocalized();
 
   return (
     <article
@@ -140,13 +152,14 @@ const BranchTile = memo(function BranchTile({
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-caption font-semibold uppercase tracking-[0.16em] text-primary/80">
-          {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} · {branch.city}
+          {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} ·{" "}
+          {L(branch, "city", "base")}
         </p>
         <h3 className="mt-0.5 truncate text-small font-bold leading-snug text-foreground">
-          {branch.name}
+          {L(branch, "name", "base")}
         </h3>
         <p className="mt-0.5 line-clamp-1 text-caption leading-relaxed text-muted-foreground">
-          {branch.address}
+          {L(branch, "address", "base")}
         </p>
       </div>
 
@@ -164,11 +177,13 @@ const BranchTile = memo(function BranchTile({
 
 function ActiveBranchPanel({ branch }: { branch: Branch }) {
   const { t } = useTranslation();
+  const { L } = useLocalized();
+  const hours = L(branch, "working_hours", "empty");
+  const address = L(branch, "address", "base");
+  const name = L(branch, "name", "base");
 
   const facts = [
-    branch.working_hours
-      ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: branch.working_hours }
-      : null,
+    hours ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours } : null,
     branch.phone
       ? {
           key: "phone",
@@ -181,7 +196,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
     branch.email
       ? { key: "email", icon: Mail, label: t("branches.info.email"), value: branch.email, ltr: true }
       : null,
-    { key: "address", icon: Building2, label: t("branches.info.headquarters"), value: branch.address },
+    { key: "address", icon: Building2, label: t("branches.info.headquarters"), value: address },
   ].filter(Boolean) as {
     key: string;
     icon: typeof Clock;
@@ -257,7 +272,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
             type="button"
             title={t("branches.copyAddress")}
             aria-label={t("branches.copyAddress")}
-            onClick={() => copyToClipboard(`${branch.name} — ${branch.address}`, t("branches.addressCopied"))}
+            onClick={() => copyToClipboard(`${name} — ${address}`, t("branches.addressCopied"))}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             <Copy className="h-[18px] w-[18px]" strokeWidth={2} />
@@ -284,6 +299,7 @@ type InfoRow = {
 
 function useContactRows(items: ContactInfo[]) {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const phone = items.find((i) => i.key === "phone" || i.key === "mobile");
   const whatsapp = items.find((i) => i.key === "whatsapp");
   const email = items.find((i) => i.key === "email");
@@ -296,7 +312,7 @@ function useContactRows(items: ContactInfo[]) {
       key: "whatsapp",
       icon: MessageCircle,
       title: t("branches.info.whatsapp"),
-      value: whatsapp.value,
+      value: prettyPhone(whatsapp.value) || phone?.value || whatsapp.value,
       href: whatsappHref(whatsapp.value),
       external: true,
       ltr: true,
@@ -324,22 +340,27 @@ function useContactRows(items: ContactInfo[]) {
       ltr: true,
       actionLabel: t("branches.copy"),
     });
-  if (address)
+  if (address) {
+    const value = L(address, "value", "base");
     rows.push({
       key: "address",
       icon: Building2,
       title: t("branches.info.headquarters"),
-      value: address.value,
-      copy: address.value,
+      value,
+      copy: value,
       actionLabel: t("branches.copyAddress"),
     });
-  if (hours)
-    rows.push({
-      key: "hours",
-      icon: Clock,
-      title: t("branches.info.hours"),
-      value: hours.value,
-    });
+  }
+  if (hours) {
+    const value = L(hours, "value", "empty");
+    if (value)
+      rows.push({
+        key: "hours",
+        icon: Clock,
+        title: t("branches.info.hours"),
+        value,
+      });
+  }
   return rows;
 }
 
@@ -351,7 +372,7 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
   if (rows.length === 0 && socials.length === 0) return null;
 
   return (
-    <aside className="ds-reveal relative flex h-full flex-col overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card/90 to-card/60 shadow-lg shadow-primary/5 backdrop-blur-xl">
+    <aside className="ds-reveal relative flex flex-col self-start overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card/90 to-card/60 shadow-lg shadow-primary/5 backdrop-blur-xl">
       <span
         aria-hidden
         className="pointer-events-none absolute -top-24 end-[-15%] h-56 w-56 rounded-full bg-primary/10 blur-3xl"
@@ -386,6 +407,9 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
             </span>
 
             <div className="min-w-0 flex-1">
+              <p className="text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {r.title}
+              </p>
               {r.href ? (
                 <a
                   href={r.href}
@@ -394,7 +418,7 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
                   dir={r.ltr ? "ltr" : undefined}
                   aria-label={`${r.title}: ${r.value}`}
                   className={cn(
-                    "block break-words text-small font-semibold leading-relaxed text-foreground transition-colors duration-base hover:text-primary",
+                    "mt-0.5 block break-words text-small font-semibold leading-relaxed text-foreground transition-colors duration-base hover:text-primary",
                     r.ltr && "text-start",
                   )}
                 >
@@ -404,7 +428,7 @@ function InfoPanel({ items }: { items: ContactInfo[] }) {
                 <p
                   dir={r.ltr ? "ltr" : undefined}
                   className={cn(
-                    "break-words text-small font-semibold leading-relaxed text-foreground",
+                    "mt-0.5 break-words text-small font-semibold leading-relaxed text-foreground",
                     r.ltr && "text-start",
                   )}
                 >
@@ -520,6 +544,7 @@ function ContactForm({
   defaultBranchId?: string | null;
 }) {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const whatsappItem = info.find((i) => i.key === "whatsapp");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -603,7 +628,7 @@ function ContactForm({
               <SelectContent className="rounded-lg">
                 {branches.map((b) => (
                   <SelectItem key={b.id} value={b.id}>
-                    {b.name} — {b.city}
+                    {L(b, "name", "base")} — {L(b, "city", "base")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -661,6 +686,7 @@ function ContactForm({
 
 export function BranchesSection() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data, isLoading } = useQuery(branchesQuery());
   const { data: infoData } = useQuery(contactInfoQuery());
   const branches = useMemo(() => data ?? [], [data]);
@@ -677,10 +703,14 @@ export function BranchesSection() {
 
   useEffect(() => setMounted(true), []);
 
-  const cities = useMemo(
-    () => Array.from(new Set(branches.map((b) => b.city).filter(Boolean))) as string[],
-    [branches],
-  );
+  /** city id = base column value (stable), label = localized value */
+  const cities = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const b of branches) {
+      if (b.city && !map.has(b.city)) map.set(b.city, L(b, "city", "base"));
+    }
+    return Array.from(map, ([id, label]) => ({ id, label }));
+  }, [branches, L]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -688,7 +718,9 @@ export function BranchesSection() {
       const cityOk = city === "all" || b.city === city;
       const qOk =
         !q ||
-        [b.name, b.city, b.address].filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+        [b.name, b.name_fr, b.city, b.city_fr, b.address, b.address_fr]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q));
       return cityOk && qOk;
     });
   }, [branches, search, city]);
@@ -808,10 +840,7 @@ export function BranchesSection() {
                 </div>
                 {cities.length > 1 && (
                   <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
-                    {[
-                      { id: "all", label: t("branches.allCities") },
-                      ...cities.map((c) => ({ id: c, label: c })),
-                    ].map((c) => (
+                    {[{ id: "all", label: t("branches.allCities") }, ...cities].map((c) => (
                       <button
                         key={c.id}
                         type="button"
@@ -875,15 +904,15 @@ export function BranchesSection() {
 
               <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/85 px-4 py-3 shadow-xl backdrop-blur-xl md:block">
                 <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-                  {activeBranch ? activeBranch.city : t("branches.ourBranches")}
+                  {activeBranch ? L(activeBranch, "city", "base") : t("branches.ourBranches")}
                 </p>
                 <p className="mt-0.5 text-small font-bold leading-snug text-foreground">
                   {activeBranch
-                    ? activeBranch.name
+                    ? L(activeBranch, "name", "base")
                     : `${filtered.length} ${t("branches.branchesCount")}`}
                 </p>
                 <p className="mt-0.5 line-clamp-2 text-caption leading-relaxed text-muted-foreground">
-                  {activeBranch ? activeBranch.address : t("branches.selectHint")}
+                  {activeBranch ? L(activeBranch, "address", "base") : t("branches.selectHint")}
                 </p>
               </div>
             </div>
@@ -894,7 +923,7 @@ export function BranchesSection() {
         </div>
 
         {/* ---------- form + general contact information ---------- */}
-        <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-12">
+        <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <ContactForm branches={branches} info={info} defaultBranchId={activeId} />
           </div>

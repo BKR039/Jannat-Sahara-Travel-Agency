@@ -2,9 +2,11 @@ import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { statsQuery } from "@/lib/queries";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
+import { useLocalized } from "@/lib/localize";
 
 function StatsSectionBase() {
   const { data } = useQuery(statsQuery());
+  const { L } = useLocalized();
   if (!data || data.length === 0) return null;
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
@@ -18,7 +20,7 @@ function StatsSectionBase() {
               <DynamicIcon name={s.icon} className="h-6 w-6 shrink-0" />
             </div>
             <div className="text-h2 font-extrabold text-foreground">{s.value}</div>
-            <div className="text-small text-muted-foreground">{s.label}</div>
+            <div className="text-small text-muted-foreground">{L(s, "label", "base")}</div>
           </div>
         ))}
       </div>

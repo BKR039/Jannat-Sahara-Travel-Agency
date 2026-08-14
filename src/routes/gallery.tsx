@@ -3,6 +3,7 @@ import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocalized } from "@/lib/localize";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/gallery")({
 
 function GalleryPage() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const [cat, setCat] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
   const { data, isLoading } = useQuery(galleryQuery());
@@ -95,21 +97,21 @@ function GalleryPage() {
               <button
                 key={g.id}
                 type="button"
-                onClick={() => setPreview({ src: g.image, alt: g.title ?? "" })}
-                aria-label={g.title ?? t("home.gallery")}
+                onClick={() => setPreview({ src: g.image, alt: L(g, "title", "base") })}
+                aria-label={L(g, "title", "base") || t("home.gallery")}
                 className="group relative aspect-square overflow-hidden rounded-[var(--radius-card)] bg-muted shadow-sm transition-shadow duration-base ease-standard hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ds-reveal"
                 style={{ animationDelay: `${(i % 12) * 40}ms` }}
               >
                 <LazyImage
                   src={g.image}
-                  alt={g.title ?? ""}
+                  alt={L(g, "title", "base")}
                   wrapperClassName="h-full w-full"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="transition-transform duration-slow ease-emphasized group-hover:scale-110"
                 />
-                {g.title && (
+                {L(g, "title", "base") && (
                   <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition group-hover:opacity-100">
-                    <span className="text-small font-semibold text-on-dark">{g.title}</span>
+                    <span className="text-small font-semibold text-on-dark">{L(g, "title", "base")}</span>
                   </div>
                 )}
               </button>

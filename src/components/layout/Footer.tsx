@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeNewsletter } from "@/lib/public.functions";
 import { contactInfoQuery, branchesQuery } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 import type { SupportedLanguage } from "@/lib/i18n";
 
 const QUICK_LINKS = [
@@ -35,6 +36,7 @@ const LEGAL_LINKS = [
 
 export function Footer() {
   const { t, i18n } = useTranslation();
+  const { L } = useLocalized();
   const year = new Date().getFullYear();
   const { data: info } = useQuery(contactInfoQuery());
   const { data: branches } = useQuery(branchesQuery());
@@ -45,7 +47,10 @@ export function Footer() {
   const socials = info?.filter((c) => ["facebook", "instagram", "whatsapp", "youtube", "tiktok"].includes(c.key)) ?? [];
   const contactDetails = info?.filter((c) => ["address", "phone", "mobile", "email"].includes(c.key)) ?? [];
   const mainBranch = branches?.find((b) => b.is_main_branch) ?? branches?.[0];
-  const workingHours = info?.find((c) => c.key === "hours")?.value ?? mainBranch?.working_hours;
+  const hoursItem = info?.find((c) => c.key === "hours");
+  const workingHours =
+    (hoursItem ? L(hoursItem, "value", "empty") : "") ||
+    (mainBranch ? L(mainBranch, "working_hours", "empty") : "");
 
   const onSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -209,7 +214,7 @@ export function Footer() {
                     >
                       <MapPin className="mt-[0.2em] h-4 w-4 shrink-0 text-secondary" />
                       <span>
-                        {b.city} — {b.name}
+                        {L(b, "city", "base")} — {L(b, "name", "base")}
                       </span>
                     </Link>
                   </li>
@@ -236,7 +241,7 @@ export function Footer() {
                     dir={["phone", "mobile", "email"].includes(c.key) ? "ltr" : undefined}
                     className="min-w-0 break-words leading-relaxed rtl:text-start"
                   >
-                    {c.value}
+                    {L(c, "value", "base")}
                   </span>
                 </li>
               ))}
