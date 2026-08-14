@@ -35,6 +35,7 @@ const LEGAL_LINKS = [
 
 export function Footer() {
   const { t, i18n } = useTranslation();
+  const { L } = useLocalized();
   const year = new Date().getFullYear();
   const { data: info } = useQuery(contactInfoQuery());
   const { data: branches } = useQuery(branchesQuery());
@@ -45,7 +46,10 @@ export function Footer() {
   const socials = info?.filter((c) => ["facebook", "instagram", "whatsapp", "youtube", "tiktok"].includes(c.key)) ?? [];
   const contactDetails = info?.filter((c) => ["address", "phone", "mobile", "email"].includes(c.key)) ?? [];
   const mainBranch = branches?.find((b) => b.is_main_branch) ?? branches?.[0];
-  const workingHours = info?.find((c) => c.key === "hours")?.value ?? mainBranch?.working_hours;
+  const hoursItem = info?.find((c) => c.key === "hours");
+  const workingHours =
+    (hoursItem ? L(hoursItem, "value", "empty") : "") ||
+    (mainBranch ? L(mainBranch, "working_hours", "empty") : "");
 
   const onSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
