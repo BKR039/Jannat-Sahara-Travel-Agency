@@ -10,6 +10,10 @@ import arShell from "@/locales/ar/adminShell.json";
 import frShell from "@/locales/fr/adminShell.json";
 import enShell from "@/locales/en/adminShell.json";
 
+import arOps from "@/locales/ar/adminOps.json";
+import frOps from "@/locales/fr/adminOps.json";
+import enOps from "@/locales/en/adminOps.json";
+
 export const SUPPORTED_LANGUAGES = ["ar", "fr", "en"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
@@ -24,9 +28,9 @@ if (!i18n.isInitialized) {
     .use(initReactI18next)
     .init({
       resources: {
-        ar: { common: ar, admin: arShell },
-        fr: { common: fr, admin: frShell },
-        en: { common: en, admin: enShell },
+        ar: { common: ar, admin: { ...arShell, ...arOps } },
+        fr: { common: fr, admin: { ...frShell, ...frOps } },
+        en: { common: en, admin: { ...enShell, ...enOps } },
       },
       fallbackLng: "ar",
       supportedLngs: SUPPORTED_LANGUAGES,
