@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { Package } from "@/lib/queries";
 import { LazyImage } from "@/components/common/LazyImage";
 import { cn } from "@/lib/utils";
+import { useLocalized } from "@/lib/localize";
 
 /**
  * Package Card — compact luxury listing card
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
  */
 function PackageCardBase({ pkg, className }: { pkg: Package; className?: string }) {
   const { t } = useTranslation();
+  const { L, price } = useLocalized();
   const discounted =
     pkg.discount && pkg.discount > 0 ? Number(pkg.price) * (1 - Number(pkg.discount) / 100) : null;
 
@@ -24,9 +26,9 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
   const metaItems = useMemo(
     () =>
       [
-        { key: "hotel", icon: Hotel, value: pkg.hotel },
-        { key: "airline", icon: Plane, value: pkg.airline },
-        { key: "duration", icon: Clock, value: pkg.duration },
+        { key: "hotel", icon: Hotel, value: L(pkg, "hotel", "empty") },
+        { key: "airline", icon: Plane, value: L(pkg, "airline", "empty") },
+        { key: "duration", icon: Clock, value: L(pkg, "duration", "empty") },
         {
           key: "seats",
           icon: Users,
@@ -34,7 +36,7 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
             typeof pkg.seats === "number" && pkg.seats > 0 ? `${pkg.seats} ${t("package.seats")}` : null,
         },
       ].filter((item) => Boolean(item.value)),
-    [pkg.hotel, pkg.airline, pkg.duration, pkg.seats, t],
+    [pkg, L, t],
   );
 
   return (
@@ -56,7 +58,7 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
         {pkg.cover ? (
           <LazyImage
             src={pkg.cover}
-            alt={pkg.title}
+            alt={L(pkg, "title", "base")}
             wrapperClassName="h-full w-full"
             className="transition-transform duration-slow ease-emphasized group-hover:scale-[1.04]"
           />
@@ -87,10 +89,10 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
           </div>
         )}
 
-        {pkg.destination && (
+        {L(pkg, "destination", "empty") && (
           <div className="absolute bottom-2.5 start-2.5 flex items-center gap-1 text-on-dark">
             <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span className="line-clamp-1 max-w-[12rem] text-small font-medium">{pkg.destination}</span>
+            <span className="line-clamp-1 max-w-[12rem] text-small font-medium">{L(pkg, "destination", "empty")}</span>
           </div>
         )}
       </Link>
@@ -103,11 +105,11 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
           className="rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <h3 className="line-clamp-1 text-card-title font-semibold text-foreground transition-colors duration-fast group-hover:text-primary">
-            {pkg.title}
+            {L(pkg, "title", "base")}
           </h3>
         </Link>
-        {pkg.short_description && (
-          <p className="mt-1 line-clamp-2 text-card-desc text-muted-foreground">{pkg.short_description}</p>
+        {L(pkg, "short_description", "empty") && (
+          <p className="mt-1 line-clamp-2 text-card-desc text-muted-foreground">{L(pkg, "short_description", "empty")}</p>
         )}
 
         {/* ---------- Bottom: meta + price + CTAs ---------- */}
@@ -128,11 +130,11 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
               <p className="text-caption text-muted-foreground">{t("package.from")}</p>
               <div className="flex flex-wrap items-baseline gap-1.5">
                 <span className="text-h5 font-bold text-primary">
-                  {currentPrice.toLocaleString()} {pkg.currency}
+                  {price(currentPrice, pkg.currency ?? "TND")}
                 </span>
                 {discounted !== null && (
                   <span className="text-caption text-muted-foreground line-through">
-                    {Number(pkg.price).toLocaleString()} {pkg.currency}
+                    {price(pkg.price, pkg.currency ?? "TND")}
                   </span>
                 )}
               </div>
