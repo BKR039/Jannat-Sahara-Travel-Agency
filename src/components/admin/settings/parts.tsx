@@ -237,34 +237,41 @@ export function ImageField({
 
   return (
     <Field label={label} hint={hint} wide>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <div
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => void pick(e.target.files?.[0])}
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          aria-label={value ? `Replace ${label}` : `Upload ${label}`}
           className={cn(
-            "relative w-full overflow-hidden rounded-xl border border-border-subtle bg-surface-sunken/60 sm:w-64",
+            "relative w-full shrink-0 overflow-hidden rounded-xl transition-colors sm:w-56",
+            value
+              ? "border border-border-subtle bg-surface-sunken/50"
+              : "border border-dashed border-border hover:border-primary/60 hover:bg-accent/40",
             aspect,
           )}
         >
           {value ? (
             <img src={value} alt="" loading="lazy" className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-caption text-muted-foreground">
-              No image yet
-            </div>
+            <span className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+              <CloudUpload className="h-5 w-5" />
+              <span className="text-caption">Upload an image</span>
+            </span>
           )}
           {busy && (
-            <div className="absolute inset-0 grid place-items-center bg-background/70">
+            <span className="absolute inset-0 grid place-items-center bg-background/70">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            </div>
+            </span>
           )}
-        </div>
+        </button>
         <div className="flex flex-1 flex-wrap items-center gap-2">
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => void pick(e.target.files?.[0])}
-          />
           <Button
             type="button"
             variant="outline"
@@ -289,6 +296,7 @@ export function ImageField({
       </div>
     </Field>
   );
+
 }
 
 /* -------------------------------- icon picker ------------------------------- */
