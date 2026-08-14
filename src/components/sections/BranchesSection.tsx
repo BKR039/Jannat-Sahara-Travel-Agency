@@ -277,7 +277,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                   f.ltr && "text-start",
                   f.ltr || f.tight
                     ? "whitespace-nowrap [font-size:0.8125rem]"
-                    : "line-clamp-2",
+                    : "lg:line-clamp-2",
                 )}
                 style={f.ltr || f.tight ? undefined : { overflowWrap: "anywhere", wordBreak: "normal" }}
               >
