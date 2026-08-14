@@ -14,6 +14,10 @@ import arOps from "@/locales/ar/adminOps.json";
 import frOps from "@/locales/fr/adminOps.json";
 import enOps from "@/locales/en/adminOps.json";
 
+import arContent from "@/locales/ar/adminContent.json";
+import frContent from "@/locales/fr/adminContent.json";
+import enContent from "@/locales/en/adminContent.json";
+
 export const SUPPORTED_LANGUAGES = ["ar", "fr", "en"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
@@ -28,9 +32,9 @@ if (!i18n.isInitialized) {
     .use(initReactI18next)
     .init({
       resources: {
-        ar: { common: ar, admin: { ...arShell, ...arOps } },
-        fr: { common: fr, admin: { ...frShell, ...frOps } },
-        en: { common: en, admin: { ...enShell, ...enOps } },
+        ar: { common: ar, admin: { ...arShell, ...arOps, ...arContent } },
+        fr: { common: fr, admin: { ...frShell, ...frOps, ...frContent } },
+        en: { common: en, admin: { ...enShell, ...enOps, ...enContent } },
       },
       fallbackLng: "ar",
       supportedLngs: SUPPORTED_LANGUAGES,
