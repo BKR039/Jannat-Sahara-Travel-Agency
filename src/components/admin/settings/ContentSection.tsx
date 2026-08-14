@@ -206,13 +206,11 @@ export function ContentSection() {
                   <FieldGrid>
                     <TextField
                       label="Title"
-                      maxCount={60}
                       value={b.title}
                       onChange={(v) => patch(b.id, { title: v })}
                     />
                     <TextField
                       label="Subtitle"
-                      maxCount={120}
                       value={b.subtitle}
                       onChange={(v) => patch(b.id, { subtitle: v })}
                     />

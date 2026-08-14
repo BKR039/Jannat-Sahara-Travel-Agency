@@ -1,20 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  Bell,
   Building2,
+  ChevronRight,
   Contact,
   Layout,
-  Share2,
-  BarChart3,
-  Search,
   Mail,
-  Bell,
-  ShieldCheck,
-  Palette,
   MapPin,
+  Palette,
+  Search,
+  Share2,
+  ShieldCheck,
   Users,
-  ChevronRight,
-  Settings as SettingsIcon,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,171 +51,244 @@ type SectionId =
   | "contact"
   | "branches"
   | "social"
-  | "seo"
   | "email"
+  | "seo"
   | "notifications"
   | "security"
   | "team";
 
-interface NavGroup {
-  group: string;
-  items: { id: SectionId; label: string; icon: LucideIcon; hint: string }[];
+interface Entry {
+  id: SectionId;
+  label: string;
+  summary: string;
+  detail: string;
+  icon: LucideIcon;
+  component: () => React.JSX.Element;
 }
 
-const NAV: NavGroup[] = [
+interface Group {
+  group: string;
+  caption: string;
+  items: Entry[];
+}
+
+const GROUPS: Group[] = [
   {
     group: "Agency",
+    caption: "Who you are",
     items: [
-      { id: "general", label: "General", icon: Building2, hint: "Name, address, opening hours" },
-      { id: "brand", label: "Brand", icon: Palette, hint: "Logo, colours, tagline" },
+      {
+        id: "general",
+        label: "General",
+        summary: "Your agency information",
+        detail: "Name, address and working hours",
+        icon: Building2,
+        component: GeneralSection,
+      },
+      {
+        id: "brand",
+        label: "Brand",
+        summary: "Your visual identity",
+        detail: "Logo, tagline and colours",
+        icon: Palette,
+        component: BrandSection,
+      },
     ],
   },
   {
     group: "Website",
+    caption: "What visitors see",
     items: [
-      { id: "homepage", label: "Homepage", icon: Layout, hint: "Hero, about and CTA blocks" },
-      { id: "statistics", label: "Statistics", icon: BarChart3, hint: "Achievement counters" },
-      { id: "seo", label: "SEO", icon: Search, hint: "Search and social appearance" },
+      {
+        id: "homepage",
+        label: "Homepage",
+        summary: "What visitors see first",
+        detail: "Hero, about and call to action",
+        icon: Layout,
+        component: ContentSection,
+      },
+      {
+        id: "statistics",
+        label: "Statistics",
+        summary: "Your achievements",
+        detail: "Counters shown on the homepage",
+        icon: BarChart3,
+        component: StatsSection,
+      },
+      {
+        id: "seo",
+        label: "Search appearance",
+        summary: "How you appear on Google",
+        detail: "Titles, description and sharing image",
+        icon: Search,
+        component: SeoSection,
+      },
     ],
   },
   {
     group: "Communication",
+    caption: "How travellers reach you",
     items: [
-      { id: "contact", label: "Contact", icon: Contact, hint: "Phone, email, WhatsApp" },
-      { id: "branches", label: "Branches", icon: MapPin, hint: "Offices shown on the map" },
-      { id: "social", label: "Social media", icon: Share2, hint: "Channels and links" },
-      { id: "email", label: "Email", icon: Mail, hint: "Booking notification delivery" },
+      {
+        id: "contact",
+        label: "Contact",
+        summary: "Phone, email and WhatsApp",
+        detail: "Shown across the website",
+        icon: Contact,
+        component: ContactSection,
+      },
+      {
+        id: "branches",
+        label: "Branches",
+        summary: "Offices and locations",
+        detail: "Displayed on the contact map",
+        icon: MapPin,
+        component: BranchesSection,
+      },
+      {
+        id: "social",
+        label: "Social media",
+        summary: "Instagram, Facebook and more",
+        detail: "Channels linked in the footer",
+        icon: Share2,
+        component: SocialSection,
+      },
+      {
+        id: "email",
+        label: "Email",
+        summary: "Booking notifications",
+        detail: "Where new requests are delivered",
+        icon: Mail,
+        component: EmailSection,
+      },
     ],
   },
   {
     group: "System",
+    caption: "Access and alerts",
     items: [
-      { id: "notifications", label: "Notifications", icon: Bell, hint: "Dashboard alerts" },
-      { id: "team", label: "Team", icon: Users, hint: "Admins and roles" },
-      { id: "security", label: "Security", icon: ShieldCheck, hint: "Access policies" },
+      {
+        id: "notifications",
+        label: "Notifications",
+        summary: "How you receive alerts",
+        detail: "Dashboard and email alerts",
+        icon: Bell,
+        component: NotificationsSection,
+      },
+      {
+        id: "team",
+        label: "Team",
+        summary: "Manage team access",
+        detail: "Admins and their roles",
+        icon: Users,
+        component: TeamSection,
+      },
+      {
+        id: "security",
+        label: "Security",
+        summary: "Account protection",
+        detail: "Access policies and sessions",
+        icon: ShieldCheck,
+        component: SecuritySection,
+      },
     ],
   },
 ];
 
-const ALL_ITEMS = NAV.flatMap((g) => g.items);
-
-const SECTIONS: Record<SectionId, () => React.JSX.Element> = {
-  general: GeneralSection,
-  brand: BrandSection,
-  homepage: ContentSection,
-  statistics: StatsSection,
-  contact: ContactSection,
-  branches: BranchesSection,
-  social: SocialSection,
-  seo: SeoSection,
-  email: EmailSection,
-  notifications: NotificationsSection,
-  security: SecuritySection,
-  team: TeamSection,
-};
+const ALL = GROUPS.flatMap((g) => g.items);
 
 function SettingsPage() {
-  const [active, setActive] = useState<SectionId>("general");
-  const current = ALL_ITEMS.find((i) => i.id === active)!;
-  const Section = SECTIONS[active];
-  const currentGroup = NAV.find((g) => g.items.some((i) => i.id === active))!.group;
+  const [open, setOpen] = useState<SectionId | null>(null);
+  const entry = open ? ALL.find((i) => i.id === open) ?? null : null;
+
+  useEffect(() => {
+    if (entry) window.scrollTo({ top: 0 });
+  }, [entry]);
+
+  if (entry) return <FocusedSetting entry={entry} onBack={() => setOpen(null)} />;
 
   return (
-    <div className="mx-auto max-w-6xl">
-      {/* Editorial masthead — quiet, branded, no oversized heading */}
-      <header className="mb-8 border-b border-border-subtle pb-6">
-        <div className="min-w-0">
-          <p className="flex items-center gap-2 text-caption font-medium text-primary">
-            <SettingsIcon className="h-3.5 w-3.5" />
-            Agency settings
-          </p>
-          <h1 className="mt-2 text-h3 tracking-tight text-foreground">
-            Everything that shapes your website
-          </h1>
-          <p className="mt-1.5 max-w-xl text-small text-muted-foreground">
-            Update your agency details, website content and contact channels. Changes are saved as
-            you work.
-          </p>
-        </div>
+    <div className="mx-auto max-w-3xl pb-16">
+      <header className="pb-8">
+        <h1 className="text-h4 font-bold tracking-tight text-foreground">Settings</h1>
+        <p className="mt-1.5 text-small text-muted-foreground">
+          Manage your agency, website and communication.
+        </p>
       </header>
 
-      <div className="grid gap-8 lg:grid-cols-[248px_minmax(0,1fr)]">
-        {/* Mobile / tablet: horizontal section selector */}
-        <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:hidden">
-          <div className="flex w-max gap-2">
-            {ALL_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = item.id === active;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActive(item.id)}
-                  aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "flex items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-small transition-colors",
-                    isActive
-                      ? "border-primary/30 bg-primary/10 font-semibold text-primary"
-                      : "border-border-subtle bg-card text-foreground/70",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Desktop: grouped sidebar */}
-        <nav
-          aria-label="Settings categories"
-          className="hidden lg:sticky lg:top-20 lg:block lg:self-start"
-        >
-          {NAV.map((group) => (
-            <div key={group.group} className="mb-6 last:mb-0">
-              <p className="mb-2 px-3 text-caption font-semibold tracking-wide text-muted-foreground">
+      <div className="space-y-9">
+        {GROUPS.map((group) => (
+          <section key={group.group}>
+            <div className="mb-3 flex items-baseline gap-2">
+              <h2 className="text-body font-semibold tracking-tight text-foreground">
                 {group.group}
-              </p>
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = item.id === active;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setActive(item.id)}
-                      aria-current={isActive ? "page" : undefined}
-                      className={cn(
-                        "relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start text-small transition-colors",
-                        isActive
-                          ? "bg-primary/10 font-semibold text-primary"
-                          : "text-foreground/70 hover:bg-accent/60 hover:text-foreground",
-                      )}
-                    >
-                      {isActive && (
-                        <span className="absolute inset-y-2 start-0 w-0.5 rounded-full bg-primary" />
-                      )}
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              </h2>
+              <span className="text-caption text-muted-foreground">{group.caption}</span>
             </div>
-          ))}
-        </nav>
-
-        <div className="min-w-0">
-          <p className="mb-4 flex items-center gap-1.5 text-caption text-muted-foreground">
-            {currentGroup}
-            <ChevronRight className="h-3 w-3" />
-            <span className="font-medium text-foreground">{current.label}</span>
-          </p>
-          <Section />
-        </div>
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              {group.items.map((item) => (
+                <SettingTile key={item.id} item={item} onOpen={() => setOpen(item.id)} />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
+    </div>
+  );
+}
+
+function SettingTile({ item, onOpen }: { item: Entry; onOpen: () => void }) {
+  const Icon = item.icon;
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className={cn(
+        "group flex w-full items-start gap-3.5 rounded-2xl border border-border-subtle bg-card p-4 text-start",
+        "transition-colors hover:border-primary/40 hover:bg-accent/40",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      )}
+    >
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-small font-semibold text-foreground">{item.label}</span>
+        <span className="mt-0.5 block text-caption leading-relaxed text-muted-foreground">
+          {item.summary}
+        </span>
+        <span className="mt-0.5 block text-caption leading-relaxed text-muted-foreground/70">
+          {item.detail}
+        </span>
+      </span>
+      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+    </button>
+  );
+}
+
+function FocusedSetting({ entry, onBack }: { entry: Entry; onBack: () => void }) {
+  const Section = entry.component;
+  return (
+    <div className="mx-auto max-w-3xl pb-16">
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-5 inline-flex items-center gap-1.5 text-caption font-medium text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-3.5 w-3.5 ltr:inline rtl:hidden" />
+        <ArrowRight className="h-3.5 w-3.5 ltr:hidden rtl:inline" />
+        Settings
+      </button>
+
+      <header className="mb-7 flex flex-wrap items-end justify-between gap-3 border-b border-border-subtle pb-5">
+        <div className="min-w-0">
+          <h1 className="text-h5 font-bold tracking-tight text-foreground">{entry.label}</h1>
+          <p className="mt-1 text-small text-muted-foreground">{entry.summary}</p>
+        </div>
+        <div id="settings-save-slot" className="shrink-0" />
+      </header>
+
+      <Section />
     </div>
   );
 }

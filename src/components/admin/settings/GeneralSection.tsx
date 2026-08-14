@@ -69,7 +69,6 @@ export function GeneralSection() {
             label="Agency name"
             hint={FIELDS[0].hint}
             error={s.errors.agency_name}
-            maxCount={60}
             value={s.form.agency_name ?? ""}
             onChange={(v) => s.set("agency_name", v)}
           />

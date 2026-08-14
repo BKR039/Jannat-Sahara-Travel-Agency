@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Disclosure } from "@/components/admin/kit";
 import { uploadMedia } from "@/lib/admin/media";
 import { cn } from "@/lib/utils";
-import { SettingsCard, SettingsSection, TextField } from "./parts";
+import { AutoSaveBar, SettingsCard, SettingsSection, TextField } from "./parts";
 import { hexColor, maxLen, url, useSiteSettings, type SettingSpec } from "./useSiteSettings";
 import { useContactSettings } from "./useContactSettings";
 
@@ -277,7 +277,6 @@ export function BrandSection() {
                 label="Tagline"
                 hint="One short line under your logo."
                 error={s.errors.brand_tagline}
-                maxCount={80}
                 value={s.form.brand_tagline ?? ""}
                 onChange={(v) => s.set("brand_tagline", v)}
               />
@@ -380,61 +379,22 @@ export function BrandSection() {
         </aside>
       </div>
 
-      {/* --------------------------------- save bar -------------------------------- */}
-      <div className="sticky bottom-0 z-20 -mx-4 mt-2 border-t border-border-subtle bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="flex items-center gap-2 text-caption text-muted-foreground">
-            {hasErrors ? (
-              <>
-                <span className="h-2 w-2 rounded-full bg-destructive" /> Fix the highlighted fields
-              </>
-            ) : saving ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
-              </>
-            ) : dirty ? (
-              <>
-                <span className="h-2 w-2 animate-pulse rounded-full bg-warning" /> Unsaved changes
-              </>
-            ) : (
-              <>
-                <Check className="h-3.5 w-3.5 text-success" />
-                {lastSaved
-                  ? `All changes saved · ${lastSaved.toLocaleTimeString()}`
-                  : "All changes saved"}
-              </>
-            )}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={!dirty || saving}
-              onClick={() => {
-                s.discard();
-                contact.discard();
-              }}
-            >
-              <RotateCcw className="me-2 h-4 w-4" /> Discard
-            </Button>
-            <Button
-              size="sm"
-              disabled={!dirty || saving || hasErrors}
-              onClick={() => {
-                s.saveNow();
-                contact.saveNow();
-              }}
-            >
-              {saving ? (
-                <Loader2 className="me-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Check className="me-2 h-4 w-4" />
-              )}{" "}
-              Save changes
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* save control — rendered into the page header slot */}
+      <AutoSaveBar
+        dirty={dirty}
+        saving={saving}
+        hasErrors={hasErrors}
+        lastSaved={lastSaved}
+        onSave={() => {
+          s.saveNow();
+          contact.saveNow();
+        }}
+        onDiscard={() => {
+          s.discard();
+          contact.discard();
+        }}
+      />
+
     </SettingsSection>
   );
 }
