@@ -35,11 +35,11 @@ export function SettingsSection({
   aside?: ReactNode;
 }) {
   return (
-    <section className="space-y-6">
-      <header className="max-w-2xl">
+    <section className="space-y-7 pb-20">
+      <header className="max-w-2xl border-b border-border-subtle pb-5">
         <h2 className="text-h4 font-bold tracking-tight text-foreground">{title}</h2>
         {description && (
-          <p className="mt-2 text-small leading-relaxed text-muted-foreground">{description}</p>
+          <p className="mt-1.5 text-small leading-relaxed text-muted-foreground">{description}</p>
         )}
       </header>
       {aside}
@@ -64,25 +64,30 @@ export function SettingsCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border-subtle bg-card shadow-sm transition-shadow hover:shadow-md",
+        "rounded-2xl border border-border-subtle bg-card shadow-[0_1px_2px_0_hsl(0_0%_0%/0.04)]",
         className,
       )}
     >
       {(title || actions) && (
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border-subtle px-5 py-4 sm:px-6">
+        <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 sm:px-7 sm:pt-6">
           <div className="min-w-0">
-            {title && <h3 className="text-body font-semibold">{title}</h3>}
+            {title && (
+              <h3 className="text-body font-semibold tracking-tight text-foreground">{title}</h3>
+            )}
             {description && (
-              <p className="mt-0.5 text-caption text-muted-foreground">{description}</p>
+              <p className="mt-1 text-caption leading-relaxed text-muted-foreground">
+                {description}
+              </p>
             )}
           </div>
           {actions}
         </div>
       )}
-      <div className="p-5 sm:p-6">{children}</div>
+      <div className="p-5 sm:p-7">{children}</div>
     </div>
   );
 }
+
 
 /** Responsive field grid — never more than two columns. */
 export function FieldGrid({ children, className }: { children: ReactNode; className?: string }) {
@@ -232,34 +237,41 @@ export function ImageField({
 
   return (
     <Field label={label} hint={hint} wide>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <div
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => void pick(e.target.files?.[0])}
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          aria-label={value ? `Replace ${label}` : `Upload ${label}`}
           className={cn(
-            "relative w-full overflow-hidden rounded-xl border border-border-subtle bg-surface-sunken/60 sm:w-64",
+            "relative w-full shrink-0 overflow-hidden rounded-xl transition-colors sm:w-56",
+            value
+              ? "border border-border-subtle bg-surface-sunken/50"
+              : "border border-dashed border-border hover:border-primary/60 hover:bg-accent/40",
             aspect,
           )}
         >
           {value ? (
             <img src={value} alt="" loading="lazy" className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-caption text-muted-foreground">
-              No image yet
-            </div>
+            <span className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+              <CloudUpload className="h-5 w-5" />
+              <span className="text-caption">Upload an image</span>
+            </span>
           )}
           {busy && (
-            <div className="absolute inset-0 grid place-items-center bg-background/70">
+            <span className="absolute inset-0 grid place-items-center bg-background/70">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            </div>
+            </span>
           )}
-        </div>
+        </button>
         <div className="flex flex-1 flex-wrap items-center gap-2">
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => void pick(e.target.files?.[0])}
-          />
           <Button
             type="button"
             variant="outline"
@@ -284,6 +296,7 @@ export function ImageField({
       </div>
     </Field>
   );
+
 }
 
 /* -------------------------------- icon picker ------------------------------- */
@@ -393,41 +406,107 @@ export function SaveBar({
   onDiscard: () => void;
 }) {
   return (
-    <div className="sticky bottom-0 z-20 -mx-4 mt-8 border-t border-border-subtle bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-caption text-muted-foreground">
-          {saving ? (
+    <StatusPill
+      dirty={dirty}
+      saving={saving}
+      lastSaved={lastSaved}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      saveLabel="Save changes"
+      savedLabel="Saved"
+      pendingLabel="Unsaved changes"
+    />
+  );
+}
+
+/**
+ * Compact floating status pill — communicates Saved / Unsaved / Saving / Error
+ * without eating a full-width strip of the screen.
+ */
+function StatusPill({
+  dirty,
+  saving,
+  hasErrors,
+  lastSaved,
+  onSave,
+  onDiscard,
+  saveLabel,
+  savedLabel,
+  pendingLabel,
+}: {
+  dirty: boolean;
+  saving: boolean;
+  hasErrors?: boolean;
+  lastSaved: Date | null;
+  onSave: () => void;
+  onDiscard: () => void;
+  saveLabel: string;
+  savedLabel: string;
+  pendingLabel: string;
+}) {
+  const state = hasErrors ? "error" : saving ? "saving" : dirty ? "dirty" : "saved";
+  return (
+    <div className="pointer-events-none fixed inset-x-4 bottom-5 z-30 flex justify-center sm:inset-x-auto sm:end-8 sm:justify-end">
+      <div
+        className={cn(
+          "pointer-events-auto flex max-w-full items-center gap-3 rounded-full border bg-card/95 py-1.5 pe-1.5 ps-4 shadow-lg backdrop-blur",
+          state === "error" ? "border-destructive/40" : "border-border-subtle",
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-2 text-caption font-medium">
+          {state === "error" && (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving changes…
-            </>
-          ) : dirty ? (
-            <>
-              <span className="h-2 w-2 rounded-full bg-warning" /> Unsaved changes
-            </>
-          ) : (
-            <>
-              <Check className="h-3.5 w-3.5 text-success" />
-              {lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : "All changes saved"}
+              <span className="h-2 w-2 shrink-0 rounded-full bg-destructive" />
+              <span className="truncate text-destructive">Check highlighted fields</span>
             </>
           )}
-        </p>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" disabled={!dirty || saving} onClick={onDiscard}>
-            <RotateCcw className="me-2 h-4 w-4" /> Discard
+          {state === "saving" && (
+            <>
+              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-primary" />
+              <span className="truncate text-muted-foreground">Saving…</span>
+            </>
+          )}
+          {state === "dirty" && (
+            <>
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-warning" />
+              <span className="truncate text-foreground">{pendingLabel}</span>
+            </>
+          )}
+          {state === "saved" && (
+            <>
+              <Check className="h-3.5 w-3.5 shrink-0 text-success" />
+              <span className="truncate text-muted-foreground">
+                {lastSaved ? `${savedLabel} · ${lastSaved.toLocaleTimeString()}` : savedLabel}
+              </span>
+            </>
+          )}
+        </span>
+        <span className="flex items-center gap-1">
+          {(dirty || hasErrors) && !saving && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 rounded-full px-2.5"
+              onClick={onDiscard}
+              aria-label="Discard changes"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          <Button
+            size="sm"
+            className="h-8 rounded-full px-3.5"
+            disabled={!dirty || saving || hasErrors}
+            onClick={onSave}
+          >
+            {saveLabel}
           </Button>
-          <Button size="sm" disabled={!dirty || saving} onClick={onSave}>
-            {saving ? (
-              <Loader2 className="me-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="me-2 h-4 w-4" />
-            )}{" "}
-            Save changes
-          </Button>
-        </div>
+        </span>
       </div>
     </div>
   );
 }
+
 
 /* ------------------------------- live preview ------------------------------- */
 
@@ -500,46 +579,19 @@ export function AutoSaveBar({
   onDiscard: () => void;
 }) {
   return (
-    <div className="sticky bottom-0 z-20 -mx-4 mt-8 border-t border-border-subtle bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-caption text-muted-foreground">
-          {hasErrors ? (
-            <>
-              <span className="h-2 w-2 rounded-full bg-destructive" /> Fix the highlighted fields to
-              save
-            </>
-          ) : saving ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
-            </>
-          ) : dirty ? (
-            <>
-              <span className="h-2 w-2 animate-pulse rounded-full bg-warning" /> Auto-saving in a
-              moment
-            </>
-          ) : (
-            <>
-              <Check className="h-3.5 w-3.5 text-success" />
-              {lastSaved ? `Auto-saved at ${lastSaved.toLocaleTimeString()}` : "All changes saved"}
-            </>
-          )}
-        </p>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" disabled={!dirty || saving} onClick={onDiscard}>
-            <RotateCcw className="me-2 h-4 w-4" /> Discard
-          </Button>
-          <Button size="sm" disabled={!dirty || saving || hasErrors} onClick={onSave}>
-            {saving ? (
-              <Loader2 className="me-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="me-2 h-4 w-4" />
-            )}{" "}
-            Save now
-          </Button>
-        </div>
-      </div>
-    </div>
+    <StatusPill
+      dirty={dirty}
+      saving={saving}
+      hasErrors={hasErrors}
+      lastSaved={lastSaved}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      saveLabel="Save now"
+      savedLabel="All changes saved"
+      pendingLabel="Saving automatically…"
+    />
   );
+
 }
 
 /* -------------------------------- toggle field ------------------------------ */

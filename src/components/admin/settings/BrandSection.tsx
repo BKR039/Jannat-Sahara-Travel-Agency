@@ -85,7 +85,7 @@ function AssetUploader({
 
       <div className="min-w-0">
         <p className="text-small font-medium text-foreground">
-          {value ? label : label === "Logo" ? "أضف شعار الوكالة" : `أضف ${label}`}
+          {label}
         </p>
         {hint && <p className="mt-0.5 text-caption text-muted-foreground">{hint}</p>}
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
