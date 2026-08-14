@@ -35,11 +35,11 @@ export function SettingsSection({
   aside?: ReactNode;
 }) {
   return (
-    <section className="space-y-6">
-      <header className="max-w-2xl">
+    <section className="space-y-7 pb-20">
+      <header className="max-w-2xl border-b border-border-subtle pb-5">
         <h2 className="text-h4 font-bold tracking-tight text-foreground">{title}</h2>
         {description && (
-          <p className="mt-2 text-small leading-relaxed text-muted-foreground">{description}</p>
+          <p className="mt-1.5 text-small leading-relaxed text-muted-foreground">{description}</p>
         )}
       </header>
       {aside}
@@ -64,25 +64,30 @@ export function SettingsCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border-subtle bg-card shadow-sm transition-shadow hover:shadow-md",
+        "rounded-2xl border border-border-subtle bg-card shadow-[0_1px_2px_0_hsl(0_0%_0%/0.04)]",
         className,
       )}
     >
       {(title || actions) && (
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border-subtle px-5 py-4 sm:px-6">
+        <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 sm:px-7 sm:pt-6">
           <div className="min-w-0">
-            {title && <h3 className="text-body font-semibold">{title}</h3>}
+            {title && (
+              <h3 className="text-body font-semibold tracking-tight text-foreground">{title}</h3>
+            )}
             {description && (
-              <p className="mt-0.5 text-caption text-muted-foreground">{description}</p>
+              <p className="mt-1 text-caption leading-relaxed text-muted-foreground">
+                {description}
+              </p>
             )}
           </div>
           {actions}
         </div>
       )}
-      <div className="p-5 sm:p-6">{children}</div>
+      <div className="p-5 sm:p-7">{children}</div>
     </div>
   );
 }
+
 
 /** Responsive field grid — never more than two columns. */
 export function FieldGrid({ children, className }: { children: ReactNode; className?: string }) {
