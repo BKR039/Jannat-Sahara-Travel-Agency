@@ -616,5 +616,46 @@
       "activated": "L'agence est visible sur le site",
       "deactivated": "L'agence est masquée du site"
     }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "goHome": "Retour à l'accueil"
+  },
+  "errorPage": {
+    "title": "Cette page n'a pas pu être chargée",
+    "description": "Une erreur est survenue de notre côté. Réessayez ou revenez à l'accueil.",
+    "retry": "Réessayer",
+    "goHome": "Retour à l'accueil"
+  },
+  "auth": {
+    "signInTitle": "Tableau de bord admin",
+    "signInSubtitle": "Connectez-vous pour gérer Janat Sahara Travel",
+    "tabSignIn": "Connexion",
+    "tabForgot": "Oublié ?",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "forgotHint": "Saisissez votre e-mail administrateur. Nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.",
+    "sendResetLink": "Envoyer le lien",
+    "invalidEmail": "Saisissez un e-mail valide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+    "welcomeBack": "Content de vous revoir",
+    "signInFailed": "Échec de la connexion",
+    "resetEmailSent": "E-mail de réinitialisation envoyé",
+    "resetEmailFailed": "Échec de l'envoi de l'e-mail",
+    "newPasswordTitle": "Définir un nouveau mot de passe",
+    "newPasswordSubtitle": "Choisissez un mot de passe solide pour votre compte administrateur.",
+    "waitingLink": "En attente d'un lien de récupération valide… Si cette page s'est ouverte directement, demandez un nouveau lien depuis",
+    "signInPageLink": "la page de connexion",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "updatePassword": "Mettre à jour",
+    "passwordsMismatch": "Les mots de passe ne correspondent pas",
+    "passwordMin8": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordUpdated": "Mot de passe mis à jour",
+    "passwordUpdateFailed": "Échec de la mise à jour du mot de passe",
+    "seoTitle": "Connexion admin — Janat Sahara Travel",
+    "seoDescription": "Connexion sécurisée au tableau de bord de gestion Janat Sahara Travel."
   }
 }

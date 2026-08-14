@@ -7,6 +7,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { ChevronRight, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 /* --------------------------------- layout --------------------------------- */
 
@@ -222,6 +223,7 @@ export function InsightCard({
   body: string;
   action?: ReactNode;
 }) {
+  const { t } = useTranslation("admin");
   const tones: Record<InsightSeverity, string> = {
     info: "border-info/30 bg-info-muted/50",
     opportunity: "border-success/30 bg-success-muted/50",
@@ -229,10 +231,10 @@ export function InsightCard({
     critical: "border-destructive/40 bg-danger-muted/50",
   };
   const labels: Record<InsightSeverity, string> = {
-    info: "Information",
-    opportunity: "Opportunity",
-    attention: "Attention",
-    critical: "Critical",
+    info: t("shell.kit.insight.info"),
+    opportunity: t("shell.kit.insight.opportunity"),
+    attention: t("shell.kit.insight.attention"),
+    critical: t("shell.kit.insight.critical"),
   };
   const chips: Record<InsightSeverity, string> = {
     info: "bg-info-muted text-info",
@@ -313,6 +315,7 @@ export function Occupancy({
   capacity: number | null;
   className?: string;
 }) {
+  const { t } = useTranslation("admin");
   const pct = capacity && capacity > 0 ? Math.min(100, Math.round((booked / capacity) * 100)) : 0;
   const tone = pct >= 90 ? "bg-destructive" : pct >= 60 ? "bg-primary" : "bg-brand-green";
   return (
@@ -320,12 +323,12 @@ export function Occupancy({
       <div className="flex items-center justify-between text-caption text-muted-foreground">
         <span className="tabular-nums">
           {booked}
-          {capacity ? ` / ${capacity}` : ""} travellers
+          {capacity ? ` / ${capacity}` : ""} {t("shell.kit.occupancy.travellers")}
         </span>
         {capacity ? (
-          <span className="tabular-nums">{Math.max(capacity - booked, 0)} left</span>
+          <span className="tabular-nums">{Math.max(capacity - booked, 0)} {t("shell.kit.occupancy.left")}</span>
         ) : (
-          <span>No capacity set</span>
+          <span>{t("shell.kit.occupancy.noCapacity")}</span>
         )}
       </div>
       <div
@@ -346,7 +349,7 @@ export function Occupancy({
 export function SearchInput({
   value,
   onChange,
-  placeholder = "Search…",
+  placeholder,
   className = "",
 }: {
   value: string;
@@ -354,6 +357,7 @@ export function SearchInput({
   placeholder?: string;
   className?: string;
 }) {
+  const { t } = useTranslation("admin");
   return (
     <div className={cn("relative", className)}>
       <Search className="pointer-events-none absolute inset-inline-start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -361,7 +365,7 @@ export function SearchInput({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("shell.kit.search.placeholder")}
         className="h-10 w-full rounded-xl border border-border bg-background ps-9 pe-3 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
       />
     </div>
@@ -448,6 +452,7 @@ export function Drawer({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  const { t } = useTranslation("admin");
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -460,6 +465,7 @@ export function Drawer({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
+
       <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
       <aside
         role="dialog"
@@ -474,7 +480,7 @@ export function Drawer({
               <p className="mt-0.5 truncate text-caption text-muted-foreground">{description}</p>
             )}
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("shell.kit.close")}>
             <X className="h-4 w-4" />
           </Button>
         </header>

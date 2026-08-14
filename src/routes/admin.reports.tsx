@@ -25,6 +25,7 @@ import {
   money,
   shortDate,
 } from "@/components/admin/kit";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/reports")({
   ssr: false,
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/admin/reports")({
 });
 
 function ReportsPage() {
+  const { t } = useTranslation("admin");
   const fetchReports = useServerFn(getReports);
   const q = useQuery({
     queryKey: ["admin-reports"] as const,
@@ -48,36 +50,36 @@ function ReportsPage() {
   const currency = data?.currency ?? "TND";
 
   return (
-    <Page title="Reports" description="Answers to the questions you ask every week.">
+    <Page title={t("shell.reports.title")} description={t("shell.reports.description")}>
       {q.isLoading || !data ? (
         <SkeletonKpis />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <KpiCard
-            label="Revenue (12 months)"
+            label={t("shell.reports.kpi.revenue")}
             value={money(data.summary.revenue, currency)}
             icon={Wallet}
             tone="primary"
           />
           <KpiCard
-            label="Bookings"
+            label={t("shell.reports.kpi.bookings")}
             value={data.summary.bookings}
             icon={CalendarCheck}
             tone="green"
           />
-          <KpiCard label="Travellers" value={data.summary.travellers} icon={Users} tone="gold" />
+          <KpiCard label={t("shell.reports.kpi.travellers")} value={data.summary.travellers} icon={Users} tone="gold" />
           <KpiCard
-            label="Average booking"
+            label={t("shell.reports.kpi.averageBooking")}
             value={money(data.summary.averageValue, currency)}
             icon={TrendingUp}
             tone="muted"
-            hint={`${Math.round(data.summary.conversion)}% of enquiries confirmed`}
+            hint={t("shell.reports.kpi.conversionHint", { value: Math.round(data.summary.conversion) })}
           />
         </div>
       )}
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <Panel title="Revenue and bookings" description="Monthly comparison">
+        <Panel title={t("shell.reports.revenueAndBookings.title")} description={t("shell.reports.revenueAndBookings.description")}>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.trend ?? []}>
@@ -91,7 +93,7 @@ function ReportsPage() {
           </div>
         </Panel>
 
-        <Panel title="New customers" description="Unique customers per month">
+        <Panel title={t("shell.reports.newCustomers.title")} description={t("shell.reports.newCustomers.description")}>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data?.acquisition ?? []}>
@@ -113,37 +115,37 @@ function ReportsPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <Panel title="Best performing trips" bodyClassName="p-0 sm:p-0">
+        <Panel title={t("shell.reports.bestPerformingTrips.title")} bodyClassName="p-0 sm:p-0">
           {q.isLoading ? (
             <div className="p-4">
               <SkeletonRows rows={4} />
             </div>
           ) : (data?.topTrips.length ?? 0) === 0 ? (
             <div className="p-4">
-              <EmptyState title="No data yet" />
+              <EmptyState title={t("shell.reports.bestPerformingTrips.emptyTitle")} />
             </div>
           ) : (
             <ul className="divide-y divide-border-subtle">
-              {data!.topTrips.map((t) => (
-                <li key={t.title} className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+              {data!.topTrips.map((trip) => (
+                <li key={trip.title} className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
                   <div className="min-w-0">
-                    <p className="truncate text-small font-medium">{t.title}</p>
+                    <p className="truncate text-small font-medium">{trip.title}</p>
                     <p className="text-caption text-muted-foreground">
-                      {t.bookings} bookings · {t.travellers} travellers
+                      {t("shell.reports.bestPerformingTrips.summary", { bookings: trip.bookings, travellers: trip.travellers })}
                     </p>
                   </div>
-                  <p className="text-small font-semibold tabular-nums">{money(t.revenue, currency)}</p>
+                  <p className="text-small font-semibold tabular-nums">{money(trip.revenue, currency)}</p>
                 </li>
               ))}
             </ul>
           )}
         </Panel>
 
-        <Panel title="Capacity of upcoming trips">
+        <Panel title={t("shell.reports.capacity.title")}>
           {q.isLoading ? (
             <SkeletonRows rows={4} />
           ) : (data?.capacity.length ?? 0) === 0 ? (
-            <EmptyState title="No upcoming departures" />
+            <EmptyState title={t("shell.reports.capacity.emptyTitle")} />
           ) : (
             <ul className="space-y-4">
               {data!.capacity.map((c) => (
@@ -162,10 +164,10 @@ function ReportsPage() {
         </Panel>
       </div>
 
-      <Panel title="Top destinations" className="mt-6" bodyClassName="p-0 sm:p-0">
+      <Panel title={t("shell.reports.topDestinations.title")} className="mt-6" bodyClassName="p-0 sm:p-0">
         {(data?.topDestinations.length ?? 0) === 0 ? (
           <div className="p-4">
-            <EmptyState title="No data yet" />
+            <EmptyState title={t("shell.reports.topDestinations.emptyTitle")} />
           </div>
         ) : (
           <ul className="divide-y divide-border-subtle">

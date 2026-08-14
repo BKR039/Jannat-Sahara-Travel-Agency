@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 export function PageHeader({
   title,
@@ -138,12 +139,13 @@ export function StatusBadge({ status }: { status: string | null | undefined }) {
 
 /** Subtle pill shown next to a field/row whose French translation is empty. */
 export function MissingFrBadge({ className = "" }: { className?: string }) {
+  const { t } = useTranslation("admin");
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full bg-warning-muted px-2 py-0.5 text-caption font-medium text-warning ${className}`}
-      title="No French translation yet"
+      title={t("shell.kit.missingFr.title")}
     >
-      FR missing
+      {t("shell.kit.missingFr.badge")}
     </span>
   );
 }

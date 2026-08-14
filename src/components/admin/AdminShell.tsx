@@ -25,7 +25,10 @@ import { useAdmin } from "./context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/common/Logo";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { useLocalized } from "@/lib/localize";
 
 interface NavItem {
   to: string;
@@ -44,42 +47,44 @@ interface NavGroup {
  * Navigation follows the daily workflow of the agency:
  * what needs an answer today, then the catalogue, then the website, then setup.
  */
-const NAV_GROUPS: NavGroup[] = [
-  {
-    group: "Today",
-    items: [
-      { to: "/admin", label: "Command center", icon: LayoutDashboard },
-      { to: "/admin/requests", label: "Requests", icon: Inbox, badge: "requests" },
-      { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-    ],
-  },
-  {
-    group: "Business",
-    items: [
-      { to: "/admin/packages", label: "Trips", icon: PackageIcon },
-      { to: "/admin/customers", label: "Customers", icon: Users },
-      { to: "/admin/reports", label: "Reports", icon: BarChart3 },
-      { to: "/admin/branches", label: "Branches", icon: MapPin },
-    ],
-  },
-  {
-    group: "Website",
-    items: [
-      { to: "/admin/gallery", label: "Gallery", icon: ImageIcon },
-      { to: "/admin/blog", label: "Blog", icon: Newspaper },
-      { to: "/admin/testimonials", label: "Testimonials", icon: Star },
-      { to: "/admin/faq", label: "FAQ", icon: HelpCircle },
-    ],
-  },
-  {
-    group: "Setup",
-    items: [
-      { to: "/admin/notifications", label: "Notifications", icon: Bell, badge: "notifications" },
-      { to: "/admin/settings", label: "Settings", icon: Settings },
-      { to: "/admin/admins", label: "Team", icon: ShieldCheck, superOnly: true },
-    ],
-  },
-];
+function buildNavGroups(t: (key: string) => string): NavGroup[] {
+  return [
+    {
+      group: t("shell.nav.groups.today"),
+      items: [
+        { to: "/admin", label: t("shell.nav.commandCenter"), icon: LayoutDashboard },
+        { to: "/admin/requests", label: t("shell.nav.requests"), icon: Inbox, badge: "requests" },
+        { to: "/admin/bookings", label: t("shell.nav.bookings"), icon: Calendar },
+      ],
+    },
+    {
+      group: t("shell.nav.groups.business"),
+      items: [
+        { to: "/admin/packages", label: t("shell.nav.trips"), icon: PackageIcon },
+        { to: "/admin/customers", label: t("shell.nav.customers"), icon: Users },
+        { to: "/admin/reports", label: t("shell.nav.reports"), icon: BarChart3 },
+        { to: "/admin/branches", label: t("shell.nav.branches"), icon: MapPin },
+      ],
+    },
+    {
+      group: t("shell.nav.groups.website"),
+      items: [
+        { to: "/admin/gallery", label: t("shell.nav.gallery"), icon: ImageIcon },
+        { to: "/admin/blog", label: t("shell.nav.blog"), icon: Newspaper },
+        { to: "/admin/testimonials", label: t("shell.nav.testimonials"), icon: Star },
+        { to: "/admin/faq", label: t("shell.nav.faq"), icon: HelpCircle },
+      ],
+    },
+    {
+      group: t("shell.nav.groups.setup"),
+      items: [
+        { to: "/admin/notifications", label: t("shell.nav.notifications"), icon: Bell, badge: "notifications" },
+        { to: "/admin/settings", label: t("shell.nav.settings"), icon: Settings },
+        { to: "/admin/admins", label: t("shell.nav.team"), icon: ShieldCheck, superOnly: true },
+      ],
+    },
+  ];
+}
 
 function useUnreadCount() {
   return useQuery({
@@ -111,14 +116,16 @@ function useOpenRequestCount() {
   });
 }
 
-function greeting(): string {
+function greetingKey(): string {
   const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
+  if (h < 12) return "shell.greeting.morning";
+  if (h < 18) return "shell.greeting.afternoon";
+  return "shell.greeting.evening";
 }
 
 export function AdminShell({ children }: { children: ReactNode }) {
+  const { t } = useTranslation("admin");
+  const { date } = useLocalized();
   const { user, isSuperAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
@@ -128,13 +135,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const unread = useUnreadCount();
   const openRequests = useOpenRequestCount();
 
+  const navGroups = useMemo(() => buildNavGroups(t), [t]);
   const groups = useMemo(
     () =>
-      NAV_GROUPS.map((g) => ({
+      navGroups.map((g) => ({
         ...g,
         items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
       })).filter((g) => g.items.length > 0),
-    [isSuperAdmin],
+    [navGroups, isSuperAdmin],
   );
 
   const firstName = (user.email ?? "").split("@")[0] ?? "";
@@ -182,7 +190,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             size="icon"
             className="lg:hidden"
             onClick={() => setMobileOpen(false)}
-            aria-label="Close navigation"
+            aria-label={t("shell.closeNavigation")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -234,13 +242,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             rel="noreferrer"
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-small text-muted-foreground hover:bg-accent"
           >
-            <ExternalLink className="h-4 w-4" /> View public site
+            <ExternalLink className="h-4 w-4" /> {t("shell.viewPublicSite")}
           </a>
           <div className="mt-2 rounded-xl border border-border-subtle bg-surface-sunken/60 p-3">
-            <p className="text-caption text-muted-foreground">Signed in as</p>
+            <p className="text-caption text-muted-foreground">{t("shell.signedInAs")}</p>
             <p className="truncate text-small font-medium">{user.email}</p>
             <Button variant="outline" size="sm" className="mt-2 w-full" onClick={signOut}>
-              <LogOut className="me-2 h-4 w-4" /> Sign out
+              <LogOut className="me-2 h-4 w-4" /> {t("shell.signOut")}
             </Button>
           </div>
         </div>
@@ -253,20 +261,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
             size="icon"
             className="lg:hidden"
             onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation"
+            aria-label={t("shell.openNavigation")}
           >
             <Menu className="h-4 w-4" />
           </Button>
           <div className="hidden min-w-0 sm:block">
             <p className="truncate text-small font-semibold capitalize">
-              {greeting()}, {firstName}
+              {t(greetingKey())}, {firstName}
             </p>
             <p className="truncate text-caption text-muted-foreground">
-              {new Date().toLocaleDateString("en-GB", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-              })}
+              {date(new Date())}
             </p>
           </div>
           <form onSubmit={submitSearch} className="ms-auto w-full max-w-xs">
@@ -274,15 +278,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search customers, phone, email…"
-              aria-label="Search customers"
+              placeholder={t("shell.search.placeholder")}
+              aria-label={t("shell.search.ariaLabel")}
               className="h-10 w-full rounded-xl border border-border bg-background px-3 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
             />
           </form>
           <Link
             to="/admin/notifications"
             className="relative rounded-xl p-2 hover:bg-accent"
-            aria-label="Notifications"
+            aria-label={t("shell.notificationsAriaLabel")}
           >
             <Bell className="h-4 w-4" />
             {(unread.data ?? 0) > 0 && (
@@ -291,6 +295,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </span>
             )}
           </Link>
+          <LanguageSwitcher />
         </header>
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

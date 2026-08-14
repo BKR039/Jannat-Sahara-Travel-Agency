@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { normalizeLang } from "@/lib/i18n";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -113,7 +114,7 @@ export function FlightRequestSection() {
       return;
     }
     setErrors({});
-    mutation.mutate(parsed.data);
+    mutation.mutate({ ...parsed.data, locale: normalizeLang(i18n.language) });
   }
 
   if (reference) {

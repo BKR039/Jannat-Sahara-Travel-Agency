@@ -10,6 +10,12 @@ function escapeHtml(v: string | null | undefined): string {
     .replace(/'/g, "&#039;");
 }
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  ar: "Arabic (العربية)",
+  fr: "French (Français)",
+  en: "English",
+};
+
 export function renderEmail(data: {
   id: string;
   createdAt: string;
@@ -38,6 +44,7 @@ export function renderEmail(data: {
       input.totalPrice != null ? `${input.totalPrice} ${input.currency}` : "—",
     ],
     ["Notes", input.notes ?? "—"],
+    ["Customer language", LANGUAGE_NAMES[input.locale ?? "ar"] ?? "Arabic (العربية)"],
   ];
 
   const passengerCards = input.passengers

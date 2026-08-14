@@ -6,6 +6,7 @@ import { Bell, CheckCheck, Trash2, Calendar, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, AdminCard, EmptyState } from "@/components/admin/ui";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/notifications")({ component: NotificationsPage });
 
@@ -22,6 +23,7 @@ function linkFor(kind: string): string {
 }
 
 function NotificationsPage() {
+  const { t } = useTranslation("admin");
   const qc = useQueryClient();
   const list = useQuery({
     queryKey: ["admin-notifications"] as const,
@@ -44,7 +46,7 @@ function NotificationsPage() {
       const { error } = await supabase.from("notifications").update({ read_at: new Date().toISOString() }).is("read_at", null);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("All marked as read"); invalidate(); },
+    onSuccess: () => { toast.success(t("shell.notifications.markAllReadSuccess")); invalidate(); },
   });
 
   const remove = useMutation({
@@ -55,13 +57,13 @@ function NotificationsPage() {
   return (
     <>
       <PageHeader
-        title="Notifications"
-        description="System events, new leads and messages."
-        actions={<Button variant="outline" size="sm" onClick={() => markAllRead.mutate()}><CheckCheck className="me-2 h-4 w-4" /> Mark all read</Button>}
+        title={t("shell.notifications.title")}
+        description={t("shell.notifications.description")}
+        actions={<Button variant="outline" size="sm" onClick={() => markAllRead.mutate()}><CheckCheck className="me-2 h-4 w-4" /> {t("shell.notifications.markAllRead")}</Button>}
       />
       <AdminCard>
-        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
-          <EmptyState title="No notifications yet" icon={Bell} />
+        {list.isLoading ? <p className="text-small text-muted-foreground">{t("shell.notifications.loading")}</p> : !list.data?.length ? (
+          <EmptyState title={t("shell.notifications.emptyTitle")} icon={Bell} />
         ) : (
           <div className="divide-y divide-border -mx-4 sm:-mx-5">
             {list.data.map((n) => {
@@ -75,8 +77,8 @@ function NotificationsPage() {
                     <p className="mt-1 text-caption text-muted-foreground">{new Date(n.created_at).toLocaleString()}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Link to={linkFor(n.kind)} className="text-caption text-primary hover:underline px-2">View</Link>
-                    {!n.read_at && <Button size="sm" variant="ghost" onClick={() => markRead.mutate(n.id)}>Mark read</Button>}
+                    <Link to={linkFor(n.kind)} className="text-caption text-primary hover:underline px-2">{t("shell.notifications.view")}</Link>
+                    {!n.read_at && <Button size="sm" variant="ghost" onClick={() => markRead.mutate(n.id)}>{t("shell.notifications.markRead")}</Button>}
                     <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove.mutate(n.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </div>

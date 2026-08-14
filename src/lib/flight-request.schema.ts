@@ -25,7 +25,7 @@ export const CABIN_LABELS_FR: Record<(typeof CABIN_CLASSES)[number], string> = {
   first: "Première classe",
 };
 
-/** Used in the internal (agency-facing) notification emails, which stay English. */
+/** English cabin labels (public English UI + internal notification emails). */
 export const CABIN_LABELS_EN: Record<(typeof CABIN_CLASSES)[number], string> = {
   economy: "Economy",
   premium_economy: "Premium economy",
@@ -37,7 +37,10 @@ export function cabinLabel(
   cabin: (typeof CABIN_CLASSES)[number],
   lang: string | undefined,
 ): string {
-  return (lang ?? "ar").startsWith("fr") ? CABIN_LABELS_FR[cabin] : CABIN_LABELS_AR[cabin];
+  const base = (lang ?? "ar").split("-")[0];
+  if (base === "fr") return CABIN_LABELS_FR[cabin];
+  if (base === "en") return CABIN_LABELS_EN[cabin];
+  return CABIN_LABELS_AR[cabin];
 }
 
 export const STATUS_LABELS: Record<(typeof FLIGHT_REQUEST_STATUSES)[number], string> = {
@@ -71,6 +74,8 @@ export const FlightRequestInput = z
     infants: z.number().int().min(0).max(20),
     cabinClass: z.enum(CABIN_CLASSES),
     notes: z.string().trim().max(2000).optional().or(z.literal("")),
+    /** Language the visitor used when submitting (ar | fr | en). */
+    locale: z.enum(["ar", "fr", "en"]).optional(),
   })
   .refine((v) => v.tripType !== "round_trip" || !!v.returnDate, {
     message: "Return date is required for round trips",

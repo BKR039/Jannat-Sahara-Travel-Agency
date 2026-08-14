@@ -6,6 +6,7 @@ import { Users, Search, Phone, MessageCircle, Mail as MailIcon, FileText } from 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PageHeader, AdminCard, EmptyState } from "@/components/admin/ui";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/customers")({ component: CustomersPage });
 
@@ -21,6 +22,7 @@ interface Customer {
 }
 
 function CustomersPage() {
+  const { t } = useTranslation("admin");
   const [search, setSearch] = useState("");
 
   const raw = useQuery({
@@ -95,32 +97,32 @@ function CustomersPage() {
   return (
     <>
       <PageHeader
-        title="Customers"
-        description="People derived from booking requests. Contact them directly."
-        actions={<Button variant="outline" size="sm" onClick={exportCsv}><FileText className="me-2 h-4 w-4" /> Export CSV</Button>}
+        title={t("shell.customers.title")}
+        description={t("shell.customers.description")}
+        actions={<Button variant="outline" size="sm" onClick={exportCsv}><FileText className="me-2 h-4 w-4" /> {t("shell.customers.exportCsv")}</Button>}
       />
 
       <AdminCard className="mb-4">
         <div className="relative">
           <Search className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search by name, phone, email…" value={search} onChange={(e) => setSearch(e.target.value)} className="ps-9" />
+          <Input placeholder={t("shell.customers.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} className="ps-9" />
         </div>
       </AdminCard>
 
       <AdminCard>
-        {raw.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !customers.length ? (
-          <EmptyState title="No customers yet" icon={Users} />
+        {raw.isLoading ? <p className="text-small text-muted-foreground">{t("shell.customers.loading")}</p> : !customers.length ? (
+          <EmptyState title={t("shell.customers.emptyTitle")} icon={Users} />
         ) : (
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
             <table className="w-full text-small">
               <thead><tr className="border-b border-border text-left">
-                <th className="px-4 sm:px-5 py-2 font-semibold">Name</th>
-                <th className="px-4 py-2 font-semibold">Phone</th>
-                <th className="px-4 py-2 font-semibold">Email</th>
-                <th className="px-4 py-2 font-semibold">Bookings</th>
-                <th className="px-4 py-2 font-semibold">Categories</th>
-                <th className="px-4 py-2 font-semibold">Last booking</th>
-                <th className="px-4 sm:px-5 py-2 font-semibold text-right">Contact</th>
+                <th className="px-4 sm:px-5 py-2 font-semibold">{t("shell.customers.table.name")}</th>
+                <th className="px-4 py-2 font-semibold">{t("shell.customers.table.phone")}</th>
+                <th className="px-4 py-2 font-semibold">{t("shell.customers.table.email")}</th>
+                <th className="px-4 py-2 font-semibold">{t("shell.customers.table.bookings")}</th>
+                <th className="px-4 py-2 font-semibold">{t("shell.customers.table.categories")}</th>
+                <th className="px-4 py-2 font-semibold">{t("shell.customers.table.lastBooking")}</th>
+                <th className="px-4 sm:px-5 py-2 font-semibold text-right">{t("shell.customers.table.contact")}</th>
               </tr></thead>
               <tbody>
                 {customers.map((c) => (

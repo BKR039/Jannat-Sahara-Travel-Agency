@@ -86,11 +86,15 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
         [
           p.title,
           (p as Record<string, unknown>).title_fr,
+          (p as Record<string, unknown>).title_en,
           p.destination,
           (p as Record<string, unknown>).destination_fr,
+          (p as Record<string, unknown>).destination_en,
           p.city,
           (p as Record<string, unknown>).city_fr,
+          (p as Record<string, unknown>).city_en,
         ].some((v) => typeof v === "string" && v.toLowerCase().includes(q)),
+
     );
   }, [packages, term]);
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminContext } from "@/components/admin/context";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminLayout() {
+  const { t } = useTranslation("admin");
   const navigate = useNavigate();
   const { user, loading, isAuthenticated } = useAuth();
   const rolesQuery = useUserRoles(user?.id);
@@ -45,10 +47,9 @@ function AdminLayout() {
       <div dir="ltr" className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="max-w-md text-center rounded-lg border border-border bg-card p-8 shadow-sm">
           <ShieldX className="mx-auto h-10 w-10 text-destructive" />
-          <h1 className="mt-4 text-h5 font-bold">Access denied</h1>
+          <h1 className="mt-4 text-h5 font-bold">{t("shell.layout.accessDeniedTitle")}</h1>
           <p className="mt-2 text-small text-muted-foreground">
-            Your account doesn't have permission to access the admin dashboard. Contact your super admin
-            to request access.
+            {t("shell.layout.accessDeniedDescription")}
           </p>
           <div className="mt-6 flex gap-2 justify-center">
             <Button
@@ -58,9 +59,9 @@ function AdminLayout() {
                 navigate({ to: "/auth", replace: true });
               }}
             >
-              Sign out
+              {t("shell.layout.signOut")}
             </Button>
-            <Button onClick={() => navigate({ to: "/" })}>Back to site</Button>
+            <Button onClick={() => navigate({ to: "/" })}>{t("shell.layout.backToSite")}</Button>
           </div>
         </div>
       </div>

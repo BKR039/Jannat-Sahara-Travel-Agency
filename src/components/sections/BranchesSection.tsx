@@ -727,7 +727,7 @@ export function BranchesSection() {
       const cityOk = city === "all" || b.city === city;
       const qOk =
         !q ||
-        [b.name, b.name_fr, b.city, b.city_fr, b.address, b.address_fr]
+        [b.name, b.name_fr, b.name_en, b.city, b.city_fr, b.city_en, b.address, b.address_fr, b.address_en]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q));
       return cityOk && qOk;

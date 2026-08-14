@@ -1,7 +1,7 @@
 import type { Article } from "@/lib/queries";
-import { hasArabic, isFrench, intlLocale, localizeField } from "@/lib/localize";
+import { hasArabic, intlLocale, langSuffix, localizeField } from "@/lib/localize";
 
-type TagSource = Pick<Article, "tags"> & { tags_fr?: unknown };
+type TagSource = Pick<Article, "tags"> & { tags_fr?: unknown; tags_en?: unknown };
 
 function parseTags(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw.filter((t): t is string => typeof t === "string");
@@ -18,14 +18,16 @@ function parseTags(raw: unknown): string[] {
 
 /** Tags are stored as a JSON array; first tag acts as the category. */
 export function articleTags(article: TagSource, lang?: string): string[] {
-  if (isFrench(lang)) {
-    const fr = parseTags(article.tags_fr);
-    if (fr.length > 0) return fr;
-    // Never leak Arabic tags into the French interface.
+  const suffix = langSuffix(lang);
+  if (suffix) {
+    const translated = parseTags((article as Record<string, unknown>)[`tags${suffix}`]);
+    if (translated.length > 0) return translated;
+    // Never leak Arabic tags into a latin-script interface.
     return parseTags(article.tags).filter((tag) => !hasArabic(tag));
   }
   return parseTags(article.tags);
 }
+
 
 export function articleCategory(article: TagSource, lang?: string): string | null {
   return articleTags(article, lang)[0] ?? null;

@@ -65,7 +65,7 @@ interface Props {
 
 export default function BranchesMap({ branches, activeId, onSelect }: Props) {
   const { t } = useTranslation();
-  const { L: loc, isFr } = useLocalized();
+  const { L: loc, rtl } = useLocalized();
   const markerRefs = useRef<Record<string, L.Marker | null>>({});
   const active = useMemo(
     () => branches.find((b) => b.id === activeId) ?? null,
@@ -114,7 +114,7 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
           <Popup>
             <div
               className="min-w-[230px] space-y-2 p-1 text-start"
-              dir={isFr ? "ltr" : "rtl"}
+              dir={rtl ? "rtl" : "ltr"}
             >
               <div className="text-body font-bold text-primary">{loc(b, "name", "base")}</div>
               <div className="text-caption leading-relaxed text-muted-foreground">
