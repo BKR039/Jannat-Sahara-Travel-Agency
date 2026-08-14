@@ -77,10 +77,15 @@ function ContactPage() {
                 <div className="rounded-xl bg-primary/10 p-3 text-primary">
                   <DynamicIcon name={c.icon} className="h-5 w-5" />
                 </div>
-                <div>
-                  <div className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">{c.label}</div>
-                  <div className="mt-1 font-semibold text-foreground" dir={["phone", "mobile", "email"].includes(c.key) ? "ltr" : undefined}>
-                    {c.value}
+                <div className="min-w-0">
+                  <div className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
+                    {L(c, "label", "base")}
+                  </div>
+                  <div
+                    className="mt-1 break-words font-semibold text-foreground"
+                    dir={["phone", "mobile", "email"].includes(c.key) ? "ltr" : undefined}
+                  >
+                    {L(c, "value", "base")}
                   </div>
                 </div>
               </div>
