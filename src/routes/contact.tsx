@@ -13,6 +13,7 @@ import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { useServerFn } from "@tanstack/react-start";
 import { submitContactMessage } from "@/lib/public.functions";
 import { contactInfoQuery } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
