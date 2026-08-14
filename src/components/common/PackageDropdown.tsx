@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocalized } from "@/lib/localize";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   CalendarDays,
@@ -64,6 +65,7 @@ type Props = {
 
 export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onOpenChange }: Props) {
   const { t, i18n } = useTranslation();
+  const { L, price } = useLocalized();
   const isMobile = useIsMobile();
 
   const [open, setOpen] = useState(false);
@@ -81,9 +83,14 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
     if (!q) return packages;
     return packages.filter(
       (p) =>
-        p.title.toLowerCase().includes(q) ||
-        (p.destination ?? "").toLowerCase().includes(q) ||
-        (p.city ?? "").toLowerCase().includes(q),
+        [
+          p.title,
+          (p as Record<string, unknown>).title_fr,
+          p.destination,
+          (p as Record<string, unknown>).destination_fr,
+          p.city,
+          (p as Record<string, unknown>).city_fr,
+        ].some((v) => typeof v === "string" && v.toLowerCase().includes(q)),
     );
   }, [packages, term]);
 
@@ -193,7 +200,7 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
 
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
-                        <span className="line-clamp-1 text-small font-bold text-foreground">{p.title}</span>
+                        <span className="line-clamp-1 text-small font-bold text-foreground">{L(p, "title", "base")}</span>
                         {badge && BadgeIcon && (
                           <span
                             className={cn(
@@ -208,16 +215,16 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
                         {isSelected && <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
                       </span>
 
-                      {p.destination && (
+                      {L(p, "destination", "empty") && (
                         <span className="mt-1 flex items-center gap-1 text-caption text-muted-foreground">
-                          <MapPin className="h-3 w-3" aria-hidden="true" /> {p.destination}
+                          <MapPin className="h-3 w-3" aria-hidden="true" /> {L(p, "destination", "empty")}
                         </span>
                       )}
 
                       <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-muted-foreground">
-                        {p.duration && (
+                        {L(p, "duration", "empty") && (
                           <span className="inline-flex items-center gap-1">
-                            <Clock className="h-3 w-3" aria-hidden="true" /> {p.duration}
+                            <Clock className="h-3 w-3" aria-hidden="true" /> {L(p, "duration", "empty")}
                           </span>
                         )}
                         {p.departure_date && (
@@ -237,11 +244,11 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
                     <span className="shrink-0 text-end">
                       <span className="block text-caption text-muted-foreground">{t("package.from")}</span>
                       <span className="block text-small font-extrabold text-primary">
-                        {effectivePrice(p).toLocaleString()} {p.currency}
+                        {price(effectivePrice(p), p.currency ?? "TND")}
                       </span>
                       {(p.discount_price != null || (p.discount ?? 0) > 0) && (
                         <span className="block text-caption text-muted-foreground line-through">
-                          {Number(p.price).toLocaleString()} {p.currency}
+                          {price(p.price, p.currency ?? "TND")}
                         </span>
                       )}
                     </span>
@@ -277,22 +284,22 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
               {t("selector.label")}
             </span>
             <span className="mt-1 block truncate text-body font-bold text-foreground">
-              {selected ? selected.title : t("selector.placeholder")}
+              {selected ? L(selected, "title", "base") : t("selector.placeholder")}
             </span>
             {selected && (
               <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-caption text-muted-foreground">
-                {selected.destination && (
+                {L(selected, "destination", "empty") && (
                   <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-3 w-3" aria-hidden="true" /> {selected.destination}
+                    <MapPin className="h-3 w-3" aria-hidden="true" /> {L(selected, "destination", "empty")}
                   </span>
                 )}
-                {selected.duration && (
+                {L(selected, "duration", "empty") && (
                   <span className="inline-flex items-center gap-1">
-                    <Clock className="h-3 w-3" aria-hidden="true" /> {selected.duration}
+                    <Clock className="h-3 w-3" aria-hidden="true" /> {L(selected, "duration", "empty")}
                   </span>
                 )}
                 <span className="font-semibold text-primary">
-                  {effectivePrice(selected).toLocaleString()} {selected.currency}
+                  {price(effectivePrice(selected), selected.currency ?? "TND")}
                 </span>
               </span>
             )}
