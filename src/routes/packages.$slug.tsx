@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { packageBySlugQuery, packagesQuery, faqsQuery } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 
 
 
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/packages/$slug")({
 function PackagePage() {
   const { slug } = Route.useParams();
   const { t } = useTranslation();
+  const { L, list, price } = useLocalized();
   const { data: pkg, isLoading } = useQuery(packageBySlugQuery(slug));
   const { data: allPackages } = useQuery(packagesQuery());
   const { data: faqs } = useQuery(faqsQuery());
@@ -48,9 +50,9 @@ function PackagePage() {
   if (!pkg) throw notFound();
 
   const gallery = (pkg.gallery as string[]) ?? [];
-  const included = (pkg.included as string[]) ?? [];
-  const excluded = (pkg.excluded as string[]) ?? [];
-  const timeline = (pkg.timeline as Array<{ day: string; title: string; description: string }>) ?? [];
+  const included = list<string>(pkg, "included");
+  const excluded = list<string>(pkg, "excluded");
+  const timeline = list<{ day: string; title: string; description: string }>(pkg, "timeline");
   const discounted = pkg.discount && pkg.discount > 0
     ? Number(pkg.price) * (1 - Number(pkg.discount) / 100)
     : null;
@@ -85,16 +87,18 @@ function PackagePage() {
           <span className="inline-block rounded-full border border-on-dark/30 bg-on-dark/10 px-3 py-1 text-caption font-semibold backdrop-blur">
             {t(`categories.${pkg.category}`)}
           </span>
-          <h1 className="mt-4 text-h1 font-extrabold ">{pkg.title}</h1>
-          {pkg.short_description && <p className="mt-3 max-w-2xl text-body-lg opacity-90">{pkg.short_description}</p>}
+          <h1 className="mt-4 text-h1 font-extrabold ">{L(pkg, "title")}</h1>
+          {L(pkg, "short_description", "empty") && (
+            <p className="mt-3 max-w-2xl text-body-lg opacity-90">{L(pkg, "short_description", "empty")}</p>
+          )}
         </div>
       </section>
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 lg:grid-cols-3 md:px-6">
         <div className="space-y-8 lg:col-span-2">
-          {pkg.description && (
+          {L(pkg, "description", "empty") && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <p className="leading-relaxed text-foreground/90">{pkg.description}</p>
+              <p className="leading-relaxed text-foreground/90">{L(pkg, "description", "empty")}</p>
             </div>
           )}
 
@@ -165,9 +169,9 @@ function PackagePage() {
               <Accordion type="single" collapsible className="rounded-lg border border-border-subtle bg-card px-4">
                 {faqList.map((f) => (
                   <AccordionItem key={f.id} value={f.id}>
-                    <AccordionTrigger className="text-start">{f.question}</AccordionTrigger>
+                    <AccordionTrigger className="text-start">{L(f, "question")}</AccordionTrigger>
                     <AccordionContent className="text-small text-muted-foreground">
-                      {f.answer}
+                      {L(f, "answer")}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
@@ -190,30 +194,30 @@ function PackagePage() {
               <p className="text-caption text-muted-foreground">{t("package.from")}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-h2 font-extrabold text-primary">
-                  {(discounted ?? Number(pkg.price)).toLocaleString()} {pkg.currency}
+                  {price(discounted ?? Number(pkg.price), pkg.currency ?? "TND")}
                 </span>
                 {discounted !== null && (
                   <span className="text-small text-muted-foreground line-through">
-                    {Number(pkg.price).toLocaleString()}
+                    {price(Number(pkg.price), pkg.currency ?? "TND")}
                   </span>
                 )}
               </div>
             </div>
             <div className="space-y-2 border-t border-border pt-4 text-small">
-              {pkg.destination && (
-                <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {pkg.destination}</div>
+              {L(pkg, "destination", "empty") && (
+                <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {L(pkg, "destination", "empty")}</div>
               )}
-              {pkg.duration && (
-                <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {pkg.duration}</div>
+              {L(pkg, "duration", "empty") && (
+                <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {L(pkg, "duration", "empty")}</div>
               )}
               {typeof pkg.seats === "number" && pkg.seats > 0 && (
                 <div className="flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> {pkg.seats} {t("package.seats")}</div>
               )}
-              {pkg.hotel && (
-                <div className="flex items-center gap-2"><Hotel className="h-4 w-4 text-primary" /> {pkg.hotel}</div>
+              {L(pkg, "hotel", "base") && (
+                <div className="flex items-center gap-2"><Hotel className="h-4 w-4 text-primary" /> {L(pkg, "hotel", "base")}</div>
               )}
-              {pkg.airline && (
-                <div className="flex items-center gap-2"><Plane className="h-4 w-4 text-primary" /> {pkg.airline}</div>
+              {L(pkg, "airline", "base") && (
+                <div className="flex items-center gap-2"><Plane className="h-4 w-4 text-primary" /> {L(pkg, "airline", "base")}</div>
               )}
             </div>
             <Button
@@ -246,7 +250,7 @@ function PackagePage() {
           <div>
             <p className="text-caption text-muted-foreground">{t("package.from")}</p>
             <p className="text-h5 font-extrabold text-primary">
-              {(discounted ?? Number(pkg.price)).toLocaleString()} {pkg.currency}
+              {price(discounted ?? Number(pkg.price), pkg.currency ?? "TND")}
             </p>
           </div>
           <Button asChild size="lg">

@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { uploadPassport } from "@/lib/public.functions";
 import type { Package } from "@/lib/queries";
+import { useLocalized } from "@/lib/localize";
 import {
   ALLOWED_TYPES,
   MAX_PASSPORT_BYTES,
@@ -147,6 +148,7 @@ export function PackageOption({
   onSelect: () => void;
 }) {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   return (
     <button
       type="button"
@@ -162,7 +164,7 @@ export function PackageOption({
         {pkg.cover ? (
           <img
             src={pkg.cover}
-            alt={pkg.title}
+            alt={L(pkg, "title")}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-slow ease-standard group-hover:scale-105"
           />
@@ -174,14 +176,14 @@ export function PackageOption({
         )}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="text-h5 font-bold leading-snug">{pkg.title}</h3>
-        {pkg.short_description && (
-          <p className="line-clamp-2 text-small text-muted-foreground">{pkg.short_description}</p>
+        <h3 className="text-h5 font-bold leading-snug">{L(pkg, "title")}</h3>
+        {L(pkg, "short_description", "empty") && (
+          <p className="line-clamp-2 text-small text-muted-foreground">{L(pkg, "short_description", "empty")}</p>
         )}
         <ul className="mt-auto space-y-1.5 text-caption text-muted-foreground">
-          {pkg.destination && (
+          {L(pkg, "destination", "empty") && (
             <li className="flex items-center gap-2">
-              <MapPin className="h-3.5 w-3.5 text-primary" /> {pkg.destination}
+              <MapPin className="h-3.5 w-3.5 text-primary" /> {L(pkg, "destination", "empty")}
             </li>
           )}
           {pkg.departure_date && (
@@ -190,9 +192,9 @@ export function PackageOption({
               {new Date(pkg.departure_date).toLocaleDateString()}
             </li>
           )}
-          {pkg.duration && (
+          {L(pkg, "duration", "empty") && (
             <li className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5 text-primary" /> {pkg.duration}
+              <Clock className="h-3.5 w-3.5 text-primary" /> {L(pkg, "duration", "empty")}
             </li>
           )}
           {typeof pkg.seats === "number" && (
@@ -488,7 +490,7 @@ export function SummaryPanel({
   return (
     <div className="overflow-hidden rounded-xl border border-border-subtle bg-card shadow-lg">
       {pkg.cover && (
-        <img src={pkg.cover} alt={pkg.title} loading="lazy" className="h-32 w-full object-cover" />
+        <img src={pkg.cover} alt="" loading="lazy" className="h-32 w-full object-cover" />
       )}
       <div className="p-6">
         <h3 className="text-h5 font-bold">{t("bookingFlow.summary.title")}</h3>

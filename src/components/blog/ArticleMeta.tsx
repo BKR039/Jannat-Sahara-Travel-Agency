@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { CalendarDays, Clock, UserRound } from "lucide-react";
 import type { Article } from "@/lib/queries";
 import { formatArticleDate, readingMinutes } from "@/lib/blog";
+import { useLocalized } from "@/lib/localize";
 
 export function ArticleMeta({
   article,
@@ -11,18 +12,21 @@ export function ArticleMeta({
   className?: string;
 }) {
   const { t } = useTranslation();
+  const { lang, L } = useLocalized();
+  const author = L(article as unknown as Record<string, unknown>, "author", "base");
+
   return (
     <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-caption text-muted-foreground ${className}`}>
       {article.published_at && (
         <span className="inline-flex items-center gap-1.5">
           <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-          <time dateTime={article.published_at}>{formatArticleDate(article.published_at)}</time>
+          <time dateTime={article.published_at}>{formatArticleDate(article.published_at, lang)}</time>
         </span>
       )}
-      {article.author && (
+      {author && (
         <span className="inline-flex items-center gap-1.5">
           <UserRound className="h-3.5 w-3.5" aria-hidden />
-          {article.author}
+          {author}
         </span>
       )}
       <span className="inline-flex items-center gap-1.5">

@@ -53,6 +53,7 @@ function ServicesSectionBase() {
 
 function FeaturesSectionBase() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
   const { data } = useQuery(featuresQuery());
   if (!data?.length) return null;
   return (
@@ -69,8 +70,10 @@ function FeaturesSectionBase() {
               <DynamicIcon name={f.icon} className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="mb-1 font-bold text-foreground">{f.title}</h3>
-              {f.description && <p className="text-small text-muted-foreground">{f.description}</p>}
+              <h3 className="mb-1 font-bold text-foreground">{L(f, "title")}</h3>
+              {L(f, "description", "empty") && (
+                <p className="text-small text-muted-foreground">{L(f, "description", "empty")}</p>
+              )}
             </div>
           </div>
         ))}
@@ -110,13 +113,13 @@ function TestimonialsSectionBase() {
                 {tst.avatar && (
                   <LazyImage
                     src={tst.avatar}
-                    alt={tst.name}
+                    alt={L(tst, "name", "base")}
                     wrapperClassName="h-10 w-10 shrink-0 rounded-full"
                     sizes="40px"
                   />
                 )}
                 <div>
-                  <div className="text-small font-bold">{tst.name}</div>
+                  <div className="text-small font-bold">{L(tst, "name", "base")}</div>
                   {L(tst, "role", "empty") && (
                     <div className="text-caption opacity-75">{L(tst, "role", "empty")}</div>
                   )}

@@ -7,6 +7,7 @@ import { SectionHeading } from "@/components/common/SectionHeading";
 import { FeaturesSection, TestimonialsSection } from "@/components/sections/HomeSections";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { contentQuery } from "@/lib/queries";
+import { hasArabic, useLocalized } from "@/lib/localize";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -24,8 +25,24 @@ export const Route = createFileRoute("/about")({
 
 function AboutPage() {
   const { t } = useTranslation();
+  const { isFr, L } = useLocalized();
   const { data } = useQuery(contentQuery("about"));
-  const extra = (data?.data as { mission?: string; vision?: string; values?: string[] } | null) ?? {};
+  const raw = (data?.data as {
+    mission?: string;
+    vision?: string;
+    values?: string[];
+    mission_fr?: string;
+    vision_fr?: string;
+    values_fr?: string[];
+  } | null) ?? {};
+  const keep = (value?: string) => (isFr && hasArabic(value) ? undefined : value);
+  const extra = isFr
+    ? {
+        mission: raw.mission_fr ?? keep(raw.mission),
+        vision: raw.vision_fr ?? keep(raw.vision),
+        values: raw.values_fr ?? (raw.values ?? []).filter((v) => !hasArabic(v)),
+      }
+    : raw;
 
   return (
     <SiteLayout>
@@ -47,16 +64,16 @@ function AboutPage() {
         </div>
         <div className="mx-auto max-w-4xl px-4 py-24 text-center text-on-dark md:px-6">
           <span className="rounded-full border border-on-dark/30 bg-on-dark/10 px-4 py-1 text-caption font-semibold uppercase tracking-widest backdrop-blur">
-            {data?.subtitle}
+            {L(data, "subtitle", "empty")}
           </span>
           <h1 className="mt-4 text-h1 font-extrabold ds-reveal">
-            {data?.title ?? t("about.defaultTitle")}
+            {L(data, "title", "empty") || t("about.defaultTitle")}
           </h1>
         </div>
       </section>
 
       <section className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-        <p className="text-body-lg leading-relaxed text-foreground/90">{data?.body}</p>
+        <p className="text-body-lg leading-relaxed text-foreground/90">{L(data, "body", "empty")}</p>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {extra.mission && (

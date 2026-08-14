@@ -4,11 +4,19 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Play } from "lucide-react";
 import { contentQuery } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
+import { hasArabic, useLocalized } from "@/lib/localize";
 
 export function HeroSection() {
   const { t } = useTranslation();
+  const { isFr, L } = useLocalized();
   const { data: hero } = useQuery(contentQuery("hero"));
-  const badges = ((hero?.data as { badges?: string[] } | null)?.badges) ?? [];
+  const rawBadges = ((hero?.data as { badges?: string[]; badges_fr?: string[] } | null));
+  const badges = (isFr
+    ? rawBadges?.badges_fr ?? (rawBadges?.badges ?? []).filter((b) => !hasArabic(b))
+    : rawBadges?.badges) ?? [];
+  const heroTitle = L(hero, "title", "empty");
+  const heroSubtitle = L(hero, "subtitle", "empty");
+  const heroCta = L(hero, "cta_label", "empty");
 
   return (
     <section className="relative isolate overflow-hidden">
@@ -46,16 +54,16 @@ export function HeroSection() {
           ))}
         </div>
 
-        <h1 className="max-w-4xl text-display ds-reveal">{hero?.title ?? t("brand.tagline")}</h1>
-        {hero?.subtitle && (
-          <p className="max-w-2xl text-body-lg text-on-dark/90 ds-reveal">{hero.subtitle}</p>
+        <h1 className="max-w-4xl text-display ds-reveal">{heroTitle || t("brand.tagline")}</h1>
+        {heroSubtitle && (
+          <p className="max-w-2xl text-body-lg text-on-dark/90 ds-reveal">{heroSubtitle}</p>
         )}
 
 
         <div className="mt-4 flex flex-wrap justify-center gap-3 ds-reveal">
           <Button asChild size="lg" className="shadow-brand-glow">
             <Link to={hero?.cta_href ?? "/umrah"}>
-              {hero?.cta_label ?? t("actions.bookNow")}
+              {heroCta || t("actions.bookNow")}
               <ArrowLeft className="ms-2 h-5 w-5 shrink-0 rtl:rotate-180" />
             </Link>
           </Button>

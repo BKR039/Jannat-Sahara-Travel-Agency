@@ -1,8 +1,9 @@
 import type { Article } from "@/lib/queries";
+import { hasArabic, isFrench, intlLocale, localizeField } from "@/lib/localize";
 
-/** Tags are stored as a JSON array; first tag acts as the category. */
-export function articleTags(article: Pick<Article, "tags">): string[] {
-  const raw = article.tags;
+type TagSource = Pick<Article, "tags"> & { tags_fr?: unknown };
+
+function parseTags(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw.filter((t): t is string => typeof t === "string");
   if (typeof raw === "string") {
     try {
@@ -15,8 +16,28 @@ export function articleTags(article: Pick<Article, "tags">): string[] {
   return [];
 }
 
-export function articleCategory(article: Pick<Article, "tags">): string | null {
-  return articleTags(article)[0] ?? null;
+/** Tags are stored as a JSON array; first tag acts as the category. */
+export function articleTags(article: TagSource, lang?: string): string[] {
+  if (isFrench(lang)) {
+    const fr = parseTags(article.tags_fr);
+    if (fr.length > 0) return fr;
+    // Never leak Arabic tags into the French interface.
+    return parseTags(article.tags).filter((tag) => !hasArabic(tag));
+  }
+  return parseTags(article.tags);
+}
+
+export function articleCategory(article: TagSource, lang?: string): string | null {
+  return articleTags(article, lang)[0] ?? null;
+}
+
+/** Localized article title / excerpt / content / author. */
+export function articleText(
+  article: Record<string, unknown> | null | undefined,
+  field: "title" | "excerpt" | "content" | "author",
+  lang: string,
+): string {
+  return localizeField(article, field, lang, field === "author" ? "base" : "pending");
 }
 
 /** Rough reading time in minutes (~200 words/min, works for Arabic too). */
@@ -27,9 +48,13 @@ export function readingMinutes(article: Pick<Article, "content" | "excerpt">): n
   return Math.max(1, Math.round(words / 200));
 }
 
-export function formatArticleDate(value: string | null, locale = "ar-EG"): string {
+export function formatArticleDate(value: string | null, lang = "ar"): string {
   if (!value) return "";
-  return new Date(value).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+  return new Date(value).toLocaleDateString(intlLocale(lang), {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 export function articleUrl(slug: string): string {
