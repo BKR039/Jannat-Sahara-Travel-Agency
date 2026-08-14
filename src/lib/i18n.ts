@@ -6,6 +6,10 @@ import ar from "@/locales/ar/common.json";
 import fr from "@/locales/fr/common.json";
 import en from "@/locales/en/common.json";
 
+import arShell from "@/locales/ar/adminShell.json";
+import frShell from "@/locales/fr/adminShell.json";
+import enShell from "@/locales/en/adminShell.json";
+
 export const SUPPORTED_LANGUAGES = ["ar", "fr", "en"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
@@ -20,16 +24,16 @@ if (!i18n.isInitialized) {
     .use(initReactI18next)
     .init({
       resources: {
-        ar: { common: ar },
-        fr: { common: fr },
-        en: { common: en },
+        ar: { common: ar, admin: arShell },
+        fr: { common: fr, admin: frShell },
+        en: { common: en, admin: enShell },
       },
       fallbackLng: "ar",
       supportedLngs: SUPPORTED_LANGUAGES,
       nonExplicitSupportedLngs: true,
       load: "languageOnly",
       defaultNS: "common",
-      ns: ["common"],
+      ns: ["common", "admin"],
       interpolation: { escapeValue: false },
       detection: {
         order: ["localStorage", "htmlTag", "navigator"],
