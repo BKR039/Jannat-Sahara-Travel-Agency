@@ -23,30 +23,28 @@ import { toast } from "sonner";
 
 /* ----------------------------- section scaffold ---------------------------- */
 
+/**
+ * Content wrapper for a settings screen. The screen title/description live in
+ * the focused page header (see admin.settings.tsx), so this renders no heading
+ * of its own — hierarchy comes from whitespace and the group titles inside.
+ */
 export function SettingsSection({
-  title,
-  description,
   children,
   aside,
 }: {
-  title: string;
+  title?: string;
   description?: string;
   children: ReactNode;
   aside?: ReactNode;
 }) {
   return (
-    <section className="space-y-7 pb-20">
-      <header className="max-w-2xl border-b border-border-subtle pb-5">
-        <h2 className="text-h4 font-bold tracking-tight text-foreground">{title}</h2>
-        {description && (
-          <p className="mt-1.5 text-small leading-relaxed text-muted-foreground">{description}</p>
-        )}
-      </header>
+    <section className="space-y-6 pb-10">
       {aside}
       {children}
     </section>
   );
 }
+
 
 export function SettingsCard({
   title,
