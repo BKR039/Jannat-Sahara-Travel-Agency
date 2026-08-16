@@ -774,7 +774,18 @@
       "searchPlaceholder": "Search a hotel",
       "distanceHaram": "{{value}} m from the Haram",
       "distanceMasjid": "{{value}} m from the Prophet's Mosque",
-      "empty": "No matching results"
+      "empty": "No matching results",
+      "sortLabel": "Sort by",
+      "sort": {
+        "distance": "Closest to the Haram",
+        "name": "Name",
+        "area": "Area"
+      },
+      "errorTitle": "We couldn't load the hotel list",
+      "errorHint": "You can continue your request and we'll help you pick the right hotel.",
+      "noneTitle": "No hotels available right now",
+      "noneHint": "Pick a preferred area and we'll suggest a suitable hotel.",
+      "fallbackAction": "I'd rather you suggest a hotel for me"
     },
     "room": {
       "title": "Which room suits you?",

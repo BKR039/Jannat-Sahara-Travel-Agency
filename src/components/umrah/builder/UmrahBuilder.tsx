@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -18,7 +18,7 @@ import {
 import { AirportCombobox } from "@/components/flights/AirportCombobox";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/layout/SiteLayout";
-import { contactInfoQuery, hotelsQuery } from "@/lib/queries";
+import { contactInfoQuery } from "@/lib/queries";
 import { useLocalized } from "@/lib/localize";
 import { submitCustomPackageRequest } from "@/lib/umrah-builder.functions";
 import {
@@ -49,13 +49,12 @@ import {
   ChoiceCard,
   Counter,
   DateRangeField,
-  HotelCard,
-  HotelSearch,
   StepShell,
   SummaryBody,
   SummaryPanel,
   TextField,
 } from "./parts";
+import { HotelSelector } from "./HotelSelector";
 
 const STEP_ICON: Record<BuilderStep, typeof CalendarDays> = {
   dates: CalendarDays,
@@ -332,7 +331,6 @@ export function UmrahBuilder() {
                 patch={patch}
                 areaLabel={areaLabel}
                 budgetLabel={budgetLabel}
-                localizeName={(row) => L(row, "name", "base")}
               />
             )}
 
@@ -492,18 +490,14 @@ function StayStep({
   patch,
   areaLabel,
   budgetLabel,
-  localizeName,
 }: {
   city: "makkah" | "madinah";
   state: BuilderState;
   patch: (next: Partial<BuilderState>) => void;
   areaLabel: (city: "makkah" | "madinah", code: string) => string;
   budgetLabel: (code: string) => string;
-  localizeName: (row: Record<string, unknown>) => string;
 }) {
   const { t } = useTranslation();
-  const [search, setSearch] = useState("");
-  const { data: hotels, isLoading } = useQuery(hotelsQuery(city));
 
   const nights = city === "makkah" ? state.makkahNights : state.madinahNights;
   const mode = city === "makkah" ? state.makkahMode : state.madinahMode;
@@ -519,16 +513,6 @@ function StayStep({
     });
     patch(prefixed as Partial<BuilderState>);
   };
-
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    if (!needle) return hotels ?? [];
-    return (hotels ?? []).filter((h) =>
-      [h.name, h.name_fr, h.name_en, h.location]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(needle)),
-    );
-  }, [hotels, search]);
 
   return (
     <StepShell title={t(`umrahBuilder.${city}.title`)} subtitle={t(`umrahBuilder.${city}.subtitle`)}>
@@ -563,37 +547,12 @@ function StayStep({
           </div>
 
           {mode === "hotel" && (
-            <div className="space-y-3">
-              <HotelSearch
-                value={search}
-                onChange={setSearch}
-                placeholder={t("umrahBuilder.hotels.searchPlaceholder")}
-              />
-              {isLoading ? (
-                <div className="h-40 animate-pulse rounded-3xl bg-surface-sunken" />
-              ) : filtered.length === 0 ? (
-                <p className="rounded-2xl bg-surface-sunken/60 p-4 text-small text-muted-foreground">
-                  {hotels?.length ? t("umrahBuilder.hotels.empty") : t("umrahBuilder.stay.noHotels")}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {filtered.map((hotel) => (
-                    <HotelCard
-                      key={hotel.id}
-                      hotel={hotel}
-                      city={city}
-                      selected={hotelId === hotel.id}
-                      onSelect={() =>
-                        set({
-                          hotelId: hotel.id,
-                          hotelName: localizeName(hotel as unknown as Record<string, unknown>),
-                        })
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+            <HotelSelector
+              city={city}
+              selectedId={hotelId}
+              onSelect={(hotel, name) => set({ hotelId: hotel.id, hotelName: name })}
+              onFallback={() => set({ mode: "area", hotelId: null, hotelName: "" })}
+            />
           )}
 
           {mode === "area" && (

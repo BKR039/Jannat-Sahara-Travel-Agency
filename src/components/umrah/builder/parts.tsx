@@ -1,13 +1,10 @@
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, ChevronDown, Minus, Plus, Search, Star, MapPin, Footprints } from "lucide-react";
+import { Check, ChevronDown, Minus, Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { LazyImage } from "@/components/common/LazyImage";
 import { cn } from "@/lib/utils";
 import { useLocalized } from "@/lib/localize";
-import type { Hotel } from "@/lib/queries";
 import { parseISODate, toISODate, type BuilderState, type BuilderStep } from "./model";
 
 /* ------------------------------------------------------------------ stepper */
@@ -268,112 +265,6 @@ export function DateRangeField({
 }
 
 /* ------------------------------------------------------------- hotel cards */
-
-export function HotelSearch({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  return (
-    <div className="relative">
-      <Search className="pointer-events-none absolute inset-y-0 start-4 my-auto h-4 w-4 text-muted-foreground" />
-      <input
-        type="search"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="h-12 w-full rounded-full border border-border-subtle bg-card ps-11 pe-4 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
-      />
-    </div>
-  );
-}
-
-export function HotelCard({
-  hotel,
-  city,
-  selected,
-  onSelect,
-}: {
-  hotel: Hotel;
-  city: "makkah" | "madinah";
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const { t } = useTranslation();
-  const { L, number } = useLocalized();
-  const images = Array.isArray(hotel.images) ? (hotel.images as string[]) : [];
-  const distance = city === "makkah" ? hotel.distance_to_haram : hotel.distance_to_masjid_nabawi;
-
-  return (
-    <article
-      className={cn(
-        "flex flex-col overflow-hidden rounded-3xl border bg-card transition-all sm:flex-row",
-        selected ? "border-primary shadow-md" : "border-border-subtle hover:border-primary/40",
-      )}
-    >
-      <div className="relative h-40 shrink-0 sm:h-auto sm:w-48">
-        {images[0] ? (
-          <LazyImage src={images[0]} alt="" wrapperClassName="h-full w-full" />
-        ) : (
-          <div className="h-full w-full bg-surface-sunken" />
-        )}
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-2 p-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-small font-bold">{L(hotel, "name", "base")}</h3>
-          {!!hotel.stars && (
-            <span className="inline-flex items-center gap-0.5 text-brand-gold" aria-label={`${hotel.stars}`}>
-              {Array.from({ length: hotel.stars }).map((_, i) => (
-                <Star key={i} className="h-3 w-3 fill-current" />
-              ))}
-            </span>
-          )}
-        </div>
-        <p className="line-clamp-2 text-caption text-muted-foreground">{L(hotel, "description", "empty")}</p>
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-caption text-muted-foreground">
-          {L(hotel, "location", "base") && (
-            <li className="inline-flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5 text-primary" />
-              {L(hotel, "location", "base")}
-            </li>
-          )}
-          {!!distance && (
-            <li className="inline-flex items-center gap-1">
-              <Footprints className="h-3.5 w-3.5 text-primary" />
-              {t(
-                city === "makkah"
-                  ? "umrahBuilder.hotels.distanceHaram"
-                  : "umrahBuilder.hotels.distanceMasjid",
-                { value: number(distance) },
-              )}
-            </li>
-          )}
-        </ul>
-        <div className="mt-auto pt-2">
-          <Button
-            type="button"
-            size="sm"
-            variant={selected ? "default" : "outline"}
-            onClick={onSelect}
-            className="w-full sm:w-auto"
-          >
-            {selected ? (
-              <>
-                <Check className="me-2 h-4 w-4" /> {t("umrahBuilder.hotels.selected")}
-              </>
-            ) : (
-              t("umrahBuilder.hotels.select")
-            )}
-          </Button>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 /* ----------------------------------------------------------- trip summary */
 
