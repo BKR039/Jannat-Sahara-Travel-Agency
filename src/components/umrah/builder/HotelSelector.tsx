@@ -175,7 +175,7 @@ function HotelOption({
             selected ? "text-primary" : "text-muted-foreground",
           )}
         >
-          {selected ? t("umrahBuilder.hotels.selected") : cityLabel}
+          {cityLabel}
         </p>
         <span
           aria-hidden="true"
