@@ -137,3 +137,20 @@ export const branchesQuery = () =>
           .order("sort_order"),
       ),
   });
+
+export type Hotel = Database["public"]["Tables"]["hotels"]["Row"];
+
+/** Hotel catalogue for the custom Umrah package builder (agency-managed). */
+export const hotelsQuery = (city: "makkah" | "madinah") =>
+  queryOptions({
+    queryKey: ["hotels", city] as const,
+    queryFn: () =>
+      unwrap<Hotel[]>(
+        supabase
+          .from("hotels")
+          .select("*")
+          .eq("city", city)
+          .eq("active", true)
+          .order("sort_order"),
+      ),
+  });

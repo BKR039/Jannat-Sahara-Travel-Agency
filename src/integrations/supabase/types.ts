@@ -441,6 +441,141 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_package_requests: {
+        Row: {
+          adults: number
+          airport_flexible: boolean
+          assigned_to: string | null
+          children: number
+          created_at: string
+          customer_name: string
+          departure_airport: string | null
+          departure_date: string | null
+          email: string | null
+          id: string
+          infants: number
+          internal_notes: string | null
+          last_contact_at: string | null
+          locale: string | null
+          madinah_area: string | null
+          madinah_hotel_id: string | null
+          madinah_hotel_name: string | null
+          madinah_nights: number
+          madinah_preference: string | null
+          makkah_area: string | null
+          makkah_hotel_id: string | null
+          makkah_hotel_name: string | null
+          makkah_nights: number
+          makkah_preference: string | null
+          notes: string | null
+          offer_amount: number | null
+          offer_currency: string
+          offer_notes: string | null
+          offer_sent_at: string | null
+          phone: string
+          proposed_flights: string | null
+          proposed_hotels: string | null
+          reference: string
+          return_airport: string | null
+          return_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          adults?: number
+          airport_flexible?: boolean
+          assigned_to?: string | null
+          children?: number
+          created_at?: string
+          customer_name: string
+          departure_airport?: string | null
+          departure_date?: string | null
+          email?: string | null
+          id?: string
+          infants?: number
+          internal_notes?: string | null
+          last_contact_at?: string | null
+          locale?: string | null
+          madinah_area?: string | null
+          madinah_hotel_id?: string | null
+          madinah_hotel_name?: string | null
+          madinah_nights?: number
+          madinah_preference?: string | null
+          makkah_area?: string | null
+          makkah_hotel_id?: string | null
+          makkah_hotel_name?: string | null
+          makkah_nights?: number
+          makkah_preference?: string | null
+          notes?: string | null
+          offer_amount?: number | null
+          offer_currency?: string
+          offer_notes?: string | null
+          offer_sent_at?: string | null
+          phone: string
+          proposed_flights?: string | null
+          proposed_hotels?: string | null
+          reference: string
+          return_airport?: string | null
+          return_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          adults?: number
+          airport_flexible?: boolean
+          assigned_to?: string | null
+          children?: number
+          created_at?: string
+          customer_name?: string
+          departure_airport?: string | null
+          departure_date?: string | null
+          email?: string | null
+          id?: string
+          infants?: number
+          internal_notes?: string | null
+          last_contact_at?: string | null
+          locale?: string | null
+          madinah_area?: string | null
+          madinah_hotel_id?: string | null
+          madinah_hotel_name?: string | null
+          madinah_nights?: number
+          madinah_preference?: string | null
+          makkah_area?: string | null
+          makkah_hotel_id?: string | null
+          makkah_hotel_name?: string | null
+          makkah_nights?: number
+          makkah_preference?: string | null
+          notes?: string | null
+          offer_amount?: number | null
+          offer_currency?: string
+          offer_notes?: string | null
+          offer_sent_at?: string | null
+          phone?: string
+          proposed_flights?: string | null
+          proposed_hotels?: string | null
+          reference?: string
+          return_airport?: string | null
+          return_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_package_requests_madinah_hotel_id_fkey"
+            columns: ["madinah_hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_package_requests_makkah_hotel_id_fkey"
+            columns: ["makkah_hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_notes: {
         Row: {
           author_email: string | null
@@ -686,6 +821,90 @@ export type Database = {
           title?: string | null
           title_en?: string | null
           title_fr?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hotels: {
+        Row: {
+          active: boolean
+          amenities: Json
+          area: string | null
+          city: string
+          created_at: string
+          description: string | null
+          description_en: string | null
+          description_fr: string | null
+          distance_to_haram: number | null
+          distance_to_masjid_nabawi: number | null
+          external_id: string | null
+          id: string
+          images: Json
+          latitude: number | null
+          location: string | null
+          location_en: string | null
+          location_fr: string | null
+          longitude: number | null
+          name: string
+          name_en: string | null
+          name_fr: string | null
+          sort_order: number
+          source: string
+          stars: number | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amenities?: Json
+          area?: string | null
+          city: string
+          created_at?: string
+          description?: string | null
+          description_en?: string | null
+          description_fr?: string | null
+          distance_to_haram?: number | null
+          distance_to_masjid_nabawi?: number | null
+          external_id?: string | null
+          id?: string
+          images?: Json
+          latitude?: number | null
+          location?: string | null
+          location_en?: string | null
+          location_fr?: string | null
+          longitude?: number | null
+          name: string
+          name_en?: string | null
+          name_fr?: string | null
+          sort_order?: number
+          source?: string
+          stars?: number | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amenities?: Json
+          area?: string | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          description_en?: string | null
+          description_fr?: string | null
+          distance_to_haram?: number | null
+          distance_to_masjid_nabawi?: number | null
+          external_id?: string | null
+          id?: string
+          images?: Json
+          latitude?: number | null
+          location?: string | null
+          location_en?: string | null
+          location_fr?: string | null
+          longitude?: number | null
+          name?: string
+          name_en?: string | null
+          name_fr?: string | null
+          sort_order?: number
+          source?: string
+          stars?: number | null
           updated_at?: string
         }
         Relationships: []
