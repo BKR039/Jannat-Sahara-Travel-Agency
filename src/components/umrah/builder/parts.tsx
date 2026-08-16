@@ -317,7 +317,7 @@ export function HotelCard({
     >
       <div className="relative h-40 shrink-0 sm:h-auto sm:w-48">
         {images[0] ? (
-          <LazyImage src={images[0]} alt="" className="h-full w-full object-cover" />
+          <LazyImage src={images[0]} alt="" wrapperClassName="h-full w-full" />
         ) : (
           <div className="h-full w-full bg-surface-sunken" />
         )}
