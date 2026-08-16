@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Inbox, Phone, Mail, MessageSquare, Plane, CalendarCheck } from "lucide-react";
+import { Inbox, Phone, Mail, MessageSquare, Plane, CalendarCheck, Sparkles } from "lucide-react";
 import { listRequests, updateRequest } from "@/lib/admin/command.functions";
 import {
   Page,
