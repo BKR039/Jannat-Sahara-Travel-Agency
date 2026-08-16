@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Building2, Search, TriangleAlert } from "lucide-react";
+import { Check, MapPin, Search, Sparkles, Star, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalized } from "@/lib/localize";
 import { hotelsQuery, type Hotel } from "@/lib/queries";
@@ -16,6 +16,45 @@ function distanceOf(hotel: Hotel, city: City): number | null {
   return typeof raw === "number" ? raw : null;
 }
 
+/* ------------------------------------------------------------ stay context */
+
+function StayContext({
+  city,
+  nights,
+  from,
+  to,
+  count,
+}: {
+  city: City;
+  nights: number;
+  from: string;
+  to: string;
+  count: number;
+}) {
+  const { t } = useTranslation();
+  const { longDate } = useLocalized();
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-border-subtle bg-surface-sunken/50 px-5 py-4">
+      <div className="min-w-0">
+        <p className="text-caption font-bold uppercase tracking-[0.18em] text-primary">
+          {t("umrahBuilder.hotels.stayLabel")} · {t(`umrahBuilder.summary.${city}`)}
+        </p>
+        {from && to && (
+          <p className="mt-1.5 text-body font-semibold text-foreground">
+            {longDate(from)} <span className="text-muted-foreground">→</span> {longDate(to)}
+          </p>
+        )}
+        <p className="mt-0.5 text-caption text-muted-foreground">
+          {t("umrahBuilder.summary.nightsCount", { count: nights })}
+        </p>
+      </div>
+      <p className="text-caption font-semibold text-muted-foreground">
+        {t("umrahBuilder.hotels.count", { count })}
+      </p>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ search */
 
 function HotelSearch({
@@ -28,14 +67,17 @@ function HotelSearch({
   placeholder: string;
 }) {
   return (
-    <div className="relative">
-      <Search className="pointer-events-none absolute inset-y-0 start-4 my-auto h-4 w-4 text-muted-foreground" />
+    <div className="group relative">
+      <Search className="pointer-events-none absolute inset-y-0 start-5 my-auto h-[18px] w-[18px] text-muted-foreground transition-colors group-focus-within:text-primary" />
       <input
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") onChange("");
+        }}
         placeholder={placeholder}
-        className="h-12 w-full rounded-2xl border border-border-subtle bg-card ps-11 pe-4 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+        className="h-14 w-full rounded-2xl border border-border-subtle bg-surface-sunken/40 ps-14 pe-5 text-body outline-none transition-all placeholder:text-muted-foreground focus:border-primary/60 focus:bg-card focus:shadow-md"
       />
     </div>
   );
@@ -54,24 +96,28 @@ function HotelFilters({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-caption text-muted-foreground">{t("umrahBuilder.hotels.sortLabel")}</span>
-      {options.map((key) => (
-        <button
-          key={key}
-          type="button"
-          aria-pressed={value === key}
-          onClick={() => onChange(key)}
-          className={cn(
-            "rounded-full border px-3.5 py-1.5 text-caption font-semibold transition-colors",
-            value === key
-              ? "border-primary bg-primary/10 text-primary"
-              : "border-border-subtle bg-card text-muted-foreground hover:border-primary/40",
-          )}
-        >
-          {t(`umrahBuilder.hotels.sort.${key}`)}
-        </button>
-      ))}
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <span className="text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        {t("umrahBuilder.hotels.sortLabel")}
+      </span>
+      <div className="flex flex-wrap gap-1.5 rounded-full border border-border-subtle bg-surface-sunken/50 p-1">
+        {options.map((key) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={value === key}
+            onClick={() => onChange(key)}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-caption font-semibold transition-all duration-200",
+              value === key
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {t(`umrahBuilder.hotels.sort.${key}`)}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -95,49 +141,95 @@ function HotelOption({
 }) {
   const { t } = useTranslation();
   const { L, number } = useLocalized();
-  const location = L(hotel, "location", "base");
+  const location = L(hotel as unknown as Record<string, unknown>, "location", "base");
   const area = hotel.area
     ? t(`umrahBuilder.areas.${city}.${hotel.area}`, { defaultValue: hotel.area })
     : "";
   const cityLabel = t(`umrahBuilder.summary.${city}`);
-  const secondary = [area, location].filter(Boolean).join(" · ");
+  const place = [area, location].filter(Boolean).join(" · ");
   const distance = distanceOf(hotel, city);
+  const stars = typeof hotel.stars === "number" && hotel.stars > 0 ? hotel.stars : null;
 
   return (
     <label
       className={cn(
-        "flex cursor-pointer items-start gap-4 rounded-2xl border bg-card p-4 transition-colors",
+        "group relative block cursor-pointer overflow-hidden rounded-3xl border bg-card p-5 transition-all duration-200 sm:p-6",
         selected
-          ? "border-primary bg-primary/[0.05]"
-          : "border-border-subtle hover:border-primary/40",
+          ? "border-primary/60 bg-primary/[0.04] shadow-lg"
+          : "border-border-subtle hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md",
       )}
     >
+      {/* Warm accent rail — RTL aware via logical inset */}
       <span
-        className={cn(
-          "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-          selected ? "bg-primary/15 text-primary" : "bg-surface-sunken text-muted-foreground",
-        )}
         aria-hidden="true"
-      >
-        <Building2 className="h-5 w-5" />
-      </span>
-
-      <span className="min-w-0 flex-1">
-        <span className="block break-words text-small font-bold text-foreground">{name}</span>
-        <span className="mt-1 block break-words text-caption text-muted-foreground">
-          {secondary ? `${cityLabel} · ${secondary}` : cityLabel}
-        </span>
-        {distance !== null && (
-          <span className="mt-1 block text-caption text-muted-foreground">
-            {t(
-              city === "makkah"
-                ? "umrahBuilder.hotels.distanceHaram"
-                : "umrahBuilder.hotels.distanceMasjid",
-              { value: number(distance) },
-            )}
-          </span>
+        className={cn(
+          "absolute inset-y-0 start-0 w-1 transition-opacity duration-200",
+          selected ? "bg-primary opacity-100" : "bg-primary/50 opacity-0 group-hover:opacity-100",
         )}
-      </span>
+      />
+
+      <div className="flex items-start justify-between gap-4">
+        <p
+          className={cn(
+            "text-caption font-bold uppercase tracking-[0.18em]",
+            selected ? "text-primary" : "text-muted-foreground",
+          )}
+        >
+          {cityLabel}
+        </p>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-all duration-200",
+            selected
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border text-transparent group-hover:border-primary/50",
+          )}
+        >
+          <Check className="h-4 w-4" />
+        </span>
+      </div>
+
+      <h3 className="mt-2.5 break-words text-h4 leading-snug text-foreground">{name}</h3>
+
+      {(place || stars) && (
+        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-muted-foreground">
+          {place && (
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              <MapPin className="h-4 w-4 shrink-0 text-primary/70" />
+              <span className="break-words">{place}</span>
+            </span>
+          )}
+          {stars && (
+            <span className="inline-flex items-center gap-1 text-foreground/80">
+              <Star className="h-3.5 w-3.5 fill-current text-secondary" />
+              {number(stars)}
+            </span>
+          )}
+        </p>
+      )}
+
+      {distance !== null && (
+        <p className="mt-3.5 inline-flex items-center rounded-full bg-surface-sunken px-3.5 py-1.5 text-caption font-bold text-foreground">
+          {t(
+            city === "makkah"
+              ? "umrahBuilder.hotels.distanceHaram"
+              : "umrahBuilder.hotels.distanceMasjid",
+            { value: number(distance) },
+          )}
+        </p>
+      )}
+
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border-subtle pt-4">
+        <span
+          className={cn(
+            "text-caption font-bold transition-colors",
+            selected ? "text-primary" : "text-muted-foreground group-hover:text-primary",
+          )}
+        >
+          {selected ? t("umrahBuilder.hotels.selected") : t("umrahBuilder.hotels.select")}
+        </span>
+      </div>
 
       <input
         type="radio"
@@ -146,15 +238,6 @@ function HotelOption({
         onChange={onSelect}
         className="sr-only"
       />
-      <span
-        aria-hidden="true"
-        className={cn(
-          "mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
-          selected ? "border-primary" : "border-border",
-        )}
-      >
-        {selected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
-      </span>
     </label>
   );
 }
@@ -163,24 +246,21 @@ function HotelOption({
 
 function HotelLoadingState() {
   return (
-    <div className="space-y-3" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="flex items-start gap-4 rounded-2xl border border-border-subtle bg-card p-4"
-        >
-          <div className="h-10 w-10 shrink-0 animate-pulse rounded-xl bg-surface-sunken" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-2/3 animate-pulse rounded-full bg-surface-sunken" />
-            <div className="h-3 w-1/3 animate-pulse rounded-full bg-surface-sunken" />
-          </div>
+    <div className="grid gap-4 sm:grid-cols-2" aria-hidden="true">
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} className="space-y-3 rounded-3xl border border-border-subtle bg-card p-6">
+          <div className="h-3 w-16 animate-pulse rounded-full bg-surface-sunken" />
+          <div className="h-5 w-2/3 animate-pulse rounded-full bg-surface-sunken" />
+          <div className="h-3 w-1/2 animate-pulse rounded-full bg-surface-sunken" />
+          <div className="h-8 w-32 animate-pulse rounded-full bg-surface-sunken" />
         </div>
       ))}
     </div>
   );
 }
 
-function HotelNotice({
+/** Premium concierge offer — replaces the plain "I don't know" fallback. */
+function ConciergeCard({
   title,
   hint,
   actionLabel,
@@ -196,20 +276,26 @@ function HotelNotice({
   return (
     <div
       className={cn(
-        "space-y-2 rounded-2xl border p-5",
-        tone === "error" ? "border-destructive/30 bg-destructive/5" : "border-border-subtle bg-card",
+        "rounded-3xl border p-6",
+        tone === "error"
+          ? "border-destructive/30 bg-destructive/5"
+          : "border-primary/25 bg-gradient-to-br from-primary/[0.07] via-card to-card",
       )}
     >
-      <p className="flex items-center gap-2 text-small font-semibold">
-        {tone === "error" && <TriangleAlert className="h-4 w-4 text-destructive" />}
+      <p className="flex items-center gap-2 text-caption font-bold uppercase tracking-[0.18em] text-primary">
+        {tone === "error" ? (
+          <TriangleAlert className="h-4 w-4 text-destructive" />
+        ) : (
+          <Sparkles className="h-4 w-4" />
+        )}
         {title}
       </p>
-      {hint && <p className="text-caption text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-2 max-w-xl text-small text-muted-foreground">{hint}</p>}
       {actionLabel && onAction && (
         <button
           type="button"
           onClick={onAction}
-          className="text-caption font-semibold text-primary underline-offset-4 hover:underline"
+          className="mt-4 inline-flex min-h-11 items-center rounded-full border border-primary/40 bg-card px-5 text-caption font-bold text-primary transition-all hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground"
         >
           {actionLabel}
         </button>
@@ -225,12 +311,18 @@ export function HotelSelector({
   selectedId,
   onSelect,
   onFallback,
+  nights = 0,
+  from = "",
+  to = "",
 }: {
   city: City;
   selectedId: string | null;
   onSelect: (hotel: Hotel, name: string) => void;
   /** Switch the builder to the "suggest an area" fallback flow. */
   onFallback: () => void;
+  nights?: number;
+  from?: string;
+  to?: string;
 }) {
   const { t } = useTranslation();
   const { L } = useLocalized();
@@ -279,7 +371,7 @@ export function HotelSelector({
 
   if (isError) {
     return (
-      <HotelNotice
+      <ConciergeCard
         tone="error"
         title={t("umrahBuilder.hotels.errorTitle")}
         hint={t("umrahBuilder.hotels.errorHint")}
@@ -291,7 +383,7 @@ export function HotelSelector({
 
   if (rows.length === 0) {
     return (
-      <HotelNotice
+      <ConciergeCard
         title={t("umrahBuilder.hotels.noneTitle")}
         hint={t("umrahBuilder.hotels.noneHint")}
         actionLabel={t("umrahBuilder.hotels.fallbackAction")}
@@ -301,24 +393,33 @@ export function HotelSelector({
   }
 
   return (
-    <div className="space-y-4">
-      <HotelSearch
-        value={search}
-        onChange={setSearch}
-        placeholder={t("umrahBuilder.hotels.searchPlaceholder")}
-      />
-      {sortOptions.length > 1 && (
-        <HotelFilters value={sort} onChange={setSort} options={sortOptions} />
-      )}
+    <div className="space-y-5">
+      <StayContext city={city} nights={nights} from={from} to={to} count={rows.length} />
+
+      <div className="space-y-4">
+        <HotelSearch
+          value={search}
+          onChange={setSearch}
+          placeholder={t("umrahBuilder.hotels.searchPlaceholder")}
+        />
+        {sortOptions.length > 1 && (
+          <HotelFilters value={sort} onChange={setSort} options={sortOptions} />
+        )}
+      </div>
 
       {visible.length === 0 ? (
-        <HotelNotice
+        <ConciergeCard
           title={t("umrahBuilder.hotels.empty")}
+          hint={t("umrahBuilder.hotels.conciergeDesc")}
           actionLabel={t("umrahBuilder.hotels.fallbackAction")}
           onAction={onFallback}
         />
       ) : (
-        <div className="space-y-3" role="radiogroup" aria-label={t(`umrahBuilder.${city}.title`)}>
+        <div
+          className="ds-reveal grid gap-4 sm:grid-cols-2"
+          role="radiogroup"
+          aria-label={t(`umrahBuilder.${city}.title`)}
+        >
           {visible.map(({ hotel, name }) => (
             <HotelOption
               key={hotel.id}
@@ -333,13 +434,12 @@ export function HotelSelector({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={onFallback}
-        className="text-caption font-semibold text-primary underline-offset-4 hover:underline"
-      >
-        {t("umrahBuilder.hotels.fallbackAction")}
-      </button>
+      <ConciergeCard
+        title={t("umrahBuilder.hotels.conciergeTitle")}
+        hint={t("umrahBuilder.hotels.conciergeDesc")}
+        actionLabel={t("umrahBuilder.hotels.fallbackAction")}
+        onAction={onFallback}
+      />
     </div>
   );
 }

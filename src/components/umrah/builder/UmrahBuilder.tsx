@@ -550,6 +550,9 @@ function StayStep({
             <HotelSelector
               city={city}
               selectedId={hotelId}
+              nights={nights}
+              from={state.departureDate}
+              to={state.returnDate}
               onSelect={(hotel, name) => set({ hotelId: hotel.id, hotelName: name })}
               onFallback={() => set({ mode: "area", hotelId: null, hotelName: "" })}
             />

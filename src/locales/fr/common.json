@@ -785,7 +785,12 @@
       "errorHint": "Vous pouvez continuer votre demande, nous vous aiderons à choisir l'hôtel.",
       "noneTitle": "Aucun hôtel disponible pour le moment",
       "noneHint": "Choisissez un quartier et nous vous proposerons un hôtel adapté.",
-      "fallbackAction": "Je préfère que vous me proposiez un hôtel"
+      "fallbackAction": "Je préfère que vous me proposiez un hôtel",
+      "count": "{{count}} hôtels disponibles",
+      "conciergeTitle": "Vous ne trouvez pas votre hôtel ?",
+      "conciergeDesc": "Laissez-nous vous aider à choisir l'hôtel idéal selon le quartier, le budget et la distance du Haram.",
+      "stayLabel": "Votre séjour",
+      "starsLabel": "{{count}} étoiles"
     },
     "room": {
       "title": "Quel type de chambre ?",

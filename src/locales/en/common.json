@@ -785,7 +785,12 @@
       "errorHint": "You can continue your request and we'll help you pick the right hotel.",
       "noneTitle": "No hotels available right now",
       "noneHint": "Pick a preferred area and we'll suggest a suitable hotel.",
-      "fallbackAction": "I'd rather you suggest a hotel for me"
+      "fallbackAction": "I'd rather you suggest a hotel for me",
+      "count": "{{count}} hotels available",
+      "conciergeTitle": "Can't find your hotel?",
+      "conciergeDesc": "Let us help you choose the right hotel based on area, budget and distance from the Haram.",
+      "stayLabel": "Your stay",
+      "starsLabel": "{{count}} stars"
     },
     "room": {
       "title": "Which room suits you?",
