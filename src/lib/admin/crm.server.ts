@@ -136,7 +136,7 @@ export async function loadCustomer(key: string) {
 }
 
 export async function loadRequests() {
-  const [flightsRes, bookingsRes, messagesRes] = await Promise.all([
+  const [flightsRes, bookingsRes, messagesRes, customRes] = await Promise.all([
     supabaseAdmin
       .from("flight_requests")
       .select("*")
@@ -155,11 +155,16 @@ export async function loadRequests() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(300),
+    supabaseAdmin
+      .from("custom_package_requests")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300),
   ]);
 
   type UnifiedRequest = {
     id: string;
-    kind: "flight" | "booking" | "contact";
+    kind: "flight" | "booking" | "contact" | "custom_package";
     reference: string | null;
     name: string;
     phone: string | null;
@@ -222,6 +227,25 @@ export async function loadRequests() {
       assigned_to: null,
       last_contact_at: m.last_contact_at ?? null,
       created_at: m.created_at,
+    });
+  });
+
+  (customRes.data ?? []).forEach((r) => {
+    const nights = (r.makkah_nights ?? 0) + (r.madinah_nights ?? 0);
+    const travellers = (r.adults ?? 0) + (r.children ?? 0) + (r.infants ?? 0);
+    rows.push({
+      id: r.id,
+      kind: "custom_package",
+      reference: r.reference,
+      name: r.customer_name,
+      phone: r.phone,
+      email: r.email,
+      summary: `Umrah builder · ${nights} night(s) · ${travellers} traveller(s)`,
+      detail: r as unknown as Record<string, string | number | boolean | null>,
+      status: r.status,
+      assigned_to: r.assigned_to ?? null,
+      last_contact_at: r.last_contact_at ?? null,
+      created_at: r.created_at,
     });
   });
 
