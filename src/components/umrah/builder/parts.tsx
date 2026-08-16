@@ -326,7 +326,7 @@ export function HotelCard({
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-small font-bold">{L(hotel, "name", "base")}</h3>
           {!!hotel.stars && (
-            <span className="inline-flex items-center gap-0.5 text-gold" aria-label={`${hotel.stars}`}>
+            <span className="inline-flex items-center gap-0.5 text-brand-gold" aria-label={`${hotel.stars}`}>
               {Array.from({ length: hotel.stars }).map((_, i) => (
                 <Star key={i} className="h-3 w-3 fill-current" />
               ))}
