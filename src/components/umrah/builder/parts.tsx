@@ -31,17 +31,24 @@ export function BuilderStepper({
               type="button"
               onClick={() => onSelect(i)}
               disabled={i > current}
-              className={cn(
-                "flex items-center gap-2 rounded-full border px-3.5 py-2 text-caption font-semibold transition-all",
-                active && "border-primary bg-primary text-primary-foreground shadow-sm",
-                done && "border-primary/30 bg-primary/10 text-primary",
-                !active && !done && "border-border-subtle bg-card text-muted-foreground",
+            className={cn(
+                "flex items-center gap-2 rounded-full border px-4 py-2 text-caption transition-all duration-200",
+                active &&
+                  "border-primary/70 bg-primary/10 font-bold text-primary shadow-[inset_0_0_0_1px_transparent]",
+                done && "border-transparent bg-surface-sunken/70 font-semibold text-foreground/70",
+                !active &&
+                  !done &&
+                  "border-border-subtle bg-card font-medium text-muted-foreground",
               )}
             >
               <span
                 className={cn(
                   "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold",
-                  active ? "bg-primary-foreground/20" : done ? "bg-primary/15" : "bg-surface-sunken",
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : done
+                      ? "bg-primary/15 text-primary"
+                      : "bg-surface-sunken text-muted-foreground",
                 )}
               >
                 {done ? <Check className="h-3 w-3" /> : String(i + 1).padStart(2, "0")}
