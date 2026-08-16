@@ -17,6 +17,8 @@ export function renderCustomPackageEmail(args: {
     ["Customer", input.name],
     ["Phone", input.phone],
     ["Email", input.email || "—"],
+    ["WhatsApp", input.whatsapp || "—"],
+    ["Preferred contact", input.contactPreference || "—"],
     ["Language", (input.locale ?? "ar").toUpperCase()],
     ["Departure date", input.departureDate],
     ["Return date", input.returnDate],
@@ -43,6 +45,7 @@ export function renderCustomPackageEmail(args: {
       "Travellers",
       `${input.adults} adult(s), ${input.children} child(ren), ${input.infants} infant(s)`,
     ],
+    ["Room preference", input.roomType || "—"],
     ["Notes", input.notes || "—"],
   ];
 

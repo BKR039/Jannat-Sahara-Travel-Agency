@@ -447,6 +447,7 @@ export type Database = {
           airport_flexible: boolean
           assigned_to: string | null
           children: number
+          contact_preference: string | null
           created_at: string
           customer_name: string
           departure_airport: string | null
@@ -478,14 +479,17 @@ export type Database = {
           reference: string
           return_airport: string | null
           return_date: string | null
+          room_type: string | null
           status: string
           updated_at: string
+          whatsapp: string | null
         }
         Insert: {
           adults?: number
           airport_flexible?: boolean
           assigned_to?: string | null
           children?: number
+          contact_preference?: string | null
           created_at?: string
           customer_name: string
           departure_airport?: string | null
@@ -517,14 +521,17 @@ export type Database = {
           reference: string
           return_airport?: string | null
           return_date?: string | null
+          room_type?: string | null
           status?: string
           updated_at?: string
+          whatsapp?: string | null
         }
         Update: {
           adults?: number
           airport_flexible?: boolean
           assigned_to?: string | null
           children?: number
+          contact_preference?: string | null
           created_at?: string
           customer_name?: string
           departure_airport?: string | null
@@ -556,8 +563,10 @@ export type Database = {
           reference?: string
           return_airport?: string | null
           return_date?: string | null
+          room_type?: string | null
           status?: string
           updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: [
           {

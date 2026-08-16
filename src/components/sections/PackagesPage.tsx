@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -11,11 +12,13 @@ export function PackagesPage({
   title,
   description,
   cover,
+  banner,
 }: {
   category: PackageCategory;
   title: string;
   description: string;
   cover: string;
+  banner?: ReactNode;
 }) {
   const { t } = useTranslation();
   const { data, isLoading } = useQuery(packagesQuery(category));
@@ -45,6 +48,10 @@ export function PackagesPage({
           <p className="max-w-2xl text-body-lg text-on-dark/90">{description}</p>
         </div>
       </section>
+
+      {banner ? (
+        <div className="mx-auto max-w-7xl px-4 pt-12 md:px-6">{banner}</div>
+      ) : null}
 
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
         {isLoading ? (

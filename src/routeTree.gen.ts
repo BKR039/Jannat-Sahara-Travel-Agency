@@ -26,6 +26,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as UmrahBuilderRouteImport } from './routes/umrah_.builder'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
@@ -135,6 +136,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const UmrahBuilderRoute = UmrahBuilderRouteImport.update({
+  id: '/umrah_/builder',
+  path: '/umrah/builder',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PackagesSlugRoute = PackagesSlugRouteImport.update({
   id: '/packages/$slug',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/umrah/builder': typeof UmrahBuilderRoute
   '/admin/': typeof AdminIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -339,6 +346,7 @@ export interface FileRoutesByTo {
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/umrah/builder': typeof UmrahBuilderRoute
   '/admin': typeof AdminIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/umrah_/builder': typeof UmrahBuilderRoute
   '/admin/': typeof AdminIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -428,6 +437,7 @@ export interface FileRouteTypes {
     | '/legal/privacy'
     | '/legal/terms'
     | '/packages/$slug'
+    | '/umrah/builder'
     | '/admin/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/legal/privacy'
     | '/legal/terms'
     | '/packages/$slug'
+    | '/umrah/builder'
     | '/admin'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -513,6 +524,7 @@ export interface FileRouteTypes {
     | '/legal/privacy'
     | '/legal/terms'
     | '/packages/$slug'
+    | '/umrah_/builder'
     | '/admin/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -542,6 +554,7 @@ export interface RootRouteChildren {
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
   PackagesSlugRoute: typeof PackagesSlugRoute
+  UmrahBuilderRoute: typeof UmrahBuilderRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -666,6 +679,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/umrah_/builder': {
+      id: '/umrah_/builder'
+      path: '/umrah/builder'
+      fullPath: '/umrah/builder'
+      preLoaderRoute: typeof UmrahBuilderRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/packages/$slug': {
       id: '/packages/$slug'
@@ -913,6 +933,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
   PackagesSlugRoute: PackagesSlugRoute,
+  UmrahBuilderRoute: UmrahBuilderRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }

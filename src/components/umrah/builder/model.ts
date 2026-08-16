@@ -1,7 +1,9 @@
 import type {
   BudgetLevel,
+  ContactPreference,
   MadinahArea,
   MakkahArea,
+  RoomType,
 } from "@/lib/umrah-builder.schema";
 
 /** Client-side state of the custom Umrah package builder. */
@@ -26,10 +28,13 @@ export interface BuilderState {
   adults: number;
   children: number;
   infants: number;
+  roomType: RoomType | "";
   notes: string;
   name: string;
   phone: string;
+  whatsapp: string;
   email: string;
+  contactPreference: ContactPreference | "";
 }
 
 export const INITIAL_STATE: BuilderState = {
@@ -53,13 +58,24 @@ export const INITIAL_STATE: BuilderState = {
   adults: 2,
   children: 0,
   infants: 0,
+  roomType: "",
   notes: "",
   name: "",
   phone: "",
+  whatsapp: "",
   email: "",
+  contactPreference: "whatsapp",
 };
 
-export const BUILDER_STEPS = ["dates", "flights", "makkah", "madinah", "travellers", "review"] as const;
+export const BUILDER_STEPS = [
+  "dates",
+  "flights",
+  "travellers",
+  "makkah",
+  "madinah",
+  "room",
+  "contact",
+] as const;
 export type BuilderStep = (typeof BUILDER_STEPS)[number];
 
 const STORAGE_KEY = "janat-umrah-builder-draft";
@@ -142,10 +158,13 @@ export function stepValid(step: BuilderStep, state: BuilderState): boolean {
         return !!state.madinahArea && (state.madinahArea !== "suggest" || !!state.madinahPreference);
       return false;
     case "travellers":
-      return state.adults >= 1 && state.makkahNights + state.madinahNights >= 1;
-    case "review":
+      return state.adults >= 1;
+    case "room":
+      return !!state.roomType && state.makkahNights + state.madinahNights >= 1;
+    case "contact":
       return (
         state.name.trim().length >= 2 &&
+        !!state.contactPreference &&
         /^[+()\d\s-]{6,32}$/.test(state.phone.trim()) &&
         (!state.email.trim() || /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(state.email.trim()))
       );
@@ -208,6 +227,11 @@ export function buildWhatsAppMessage(
   if (state.children) lines.push(t("umrahBuilder.summary.childrenCount", { count: state.children }));
   if (state.infants) lines.push(t("umrahBuilder.summary.infantsCount", { count: state.infants }));
 
+  if (state.roomType) {
+    lines.push("");
+    lines.push(`${t("umrahBuilder.summary.room")}: ${t(`umrahBuilder.room.types.${state.roomType}`)}`);
+  }
+
   if (state.notes.trim()) {
     lines.push("");
     lines.push(`${t("umrahBuilder.summary.notes")}: ${state.notes.trim()}`);
@@ -215,8 +239,8 @@ export function buildWhatsAppMessage(
 
   if (state.name.trim()) {
     lines.push("");
-    lines.push(`${t("umrahBuilder.review.name")}: ${state.name.trim()}`);
-    if (state.phone.trim()) lines.push(`${t("umrahBuilder.review.phone")}: ${state.phone.trim()}`);
+    lines.push(`${t("umrahBuilder.contact.name")}: ${state.name.trim()}`);
+    if (state.phone.trim()) lines.push(`${t("umrahBuilder.contact.phone")}: ${state.phone.trim()}`);
   }
 
   return lines.join("\n");

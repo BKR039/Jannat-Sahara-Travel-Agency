@@ -79,7 +79,7 @@ export const updateRequest = createServerFn({ method: "POST" })
     z
       .object({
         id: z.string().uuid(),
-        kind: z.enum(["flight", "booking", "contact"]),
+        kind: z.enum(["flight", "booking", "contact", "custom_package"]),
         status: z.string().min(1).max(40).optional(),
         assigned_to: z.string().max(120).nullable().optional(),
         internal_notes: z.string().max(4000).optional(),
@@ -103,6 +103,18 @@ export const updateRequest = createServerFn({ method: "POST" })
       if (data.markContacted) patch["last_contact_at"] = now;
       if (data.status === "confirmed") patch["completed_at"] = now;
       const { error } = await supabaseAdmin.from("flight_requests").update(patch as never).eq("id", data.id);
+      if (error) throw error;
+    } else if (data.kind === "custom_package") {
+      const patch: Record<string, unknown> = {};
+      if (data.status) patch["status"] = data.status;
+      if (data.assigned_to !== undefined) patch["assigned_to"] = data.assigned_to;
+      if (data.internal_notes !== undefined) patch["internal_notes"] = data.internal_notes;
+      if (data.admin_reply !== undefined) patch["offer_notes"] = data.admin_reply;
+      if (data.markContacted) patch["last_contact_at"] = now;
+      const { error } = await supabaseAdmin
+        .from("custom_package_requests")
+        .update(patch as never)
+        .eq("id", data.id);
       if (error) throw error;
     } else if (data.kind === "booking") {
       const patch: Record<string, unknown> = {};
