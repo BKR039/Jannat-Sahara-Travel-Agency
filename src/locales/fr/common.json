@@ -774,7 +774,18 @@
       "searchPlaceholder": "Rechercher un hôtel",
       "distanceHaram": "{{value}} m du Haram",
       "distanceMasjid": "{{value}} m de la Mosquée du Prophète",
-      "empty": "Aucun résultat"
+      "empty": "Aucun résultat",
+      "sortLabel": "Trier par",
+      "sort": {
+        "distance": "Proche du Haram",
+        "name": "Nom",
+        "area": "Quartier"
+      },
+      "errorTitle": "Impossible de charger la liste des hôtels",
+      "errorHint": "Vous pouvez continuer votre demande, nous vous aiderons à choisir l'hôtel.",
+      "noneTitle": "Aucun hôtel disponible pour le moment",
+      "noneHint": "Choisissez un quartier et nous vous proposerons un hôtel adapté.",
+      "fallbackAction": "Je préfère que vous me proposiez un hôtel"
     },
     "room": {
       "title": "Quel type de chambre ?",
