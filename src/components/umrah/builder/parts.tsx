@@ -381,11 +381,14 @@ export function SummaryBody({
   state,
   areaLabel,
   budgetLabel,
+  roomLabel,
 }: {
   state: BuilderState;
   areaLabel: (city: "makkah" | "madinah", code: string) => string;
   budgetLabel: (code: string) => string;
+  roomLabel?: string;
 }) {
+
   const { t } = useTranslation();
   const { longDate } = useLocalized();
 
@@ -454,6 +457,8 @@ export function SummaryBody({
         {!!state.infants && (
           <Row label={t("umrahBuilder.travellers.infants")} value={String(state.infants)} />
         )}
+        {roomLabel && <Row label={t("umrahBuilder.summary.room")} value={roomLabel} />}
+
       </div>
     </div>
   );

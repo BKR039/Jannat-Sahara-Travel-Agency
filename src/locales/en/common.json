@@ -657,5 +657,200 @@
     "passwordUpdateFailed": "Failed to update password",
     "seoTitle": "Admin sign in — Janat Sahara Travel",
     "seoDescription": "Secure sign-in for the Janat Sahara Travel management dashboard."
+  },
+  "umrahBuilder": {
+    "cta": {
+      "badge": "Premium experience",
+      "title": "Umrah Package Builder",
+      "subtitle": "Create a trip tailored to your dates, hotels and preferences",
+      "action": "Start building",
+      "point1": "Your dates and hotels",
+      "point2": "Nights in Makkah and Madinah",
+      "point3": "We prepare your offer",
+      "description": "Build your journey step by step: dates, flights, Makkah and Madinah hotels, travellers — we prepare a tailored offer."
+    },
+    "seo": {
+      "title": "Umrah Package Builder | Jannat Sahara Travel",
+      "description": "Build your own Umrah package: dates, flights, hotels and travellers, then receive a tailored offer from our team."
+    },
+    "hero": {
+      "badge": "Tailor-made Umrah",
+      "title": "Build your Umrah package",
+      "subtitle": "Seven simple steps — we take care of the rest."
+    },
+    "steps": {
+      "dates": "Dates",
+      "flights": "Flights",
+      "travellers": "Travellers",
+      "makkah": "Makkah",
+      "madinah": "Madinah",
+      "room": "Room",
+      "contact": "Contact"
+    },
+    "nav": {
+      "back": "Back",
+      "next": "Continue",
+      "submit": "Request my package",
+      "submitting": "Sending…",
+      "progress": "Step {{current}} of {{total}}"
+    },
+    "dates": {
+      "title": "When would you like to travel?",
+      "subtitle": "Choose your departure and return date.",
+      "from": "Departure date",
+      "to": "Return date",
+      "placeholder": "Select a date",
+      "duration": "{{count}} nights",
+      "durationDays": "{{count}} days"
+    },
+    "flights": {
+      "title": "Which airport will you fly from?",
+      "subtitle": "Choose your outbound and return airport.",
+      "departure": "Departure airport",
+      "departureHint": "Tunis-Carthage, Enfidha, Monastir…",
+      "return": "Return airport",
+      "returnHint": "Jeddah or Madinah",
+      "placeholder": "Search an airport",
+      "flexible": "Flexible — advise me",
+      "flexibleTitle": "I don't know yet",
+      "flexibleDesc": "We'll suggest the best available option",
+      "note": "Flight fares are confirmed when we prepare your offer."
+    },
+    "travellers": {
+      "title": "How many travellers?",
+      "subtitle": "Add everyone travelling with you.",
+      "adults": "Adults",
+      "adultsHint": "12 years and older",
+      "children": "Children",
+      "childrenHint": "2 to 11 years",
+      "infants": "Infants",
+      "infantsHint": "Under 2 years",
+      "total": "Total: {{count}} travellers"
+    },
+    "makkah": {
+      "title": "Your stay in Makkah",
+      "subtitle": "Choose the number of nights and your hotel or area."
+    },
+    "madinah": {
+      "title": "Your stay in Madinah",
+      "subtitle": "Choose the number of nights and your hotel or area."
+    },
+    "stay": {
+      "nights": "Number of nights",
+      "nightsHint": "Can be zero if you are not staying here",
+      "modeHotel": "I know the hotel I want",
+      "modeHotelDesc": "Pick from our selection",
+      "modeArea": "I don't know — help me choose",
+      "modeAreaDesc": "Pick an area and a budget level",
+      "areaLabel": "Preferred area",
+      "budgetLabel": "Budget level",
+      "noHotels": "Our hotel selection isn't available yet — choose an area and we'll suggest the best match.",
+      "skipped": "No stay in this city"
+    },
+    "areas": {
+      "makkah": {
+        "haram_close": "Very close to the Haram",
+        "central": "Central Makkah",
+        "ibrahim_khalil": "Ibrahim Al Khalil street",
+        "ajyad": "Ajyad",
+        "suggest": "Suggest for me"
+      },
+      "madinah": {
+        "very_close": "Very close to the Prophet's Mosque",
+        "close": "Central Madinah",
+        "value": "Best value",
+        "suggest": "Suggest for me"
+      }
+    },
+    "budgets": {
+      "economy": "Economy",
+      "standard": "Standard",
+      "premium": "Premium",
+      "luxury": "Luxury"
+    },
+    "hotels": {
+      "select": "Choose this hotel",
+      "selected": "Selected",
+      "searchPlaceholder": "Search a hotel",
+      "distanceHaram": "{{value}} m from the Haram",
+      "distanceMasjid": "{{value}} m from the Prophet's Mosque",
+      "empty": "No matching results"
+    },
+    "room": {
+      "title": "Which room suits you?",
+      "subtitle": "One choice only — we confirm details together later.",
+      "types": {
+        "double": "Double room",
+        "triple": "Triple room",
+        "quadruple": "Quadruple room",
+        "family": "Family room",
+        "flexible": "No preference — advise me"
+      }
+    },
+    "contact": {
+      "title": "How should we contact you?",
+      "subtitle": "We only use these details to prepare your offer.",
+      "name": "Full name",
+      "phone": "Phone number",
+      "whatsapp": "WhatsApp number (if different)",
+      "email": "Email (optional)",
+      "preference": "Preferred contact method",
+      "preferences": {
+        "whatsapp": "WhatsApp",
+        "phone": "Phone",
+        "email": "Email"
+      },
+      "notes": "Additional notes",
+      "notesPlaceholder": "Any special request: meals, accessibility, closeness to the Haram…"
+    },
+    "summary": {
+      "title": "Your trip",
+      "dates": "Dates",
+      "flights": "Flights",
+      "travellers": "Travellers",
+      "makkah": "Makkah",
+      "madinah": "Madinah",
+      "nights": "Nights",
+      "nightsCount": "{{count}} nights",
+      "hotel": "Hotel",
+      "area": "Area",
+      "budget": "Budget",
+      "room": "Room",
+      "notes": "Notes",
+      "notChosen": "Not chosen yet",
+      "adultsCount": "{{count}} adults",
+      "childrenCount": "{{count}} children",
+      "infantsCount": "{{count}} infants",
+      "noPrice": "We'll prepare a personalized offer based on your choices."
+    },
+    "validation": {
+      "dates": "Please choose your departure and return dates.",
+      "dateOrder": "The return date must be after the departure date.",
+      "flights": "Choose your airports or select “Flexible”.",
+      "stay": "Please complete the stay details.",
+      "nights": "At least one night in Makkah or Madinah is required.",
+      "adults": "At least one adult is required.",
+      "room": "Please choose a room type.",
+      "name": "Please enter your full name.",
+      "phone": "Please enter a valid phone number.",
+      "email": "Please enter a valid email address."
+    },
+    "success": {
+      "title": "Your request has been sent",
+      "subtitle": "Our team will contact you shortly to prepare your personalized package.",
+      "reference": "Reference",
+      "whatsapp": "Send the summary on WhatsApp",
+      "back": "Back to Umrah"
+    },
+    "errors": {
+      "submit": "We couldn't send your request. Please try again."
+    },
+    "whatsapp": {
+      "intro": "Hello Janat Sahara, I'd like a custom Umrah package:"
+    },
+    "a11y": {
+      "increase": "Increase {{label}}",
+      "decrease": "Decrease {{label}}"
+    }
   }
 }

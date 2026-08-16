@@ -657,5 +657,200 @@
     "passwordUpdateFailed": "Échec de la mise à jour du mot de passe",
     "seoTitle": "Connexion admin — Janat Sahara Travel",
     "seoDescription": "Connexion sécurisée au tableau de bord de gestion Janat Sahara Travel."
+  },
+  "umrahBuilder": {
+    "cta": {
+      "badge": "Expérience premium",
+      "title": "Créateur de forfait Omra",
+      "subtitle": "Personnalisez votre voyage selon vos dates, hôtels et préférences",
+      "action": "Commencer",
+      "point1": "Vos dates et vos hôtels",
+      "point2": "Nuits à La Mecque et Médine",
+      "point3": "Nous préparons votre offre",
+      "description": "Composez votre voyage étape par étape : dates, vols, hôtels à La Mecque et Médine, voyageurs — nous préparons une offre sur mesure."
+    },
+    "seo": {
+      "title": "Créateur de forfait Omra | Jannat Sahara Voyages",
+      "description": "Composez votre forfait Omra sur mesure : dates, vols, hôtels et voyageurs, puis recevez une offre personnalisée de notre équipe."
+    },
+    "hero": {
+      "badge": "Omra sur mesure",
+      "title": "Composez votre forfait Omra",
+      "subtitle": "Sept étapes simples — nous nous occupons du reste."
+    },
+    "steps": {
+      "dates": "Dates",
+      "flights": "Vols",
+      "travellers": "Voyageurs",
+      "makkah": "La Mecque",
+      "madinah": "Médine",
+      "room": "Chambre",
+      "contact": "Contact"
+    },
+    "nav": {
+      "back": "Retour",
+      "next": "Continuer",
+      "submit": "Demander mon forfait",
+      "submitting": "Envoi…",
+      "progress": "Étape {{current}} sur {{total}}"
+    },
+    "dates": {
+      "title": "Quand souhaitez-vous partir ?",
+      "subtitle": "Choisissez votre date de départ et de retour.",
+      "from": "Date de départ",
+      "to": "Date de retour",
+      "placeholder": "Choisir une date",
+      "duration": "{{count}} nuits",
+      "durationDays": "{{count}} jours"
+    },
+    "flights": {
+      "title": "Depuis quel aéroport ?",
+      "subtitle": "Choisissez l'aéroport de départ et celui du retour.",
+      "departure": "Aéroport de départ",
+      "departureHint": "Tunis-Carthage, Enfidha, Monastir…",
+      "return": "Aéroport de retour",
+      "returnHint": "Djeddah ou Médine",
+      "placeholder": "Rechercher un aéroport",
+      "flexible": "Flexible — conseillez-moi",
+      "flexibleTitle": "Je ne sais pas encore",
+      "flexibleDesc": "Nous vous proposerons la meilleure option",
+      "note": "Les tarifs aériens sont confirmés lors de la préparation de l'offre."
+    },
+    "travellers": {
+      "title": "Combien de voyageurs ?",
+      "subtitle": "Indiquez les personnes qui voyagent avec vous.",
+      "adults": "Adultes",
+      "adultsHint": "12 ans et plus",
+      "children": "Enfants",
+      "childrenHint": "De 2 à 11 ans",
+      "infants": "Bébés",
+      "infantsHint": "Moins de 2 ans",
+      "total": "Total : {{count}} voyageurs"
+    },
+    "makkah": {
+      "title": "Votre séjour à La Mecque",
+      "subtitle": "Choisissez le nombre de nuits et votre hôtel ou quartier."
+    },
+    "madinah": {
+      "title": "Votre séjour à Médine",
+      "subtitle": "Choisissez le nombre de nuits et votre hôtel ou quartier."
+    },
+    "stay": {
+      "nights": "Nombre de nuits",
+      "nightsHint": "Peut être zéro si vous ne séjournez pas ici",
+      "modeHotel": "Je connais mon hôtel",
+      "modeHotelDesc": "Choisir dans notre sélection",
+      "modeArea": "Je ne sais pas — aidez-moi",
+      "modeAreaDesc": "Choisir un quartier et un budget",
+      "areaLabel": "Quartier souhaité",
+      "budgetLabel": "Niveau de budget",
+      "noHotels": "Notre sélection d'hôtels n'est pas encore disponible — indiquez un quartier et nous vous proposerons le meilleur choix.",
+      "skipped": "Pas de séjour dans cette ville"
+    },
+    "areas": {
+      "makkah": {
+        "haram_close": "Très proche du Haram",
+        "central": "Centre de La Mecque",
+        "ibrahim_khalil": "Rue Ibrahim Al Khalil",
+        "ajyad": "Ajyad",
+        "suggest": "Proposez-moi"
+      },
+      "madinah": {
+        "very_close": "Très proche de la Mosquée du Prophète",
+        "close": "Centre de Médine",
+        "value": "Option économique",
+        "suggest": "Proposez-moi"
+      }
+    },
+    "budgets": {
+      "economy": "Économique",
+      "standard": "Standard",
+      "premium": "Supérieur",
+      "luxury": "Luxe"
+    },
+    "hotels": {
+      "select": "Choisir cet hôtel",
+      "selected": "Sélectionné",
+      "searchPlaceholder": "Rechercher un hôtel",
+      "distanceHaram": "{{value}} m du Haram",
+      "distanceMasjid": "{{value}} m de la Mosquée du Prophète",
+      "empty": "Aucun résultat"
+    },
+    "room": {
+      "title": "Quel type de chambre ?",
+      "subtitle": "Un seul choix — nous confirmons les détails ensemble.",
+      "types": {
+        "double": "Chambre double",
+        "triple": "Chambre triple",
+        "quadruple": "Chambre quadruple",
+        "family": "Chambre familiale",
+        "flexible": "Peu importe — conseillez-moi"
+      }
+    },
+    "contact": {
+      "title": "Comment vous contacter ?",
+      "subtitle": "Ces informations servent uniquement à préparer votre offre.",
+      "name": "Nom complet",
+      "phone": "Téléphone",
+      "whatsapp": "Numéro WhatsApp (si différent)",
+      "email": "E-mail (optionnel)",
+      "preference": "Moyen de contact préféré",
+      "preferences": {
+        "whatsapp": "WhatsApp",
+        "phone": "Téléphone",
+        "email": "E-mail"
+      },
+      "notes": "Notes complémentaires",
+      "notesPlaceholder": "Demande particulière : repas, accessibilité, proximité du Haram…"
+    },
+    "summary": {
+      "title": "Votre voyage",
+      "dates": "Dates",
+      "flights": "Vols",
+      "travellers": "Voyageurs",
+      "makkah": "La Mecque",
+      "madinah": "Médine",
+      "nights": "Nuits",
+      "nightsCount": "{{count}} nuits",
+      "hotel": "Hôtel",
+      "area": "Quartier",
+      "budget": "Budget",
+      "room": "Chambre",
+      "notes": "Notes",
+      "notChosen": "À définir",
+      "adultsCount": "{{count}} adultes",
+      "childrenCount": "{{count}} enfants",
+      "infantsCount": "{{count}} bébés",
+      "noPrice": "Nous préparerons votre offre personnalisée"
+    },
+    "validation": {
+      "dates": "Veuillez choisir vos dates de départ et de retour.",
+      "dateOrder": "La date de retour doit suivre la date de départ.",
+      "flights": "Choisissez vos aéroports ou sélectionnez « Flexible ».",
+      "stay": "Veuillez compléter les détails du séjour.",
+      "nights": "Au moins une nuit à La Mecque ou à Médine.",
+      "adults": "Au moins un adulte est requis.",
+      "room": "Veuillez choisir un type de chambre.",
+      "name": "Veuillez indiquer votre nom complet.",
+      "phone": "Veuillez saisir un numéro de téléphone valide.",
+      "email": "Veuillez saisir une adresse e-mail valide."
+    },
+    "success": {
+      "title": "Votre demande a bien été envoyée",
+      "subtitle": "Notre équipe vous contactera prochainement pour préparer votre offre personnalisée.",
+      "reference": "Référence",
+      "whatsapp": "Envoyer le résumé sur WhatsApp",
+      "back": "Retour à l'Omra"
+    },
+    "errors": {
+      "submit": "Nous n'avons pas pu envoyer votre demande. Veuillez réessayer."
+    },
+    "whatsapp": {
+      "intro": "Bonjour Janat Sahara, je souhaite un forfait Omra personnalisé :"
+    },
+    "a11y": {
+      "increase": "Augmenter {{label}}",
+      "decrease": "Diminuer {{label}}"
+    }
   }
 }

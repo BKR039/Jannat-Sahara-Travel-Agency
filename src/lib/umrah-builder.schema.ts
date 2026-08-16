@@ -11,6 +11,8 @@ import { z } from "zod";
 export const MAKKAH_AREAS = ["haram_close", "central", "ibrahim_khalil", "ajyad", "suggest"] as const;
 export const MADINAH_AREAS = ["very_close", "close", "value", "suggest"] as const;
 export const BUDGET_LEVELS = ["economy", "standard", "premium", "luxury"] as const;
+export const ROOM_TYPES = ["double", "triple", "quadruple", "family", "flexible"] as const;
+export const CONTACT_PREFERENCES = ["whatsapp", "phone", "email"] as const;
 
 export const CUSTOM_REQUEST_STATUSES = [
   "new",
@@ -24,6 +26,8 @@ export const CUSTOM_REQUEST_STATUSES = [
 export type MakkahArea = (typeof MAKKAH_AREAS)[number];
 export type MadinahArea = (typeof MADINAH_AREAS)[number];
 export type BudgetLevel = (typeof BUDGET_LEVELS)[number];
+export type RoomType = (typeof ROOM_TYPES)[number];
+export type ContactPreference = (typeof CONTACT_PREFERENCES)[number];
 export type CustomRequestStatus = (typeof CUSTOM_REQUEST_STATUSES)[number];
 
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date");
@@ -39,6 +43,14 @@ export const CustomPackageRequestInput = z
       .max(32)
       .regex(/^[+()\d\s-]+$/, "Invalid phone number"),
     email: z.string().trim().email().max(254).optional().or(z.literal("")),
+    whatsapp: z
+      .string()
+      .trim()
+      .max(32)
+      .regex(/^[+()\d\s-]*$/, "Invalid phone number")
+      .optional()
+      .or(z.literal("")),
+    contactPreference: z.enum(CONTACT_PREFERENCES).optional().or(z.literal("")),
     locale: z.enum(["ar", "fr", "en"]).optional(),
 
     departureDate: DATE,
@@ -64,6 +76,7 @@ export const CustomPackageRequestInput = z
     children: z.number().int().min(0).max(30),
     infants: z.number().int().min(0).max(30),
 
+    roomType: z.enum(ROOM_TYPES).optional().or(z.literal("")),
     notes: OPTIONAL_TEXT(2000),
   })
   .refine((v) => v.returnDate >= v.departureDate, {
