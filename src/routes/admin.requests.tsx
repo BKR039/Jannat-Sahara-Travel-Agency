@@ -31,12 +31,13 @@ export const Route = createFileRoute("/admin/requests")({
   component: RequestsPage,
 });
 
-type Kind = "all" | "booking" | "flight" | "contact";
+type Kind = "all" | "booking" | "flight" | "contact" | "custom_package";
 
 const KIND_ICON = {
   booking: CalendarCheck,
   flight: Plane,
   contact: MessageSquare,
+  custom_package: Sparkles,
 } as const;
 
 function RequestsPage() {
@@ -95,6 +96,11 @@ function RequestsPage() {
             { value: "booking", label: "Bookings", count: rows.filter((r) => r.kind === "booking").length },
             { value: "flight", label: "Flights", count: rows.filter((r) => r.kind === "flight").length },
             { value: "contact", label: "Messages", count: rows.filter((r) => r.kind === "contact").length },
+            {
+              value: "custom_package",
+              label: "Custom Umrah",
+              count: rows.filter((r) => r.kind === "custom_package").length,
+            },
           ]}
         />
         <SearchInput
