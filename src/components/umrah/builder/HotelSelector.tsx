@@ -77,7 +77,7 @@ function HotelSearch({
           if (e.key === "Escape") onChange("");
         }}
         placeholder={placeholder}
-        className="h-14 w-full rounded-2xl border border-border-subtle bg-surface-sunken/40 ps-14 pe-5 text-body outline-none transition-all placeholder:text-muted-foreground focus:border-primary/60 focus:bg-card focus:shadow-[0_10px_30px_-22px_hsl(var(--foreground)/0.5)]"
+        className="h-14 w-full rounded-2xl border border-border-subtle bg-surface-sunken/40 ps-14 pe-5 text-body outline-none transition-all placeholder:text-muted-foreground focus:border-primary/60 focus:bg-card focus:shadow-md"
       />
     </div>
   );
@@ -155,8 +155,8 @@ function HotelOption({
       className={cn(
         "group relative block cursor-pointer overflow-hidden rounded-3xl border bg-card p-5 transition-all duration-200 sm:p-6",
         selected
-          ? "border-primary/60 bg-primary/[0.04] shadow-[0_18px_44px_-30px_hsl(var(--primary)/0.55)]"
-          : "border-border-subtle hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-[0_16px_38px_-30px_hsl(var(--foreground)/0.55)]",
+          ? "border-primary/60 bg-primary/[0.04] shadow-lg"
+          : "border-border-subtle hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md",
       )}
     >
       {/* Warm accent rail — RTL aware via logical inset */}
