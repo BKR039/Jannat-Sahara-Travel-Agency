@@ -268,6 +268,17 @@ export function DateRangeField({
 
 /* ----------------------------------------------------------- trip summary */
 
+function SummaryBlock({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="border-b border-border-subtle pb-3.5 last:border-0 last:pb-0">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </p>
+      <div className="mt-1.5 space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
 export function SummaryBody({
   state,
   areaLabel,
@@ -279,78 +290,80 @@ export function SummaryBody({
   budgetLabel: (code: string) => string;
   roomLabel?: string;
 }) {
-
   const { t } = useTranslation();
   const { longDate } = useLocalized();
 
-  const Row = ({ label, value }: { label: string; value: string }) => (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className="text-caption text-muted-foreground">{label}</span>
-      <span className="text-caption font-semibold text-end">{value}</span>
-    </div>
-  );
+  const pending = <span className="text-caption text-muted-foreground">{t("umrahBuilder.summary.notChosen")}</span>;
 
   const stay = (city: "makkah" | "madinah") => {
     const nights = city === "makkah" ? state.makkahNights : state.madinahNights;
     const hotel = city === "makkah" ? state.makkahHotelName : state.madinahHotelName;
     const area = city === "makkah" ? state.makkahArea : state.madinahArea;
     const budget = city === "makkah" ? state.makkahPreference : state.madinahPreference;
+    const place = hotel || (area ? areaLabel(city, area) : "");
     return (
-      <div className="space-y-1.5 rounded-2xl bg-surface-sunken/60 p-3">
-        <p className="text-caption font-bold uppercase tracking-wide text-primary">
-          {t(`umrahBuilder.summary.${city}`)}
+      <SummaryBlock label={t(`umrahBuilder.summary.${city}`)}>
+        {place ? (
+          <p
+            className={cn(
+              "text-small font-bold leading-snug",
+              hotel ? "text-primary" : "text-foreground",
+            )}
+          >
+            {place}
+          </p>
+        ) : (
+          <p>{pending}</p>
+        )}
+        <p className="text-caption text-muted-foreground">
+          {nights ? t("umrahBuilder.summary.nightsCount", { count: nights }) : "—"}
+          {budget ? ` · ${budgetLabel(budget)}` : ""}
         </p>
-        <Row
-          label={t("umrahBuilder.summary.nights")}
-          value={nights ? t("umrahBuilder.summary.nightsCount", { count: nights }) : "—"}
-        />
-        <Row
-          label={t("umrahBuilder.summary.hotel")}
-          value={hotel || (area ? areaLabel(city, area) : t("umrahBuilder.summary.notChosen"))}
-        />
-        {budget && <Row label={t("umrahBuilder.summary.budget")} value={budgetLabel(budget)} />}
-      </div>
+      </SummaryBlock>
     );
   };
 
+  const travellers = [
+    t("umrahBuilder.summary.adultsCount", { count: state.adults }),
+    state.children ? t("umrahBuilder.summary.childrenCount", { count: state.children }) : "",
+    state.infants ? t("umrahBuilder.summary.infantsCount", { count: state.infants }) : "",
+  ].filter(Boolean);
+
   return (
-    <div className="space-y-3">
-      <div className="space-y-1.5 rounded-2xl bg-surface-sunken/60 p-3">
-        <p className="text-caption font-bold uppercase tracking-wide text-primary">
-          {t("umrahBuilder.summary.dates")}
-        </p>
-        <p className="text-caption font-semibold">
-          {state.departureDate ? longDate(state.departureDate) : t("umrahBuilder.summary.notChosen")}
-          {state.returnDate ? ` → ${longDate(state.returnDate)}` : ""}
-        </p>
-        <p className="text-caption text-muted-foreground">
-          {t("umrahBuilder.summary.flights")}:{" "}
+    <div className="space-y-3.5">
+      <SummaryBlock label={t("umrahBuilder.summary.dates")}>
+        {state.departureDate ? (
+          <p className="text-small font-bold leading-snug">
+            {longDate(state.departureDate)}
+            {state.returnDate ? (
+              <>
+                <span className="mx-1 text-muted-foreground">→</span>
+                {longDate(state.returnDate)}
+              </>
+            ) : null}
+          </p>
+        ) : (
+          <p>{pending}</p>
+        )}
+      </SummaryBlock>
+
+      <SummaryBlock label={t("umrahBuilder.summary.flights")}>
+        <p className="text-small font-semibold">
           {state.airportFlexible
             ? t("umrahBuilder.flights.flexible")
             : state.departureAirport && state.returnAirport
               ? `${state.departureAirport} → ${state.returnAirport}`
-              : t("umrahBuilder.summary.notChosen")}
+              : pending}
         </p>
-      </div>
+      </SummaryBlock>
+
+      <SummaryBlock label={t("umrahBuilder.summary.travellers")}>
+        <p className="text-small font-semibold">{travellers.join(" · ")}</p>
+        {roomLabel && <p className="text-caption text-muted-foreground">{roomLabel}</p>}
+      </SummaryBlock>
+
       {stay("makkah")}
       {stay("madinah")}
-      <div className="space-y-1.5 rounded-2xl bg-surface-sunken/60 p-3">
-        <p className="text-caption font-bold uppercase tracking-wide text-primary">
-          {t("umrahBuilder.summary.travellers")}
-        </p>
-        <Row
-          label={t("umrahBuilder.travellers.adults")}
-          value={String(state.adults)}
-        />
-        {!!state.children && (
-          <Row label={t("umrahBuilder.travellers.children")} value={String(state.children)} />
-        )}
-        {!!state.infants && (
-          <Row label={t("umrahBuilder.travellers.infants")} value={String(state.infants)} />
-        )}
-        {roomLabel && <Row label={t("umrahBuilder.summary.room")} value={roomLabel} />}
-
-      </div>
     </div>
   );
 }
@@ -362,26 +375,28 @@ export function SummaryPanel({ children }: { children: ReactNode }) {
   return (
     <>
       <aside className="hidden lg:block">
-        <div className="sticky top-24 rounded-3xl border border-border-subtle bg-card p-5 shadow-sm">
-          <h2 className="mb-3 text-small font-bold">{t("umrahBuilder.summary.title")}</h2>
-          {children}
+        <div className="sticky top-24 overflow-hidden rounded-3xl border border-border-subtle bg-card shadow-sm">
+          <div className="border-b border-border-subtle bg-surface-sunken/50 px-5 py-4">
+            <h2 className="text-small font-bold tracking-wide">{t("umrahBuilder.summary.title")}</h2>
+          </div>
+          <div className="p-5">{children}</div>
         </div>
       </aside>
 
       <div className="lg:hidden">
-        <div className="rounded-3xl border border-border-subtle bg-card">
+        <div className="overflow-hidden rounded-3xl border border-border-subtle bg-card">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
-            className="flex w-full items-center justify-between gap-2 p-4"
+            className="flex w-full items-center justify-between gap-2 bg-surface-sunken/50 p-4"
           >
             <span className="text-small font-bold">{t("umrahBuilder.summary.title")}</span>
             <ChevronDown
               className={cn("h-4 w-4 text-primary transition-transform", open && "rotate-180")}
             />
           </button>
-          {open && <div className="border-t border-border-subtle p-4">{children}</div>}
+          {open && <div className="p-5">{children}</div>}
         </div>
       </div>
     </>
