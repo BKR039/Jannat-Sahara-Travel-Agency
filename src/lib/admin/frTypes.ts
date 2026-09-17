@@ -10,8 +10,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
  * query boundary (`select("*")` results, `insert`/`update` payloads).
  */
 
-type Row<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Row"];
+type Row<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
 
 export type PackageRowFr = Row<"packages"> & {
   title_fr: string | null;

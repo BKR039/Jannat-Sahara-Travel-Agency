@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import i18n from "@/lib/i18n";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { FlightRequestSection } from "@/components/flights/FlightRequestSection";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/flights")({
   head: () => ({
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/flights")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/flights" }],
+    links: [canonical("/flights")],
   }),
   component: () => (
     <SiteLayout>

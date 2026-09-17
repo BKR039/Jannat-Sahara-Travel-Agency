@@ -1,8 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
-import { AutoSaveBar, FieldGrid, SettingsCard, SettingsSection, TextField } from "./parts";
+import { SaveBar, FieldGrid, SettingsCard, SettingsSection, TextField } from "./parts";
 import { useContactSettings, type ContactFieldSpec } from "./useContactSettings";
 import { email as emailValidator, url as urlValidator } from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
 
 const CHANNELS: ContactFieldSpec[] = [
   {
@@ -45,24 +46,34 @@ const CHANNELS: ContactFieldSpec[] = [
 ];
 
 export function ContactSection() {
+  const { t } = useTranslation("admin");
   const s = useContactSettings(CHANNELS);
 
-  if (s.loading) return <Skeleton className="h-64 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-64 w-full rounded-card" />;
 
   const filled = CHANNELS.filter((c) => (s.form[c.key] ?? "").trim());
 
   return (
     <SettingsSection
-      title="Contact"
-      description="The channels travellers use to reach you. Empty channels are hidden from the public website."
+      title={t("content.settings.nav.contact.label")}
+      description={t("content.settings.contact.description")}
     >
-      <SettingsCard title="Contact channels" description="Phone, email and messaging.">
+      <SettingsCard
+        title={t("content.settings.contact.channelsTitle")}
+        description={t("content.settings.contact.channelsDescription")}
+      >
         <FieldGrid>
+          {/*
+           * `spec.label` is the English seed written to the `contact_info`
+           * row, not operator-facing copy — rendering it directly meant an
+           * Arabic operator read "Landline" and "WhatsApp link". The
+           * dictionary answers first; the seed is only the fallback.
+           */}
           {CHANNELS.map((c) => (
             <TextField
               key={c.key}
-              label={c.label}
-              hint={c.hint}
+              label={t(`content.settings.fields.${c.key}.label`, c.label)}
+              hint={c.hint ? t(`content.settings.fields.${c.key}.hint`, c.hint) : undefined}
               placeholder={c.placeholder}
               error={s.errors[c.key]}
               value={s.form[c.key] ?? ""}
@@ -73,8 +84,8 @@ export function ContactSection() {
       </SettingsCard>
 
       <SettingsCard
-        title="Live preview"
-        description="How the contact card renders on the website."
+        title={t("content.settings.livePreview.title")}
+        description={t("content.settings.contact.livePreviewDescription")}
       >
         {filled.length ? (
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -87,18 +98,22 @@ export function ContactSection() {
                   <DynamicIcon name={c.icon} className="h-4 w-4" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-caption text-muted-foreground">{c.label}</span>
+                  <span className="block text-caption text-muted-foreground">
+                    {t(`content.settings.fields.${c.key}.label`, c.label)}
+                  </span>
                   <span className="block truncate text-small font-medium">{s.form[c.key]}</span>
                 </span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-small text-muted-foreground">Add at least one contact channel.</p>
+          <p className="text-small text-muted-foreground">
+            {t("content.settings.contact.emptyHint")}
+          </p>
         )}
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

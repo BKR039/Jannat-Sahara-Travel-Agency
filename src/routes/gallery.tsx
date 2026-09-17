@@ -9,9 +9,11 @@ import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
 import { ImageLightbox } from "@/components/common/ImageLightbox";
 import { LazyImage } from "@/components/common/LazyImage";
+import { Images } from "lucide-react";
 import { useInView } from "@/hooks/useInView";
 import { galleryQuery } from "@/lib/queries";
-
+import { categoryKey } from "@/lib/category-label";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/gallery")({
       { property: "og:description", content: i18n.t("seo.gallery.ogDescription") },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "/gallery" }],
+    links: [canonical("/gallery")],
   }),
   component: GalleryPage,
 });
@@ -54,8 +56,10 @@ function GalleryPage() {
 
   const chipClass = useCallback(
     (active: boolean) =>
-      `rounded-full px-4 py-2 text-small font-semibold transition-colors duration-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
-        active ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-muted/80"
+      `inline-flex min-h-11 items-center rounded-badge border px-4 py-2 text-caption font-semibold transition-colors duration-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+        active
+          ? "border-transparent bg-gradient-sunrise text-primary-foreground"
+          : "border-border-subtle bg-card text-muted-foreground hover:border-primary hover:text-primary"
       }`,
     [],
   );
@@ -63,7 +67,13 @@ function GalleryPage() {
   return (
     <SiteLayout>
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <SectionHeading eyebrow="📷" title={t("home.gallery")} description={t("home.galleryDesc")} />
+        <SectionHeading
+          eyebrow={t("home.gallery")}
+          icon={Images}
+          title={t("home.gallery")}
+          as="h1"
+          description={t("home.galleryDesc")}
+        />
 
         <div className="mb-8 flex flex-wrap justify-center gap-2">
           <button
@@ -82,7 +92,7 @@ function GalleryPage() {
               onClick={() => setCat(c)}
               className={chipClass(cat === c)}
             >
-              {t(`categories.${c}`, { defaultValue: c })}
+              {t(`categories.${categoryKey(c)}`, { defaultValue: c })}
             </button>
           ))}
         </div>
@@ -111,7 +121,9 @@ function GalleryPage() {
                 />
                 {L(g, "title", "base") && (
                   <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition group-hover:opacity-100">
-                    <span className="text-small font-semibold text-on-dark">{L(g, "title", "base")}</span>
+                    <span className="text-small font-semibold text-on-dark">
+                      {L(g, "title", "base")}
+                    </span>
                   </div>
                 )}
               </button>
@@ -120,8 +132,11 @@ function GalleryPage() {
         )}
         {visible < filtered.length && <div ref={sentinelRef} className="h-10" aria-hidden="true" />}
       </section>
-      <ImageLightbox src={preview?.src ?? null} alt={preview?.alt} onClose={() => setPreview(null)} />
+      <ImageLightbox
+        src={preview?.src ?? null}
+        alt={preview?.alt}
+        onClose={() => setPreview(null)}
+      />
     </SiteLayout>
-
   );
 }

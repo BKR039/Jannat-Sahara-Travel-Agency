@@ -4,12 +4,42 @@
  * Semantic design tokens only — no hardcoded colours.
  */
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { ChevronRight, Search, X } from "lucide-react";
+import { AlertTriangle, ChevronRight, RefreshCw, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { StatusChip } from "@/components/ds";
 
 /* --------------------------------- layout --------------------------------- */
+
+/**
+ * The heading block every admin screen opens with.
+ *
+ * Exported on its own because `admin/ui`'s `PageHeader` was a second,
+ * near-identical implementation of it — different heading size, different
+ * bottom margin, different action wrapper — which is why screens built at
+ * different times did not line up with each other. There is one of these now,
+ * and `PageHeader` forwards to it.
+ */
+export function PageHeading({
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
+  return (
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="text-h4 font-bold tracking-tight text-foreground">{title}</h1>
+        {description && <p className="mt-1 text-small text-muted-foreground">{description}</p>}
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+    </div>
+  );
+}
 
 export function Page({
   title,
@@ -23,14 +53,8 @@ export function Page({
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[1400px]">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h1 className="text-h4 font-bold tracking-tight text-foreground">{title}</h1>
-          {description && <p className="mt-1 text-small text-muted-foreground">{description}</p>}
-        </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
-      </div>
+    <div className="w-full">
+      <PageHeading title={title} description={description} actions={actions} />
       {children}
     </div>
   );
@@ -55,10 +79,7 @@ export function Panel({
 }) {
   return (
     <section
-      className={cn(
-        "overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm",
-        className,
-      )}
+      className={cn("overflow-hidden rounded-card border border-border-subtle bg-card", className)}
     >
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle px-4 py-3 sm:px-5">
@@ -93,11 +114,13 @@ export function FormSection({
   aside?: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-border-subtle bg-card p-4 shadow-sm sm:p-5">
+    <section className="rounded-card border border-border-subtle bg-card p-4 sm:p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-small font-semibold">{title}</h2>
-          {description && <p className="mt-0.5 text-caption text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="mt-0.5 text-caption text-muted-foreground">{description}</p>
+          )}
         </div>
         {aside}
       </div>
@@ -118,7 +141,7 @@ export function Disclosure({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-2xl border border-border-subtle bg-card shadow-sm">
+    <div className="rounded-card border border-border-subtle bg-card">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -144,7 +167,6 @@ export function KpiCard({
   hint,
   series,
   icon: Icon,
-  tone = "primary",
 }: {
   label: string;
   value: string | number;
@@ -152,26 +174,40 @@ export function KpiCard({
   hint?: string;
   series?: number[];
   icon: React.ComponentType<{ className?: string }>;
-  tone?: "primary" | "green" | "gold" | "muted";
 }) {
-  const tones: Record<string, string> = {
-    primary: "bg-accent text-primary",
-    green: "bg-mint-muted text-brand-green",
-    gold: "bg-secondary-muted text-brand-gold",
-    muted: "bg-muted text-muted-foreground",
-  };
+  /*
+   * The icon container used to carry one of four filled tints
+   * (orange / green / gold / grey) chosen per metric. That was decorative
+   * colour: nothing about "travellers" is gold and nothing about "bookings" is
+   * green, so five tiles read as five unrelated widgets. A single bordered
+   * container — the reference's treatment — lets the numbers do the talking,
+   * and leaves colour free to mean something when it appears on the delta.
+   */
   const up = (delta ?? 0) >= 0;
+  /* A metric reading zero is real information, but it should not compete with
+     one that is not. Money arrives pre-formatted ("0 TND"), so this asks
+     whether the value contains any significant digit rather than comparing to
+     a literal zero. */
+  const isZero =
+    value === 0 || (typeof value === "string" && value.trim() !== "" && !/[1-9]/.test(value));
   return (
-    <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm">
+    <div className="rounded-card border border-border-subtle bg-card p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="text-caption font-semibold uppercase tracking-wide text-muted-foreground">
           {label}
         </p>
-        <span className={cn("rounded-xl p-2", tones[tone])}>
+        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-input border border-border-subtle bg-surface-sunken/50 text-muted-foreground">
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <p className="mt-3 text-h3 font-bold tabular-nums leading-none">{value}</p>
+      <p
+        className={cn(
+          "mt-3 text-h3 font-bold tabular-nums leading-none",
+          isZero && "text-muted-foreground/60",
+        )}
+      >
+        {value}
+      </p>
       <div className="mt-3 flex items-end justify-between gap-3">
         <div className="min-w-0">
           {delta != null && Number.isFinite(delta) && (
@@ -198,7 +234,10 @@ export function Sparkline({ data, className = "" }: { data: number[]; className?
     const max = Math.max(...data, 1);
     const step = 100 / Math.max(data.length - 1, 1);
     return data
-      .map((v, i) => `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${(28 - (v / max) * 26).toFixed(1)}`)
+      .map(
+        (v, i) =>
+          `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${(28 - (v / max) * 26).toFixed(1)}`,
+      )
       .join(" ");
   }, [data]);
   return (
@@ -243,7 +282,7 @@ export function InsightCard({
     critical: "bg-danger-muted text-destructive",
   };
   return (
-    <article className={cn("rounded-2xl border p-4", tones[severity])}>
+    <article className={cn("rounded-card border p-4", tones[severity])}>
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -263,26 +302,6 @@ export function InsightCard({
 
 /* ------------------------------ status badges ------------------------------ */
 
-const STATUS_TONE: Record<string, string> = {
-  new: "bg-info-muted text-info",
-  unread: "bg-info-muted text-info",
-  pending: "bg-warning-muted text-warning",
-  waiting: "bg-warning-muted text-warning",
-  contacted: "bg-secondary-muted text-brand-gold",
-  quoted: "bg-secondary-muted text-brand-gold",
-  partially_paid: "bg-secondary-muted text-brand-gold",
-  unpaid: "bg-muted text-muted-foreground",
-  confirmed: "bg-success-muted text-success",
-  paid: "bg-success-muted text-success",
-  resolved: "bg-mint-muted text-brand-green",
-  completed: "bg-mint-muted text-brand-green",
-  published: "bg-success-muted text-success",
-  cancelled: "bg-danger-muted text-destructive",
-  sold_out: "bg-danger-muted text-destructive",
-  draft: "bg-muted text-muted-foreground",
-  archived: "bg-muted text-muted-foreground",
-};
-
 export function StatusBadge({
   status,
   className = "",
@@ -290,18 +309,8 @@ export function StatusBadge({
   status: string | null | undefined;
   className?: string;
 }) {
-  const s = status ?? "—";
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-caption font-semibold uppercase tracking-wide",
-        STATUS_TONE[s] ?? "bg-muted text-muted-foreground",
-        className,
-      )}
-    >
-      {s.replace(/_/g, " ")}
-    </span>
-  );
+  // Same delegation as the admin/ui copy: one state vocabulary, localized.
+  return <StatusChip value={status} vocab="status" className={className} />;
 }
 
 /* -------------------------------- progress -------------------------------- */
@@ -326,7 +335,9 @@ export function Occupancy({
           {capacity ? ` / ${capacity}` : ""} {t("shell.kit.occupancy.travellers")}
         </span>
         {capacity ? (
-          <span className="tabular-nums">{Math.max(capacity - booked, 0)} {t("shell.kit.occupancy.left")}</span>
+          <span className="tabular-nums">
+            {Math.max(capacity - booked, 0)} {t("shell.kit.occupancy.left")}
+          </span>
         ) : (
           <span>{t("shell.kit.occupancy.noCapacity")}</span>
         )}
@@ -338,7 +349,10 @@ export function Occupancy({
         aria-valuemin={0}
         aria-valuemax={100}
       >
-        <div className={cn("h-full rounded-full transition-[width] duration-500", tone)} style={{ width: `${pct}%` }} />
+        <div
+          className={cn("h-full rounded-full transition-[width] duration-500", tone)}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );
@@ -366,7 +380,9 @@ export function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? t("shell.kit.search.placeholder")}
-        className="h-10 w-full rounded-xl border border-border bg-background ps-9 pe-3 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+        /* h-11 to match `ui/Input` and `ui/SelectTrigger`: at h-10 this was the
+           one field in a filter row that missed the 44px touch floor. */
+        className="h-11 w-full rounded-input border border-border bg-background ps-9 pe-3 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
       />
     </div>
   );
@@ -396,7 +412,7 @@ export function FilterTabs<T extends string>({
   return (
     <div
       className={cn(
-        "flex gap-1 overflow-x-auto rounded-xl border border-border-subtle bg-card p-1 shadow-sm",
+        "flex gap-1 overflow-x-auto rounded-card border border-border-subtle bg-card p-1",
         className,
       )}
       role="tablist"
@@ -411,7 +427,9 @@ export function FilterTabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(t.value)}
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-small font-medium transition-colors",
+              /* `max-md:min-h-11` matches the Button convention: 36px on a
+                 desktop admin, a full 44px touch target on a phone. */
+              "flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-small font-medium transition-colors max-md:min-h-11",
               active
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -465,7 +483,6 @@ export function Drawer({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-
       <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
       <aside
         role="dialog"
@@ -486,7 +503,9 @@ export function Drawer({
         </header>
         <div className="flex-1 overflow-y-auto p-5">{children}</div>
         {footer && (
-          <footer className="border-t border-border-subtle bg-surface-sunken/40 p-4">{footer}</footer>
+          <footer className="border-t border-border-subtle bg-surface-sunken/40 p-4">
+            {footer}
+          </footer>
         )}
       </aside>
     </div>
@@ -507,13 +526,51 @@ export function EmptyState({
   icon?: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface-sunken/40 px-6 py-12 text-center">
+    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-border bg-surface-sunken/40 px-6 py-12 text-center">
       {Icon && <Icon className="h-8 w-8 text-muted-foreground" />}
       <p className="mt-3 text-small font-medium">{title}</p>
       {description && (
         <p className="mt-1 max-w-sm text-caption text-muted-foreground">{description}</p>
       )}
       {action && <div className="mt-4">{action}</div>}
+    </div>
+  );
+}
+
+/**
+ * A list whose query failed.
+ *
+ * Distinct from `EmptyState` on purpose: until this existed, every admin list
+ * except Requests rendered a failed fetch with its own "no records yet"
+ * message, so an outage was indistinguishable from an empty table — an
+ * operator would reasonably conclude the data was gone. The amber framing and
+ * the retry are the difference between "nothing here" and "we could not look".
+ */
+export function ErrorState({ onRetry, className }: { onRetry?: () => void; className?: string }) {
+  const { t } = useTranslation("admin");
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "flex flex-col items-center justify-center rounded-card border border-dashed border-border bg-warning-muted px-6 py-12 text-center",
+        className,
+      )}
+    >
+      <AlertTriangle className="h-8 w-8 text-warning" aria-hidden="true" />
+      <p className="mt-3 text-small font-medium">{t("shell.states.errorTitle")}</p>
+      <p className="mt-1 max-w-sm text-caption text-muted-foreground">
+        {t("shell.states.errorDescription")}
+      </p>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-4 text-caption font-semibold transition-colors duration-fast hover:border-primary/50 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+          {t("shell.states.retry")}
+        </button>
+      )}
     </div>
   );
 }
@@ -536,7 +593,7 @@ export function SkeletonKpis({ count = 4 }: { count?: number }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-[132px] w-full rounded-2xl" />
+        <Skeleton key={i} className="h-[132px] w-full rounded-card" />
       ))}
     </div>
   );
@@ -580,7 +637,13 @@ export function initials(name: string | null | undefined): string {
     .join("");
 }
 
-export function Avatar({ name, className = "" }: { name: string | null | undefined; className?: string }) {
+export function Avatar({
+  name,
+  className = "",
+}: {
+  name: string | null | undefined;
+  className?: string;
+}) {
   return (
     <span
       aria-hidden

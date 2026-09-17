@@ -8,21 +8,35 @@ import { articleBySlugQuery, articlesQuery } from "@/lib/queries";
 import { articleCategory, articleTags, readingMinutes } from "@/lib/blog";
 import { ArticleMeta, CategoryBadge } from "@/components/blog/ArticleMeta";
 import { ShareButtons } from "@/components/blog/ShareButtons";
-import { useLocalized } from "@/lib/localize";
+import { pickLocalized, useLocalized } from "@/lib/localize";
+import { absoluteUrl, canonical, jsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/$slug")({
-  loader: async ({ context, params }) =>
-    context.queryClient.ensureQueryData(articleBySlugQuery(params.slug)),
+  /* Same soft-404 as the programme route: decide it before the status is
+     written, not in the component after the server has already said 200. */
+  loader: async ({ context, params }) => {
+    const article = await context.queryClient.ensureQueryData(articleBySlugQuery(params.slug));
+    if (!article) throw notFound();
+    return article;
+  },
   head: ({ params, loaderData }) => {
-    const title = loaderData?.title ? `${loaderData.title}${i18n.t("seo.blogArticle.titleSuffix")}` : i18n.t("seo.blogArticle.defaultTitle");
-    const description = loaderData?.excerpt ?? i18n.t("seo.blogArticle.defaultDescription");
+    // Article metadata follows the visitor's language, like the page body does.
+    const row = (loaderData ?? {}) as unknown as Record<string, unknown>;
+    const lang = i18n.language;
+    const localizedTitle = pickLocalized(row, "title", lang);
+    const localizedExcerpt = pickLocalized(row, "excerpt", lang);
+
+    const title = localizedTitle
+      ? `${localizedTitle}${i18n.t("seo.blogArticle.titleSuffix")}`
+      : i18n.t("seo.blogArticle.defaultTitle");
+    const description = localizedExcerpt ?? i18n.t("seo.blogArticle.defaultDescription");
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: description },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: `/blog/${params.slug}` },
+      { property: "og:url", content: absoluteUrl(`/blog/${params.slug}`) },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
@@ -33,20 +47,23 @@ export const Route = createFileRoute("/blog/$slug")({
     }
     return {
       meta,
-      links: [{ rel: "canonical", href: `/blog/${params.slug}` }],
+      links: [canonical(`/blog/${params.slug}`)],
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            headline: loaderData?.title ?? i18n.t("seo.blogArticle.defaultHeadline"),
+            headline: localizedTitle ?? i18n.t("seo.blogArticle.defaultHeadline"),
             description,
             datePublished: loaderData?.published_at ?? undefined,
             dateModified: loaderData?.updated_at ?? undefined,
-            author: { "@type": "Person", name: loaderData?.author ?? i18n.t("seo.blogArticle.authorFallback") },
+            author: {
+              "@type": "Person",
+              name: loaderData?.author ?? i18n.t("seo.blogArticle.authorFallback"),
+            },
             publisher: { "@type": "Organization", name: i18n.t("seo.blogArticle.publisherName") },
-            mainEntityOfPage: `/blog/${params.slug}`,
+            mainEntityOfPage: absoluteUrl(`/blog/${params.slug}`),
           }),
         },
       ],
@@ -85,7 +102,10 @@ function ArticlePage() {
   const excerpt = L(article, "excerpt", "empty");
   const content = L(article, "content", "empty");
   const related = (all ?? [])
-    .filter((a) => a.slug !== slug && (!tags.length || articleTags(a, lang).some((tag) => tags.includes(tag))))
+    .filter(
+      (a) =>
+        a.slug !== slug && (!tags.length || articleTags(a, lang).some((tag) => tags.includes(tag))),
+    )
     .slice(0, 3);
 
   return (
@@ -124,7 +144,10 @@ function ArticlePage() {
         {tags.length > 0 && (
           <div className="mt-8 flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span key={tag} className="rounded-full bg-muted px-3 py-1 text-caption font-medium text-muted-foreground">
+              <span
+                key={tag}
+                className="rounded-full bg-muted px-3 py-1 text-caption font-medium text-muted-foreground"
+              >
                 #{tag}
               </span>
             ))}
@@ -132,7 +155,9 @@ function ArticlePage() {
         )}
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border-subtle pt-6">
-          <span className="text-caption text-muted-foreground">{t("common.minutesRead", { count: readingMinutes(article) })}</span>
+          <span className="text-caption text-muted-foreground">
+            {t("common.minutesRead", { count: readingMinutes(article) })}
+          </span>
           <ShareButtons slug={article.slug} title={title} />
         </div>
 

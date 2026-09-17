@@ -14,31 +14,93 @@
       "hidden": "Hidden",
       "uploadFailed": "Upload failed",
       "saveFailed": "Save failed",
-      "deleted": "Deleted"
+      "deleted": "Deleted",
+      "missingTranslations": "Missing: {{langs}}",
+      "toggleActive": "Toggle visibility"
     },
     "settings": {
       "pageTitle": "Settings",
       "pageDescription": "Manage your agency, website and communication.",
       "backToSettings": "Settings",
       "groups": {
-        "agency": { "title": "Agency", "caption": "Who you are" },
-        "website": { "title": "Website", "caption": "What visitors see" },
-        "communication": { "title": "Communication", "caption": "How travellers reach you" },
-        "system": { "title": "System", "caption": "Access and alerts" }
+        "agency": {
+          "title": "Agency",
+          "caption": "Who you are"
+        },
+        "website": {
+          "title": "Website",
+          "caption": "What visitors see"
+        },
+        "communication": {
+          "title": "Communication",
+          "caption": "How travellers reach you"
+        },
+        "system": {
+          "title": "System",
+          "caption": "Access and alerts"
+        }
       },
       "nav": {
-        "general": { "label": "General", "summary": "Your agency information", "detail": "Name, address and working hours" },
-        "brand": { "label": "Brand", "summary": "Your visual identity", "detail": "Logo, tagline and colours" },
-        "homepage": { "label": "Homepage", "summary": "What visitors see first", "detail": "Hero, about and call to action" },
-        "statistics": { "label": "Statistics", "summary": "Your achievements", "detail": "Counters shown on the homepage" },
-        "seo": { "label": "Search appearance", "summary": "How you appear on Google", "detail": "Titles, description and sharing image" },
-        "contact": { "label": "Contact", "summary": "Phone, email and WhatsApp", "detail": "Shown across the website" },
-        "branches": { "label": "Branches", "summary": "Offices and locations", "detail": "Displayed on the contact map" },
-        "social": { "label": "Social media", "summary": "Instagram, Facebook and more", "detail": "Channels linked in the footer" },
-        "email": { "label": "Email", "summary": "Booking notifications", "detail": "Where new requests are delivered" },
-        "notifications": { "label": "Notifications", "summary": "How you receive alerts", "detail": "Dashboard and email alerts" },
-        "team": { "label": "Team", "summary": "Manage team access", "detail": "Admins and their roles" },
-        "security": { "label": "Security", "summary": "Account protection", "detail": "Access policies and sessions" }
+        "general": {
+          "label": "General",
+          "summary": "Your agency information",
+          "detail": "Name, address and working hours"
+        },
+        "brand": {
+          "label": "Brand",
+          "summary": "Your visual identity",
+          "detail": "Logo, tagline and colours"
+        },
+        "homepage": {
+          "label": "Homepage",
+          "summary": "What visitors see first",
+          "detail": "Hero, about and call to action"
+        },
+        "statistics": {
+          "label": "Statistics",
+          "summary": "Your achievements",
+          "detail": "Counters shown on the homepage"
+        },
+        "seo": {
+          "label": "Search appearance",
+          "summary": "How you appear on Google",
+          "detail": "Titles, description and sharing image"
+        },
+        "contact": {
+          "label": "Contact",
+          "summary": "Phone, email and WhatsApp",
+          "detail": "Shown across the website"
+        },
+        "branches": {
+          "label": "Branches",
+          "summary": "Offices and locations",
+          "detail": "Displayed on the contact map"
+        },
+        "social": {
+          "label": "Social media",
+          "summary": "Instagram, Facebook and more",
+          "detail": "Channels linked in the footer"
+        },
+        "email": {
+          "label": "Email",
+          "summary": "Booking notifications",
+          "detail": "Where new requests are delivered"
+        },
+        "notifications": {
+          "label": "Notifications",
+          "summary": "How you receive alerts",
+          "detail": "Dashboard and email alerts"
+        },
+        "team": {
+          "label": "Team",
+          "summary": "Manage team access",
+          "detail": "Admins and their roles"
+        },
+        "security": {
+          "label": "Security",
+          "summary": "Account protection",
+          "detail": "Access policies and sessions"
+        }
       },
       "validation": {
         "required": "This field is required",
@@ -101,7 +163,11 @@
         "headOfficeAddress": "Head office address",
         "addressHint": "Street, city and country.",
         "googleMapsLink": "Google Maps link",
-        "googleMapsHint": "Paste the share link of your office location."
+        "googleMapsHint": "Paste the share link of your office location.",
+        "hoursPlaceholder": "Mon – Sat: 9:00 – 18:00",
+        "hints": {
+          "mapsUrl": "Paste the share link of your office location."
+        }
       },
       "brand": {
         "title": "Brand identity",
@@ -137,7 +203,15 @@
         "navTrips": "Trips",
         "bookNow": "Book now",
         "browseOffers": "Browse offers",
-        "uploaded": "Uploaded"
+        "uploaded": "Uploaded",
+        "previewBook": "Book now",
+        "previewBrowse": "Browse offers",
+        "hints": {
+          "agencyNameInherited": "Inherited from your agency profile — editing it here updates it everywhere.",
+          "tagline": "One short line under your logo.",
+          "logo": "Square, transparent background. 512×512 recommended.",
+          "favicon": "Browser-tab icon. 64×64."
+        }
       },
       "homepage": {
         "title": "Homepage content",
@@ -155,11 +229,26 @@
         "buttonLinkHint": "Internal path such as /umrah or a full https link.",
         "published": "Content published",
         "blocks": {
-          "hero": { "name": "Hero", "help": "The first thing visitors see. Keep the headline under 60 characters and use a wide, bright background image." },
-          "about": { "name": "About the agency", "help": "A short story about your agency, shown on the homepage and About page." },
-          "cta": { "name": "Closing call to action", "help": "The final nudge before the footer. One clear action performs best." },
+          "hero": {
+            "name": "Hero",
+            "help": "The first thing visitors see. Keep the headline under 60 characters and use a wide, bright background image."
+          },
+          "about": {
+            "name": "About the agency",
+            "help": "A short story about your agency, shown on the homepage and About page."
+          },
+          "cta": {
+            "name": "Closing call to action",
+            "help": "The final nudge before the footer. One clear action performs best."
+          },
           "generic": "Content block rendered on the public website."
-        }
+        },
+        "hints": {
+          "heroImage": "Upload directly — no need to paste URLs. Recommended 1920×1080.",
+          "ctaLink": "Internal path such as /umrah or a full https link."
+        },
+        "badgesField": "Hero badges",
+        "badgesHint": "Separate with commas. The first one is shown as the badge above the headline."
       },
       "stats": {
         "title": "Statistics",
@@ -203,7 +292,15 @@
         "googleVerificationCode": "Google verification code",
         "googleVerificationHint": "The content value of the google-site-verification tag.",
         "allowIndexing": "Allow search engines to index the website",
-        "allowIndexingHint": "Turn off only while the site is under construction."
+        "allowIndexingHint": "Turn off only while the site is under construction.",
+        "hints": {
+          "siteTitle": "Under 60 characters performs best.",
+          "metaDescription": "Under 160 characters. Describe your services and destinations.",
+          "keywords": "Comma separated. Used for internal search hints.",
+          "shareImage": "Recommended 1200×630.",
+          "googleVerification": "The content value of the google-site-verification tag.",
+          "indexing": "Turn off only while the site is under construction."
+        }
       },
       "contact": {
         "title": "Contact",
@@ -228,10 +325,11 @@
         "channelsTitle": "Channels",
         "channelsDescription": "Leave a field empty to hide that channel from the website.",
         "exampleHint": "Example: {{placeholder}}",
-        "openChannel": "Open {{label}}",
+        "openChannel": "Open {{name}}",
         "livePreviewTitle": "Live preview",
         "livePreviewDescription": "How the footer social row will look.",
-        "noChannels": "No channels connected yet — the social row stays hidden."
+        "noChannels": "No channels connected yet — the social row stays hidden.",
+        "example": "Example: {{value}}"
       },
       "email": {
         "title": "Email",
@@ -258,7 +356,14 @@
         "deliveryDescription": "Temporarily pause outgoing notifications.",
         "bookingEmailsToggle": "Send an email for every new booking",
         "bookingEmailsHint": "When off, bookings are still saved and shown in the dashboard.",
-        "defaultFromName": "Janat Sahara Travel"
+        "defaultFromName": "Janat Sahara Travel",
+        "hints": {
+          "ownerRecipient": "Primary inbox for booking notifications.",
+          "ccRecipients": "Optional. Separate several addresses with commas.",
+          "replyTo": "Replies from your team go here.",
+          "subjectPrefix": "Helps filter emails, e.g. [Booking].",
+          "bookingEmails": "When off, bookings are still saved and shown in the dashboard."
+        }
       },
       "notifications": {
         "title": "Notifications",
@@ -276,7 +381,14 @@
         "housekeepingTitle": "Housekeeping",
         "housekeepingDescription": "How long read alerts stay in the bell.",
         "retentionLabel": "Keep notifications for (days)",
-        "retentionHint": "Between 1 and 365 days."
+        "retentionHint": "Between 1 and 365 days.",
+        "hints": {
+          "newBooking": "Alerts the team as soon as a traveller reserves a package.",
+          "newMessage": "Alerts when someone submits the contact form.",
+          "newsletter": "Useful while growing your mailing list.",
+          "dailyDigest": "A single summary alert instead of individual pings.",
+          "retention": "Between 1 and 365 days."
+        }
       },
       "security": {
         "title": "Security",
@@ -295,7 +407,12 @@
         "auditLoggingHint": "Records who changed what, and when.",
         "sessionLength": "Session length (hours)",
         "sessionLengthHint": "Admins are signed out after this period of inactivity. 1–720.",
-        "superAdminOnly": "Only a super admin can change access policies."
+        "superAdminOnly": "Only a super admin can change access policies.",
+        "hints": {
+          "require2fa": "Admins must confirm a second factor before reaching the dashboard.",
+          "auditLogging": "Records who changed what, and when.",
+          "sessionLength": "Admins are signed out after this period of inactivity. 1–720."
+        }
       },
       "team": {
         "title": "Team",
@@ -308,13 +425,52 @@
       "branches": {
         "translationGroupTitle": "Translations",
         "translationGroupHint": "Shown to French and English speaking travellers. Falls back to Arabic when empty."
+      },
+      "fields": {
+        "agency_name": {
+          "label": "Agency name",
+          "hint": "Shown in emails, the footer and structured data."
+        },
+        "address": {
+          "label": "Head office address"
+        },
+        "hours": {
+          "label": "Working hours"
+        },
+        "maps_url": {
+          "label": "Google Maps link"
+        },
+        "phone": {
+          "label": "Landline"
+        },
+        "mobile": {
+          "label": "Mobile"
+        },
+        "email": {
+          "label": "Contact email",
+          "hint": "Published on the website for travellers."
+        },
+        "whatsapp": {
+          "label": "WhatsApp link",
+          "hint": "Full wa.me link, e.g. https://wa.me/21655123456"
+        },
+        "emergency": {
+          "label": "Emergency contact",
+          "hint": "Optional out-of-hours number for travellers."
+        }
       }
     },
     "blog": {
       "pageTitle": "Blog",
       "pageDescription": "Articles shown on the public blog.",
       "newArticle": "New article",
-      "table": { "title": "Title", "slug": "Slug", "published": "Published", "date": "Date", "actions": "Actions" },
+      "table": {
+        "title": "Title",
+        "slug": "Slug",
+        "published": "Published",
+        "date": "Date",
+        "actions": "Actions"
+      },
       "loading": "Loading…",
       "empty": "No articles yet",
       "unpublish": "Unpublish",
@@ -333,7 +489,11 @@
         "tags": "Tags (comma separated)",
         "published": "Published"
       },
-      "toasts": { "titleSlugRequired": "Title and slug required", "saved": "Saved", "saveFailed": "Save failed" }
+      "toasts": {
+        "titleSlugRequired": "Title and slug required",
+        "saved": "Saved",
+        "saveFailed": "Save failed"
+      }
     },
     "gallery": {
       "pageTitle": "Gallery",
@@ -348,7 +508,13 @@
       "deleteDescription": "This can't be undone.",
       "editTitle": "Edit item",
       "newTitle": "Add gallery item",
-      "fields": { "title": "Title", "image": "Image *", "category": "Category", "sortOrder": "Sort order", "active": "Active" },
+      "fields": {
+        "title": "Title",
+        "image": "Image *",
+        "category": "Category",
+        "sortOrder": "Sort order",
+        "active": "Active"
+      },
       "toasts": {
         "uploadedCount": "Uploaded {{count}} image(s)",
         "imageRequired": "Image required",
@@ -365,8 +531,18 @@
       "deleteTitle": "Delete FAQ?",
       "editTitle": "Edit FAQ",
       "newTitle": "New FAQ",
-      "fields": { "question": "Question *", "answer": "Answer *", "category": "Category", "sortOrder": "Sort order", "active": "Active" },
-      "toasts": { "questionAnswerRequired": "Question and answer required", "saved": "Saved", "saveFailed": "Save failed" }
+      "fields": {
+        "question": "Question *",
+        "answer": "Answer *",
+        "category": "Category",
+        "sortOrder": "Sort order",
+        "active": "Active"
+      },
+      "toasts": {
+        "questionAnswerRequired": "Question and answer required",
+        "saved": "Saved",
+        "saveFailed": "Save failed"
+      }
     },
     "testimonials": {
       "pageTitle": "Testimonials",
@@ -386,7 +562,11 @@
         "sortOrder": "Sort order",
         "active": "Active"
       },
-      "toasts": { "nameContentRequired": "Name and content required", "saved": "Saved", "saveFailed": "Save failed" }
+      "toasts": {
+        "nameContentRequired": "Name and content required",
+        "saved": "Saved",
+        "saveFailed": "Save failed"
+      }
     },
     "admins": {
       "pageTitle": "Admins",
@@ -396,7 +576,12 @@
       "superAdminOnlyDescription": "Only super admins can manage admin accounts.",
       "loading": "Loading…",
       "empty": "No admins yet",
-      "table": { "email": "Email", "roles": "Roles", "lastSignIn": "Last sign in", "actions": "Actions" },
+      "table": {
+        "email": "Email",
+        "roles": "Roles",
+        "lastSignIn": "Last sign in",
+        "actions": "Actions"
+      },
       "removeRole": "Remove role",
       "removeAllAccessTitle": "Remove all admin access?",
       "removeAllAccessDescription": "{{email}} will lose all admin/staff roles. The auth account is not deleted.",
@@ -409,7 +594,108 @@
       "roleStaff": "Staff (read only)",
       "inviteHint": "An invitation email will be sent. When the recipient sets a password they'll be able to access the dashboard immediately.",
       "sendInvite": "Send invite",
-      "toasts": { "invitationSent": "Invitation sent", "roleRemoved": "Role removed" }
+      "toasts": {
+        "invitationSent": "Invitation sent",
+        "roleRemoved": "Role removed"
+      }
+    },
+    "services": {
+      "pageTitle": "Services",
+      "pageDescription": "The service cards shown on the homepage, in Arabic, French and English.",
+      "addItem": "Add service",
+      "editTitle": "Edit service",
+      "newTitle": "New service",
+      "formHint": "Arabic is the default text. French and English are optional and are never filled in automatically.",
+      "searchPlaceholder": "Search services…",
+      "emptyTitle": "No services yet",
+      "emptyDescription": "Add the services the agency offers so they appear on the homepage.",
+      "noMatchTitle": "No matching service",
+      "noMatchDescription": "Try another search term or clear the filters.",
+      "deleteTitle": "Delete this service?",
+      "deleteDescription": "\"{{name}}\" will be removed from the homepage. This cannot be undone.",
+      "filters": {
+        "all": "All",
+        "active": "Visible",
+        "inactive": "Hidden"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "slug": "Links to page",
+        "slugHint": "The card opens this page, for example /umrah.",
+        "slugUnknown": "No public page uses this address yet — the card would lead nowhere.",
+        "icon": "Icon",
+        "iconHint": "Lucide icon name, for example moon or plane.",
+        "cover": "Cover image",
+        "coverHint": "Stored with the service. The homepage cards currently show the icon, not this image.",
+        "sortOrder": "Order",
+        "sortOrderHint": "Lower numbers appear first.",
+        "active": "Visible on the website",
+        "activeHint": "Hidden services stay here but disappear from the homepage."
+      },
+      "errors": {
+        "titleRequired": "Enter a title of at least 2 characters.",
+        "slugRequired": "Choose the page this card links to.",
+        "slugInvalid": "Use lowercase letters, numbers and hyphens only.",
+        "slugTaken": "Another service already links to this page."
+      },
+      "actions": {
+        "activate": "Show on the website",
+        "deactivate": "Hide from the website",
+        "upload": "Upload"
+      },
+      "toasts": {
+        "saved": "Service saved",
+        "deleted": "Service deleted",
+        "activated": "Service is now visible",
+        "deactivated": "Service is now hidden",
+        "saveFailed": "Could not save the service",
+        "uploadFailed": "Upload failed"
+      }
+    },
+    "features": {
+      "pageTitle": "Why choose us",
+      "pageDescription": "The reasons shown in the \"Why choose us\" section of the homepage, in Arabic, French and English.",
+      "addItem": "Add reason",
+      "editTitle": "Edit reason",
+      "newTitle": "New reason",
+      "formHint": "Arabic is the default text. French and English are optional and are never filled in automatically.",
+      "searchPlaceholder": "Search reasons…",
+      "emptyTitle": "No reasons yet",
+      "emptyDescription": "Add what sets the agency apart so it appears on the homepage.",
+      "noMatchTitle": "No matching reason",
+      "noMatchDescription": "Try another search term or clear the filters.",
+      "deleteTitle": "Delete this reason?",
+      "deleteDescription": "\"{{name}}\" will be removed from the homepage. This cannot be undone.",
+      "filters": {
+        "all": "All",
+        "active": "Visible",
+        "inactive": "Hidden"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "icon": "Icon",
+        "iconHint": "Lucide icon name, for example award or shield-check.",
+        "sortOrder": "Order",
+        "sortOrderHint": "Lower numbers appear first.",
+        "active": "Visible on the website",
+        "activeHint": "Hidden reasons stay here but disappear from the homepage."
+      },
+      "errors": {
+        "titleRequired": "Enter a title of at least 2 characters."
+      },
+      "actions": {
+        "activate": "Show on the website",
+        "deactivate": "Hide from the website"
+      },
+      "toasts": {
+        "saved": "Reason saved",
+        "deleted": "Reason deleted",
+        "activated": "Reason is now visible",
+        "deactivated": "Reason is now hidden",
+        "saveFailed": "Could not save the reason"
+      }
     }
   }
 }

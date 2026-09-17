@@ -166,14 +166,9 @@ export function BookingFlow({ packageSlug = null }: Props) {
             type: p.type,
             isPrimary: i === 0,
             fullName: p.fullName.trim(),
-            passportNumber: p.passportNumber.trim() || null,
-            nationality: p.nationality.trim() || null,
             gender: p.gender || null,
-            dateOfBirth: p.dateOfBirth || null,
-            passportExpiry: p.passportExpiry || null,
             phone: i === 0 ? p.phone.trim() : null,
             email: i === 0 ? p.email.trim() : null,
-            emergencyContact: p.emergencyContact.trim() || null,
             passportPath: p.passportPath,
             notes: p.notes.trim() || null,
           })),
@@ -253,7 +248,11 @@ export function BookingFlow({ packageSlug = null }: Props) {
                 </span>
                 <h2 className="mt-1 truncate text-body font-bold">{L(selectedPackage, "title")}</h2>
                 <p className="mt-0.5 truncate text-caption text-muted-foreground">
-                  {[L(selectedPackage, "destination", "empty"), L(selectedPackage, "duration", "empty"), departure]
+                  {[
+                    L(selectedPackage, "destination", "empty"),
+                    L(selectedPackage, "duration", "empty"),
+                    departure,
+                  ]
                     .filter(Boolean)
                     .join(" • ")}
                 </p>
@@ -406,7 +405,11 @@ export function BookingFlow({ packageSlug = null }: Props) {
                 <h3 className="text-h5 font-bold">{t("bookingFlow.review.packageBlock")}</h3>
                 <p className="mt-2 text-body font-semibold">{L(selectedPackage, "title")}</p>
                 <p className="text-small text-muted-foreground">
-                  {[L(selectedPackage, "destination", "empty"), L(selectedPackage, "duration", "empty"), departure]
+                  {[
+                    L(selectedPackage, "destination", "empty"),
+                    L(selectedPackage, "duration", "empty"),
+                    departure,
+                  ]
                     .filter(Boolean)
                     .join(" • ")}
                 </p>

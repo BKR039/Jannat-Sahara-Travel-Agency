@@ -59,11 +59,17 @@ function FlyTo({ target }: { target: Branch | null }) {
 
 interface Props {
   branches: Branch[];
-  activeId: string | null;
-  onSelect: (id: string) => void;
+  /**
+   * Selection is optional: the homepage drives the map from a branch list
+   * beside it, while the branches page just shows every office at once. Both
+   * were previously impossible to express — the map demanded a selection model
+   * its second caller does not have.
+   */
+  activeId?: string | null;
+  onSelect?: (id: string) => void;
 }
 
-export default function BranchesMap({ branches, activeId, onSelect }: Props) {
+export default function BranchesMap({ branches, activeId = null, onSelect }: Props) {
   const { t } = useTranslation();
   const { L: loc, rtl } = useLocalized();
   const markerRefs = useRef<Record<string, L.Marker | null>>({});
@@ -92,9 +98,20 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
       className="janat-map h-full w-full"
       style={{ minHeight: "100%", background: "transparent" }}
     >
+      {/*
+       * Carto's Voyager endpoint now requires an API key: it still answers
+       * 200, but every tile it returns is a grey "API KEY REQUIRED" watermark,
+       * so the map read as broken wherever it appeared — the homepage branch
+       * section included. OpenStreetMap's own tile server needs no key and is
+       * the source this map already credits in its attribution.
+       *
+       * If the agency wants the warmer Voyager styling back, that is a Carto
+       * (or Mapbox) account plus a key in the URL — a billing decision rather
+       * than a code one.
+       */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ZoomControl position="bottomright" />
       <FitToBranches branches={branches} hasActive={!!activeId} />
@@ -104,20 +121,29 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
           key={b.id}
           position={[Number(b.latitude), Number(b.longitude)]}
           icon={brandMarkerIcon(b.id === activeId)}
+          // Leaflet copies `title` onto the marker element, which is what gives
+          // this role=button div an accessible name. Without it a screen reader
+          // announces every pin as an unnamed button.
+          title={loc(b, "name", "base")}
+          alt={loc(b, "name", "base")}
           ref={(ref) => {
             markerRefs.current[b.id] = ref;
           }}
           eventHandlers={{
-            click: () => onSelect(b.id),
+            click: () => onSelect?.(b.id),
           }}
         >
-          <Popup>
-            <div
-              className="min-w-[230px] space-y-2 p-1 text-start"
-              dir={rtl ? "rtl" : "ltr"}
-            >
-              <div className="text-body font-bold text-primary">{loc(b, "name", "base")}</div>
-              <div className="text-caption leading-relaxed text-muted-foreground">
+          {/*
+           * Bounded so the popup can never be wider than a small phone's map
+           * viewport. Leaflet's own default maxWidth is 300px, which a long
+           * Arabic branch name would otherwise push against.
+           */}
+          <Popup minWidth={200} maxWidth={260} autoPanPadding={[16, 16]}>
+            <div className="max-w-full space-y-2 p-1 text-start" dir={rtl ? "rtl" : "ltr"}>
+              <div className="text-body font-bold text-primary [overflow-wrap:anywhere]">
+                {loc(b, "name", "base")}
+              </div>
+              <div className="text-caption leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
                 {loc(b, "address", "base")}
               </div>
               {b.phone && (
@@ -126,7 +152,7 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
                   className="flex items-center gap-1.5 text-caption font-medium"
                   dir="ltr"
                 >
-                  <Phone className="h-3 w-3" />
+                  <Phone className="h-3.5 w-3.5" />
                   {b.phone}
                 </a>
               )}
@@ -137,7 +163,7 @@ export default function BranchesMap({ branches, activeId, onSelect }: Props) {
                   rel="noopener noreferrer"
                   className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption font-semibold text-primary-foreground no-underline"
                 >
-                  <Navigation className="h-3 w-3" />
+                  <Navigation className="h-3.5 w-3.5" />
                   {t("branches.directions")}
                 </a>
               )}

@@ -9,7 +9,13 @@ export default defineTool({
     "List messages sent through the website contact form, including whether they have been handled. Requires an admin or staff account.",
   inputSchema: {
     handled: z.boolean().optional().describe("Filter by handled state."),
-    limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of messages to return."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(20)
+      .describe("Maximum number of messages to return."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ handled, limit }, ctx) => {

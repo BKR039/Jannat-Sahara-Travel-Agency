@@ -3,15 +3,17 @@ import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Search, X } from "lucide-react";
+import { Newspaper, Search, X } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
 import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { ArticleCard } from "@/components/blog/ArticleCard";
+import { FeaturedArticle } from "@/components/blog/FeaturedArticle";
 import { articlesQuery } from "@/lib/queries";
 import { articleTags } from "@/lib/blog";
 import { useLocalized } from "@/lib/localize";
+import { canonical, jsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -26,11 +28,11 @@ export const Route = createFileRoute("/blog")({
       { name: "twitter:title", content: i18n.t("seo.blog.title") },
       { name: "twitter:description", content: i18n.t("seo.blog.ogDescription") },
     ],
-    links: [{ rel: "canonical", href: "/blog" }],
+    links: [canonical("/blog")],
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "Blog",
           name: i18n.t("seo.blog.jsonName"),
@@ -61,15 +63,26 @@ function BlogPage() {
     const q = search.trim().toLowerCase();
     return (data ?? []).filter((a) => {
       const matchesCategory = !category || articleTags(a, lang).includes(category);
-      const haystack = `${L(a, "title", "base")} ${L(a, "excerpt", "base")} ${L(a, "author", "base")}`.toLowerCase();
+      const haystack =
+        `${L(a, "title", "base")} ${L(a, "excerpt", "base")} ${L(a, "author", "base")}`.toLowerCase();
       return matchesCategory && (!q || haystack.includes(q));
     });
   }, [data, search, category, lang, L]);
 
+  const isFiltered = search.trim() !== "" || category !== null;
+  const lead = isFiltered ? null : (filtered[0] ?? null);
+  const rest = lead ? filtered.slice(1) : filtered;
+
   return (
     <SiteLayout>
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <SectionHeading eyebrow="📰" title={t("nav.blog")} description={t("home.latestArticlesDesc")} />
+        <SectionHeading
+          eyebrow={t("blog.eyebrow")}
+          icon={Newspaper}
+          title={t("nav.blog")}
+          as="h1"
+          description={t("home.latestArticlesDesc")}
+        />
 
         <div className="mb-8 flex flex-col gap-4">
           <div className="relative mx-auto w-full max-w-xl">
@@ -83,7 +96,7 @@ function BlogPage() {
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("blog.searchPlaceholder")}
               aria-label={t("blog.searchAria")}
-              className="h-12 w-full rounded-full border border-border-subtle bg-card ps-11 pe-11 text-small text-foreground shadow-sm outline-none transition-all duration-base ease-standard placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="h-12 w-full rounded-badge border border-border bg-card ps-11 pe-11 text-small text-foreground outline-none transition-[border-color,box-shadow] duration-fast ease-standard placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/15"
             />
             {search && (
               <button
@@ -116,14 +129,31 @@ function BlogPage() {
         ) : !filtered.length ? (
           <EmptyState label={t("common.empty")} />
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((a, i) => (
-              <ArticleCard key={a.id} article={a} index={i} onOpen={setOpenSlug} />
-            ))}
+          /*
+           * The lead article gets the weight; the rest share the grid.
+           *
+           * The feature is only used on the unfiltered list. Once someone has
+           * searched or picked a category the first result is simply the first
+           * match, and promoting it would present a filter artefact as an
+           * editorial choice.
+           */
+          <div className="space-y-8">
+            {!isFiltered && lead && <FeaturedArticle article={lead} onOpen={setOpenSlug} />}
+            {rest.length > 0 && (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {rest.map((a, i) => (
+                  <ArticleCard key={a.id} article={a} index={i} onOpen={setOpenSlug} />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </section>
-      <ArticleDialog slug={openSlug} onClose={() => setOpenSlug(null)} onOpenArticle={setOpenSlug} />
+      <ArticleDialog
+        slug={openSlug}
+        onClose={() => setOpenSlug(null)}
+        onOpenArticle={setOpenSlug}
+      />
     </SiteLayout>
   );
 }
@@ -142,9 +172,9 @@ function CategoryChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full border px-4 py-2 text-caption font-semibold transition-all duration-base ease-standard ${
+      className={`inline-flex min-h-11 items-center rounded-badge border px-4 py-2 text-caption font-semibold transition-all duration-base ease-standard ${
         active
-          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+          ? "border-transparent bg-gradient-sunrise text-primary-foreground"
           : "border-border-subtle bg-card text-muted-foreground hover:border-primary hover:text-primary"
       }`}
     >

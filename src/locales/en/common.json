@@ -25,7 +25,8 @@
     "menu": "Menu",
     "toggleTheme": "Toggle Theme",
     "changeLanguage": "Change Language",
-    "viewDetails": "Details"
+    "viewDetails": "Details",
+    "discoverTrips": "Discover our trips"
   },
   "home": {
     "featuredPackages": "Featured Offers",
@@ -48,6 +49,23 @@
       "destination": "Destination",
       "date": "Date",
       "search": "Search"
+    },
+    "programmesEyebrow": "Umrah",
+    "programmes": "Upcoming Umrah programmes",
+    "programmesDesc": "Our programmes to Makkah and Madinah, with their departure and return dates.",
+    "servicesEyebrow": "What we offer",
+    "whyUsEyebrow": "Why us",
+    "galleryEyebrow": "From our trips",
+    "articlesEyebrow": "The blog",
+    "branchesEyebrow": "Our branches",
+    "finalCtaTitle": "Ready to begin your journey?",
+    "finalCtaDesc": "Talk to our team and we will help you choose the right programme.",
+    "hero": {
+      "imageAlt": "The Great Mosque of Makkah and the Kaaba",
+      "branchesLabel": "branches at your service",
+      "mediaEyebrow": "From the gallery",
+      "mediaTitle": "Moments from Umrah",
+      "mediaCta": "Browse the gallery"
     }
   },
   "categories": {
@@ -70,7 +88,22 @@
     "gallery": "Gallery",
     "related": "Similar Offers",
     "terms": "Booking Terms",
-    "faqTitle": "Frequently Asked Questions"
+    "faqTitle": "Frequently Asked Questions",
+    "soldOut": "Sold out",
+    "dates": "Dates",
+    "perPerson": "per person",
+    "overview": "Trip details",
+    "destinations": "Destinations",
+    "makkah": "Makkah",
+    "madinah": "Madinah",
+    "departureLabel": "Departure",
+    "returnLabel": "Return",
+    "ctaTitle": "Ready for Umrah?",
+    "ctaDesc": "Book with Janat Sahara and we will take care of the rest.",
+    "detailsPending": "Further information coming soon",
+    "destinationsNote": "The two cities every Umrah programme visits.",
+    "importantInfo": "Important information",
+    "priceOnRequest": "Price on request — contact us for this programme's details."
   },
   "contact": {
     "title": "Contact Us",
@@ -82,7 +115,23 @@
     "message": "Message",
     "send": "Send Message",
     "success": "Your message has been sent successfully",
-    "error": "An error occurred"
+    "error": "An error occurred",
+    "eyebrow": "Contact",
+    "methodsTitle": "Ways to reach us",
+    "formTitle": "Send us a message",
+    "formHint": "Fill in the form and we will get back to you shortly.",
+    "callNow": "Call now",
+    "whatsapp": "WhatsApp",
+    "required": "Required",
+    "optional": "Optional",
+    "branchesCta": "Visit one of our branches",
+    "branchesCtaDesc": "We are in Souk El Ahad, El Faouar, Kebili and El Mourouj.",
+    "branchesCtaAction": "View branches",
+    "reassurance": {
+      "realOffices": "Real offices you can visit in Tunisia.",
+      "personAnswers": "Your message reaches our team and a person replies.",
+      "noObligation": "An enquiry commits you to no booking and no payment."
+    }
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -171,7 +220,9 @@
       "whatsapp": "WhatsApp",
       "email": "Email",
       "headquarters": "Headquarters",
-      "hours": "Hours"
+      "hours": "Hours",
+      "emergency": "Emergency contact",
+      "address": "Address"
     },
     "form": {
       "title": "Send Us a Message",
@@ -189,7 +240,11 @@
     "office": "Office",
     "selectHint": "Select a branch to view it on the map",
     "kicker": "Our Network",
-    "contactKicker": "Contact Us"
+    "contactKicker": "Contact Us",
+    "mapTitle": "Where to find us",
+    "mapDesc": "Our offices on the map.",
+    "ctaTitle": "A question before you visit?",
+    "ctaDesc": "Send us a message and our team will reply."
   },
   "bookingFlow": {
     "eyebrow": "3-Step Booking",
@@ -453,7 +508,12 @@
       "ogDescription": "How we protect and use your data."
     },
     "packageDetail": {
-      "title": "Offer — Janat Sahara"
+      "title": "Offer — Janat Sahara",
+      "description": "See what this package includes, the full itinerary and how to book with Janat Sahara Travel."
+    },
+    "branches": {
+      "title": "Our branches — Janat Sahara Travel",
+      "description": "Addresses and phone numbers for the Janat Sahara offices in Souk El Ahad, El Faouar, Kebili and El Mourouj."
     }
   },
   "about": {
@@ -489,7 +549,9 @@
     "copyLink": "Copy Link",
     "linkCopied": "Article link copied",
     "copyFailed": "Unable to copy the link",
-    "readMore": "Read More"
+    "readMore": "Read More",
+    "featured": "Featured",
+    "eyebrow": "The blog"
   },
   "flightRequest": {
     "badge": "Flight Tickets",
@@ -505,7 +567,6 @@
     "departureLabel": "Departure Date",
     "returnLabel": "Return Date",
     "passengersFieldLabel": "Travelers",
-    "passengersCount": "{{count}} traveler(s)",
     "adultsLabel": "Adults",
     "adultsHint": "12 years and older",
     "childrenLabel": "Children",
@@ -542,7 +603,61 @@
     "newRequestCta": "Send Another Request",
     "waMessage": "Hello, flight ticket request no. {{ref}}",
     "noResults": "No matching results",
-    "clearAria": "Clear"
+    "clearAria": "Clear",
+    "cabins": {
+      "economy": "Economy",
+      "premium_economy": "Premium economy",
+      "business": "Business",
+      "first": "First"
+    },
+    "tripDetailsTitle": "Trip details",
+    "contactDetailsTitle": "Contact details",
+    "swapAria": "Swap origin and destination",
+    "stepTrip": "Step 1",
+    "stepContact": "Step 2",
+    "useCustom": {
+      "from": "Use “{{value}}” as the departure point",
+      "to": "Use “{{value}}” as the destination"
+    },
+    "customHint": {
+      "from": "We will look for available flights departing from there.",
+      "to": "We will look for available flights to this destination."
+    },
+    "customBadge": "Custom entry",
+    "summaryTitle": "Your request at a glance",
+    "summaryTrip": "Trip type",
+    "summaryDates": "Dates",
+    "summaryTravellers": "Travellers",
+    "summaryCabin": "Cabin",
+    "journeyTitle": "Your journey",
+    "journeyDescription": "Choose your departure airport, destination and trip type.",
+    "detailsTitle": "Travel details",
+    "detailsDescription": "Dates, how many are travelling, and cabin class.",
+    "contactDescription": "How we reach you with the available options.",
+    "stageComplete": "Complete",
+    "pickDate": "Pick a date",
+    "noResultsHint": "Type a city or airport — you can also use exactly what you typed.",
+    "summaryEmpty": "Choose a departure airport and a destination to see your request summary here.",
+    "reassurance": {
+      "noPayment": "A request only — no booking or payment at this stage.",
+      "teamReplies": "Our team reviews your request and replies with the available options.",
+      "helpChoosing": "We help you choose the flight that best fits your dates."
+    },
+    "fieldErrors": {
+      "name": "Please enter your full name.",
+      "phone": "Please enter a valid phone number.",
+      "email": "Please enter a valid email address.",
+      "fromAirport": "Please choose a departure airport.",
+      "toAirport": "Please choose a destination.",
+      "departureDate": "Please choose a departure date.",
+      "returnDateRequired": "Please choose a return date.",
+      "returnDateOrder": "The return date must be on or after the departure date.",
+      "adults": "At least one adult is required.",
+      "notes": "These notes are too long.",
+      "generic": "Please check this field."
+    },
+    "passengersCount_one": "1 traveller",
+    "passengersCount_other": "{{count}} travellers"
   },
   "adminBranches": {
     "title": "Branches",
@@ -580,12 +695,15 @@
       "contact": "Contact",
       "location": "Location",
       "business": "Display",
-      "translation": "French Translation"
+      "translation": "French Translation",
+      "translationFr": "French translation",
+      "translationEn": "English translation"
     },
     "hints": {
       "translation": "Used when the website is viewed in French.",
       "location": "Google Maps link and/or coordinates.",
-      "business": "An inactive branch remains here but does not appear on the website."
+      "business": "An inactive branch remains here but does not appear on the website.",
+      "translationEn": "Used when the website is viewed in English. Leave empty to fall back to the base text."
     },
     "fields": {
       "name": "Branch Name",
@@ -599,7 +717,8 @@
       "lng": "Longitude",
       "photo": "Branch Photo",
       "mainBranch": "Main Branch",
-      "active": "Visible on Website"
+      "active": "Visible on Website",
+      "hoursPlaceholder": "Mon – Sat: 9:00 – 18:00"
     },
     "errors": {
       "required": "This field is required",
@@ -656,7 +775,8 @@
     "passwordUpdated": "Password updated",
     "passwordUpdateFailed": "Failed to update password",
     "seoTitle": "Admin sign in — Janat Sahara Travel",
-    "seoDescription": "Secure sign-in for the Janat Sahara Travel management dashboard."
+    "seoDescription": "Secure sign-in for the Janat Sahara Travel management dashboard.",
+    "backToWebsite": "Back to website"
   },
   "umrahBuilder": {
     "cta": {
@@ -714,7 +834,7 @@
       "flexible": "Flexible — advise me",
       "flexibleTitle": "I don't know yet",
       "flexibleDesc": "We'll suggest the best available option",
-      "note": "Flight fares are confirmed when we prepare your offer."
+      "note": "This is a request, not a booking. The agency checks flight availability and sets the price when preparing your offer."
     },
     "travellers": {
       "title": "How many travellers?",
@@ -772,15 +892,7 @@
       "select": "Choose this hotel",
       "selected": "Selected",
       "searchPlaceholder": "Search a hotel",
-      "distanceHaram": "{{value}} m from the Haram",
-      "distanceMasjid": "{{value}} m from the Prophet's Mosque",
       "empty": "No matching results",
-      "sortLabel": "Sort by",
-      "sort": {
-        "distance": "Closest to the Haram",
-        "name": "Name",
-        "area": "Area"
-      },
       "errorTitle": "We couldn't load the hotel list",
       "errorHint": "You can continue your request and we'll help you pick the right hotel.",
       "noneTitle": "No hotels available right now",
@@ -790,7 +902,8 @@
       "conciergeTitle": "Can't find your hotel?",
       "conciergeDesc": "Let us help you choose the right hotel based on area, budget and distance from the Haram.",
       "stayLabel": "Your stay",
-      "starsLabel": "{{count}} stars"
+      "staleTitle": "The hotel you picked is no longer available",
+      "staleHint": "The hotel list has changed since your last visit. Please choose another hotel below."
     },
     "room": {
       "title": "Which room suits you?",
@@ -849,17 +962,30 @@
       "room": "Please choose a room type.",
       "name": "Please enter your full name.",
       "phone": "Please enter a valid phone number.",
-      "email": "Please enter a valid email address."
+      "email": "Please enter a valid email address.",
+      "datePast": "The departure date cannot be in the past.",
+      "dateHorizon": "That departure date is too far ahead. Please pick a date within the next two years.",
+      "minStay": "Stay duration must be at least 1 night."
     },
     "success": {
       "title": "Your request has been sent",
       "subtitle": "Our team will contact you shortly to prepare your personalized package.",
       "reference": "Reference",
       "whatsapp": "Send the summary on WhatsApp",
-      "back": "Back to Umrah"
+      "back": "Back to Umrah",
+      "next": {
+        "title": "What happens next",
+        "review": "Our team reviews your choices and checks hotel and flight availability.",
+        "contact": "We contact you the way you asked us to, to confirm the details.",
+        "offer": "We send you a personalised offer with the final prices."
+      },
+      "call": "Call the agency"
     },
     "errors": {
-      "submit": "We couldn't send your request. Please try again."
+      "submit": "We couldn't send your request. Please try again.",
+      "hotelUnavailable": "The hotel you picked is no longer available. Choose another one and send your request again.",
+      "hotelLookup": "We could not check the hotel list right now. Please try again in a moment.",
+      "rateLimited": "You have sent several requests in a short time. Please wait a moment before trying again."
     },
     "whatsapp": {
       "intro": "Hello Janat Sahara, I'd like a custom Umrah package:"
@@ -868,5 +994,23 @@
       "increase": "Increase {{label}}",
       "decrease": "Decrease {{label}}"
     }
+  },
+  "offerEmail": {
+    "agency": "Janat Sahara Travel",
+    "title": "Your Umrah offer",
+    "subject": "Your personalised offer {{reference}} — Janat Sahara",
+    "greeting": "Hello {{name}},",
+    "intro": "Thank you for your request. Here is the offer we prepared from your choices. To confirm, reply to this email or get in touch.",
+    "referenceLabel": "Reference",
+    "datesLabel": "Travel dates",
+    "travellersLabel": "Travellers",
+    "hotelsLabel": "Proposed hotels",
+    "flightsLabel": "Proposed flights",
+    "amountLabel": "Offer amount",
+    "notesLabel": "Notes",
+    "closing": "This offer is a proposal, not a confirmed booking. We are happy to answer any questions.",
+    "adults": "{{count}} adult(s)",
+    "children": "{{count}} child(ren)",
+    "infants": "{{count}} infant(s)"
   }
 }

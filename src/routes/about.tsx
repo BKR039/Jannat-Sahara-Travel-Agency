@@ -8,6 +8,7 @@ import { FeaturesSection, TestimonialsSection } from "@/components/sections/Home
 import { StatsSection } from "@/components/sections/StatsSection";
 import { contentQuery } from "@/lib/queries";
 import { pickLocalized, pickLocalizedList, useLocalized } from "@/lib/localize";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/about")({
       { property: "og:description", content: i18n.t("seo.about.ogDescription") },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [canonical("/about")],
   }),
   component: AboutPage,
 });
@@ -33,7 +34,6 @@ function AboutPage() {
     vision: pickLocalized(raw, "vision", lang),
     values: pickLocalizedList(raw, "values", lang),
   };
-
 
   return (
     <SiteLayout>
@@ -64,18 +64,20 @@ function AboutPage() {
       </section>
 
       <section className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-        <p className="text-body-lg leading-relaxed text-foreground/90">{L(data, "body", "empty")}</p>
+        <p className="text-body-lg leading-relaxed text-foreground/90">
+          {L(data, "body", "empty")}
+        </p>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {extra.mission && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <h3 className="mb-2 text-body-lg font-bold text-primary">{t("about.mission")}</h3>
+              <h2 className="mb-2 text-body-lg font-bold text-primary">{t("about.mission")}</h2>
               <p className="text-small text-muted-foreground">{extra.mission}</p>
             </div>
           )}
           {extra.vision && (
             <div className="rounded-lg border border-border-subtle bg-card p-6">
-              <h3 className="mb-2 text-body-lg font-bold text-primary">{t("about.vision")}</h3>
+              <h2 className="mb-2 text-body-lg font-bold text-primary">{t("about.vision")}</h2>
               <p className="text-small text-muted-foreground">{extra.vision}</p>
             </div>
           )}
@@ -86,7 +88,10 @@ function AboutPage() {
             <SectionHeading title={t("about.values")} align="start" className="mb-6" />
             <div className="flex flex-wrap gap-3">
               {extra.values.map((v) => (
-                <span key={v} className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-small font-semibold text-primary">
+                <span
+                  key={v}
+                  className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-small font-semibold text-primary"
+                >
                   {v}
                 </span>
               ))}

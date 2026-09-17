@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listAdmins } from "@/lib/admin/admin.functions";
 import { useAdmin } from "@/components/admin/context";
-import { AutoSaveBar, SettingsCard, SettingsSection, SwitchField, TextField } from "./parts";
+import { SaveBar, SettingsCard, SettingsSection, SwitchField, TextField } from "./parts";
 import { numberRange, useSiteSettings, type SettingSpec } from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
 
 const SPECS: SettingSpec[] = [
   { key: "security_require_2fa", label: "Require 2FA" },
@@ -16,25 +17,27 @@ const SPECS: SettingSpec[] = [
 ];
 
 export function SecuritySection() {
+  const { t } = useTranslation("admin");
   const s = useSiteSettings("security", SPECS);
   const { isSuperAdmin } = useAdmin();
   const list = useServerFn(listAdmins);
   const admins = useQuery({ queryKey: ["admin-admins"] as const, queryFn: () => list() });
 
-  if (s.loading) return <Skeleton className="h-64 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-64 w-full rounded-card" />;
 
   return (
     <SettingsSection
-      title="Security"
-      description="Access policies for your dashboard team. Only super admins can change these."
+      title={t("content.settings.nav.security.label")}
+      description={t("content.settings.security.description")}
     >
       <SettingsCard
-        title="Team access"
-        description="Everyone who can sign in to the admin dashboard."
+        title={t("content.settings.security.teamAccessTitle")}
+        description={t("content.settings.security.teamAccessDescription")}
         actions={
           <Button asChild variant="outline" size="sm">
             <Link to="/admin/admins">
-              Manage admins <ArrowUpRight className="ms-2 h-4 w-4" />
+              {t("content.settings.security.manageAdmins")}
+              <ArrowUpRight className="ms-2 h-4 w-4" />
             </Link>
           </Button>
         }
@@ -66,24 +69,28 @@ export function SecuritySection() {
               </li>
             ))}
           </ul>
-
         ) : (
-          <p className="text-small text-muted-foreground">No dashboard users yet.</p>
+          <p className="text-small text-muted-foreground">
+            {t("content.settings.security.noDashboardUsers")}
+          </p>
         )}
       </SettingsCard>
 
-      <SettingsCard title="Access policy" description="Applies to every dashboard user.">
+      <SettingsCard
+        title={t("content.settings.security.accessPolicyTitle")}
+        description={t("content.settings.security.accessPolicyDescription")}
+      >
         <div className="grid gap-3">
           <SwitchField
-            label="Require two-factor authentication"
-            hint="Admins must confirm a second factor before reaching the dashboard."
+            label={t("content.settings.security.require2fa")}
+            hint={t("content.settings.security.hints.require2fa")}
             checked={s.bool("security_require_2fa")}
             onChange={(v) => s.setBool("security_require_2fa", v)}
             disabled={!isSuperAdmin}
           />
           <SwitchField
-            label="Keep an audit log of admin actions"
-            hint="Records who changed what, and when."
+            label={t("content.settings.security.auditLogging")}
+            hint={t("content.settings.security.hints.auditLogging")}
             checked={s.bool("security_audit_logging")}
             onChange={(v) => s.setBool("security_audit_logging", v)}
             disabled={!isSuperAdmin}
@@ -91,8 +98,8 @@ export function SecuritySection() {
         </div>
         <div className="mt-5">
           <TextField
-            label="Session length (hours)"
-            hint="Admins are signed out after this period of inactivity. 1–720."
+            label={t("content.settings.security.sessionLength")}
+            hint={t("content.settings.security.hints.sessionLength")}
             type="number"
             error={s.errors.security_session_hours}
             value={s.form.security_session_hours ?? ""}
@@ -101,12 +108,12 @@ export function SecuritySection() {
         </div>
         {!isSuperAdmin && (
           <p className="mt-4 rounded-xl bg-surface-sunken/60 px-4 py-3 text-caption text-muted-foreground">
-            Only a super admin can change access policies.
+            {t("content.settings.security.superAdminOnly")}
           </p>
         )}
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, LogIn, Mail, Lock, KeyRound } from "lucide-react";
+import { ArrowLeft, Loader2, LogIn, Mail, Lock, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
@@ -100,7 +100,10 @@ function AuthPage() {
   }
 
   return (
-    <div dir={dirFor(i18next.language)} className="min-h-screen bg-gradient-to-br from-background via-muted/40 to-accent/20 flex items-center justify-center p-4">
+    <div
+      dir={dirFor(i18next.language)}
+      className="min-h-screen bg-gradient-to-br from-background via-muted/40 to-accent/20 flex items-center justify-center p-4"
+    >
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center">
           <Logo />
@@ -155,7 +158,11 @@ function AuthPage() {
                   </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <LogIn className="me-2 h-4 w-4" />}
+                  {busy ? (
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogIn className="me-2 h-4 w-4" />
+                  )}
                   {t("auth.signIn")}
                 </Button>
               </form>
@@ -163,9 +170,7 @@ function AuthPage() {
 
             <TabsContent value="forgot">
               <form onSubmit={onForgot} className="space-y-4">
-                <p className="text-small text-muted-foreground">
-                  {t("auth.forgotHint")}
-                </p>
+                <p className="text-small text-muted-foreground">{t("auth.forgotHint")}</p>
                 <div className="space-y-2">
                   <Label htmlFor="fpe">{t("auth.email")}</Label>
                   <div className="relative">
@@ -181,7 +186,11 @@ function AuthPage() {
                   </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <KeyRound className="me-2 h-4 w-4" />}
+                  {busy ? (
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <KeyRound className="me-2 h-4 w-4" />
+                  )}
                   {t("auth.sendResetLink")}
                 </Button>
               </form>
@@ -189,7 +198,10 @@ function AuthPage() {
           </Tabs>
 
           <p className="mt-6 text-center text-caption text-muted-foreground">
-            <Link to="/" className="hover:text-foreground">← Back to website</Link>
+            <Link to="/" className="inline-flex items-center gap-1.5 hover:text-foreground">
+              <ArrowLeft className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" aria-hidden="true" />
+              {t("auth.backToWebsite")}
+            </Link>
           </p>
         </div>
       </div>

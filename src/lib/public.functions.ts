@@ -9,9 +9,8 @@ import { ContactMessageInput, NewsletterInput, PassportUploadInput } from "./pub
 export const submitContactMessage = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ContactMessageInput.parse(d))
   .handler(async ({ data }) => {
-    const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail } = await import(
-      "./security.server"
-    );
+    const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail } =
+      await import("./security.server");
     await enforceRateLimit({ scope: "contact_message", limit: 5, windowSeconds: 600 });
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -75,7 +74,8 @@ export const uploadPassport = createServerFn({ method: "POST" })
     const bytes = decodeBase64(data.dataBase64);
     if (bytes.byteLength === 0) throw new Error("Empty file");
     if (bytes.byteLength > MAX_PASSPORT_UPLOAD_BYTES) throw new Error("File too large");
-    if (!magicBytesMatch(bytes, data.contentType)) throw new Error("File content does not match its type");
+    if (!magicBytesMatch(bytes, data.contentType))
+      throw new Error("File content does not match its type");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const path = `bookings/${crypto.randomUUID()}/passport.${extensionForMime(data.contentType)}`;

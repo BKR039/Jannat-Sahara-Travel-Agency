@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useBlocker, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -18,7 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   AlertDialog,
@@ -39,7 +45,9 @@ import {
   TextAreaField,
   TextField,
 } from "@/components/admin/settings/parts";
-import { StatusBadge } from "@/components/admin/ui";
+import { StatusChip } from "@/components/ds";
+import { Skeleton } from "@/components/admin/kit";
+import { deleteVerdict } from "@/lib/admin/package-delete";
 import { cn } from "@/lib/utils";
 import { GalleryManager, ItineraryEditor, KeywordEditor, ListEditor, PdfField } from "./fields";
 import {
@@ -55,24 +63,42 @@ import {
   type PackageRow,
   type TabKey,
 } from "./model";
+import { useTranslation } from "react-i18next";
+import { SeatPanel } from "./SeatPanel";
+import { PublicationPanel } from "./PublicationPanel";
 
-const TABS: { key: TabKey; label: string }[] = [
-  { key: "general", label: "General" },
-  { key: "pricing", label: "Pricing" },
-  { key: "media", label: "Media" },
-  { key: "hotel", label: "Hotel" },
-  { key: "flights", label: "Flights" },
-  { key: "itinerary", label: "Itinerary" },
-  { key: "included", label: "Included" },
-  { key: "excluded", label: "Excluded" },
-  { key: "documents", label: "Documents" },
-  { key: "seo", label: "SEO" },
-  { key: "gallery", label: "Gallery" },
-  { key: "availability", label: "Availability" },
-  { key: "booking", label: "Booking" },
-];
+/**
+ * Which validation errors stop a save.
+ *
+ * Title, slug and price are the columns the public page cannot render without;
+ * everything else is allowed to be incomplete in a draft.
+ */
+function blocksSave(errors: Record<string, string | undefined>): boolean {
+  return !!(errors.title || errors.slug || errors.price);
+}
+
+/** Tab labels come from the admin dictionary, like every other admin string. */
+function buildTabs(t: (key: string) => string): { key: TabKey; label: string }[] {
+  const keys: TabKey[] = [
+    "general",
+    "pricing",
+    "media",
+    "hotel",
+    "flights",
+    "itinerary",
+    "included",
+    "excluded",
+    "documents",
+    "seo",
+    "gallery",
+    "availability",
+    "booking",
+  ];
+  return keys.map((key) => ({ key, label: t(`ops.editor.tabs.${key}`) }));
+}
 
 export function PackageEditorPage({ packageId }: { packageId: string }) {
+  const { t, i18n } = useTranslation("admin");
   const isNew = packageId === "new";
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -108,7 +134,7 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
 
   const errors = useMemo(() => (form ? validate(form) : {}), [form]);
   const errorCount = Object.keys(errors).length;
-  const blocking = !!(errors.title || errors.slug || errors.price);
+  const blocking = blocksSave(errors);
   const dirty = !!form && JSON.stringify(form) !== baselineRef.current;
 
   function update<K extends keyof PackageForm>(key: K, value: PackageForm[K]) {
@@ -121,15 +147,25 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
     qc.invalidateQueries({ queryKey: ["admin-package", packageId] });
   }
 
-  async function save({ silent }: { silent?: boolean } = {}) {
-    if (!form || blocking) {
-      if (!silent) toast.error("Fix the highlighted fields before saving.");
+  /**
+   * Write the form to the database. Explicit — never called on a timer.
+   *
+   * `override` exists because a publish is one operator gesture, not two: the
+   * publish button changes the status and saves in the same click, and React
+   * state set in that click is not visible to this function's closure. Passing
+   * the intended form through the call is what makes the button do what its
+   * label says.
+   */
+  async function save({ silent, override }: { silent?: boolean; override?: PackageForm } = {}) {
+    const form_ = override ?? form;
+    if (!form_ || blocksSave(validate(form_))) {
+      if (!silent) toast.error(t("ops.editor.toastFixFields"));
       return;
     }
-    const snapshot = JSON.stringify(form);
+    const snapshot = JSON.stringify(form_);
     setSaving(true);
     try {
-      const payload = toPayload(form);
+      const payload = toPayload(form_);
       if (id) {
         const { error } = await supabase.from("packages").update(payload).eq("id", id);
         if (error) throw error;
@@ -150,21 +186,27 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
       baselineRef.current = snapshot;
       setLastSaved(new Date());
       invalidate();
-      if (!silent) toast.success(id ? "Package saved" : "Draft created");
+      if (!silent)
+        toast.success(id ? t("ops.editor.header.saved") : t("ops.editor.header.draftCreated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Save failed");
+      toast.error(e instanceof Error ? e.message : t("ops.editor.saveFailed"));
     } finally {
       setSaving(false);
     }
   }
 
-  /* auto-save (only once the record exists and validation passes) */
-  useEffect(() => {
-    if (!form || !id || !dirty || blocking || saving) return;
-    const t = setTimeout(() => void save({ silent: true }), 1500);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, id, dirty, blocking]);
+  /*
+   * Autosave removed deliberately — saving is explicit.
+   *
+   * It fired 1.5s after any keystroke, which broke two things that browser QA
+   * surfaced. First, "leave without saving" was a lie: the edit had already
+   * been written, so discarding changed nothing. Second, and worse, on a
+   * PUBLISHED programme it pushed half-typed values straight to the public
+   * page — typing "5200" over "4500" briefly advertised the trip at 52 TND.
+   *
+   * With explicit save the dirty dialog tells the truth and nothing reaches a
+   * customer until the operator decides it should.
+   */
 
   /* warn on unsaved changes when leaving */
   useEffect(() => {
@@ -174,6 +216,19 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [dirty]);
+
+  /*
+   * `beforeunload` only covers closing the tab or a hard reload. An in-app
+   * navigation — the sidebar, the back link, a notification deep link — bypassed
+   * it entirely and discarded unsaved edits silently. `useBlocker` is the
+   * router's supported hook for this, so browser back/forward and search params
+   * keep working and no history API is monkey-patched.
+   */
+  const blocker = useBlocker({
+    shouldBlockFn: () => dirty && !saving,
+    withResolver: true,
+    enableBeforeUnload: false,
+  });
 
   const duplicate = useMutation({
     mutationFn: async () => {
@@ -195,7 +250,7 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
     },
     onSuccess: (newId) => {
       invalidate();
-      toast.success("Duplicated as a new draft");
+      toast.success(t("ops.editor.toastDuplicated"));
       void navigate({ to: "/admin/packages/$id", params: { id: newId } });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -204,32 +259,75 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
   const remove = useMutation({
     mutationFn: async () => {
       if (!id) return;
+      /*
+       * The same guard the programme list applies, which the editor did not.
+       * `bookings.package_id` is ON DELETE SET NULL, so deleting a programme
+       * that has been sold does not fail — it quietly detaches every customer's
+       * booking from what they bought. Counted in the database at the moment of
+       * deletion, not from a cached row.
+       */
+      const { count, error: countError } = await supabase
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .eq("package_id", id);
+      if (countError) throw countError;
+
+      const verdict = deleteVerdict({ bookings: count ?? 0 });
+      if (!verdict.canDelete) {
+        throw new Error(
+          t("ops.packagesList.deleteBlocked.has_bookings", { count: verdict.bookings }),
+        );
+      }
+
       const { error } = await supabase.from("packages").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       invalidate();
-      toast.success("Package deleted");
+      toast.success(t("ops.editor.toastPackageDeleted"));
       void navigate({ to: "/admin/packages" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
+  /*
+   * The shape of the editor that is about to appear — action bar, tab rail,
+   * form card — rather than a spinner on an empty viewport, so opening a
+   * programme does not read as a failure to load and the layout does not jump.
+   */
   if (!isNew && record.isLoading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <div className="pb-4" role="status" aria-label={t("ops.editor.loading")}>
+        <div className="mb-6 flex flex-wrap items-center gap-3 border-b border-border-subtle pb-3">
+          <Skeleton className="h-9 w-28" />
+          <Skeleton className="h-6 w-56" />
+          <div className="ms-auto flex gap-2">
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-24" />
+          </div>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+          <div className="hidden space-y-2 lg:block">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-64 w-full rounded-card" />
+            <Skeleton className="h-40 w-full rounded-card" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!form) {
     return (
-      <SettingsCard title="Package not found">
+      <SettingsCard title={t("ops.editor.notFoundTitle")}>
         <p className="text-small text-muted-foreground">
-          This package no longer exists.{" "}
+          {t("ops.editor.notFoundDescription")}{" "}
           <Link to="/admin/packages" className="font-medium text-primary hover:underline">
-            Back to packages
+            {t("ops.editor.backToPackagesLink")}
           </Link>
         </p>
       </SettingsCard>
@@ -245,36 +343,45 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/admin/packages">
-              <ArrowLeft className="me-2 h-4 w-4" /> Packages
+              <ArrowLeft className="me-2 h-4 w-4" />
+              {t("ops.editor.backToPackages")}
             </Link>
           </Button>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h1 className="truncate text-h5 font-bold">
-                {form.title.trim() || (isNew ? "New package" : "Untitled package")}
+                {form.title.trim() ||
+                  (isNew ? t("ops.editor.header.newPackage") : t("ops.editor.header.untitled"))}
               </h1>
-              <StatusBadge status={form.status} />
+              <StatusChip value={form.status} vocab="publication" />
             </div>
             <p className="mt-0.5 flex items-center gap-2 text-caption text-muted-foreground">
               {saving ? (
                 <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  {t("ops.editor.saving")}
                 </>
               ) : dirty ? (
                 <>
                   <span className="h-2 w-2 rounded-full bg-warning" />
-                  {id ? "Unsaved changes — auto-saving" : "Draft not created yet"}
+                  {id
+                    ? t("ops.editor.header.unsavedAutosaving")
+                    : t("ops.editor.header.draftNotCreated")}
                 </>
               ) : (
                 <>
                   <Check className="h-3.5 w-3.5 text-success" />
-                  {lastSaved ? `Auto-saved at ${lastSaved.toLocaleTimeString()}` : "All changes saved"}
+                  {lastSaved
+                    ? t("ops.editor.header.savedAt", {
+                        time: lastSaved.toLocaleTimeString(i18n.language),
+                      })
+                    : t("ops.editor.header.allSaved")}
                 </>
               )}
               {errorCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-destructive">
-                  <AlertTriangle className="h-3.5 w-3.5" /> {errorCount} issue
-                  {errorCount > 1 ? "s" : ""}
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  {t("ops.editor.header.issues", { count: errorCount })}
                 </span>
               )}
             </p>
@@ -287,7 +394,8 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
               disabled={!publicPath}
               onClick={() => setPreviewOpen(true)}
             >
-              <Eye className="me-2 h-4 w-4" /> Preview
+              <Eye className="me-2 h-4 w-4" />
+              {t("ops.editor.preview")}
             </Button>
             {id && (
               <Button
@@ -296,7 +404,8 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                 disabled={duplicate.isPending}
                 onClick={() => duplicate.mutate()}
               >
-                <Copy className="me-2 h-4 w-4" /> Duplicate
+                <Copy className="me-2 h-4 w-4" />
+                {t("ops.editor.duplicate")}
               </Button>
             )}
             {form.status !== "published" ? (
@@ -304,45 +413,63 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                 size="sm"
                 disabled={saving}
                 onClick={() => {
+                  /*
+                   * Publish used to set the status and show a "Publishing…"
+                   * toast without writing anything, so the programme stayed a
+                   * draft until the operator noticed and pressed Save. One
+                   * gesture, one write: the intended form goes to `save` by
+                   * value because this click's state is not yet readable here.
+                   */
                   const next = { ...form, status: "published" as const };
-                  const nextErrors = validate(next);
-                  if (Object.keys(nextErrors).length) {
-                    setForm(next);
-                    toast.error("Resolve the highlighted fields to publish.");
+                  setForm(next);
+                  if (Object.keys(validate(next)).length) {
+                    toast.error(t("ops.editor.toastResolveFields"));
                     return;
                   }
-                  setForm(next);
-                  toast.info("Publishing…");
+                  void save({ override: next });
                 }}
               >
-                <Send className="me-2 h-4 w-4" /> Publish
+                <Send className="me-2 h-4 w-4" />
+                {t("ops.editor.publish")}
               </Button>
             ) : null}
-            <Button size="sm" variant={form.status === "published" ? "default" : "outline"} disabled={saving || !dirty} onClick={() => void save()}>
+            <Button
+              size="sm"
+              variant={form.status === "published" ? "default" : "outline"}
+              disabled={saving || !dirty}
+              onClick={() => void save()}
+            >
               {saving ? (
                 <Loader2 className="me-2 h-4 w-4 animate-spin" />
               ) : (
                 <Check className="me-2 h-4 w-4" />
               )}
-              {id ? "Save" : "Create draft"}
+              {id ? t("ops.editor.header.save") : t("ops.editor.header.createDraft")}
             </Button>
             {id && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button size="icon" variant="ghost" className="text-destructive" aria-label="Delete package">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="text-destructive"
+                    aria-label={t("ops.editor.deletePackage")}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete package?</AlertDialogTitle>
+                    <AlertDialogTitle>{t("ops.editor.deleteConfirmTitle")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      "{form.title}" will be permanently removed.
+                      {t("ops.editor.danger.deleteBody", { title: form.title })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => remove.mutate()}>Delete</AlertDialogAction>
+                    <AlertDialogCancel>{t("ops.editor.cancel")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => remove.mutate()}>
+                      {t("ops.editor.delete")}
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -353,26 +480,40 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
 
       <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
         {/* ------------------------------- tab rail ------------------------------ */}
-        <nav
-          aria-label="Editor sections"
-          className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
+        {/*
+         * Real tab semantics, and the shell's own selection language: a
+         * start-edge marker that mirrors with the writing direction plus the
+         * primary tint, rather than a second, editor-only idea of "selected".
+         */}
+        <div
+          role="tablist"
+          aria-label={t("ops.editor.editorSections")}
+          aria-orientation="vertical"
+          className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
         >
-          {TABS.map((t) => {
-            const count = errorCountForTab(t.key, errors);
+          {buildTabs(t).map((entry) => {
+            const count = errorCountForTab(entry.key, errors);
+            const active = tab === entry.key;
             return (
               <button
-                key={t.key}
+                key={entry.key}
                 type="button"
-                onClick={() => setTab(t.key)}
-                aria-current={tab === t.key}
+                role="tab"
+                id={`editor-tab-${entry.key}`}
+                aria-selected={active}
+                aria-controls="editor-tabpanel"
+                onClick={() => setTab(entry.key)}
                 className={cn(
-                  "flex shrink-0 items-center justify-between gap-2 rounded-xl px-3 py-2 text-small font-medium transition-colors lg:w-full",
-                  tab === t.key
-                    ? "bg-accent text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "relative flex min-h-11 shrink-0 items-center justify-between gap-2 rounded-input px-3 py-2",
+                  "text-small font-medium transition-colors duration-fast ease-standard lg:w-full",
+                  "before:absolute before:start-0 before:top-1/2 before:h-5 before:w-0.5",
+                  "before:-translate-y-1/2 before:rounded-full before:transition-colors",
+                  active
+                    ? "bg-primary/10 text-primary before:bg-primary"
+                    : "text-foreground/70 before:bg-transparent hover:bg-accent hover:text-foreground",
                 )}
               >
-                {t.label}
+                {entry.label}
                 {count > 0 && (
                   <span className="grid h-5 min-w-5 place-items-center rounded-full bg-destructive px-1 text-caption font-bold text-primary-foreground">
                     {count}
@@ -381,15 +522,23 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
               </button>
             );
           })}
-        </nav>
+        </div>
 
         {/* ------------------------------- tab panels ---------------------------- */}
-        <div className="min-w-0 space-y-6">
+        <div
+          id="editor-tabpanel"
+          role="tabpanel"
+          aria-labelledby={`editor-tab-${tab}`}
+          className="min-w-0 space-y-6"
+        >
           {tab === "general" && (
-            <SettingsCard title="General" description="Core identity of this package.">
+            <SettingsCard
+              title={t("ops.editor.tabs.general")}
+              description={t("ops.editor.general.cardDescription")}
+            >
               <FieldGrid>
                 <TextField
-                  label="Title"
+                  label={t("ops.editor.general.title")}
                   value={form.title}
                   error={errors.title}
                   onChange={(v) =>
@@ -398,20 +547,21 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                         ? {
                             ...f,
                             title: v,
-                            slug: !id && (!f.slug || f.slug === slugify(f.title)) ? slugify(v) : f.slug,
+                            slug:
+                              !id && (!f.slug || f.slug === slugify(f.title)) ? slugify(v) : f.slug,
                           }
                         : f,
                     )
                   }
                 />
                 <TextField
-                  label="Slug"
-                  hint={publicPath ?? "Used in the public URL."}
+                  label={t("ops.editor.general.slug")}
+                  hint={publicPath ?? t("ops.editor.slugHint")}
                   value={form.slug}
                   error={errors.slug}
                   onChange={(v) => update("slug", v)}
                 />
-                <Field label="Service category">
+                <Field label={t("ops.editor.general.category")}>
                   <Select
                     value={form.category}
                     onValueChange={(v) => update("category", v as PackageForm["category"])}
@@ -420,44 +570,78 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      {/* The translated label, never the database enum. */}
                       {CATEGORIES.map((c) => (
-                        <SelectItem key={c} value={c} className="capitalize">
-                          {c}
+                        <SelectItem key={c} value={c}>
+                          {t(`ops.categories.${c}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Status" hint="Only published packages appear on the website.">
-                  <Select
-                    value={form.status}
-                    onValueChange={(v) => update("status", v as PackageForm["status"])}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STATUSES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s.replace(/_/g, " ")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/*
+                 * Publication is driven by the shared action model rather than
+                 * a raw enum picker, so the editor and the programme list
+                 * cannot drift apart on what a status transition means.
+                 */}
+                <Field label={t("ops.editor.general.status")} wide>
+                  <PublicationPanel
+                    status={form.status}
+                    busy={saving}
+                    onChange={(next) => update("status", next)}
+                  />
                 </Field>
-                <TextField label="Country" value={form.country} onChange={(v) => update("country", v)} />
-                <TextField label="City" value={form.city} onChange={(v) => update("city", v)} />
                 <TextField
-                  label="Destination label"
-                  hint="Shown on cards, e.g. “Makkah & Madinah”."
+                  label={t("ops.editor.general.country")}
+                  value={form.country}
+                  onChange={(v) => update("country", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.countryFr")}
+                  value={form.country_fr}
+                  onChange={(v) => update("country_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.countryEn")}
+                  value={form.country_en}
+                  onChange={(v) => update("country_en", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.city")}
+                  value={form.city}
+                  onChange={(v) => update("city", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.cityFr")}
+                  value={form.city_fr}
+                  onChange={(v) => update("city_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.cityEn")}
+                  value={form.city_en}
+                  onChange={(v) => update("city_en", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.destinationLabel")}
+                  hint={t("ops.editor.general.destinationHint")}
                   wide
                   value={form.destination}
                   onChange={(v) => update("destination", v)}
                 />
+                <TextField
+                  label={t("ops.editor.general.destinationFr")}
+                  value={form.destination_fr}
+                  onChange={(v) => update("destination_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.general.destinationEn")}
+                  value={form.destination_en}
+                  onChange={(v) => update("destination_en", v)}
+                />
                 <div className="md:col-span-2">
                   <TextAreaField
-                    label="Short description"
-                    hint="One or two lines used on package cards."
+                    label={t("ops.editor.general.shortDescription")}
+                    hint={t("ops.editor.general.shortDescriptionHint")}
                     rows={2}
                     value={form.short_description}
                     onChange={(v) => update("short_description", v)}
@@ -466,20 +650,53 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                     <p className="text-caption text-destructive">{errors.short_description}</p>
                   )}
                 </div>
+                <div className="md:col-span-2">
+                  <TextAreaField
+                    label={t("ops.editor.general.shortDescriptionFr")}
+                    rows={2}
+                    value={form.short_description_fr}
+                    onChange={(v) => update("short_description_fr", v)}
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <TextAreaField
+                    label={t("ops.editor.general.shortDescriptionEn")}
+                    hint={t("ops.localized.emptyHint")}
+                    rows={2}
+                    value={form.short_description_en}
+                    onChange={(v) => update("short_description_en", v)}
+                  />
+                </div>
                 <TextAreaField
-                  label="Full description"
+                  label={t("ops.editor.general.fullDescription")}
                   rows={7}
                   value={form.description}
                   onChange={(v) => update("description", v)}
                 />
-                <Field label="Sort order" hint="Lower numbers appear first.">
+                <TextAreaField
+                  label={t("ops.editor.general.fullDescriptionFr")}
+                  rows={7}
+                  value={form.description_fr}
+                  onChange={(v) => update("description_fr", v)}
+                />
+                <TextAreaField
+                  label={t("ops.editor.general.fullDescriptionEn")}
+                  hint={t("ops.localized.emptyHint")}
+                  rows={7}
+                  value={form.description_en}
+                  onChange={(v) => update("description_en", v)}
+                />
+                <Field label={t("ops.editor.general.sortOrder")} hint="Lower numbers appear first.">
                   <Input
                     type="number"
                     value={form.sort_order}
                     onChange={(e) => update("sort_order", e.target.value)}
                   />
                 </Field>
-                <Field label="Featured" hint="Highlight this package on the homepage.">
+                <Field
+                  label={t("ops.editor.general.featured")}
+                  hint="Highlight this package on the homepage."
+                >
                   <div className="flex items-center gap-3 pt-2">
                     <Switch
                       id="featured"
@@ -487,7 +704,7 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                       onCheckedChange={(v) => update("featured", v)}
                     />
                     <Label htmlFor="featured" className="text-small">
-                      Show in featured section
+                      {t("ops.editor.general.showFeatured")}
                     </Label>
                   </div>
                 </Field>
@@ -496,18 +713,25 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "pricing" && (
-            <SettingsCard title="Pricing" description="Base fare, promotions, and per-traveller rates.">
+            <SettingsCard
+              title={t("ops.editor.tabs.pricing")}
+              description={t("ops.editor.pricing.cardDescription")}
+            >
               <FieldGrid>
                 <TextField
-                  label="Base price"
+                  label={t("ops.editor.pricing.basePrice")}
                   type="number"
                   value={form.price}
                   error={errors.price}
                   onChange={(v) => update("price", v)}
                 />
-                <TextField label="Currency" value={form.currency} onChange={(v) => update("currency", v)} />
                 <TextField
-                  label="Discounted price"
+                  label={t("ops.editor.pricing.currency")}
+                  value={form.currency}
+                  onChange={(v) => update("currency", v)}
+                />
+                <TextField
+                  label={t("ops.editor.pricing.discountedPrice")}
                   hint="Leave empty when there is no promotion."
                   type="number"
                   value={form.discount_price}
@@ -515,21 +739,21 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   onChange={(v) => update("discount_price", v)}
                 />
                 <TextField
-                  label="Discount (%)"
+                  label={t("ops.editor.pricing.discountPercent")}
                   type="number"
                   value={form.discount}
                   error={errors.discount}
                   onChange={(v) => update("discount", v)}
                 />
                 <TextField
-                  label="Child price"
+                  label={t("ops.editor.pricing.childPrice")}
                   type="number"
                   value={form.child_price}
                   error={errors.child_price}
                   onChange={(v) => update("child_price", v)}
                 />
                 <TextField
-                  label="Infant price"
+                  label={t("ops.editor.pricing.infantPrice")}
                   type="number"
                   value={form.infant_price}
                   error={errors.infant_price}
@@ -538,10 +762,10 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
               </FieldGrid>
               <div className="mt-6 rounded-xl border border-border-subtle bg-surface-sunken/40 p-4">
                 <p className="text-caption uppercase tracking-wide text-muted-foreground">
-                  Traveller pays
+                  {t("ops.editor.pricing.travellerPays")}
                 </p>
                 <p className="mt-1 text-h4 font-bold tabular-nums">
-                  {(form.discount_price || form.price || "0")} {form.currency}
+                  {form.discount_price || form.price || "0"} {form.currency}
                   {form.discount_price && (
                     <span className="ms-2 text-body font-normal text-muted-foreground line-through">
                       {form.price} {form.currency}
@@ -553,10 +777,13 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "media" && (
-            <SettingsCard title="Media" description="Cover image and downloadable brochure.">
+            <SettingsCard
+              title={t("ops.editor.tabs.media")}
+              description={t("ops.editor.media.cardDescription")}
+            >
               <div className="grid gap-5">
                 <ImageField
-                  label="Cover image"
+                  label={t("ops.editor.media.coverImage")}
                   hint="Used on cards, package page hero, and social previews."
                   value={form.cover}
                   folder="packages"
@@ -564,7 +791,7 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                 />
                 {errors.cover && <p className="text-caption text-destructive">{errors.cover}</p>}
                 <PdfField
-                  label="Brochure (PDF)"
+                  label={t("ops.editor.media.brochure")}
                   hint="Optional downloadable programme."
                   value={form.brochure_pdf}
                   onChange={(v) => update("brochure_pdf", v)}
@@ -574,39 +801,83 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "hotel" && (
-            <SettingsCard title="Accommodation" description="Where travellers stay and how they move.">
+            <SettingsCard
+              title={t("ops.editor.hotel.cardTitle")}
+              description={t("ops.editor.hotel.cardDescription")}
+            >
               <FieldGrid>
-                <TextField label="Hotel name" value={form.hotel} onChange={(v) => update("hotel", v)} />
                 <TextField
-                  label="Hotel rating (1–5)"
+                  label={t("ops.editor.hotel.hotelName")}
+                  value={form.hotel}
+                  onChange={(v) => update("hotel", v)}
+                />
+                <TextField
+                  label={t("ops.editor.hotel.hotelNameFr")}
+                  value={form.hotel_fr}
+                  onChange={(v) => update("hotel_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.hotel.hotelNameEn")}
+                  value={form.hotel_en}
+                  onChange={(v) => update("hotel_en", v)}
+                />
+                <TextField
+                  label={t("ops.editor.hotel.hotelRating")}
                   type="number"
                   value={form.hotel_rating}
                   error={errors.hotel_rating}
                   onChange={(v) => update("hotel_rating", v)}
                 />
                 <TextField
-                  label="Ground transport"
+                  label={t("ops.editor.hotel.groundTransport")}
                   hint="e.g. Private air-conditioned coach"
                   wide
                   value={form.transport}
                   onChange={(v) => update("transport", v)}
+                />
+                <TextField
+                  label={t("ops.editor.hotel.groundTransportFr")}
+                  value={form.transport_fr}
+                  onChange={(v) => update("transport_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.hotel.groundTransportEn")}
+                  value={form.transport_en}
+                  onChange={(v) => update("transport_en", v)}
                 />
               </FieldGrid>
             </SettingsCard>
           )}
 
           {tab === "flights" && (
-            <SettingsCard title="Flights" description="Airline and travel dates.">
+            <SettingsCard
+              title={t("ops.editor.tabs.flights")}
+              description={t("ops.editor.flights.cardDescription")}
+            >
               <FieldGrid>
-                <TextField label="Airline" value={form.airline} onChange={(v) => update("airline", v)} />
-                <Field label="Departure date">
+                <TextField
+                  label={t("ops.editor.flights.airline")}
+                  value={form.airline}
+                  onChange={(v) => update("airline", v)}
+                />
+                <TextField
+                  label={t("ops.editor.flights.airlineFr")}
+                  value={form.airline_fr}
+                  onChange={(v) => update("airline_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.flights.airlineEn")}
+                  value={form.airline_en}
+                  onChange={(v) => update("airline_en", v)}
+                />
+                <Field label={t("ops.editor.flights.departureDate")}>
                   <Input
                     type="date"
                     value={form.departure_date}
                     onChange={(e) => update("departure_date", e.target.value)}
                   />
                 </Field>
-                <Field label="Return date" error={errors.return_date}>
+                <Field label={t("ops.editor.flights.returnDate")} error={errors.return_date}>
                   <Input
                     type="date"
                     value={form.return_date}
@@ -618,17 +889,23 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "itinerary" && (
-            <SettingsCard title="Itinerary" description="Day-by-day programme shown on the package page.">
+            <SettingsCard
+              title={t("ops.editor.tabs.itinerary")}
+              description={t("ops.editor.itinerary.cardDescription")}
+            >
               <ItineraryEditor items={form.timeline} onChange={(v) => update("timeline", v)} />
             </SettingsCard>
           )}
 
           {tab === "included" && (
-            <SettingsCard title="What's included" description="Everything covered by the price.">
+            <SettingsCard
+              title={t("ops.editor.included.cardTitle")}
+              description={t("ops.editor.included.cardDescription")}
+            >
               <ListEditor
                 items={form.included}
                 onChange={(v) => update("included", v)}
-                placeholder="Return flights from Tunis"
+                placeholder={t("ops.editor.included.placeholder")}
                 addLabel="Add inclusion"
                 emptyTitle="No inclusions listed"
                 emptyDescription="Add the services covered by this package."
@@ -637,11 +914,14 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "excluded" && (
-            <SettingsCard title="What's not included" description="Set expectations up front.">
+            <SettingsCard
+              title={t("ops.editor.excluded.cardTitle")}
+              description={t("ops.editor.excluded.cardDescription")}
+            >
               <ListEditor
                 items={form.excluded}
                 onChange={(v) => update("excluded", v)}
-                placeholder="Personal expenses"
+                placeholder={t("ops.editor.excluded.placeholder")}
                 addLabel="Add exclusion"
                 emptyTitle="No exclusions listed"
                 emptyDescription="Add anything travellers must pay separately."
@@ -650,11 +930,14 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "documents" && (
-            <SettingsCard title="Required documents" description="Paperwork travellers must provide.">
+            <SettingsCard
+              title={t("ops.editor.documents.cardTitle")}
+              description={t("ops.editor.documents.cardDescription")}
+            >
               <ListEditor
                 items={form.required_documents}
                 onChange={(v) => update("required_documents", v)}
-                placeholder="Passport valid for 6 months"
+                placeholder={t("ops.editor.documents.placeholder")}
                 addLabel="Add document"
                 emptyTitle="No documents listed"
                 emptyDescription="List the documents needed to confirm a booking."
@@ -663,10 +946,13 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
           )}
 
           {tab === "seo" && (
-            <SettingsCard title="SEO" description="How this package appears in search and social previews.">
+            <SettingsCard
+              title={t("ops.editor.tabs.seo")}
+              description={t("ops.editor.seo.cardDescription")}
+            >
               <FieldGrid>
                 <TextField
-                  label="SEO title"
+                  label={t("ops.editor.seo.seoTitle")}
                   wide
                   maxCount={60}
                   value={form.seo_title}
@@ -675,7 +961,21 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   onChange={(v) => update("seo_title", v)}
                 />
                 <TextField
-                  label="Meta description"
+                  label={t("ops.editor.seo.seoTitleFr")}
+                  wide
+                  maxCount={60}
+                  value={form.seo_title_fr}
+                  onChange={(v) => update("seo_title_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.seo.seoTitleEn")}
+                  wide
+                  maxCount={60}
+                  value={form.seo_title_en}
+                  onChange={(v) => update("seo_title_en", v)}
+                />
+                <TextField
+                  label={t("ops.editor.seo.metaDescription")}
                   wide
                   maxCount={160}
                   value={form.seo_description}
@@ -683,8 +983,30 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   placeholder={form.short_description}
                   onChange={(v) => update("seo_description", v)}
                 />
-                <Field label="Keywords" wide hint="Press Enter or comma to add.">
-                  <KeywordEditor items={form.seo_keywords} onChange={(v) => update("seo_keywords", v)} />
+                <TextField
+                  label={t("ops.editor.seo.metaDescriptionFr")}
+                  wide
+                  maxCount={160}
+                  value={form.seo_description_fr}
+                  onChange={(v) => update("seo_description_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.seo.metaDescriptionEn")}
+                  wide
+                  maxCount={160}
+                  hint={t("ops.localized.emptyHint")}
+                  value={form.seo_description_en}
+                  onChange={(v) => update("seo_description_en", v)}
+                />
+                <Field
+                  label={t("ops.editor.seo.keywords")}
+                  wide
+                  hint="Press Enter or comma to add."
+                >
+                  <KeywordEditor
+                    items={form.seo_keywords}
+                    onChange={(v) => update("seo_keywords", v)}
+                  />
                 </Field>
               </FieldGrid>
               <div className="mt-6 rounded-xl border border-border-subtle bg-surface-sunken/40 p-4">
@@ -703,73 +1025,102 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
 
           {tab === "gallery" && (
             <SettingsCard
-              title="Gallery"
-              description="Photos shown on the package page. The first image is the main one."
+              title={t("ops.editor.tabs.gallery")}
+              description={t("ops.editor.gallery.cardDescription")}
             >
               <GalleryManager items={form.gallery} onChange={(v) => update("gallery", v)} />
             </SettingsCard>
           )}
 
           {tab === "availability" && (
-            <SettingsCard title="Availability" description="Duration and seat inventory.">
+            <SettingsCard
+              title={t("ops.editor.tabs.availability")}
+              description={t("ops.editor.availability.cardDescription")}
+            >
               <FieldGrid>
                 <TextField
-                  label="Duration"
+                  label={t("ops.editor.availability.duration")}
                   hint="e.g. 10 days / 9 nights"
                   value={form.duration}
                   onChange={(v) => update("duration", v)}
                 />
                 <TextField
-                  label="Available seats"
-                  type="number"
-                  value={form.seats}
-                  error={errors.seats}
-                  onChange={(v) => update("seats", v)}
+                  label={t("ops.editor.availability.durationFr")}
+                  value={form.duration_fr}
+                  onChange={(v) => update("duration_fr", v)}
                 />
                 <TextField
-                  label="Total seats"
+                  label={t("ops.editor.availability.durationEn")}
+                  value={form.duration_en}
+                  onChange={(v) => update("duration_en", v)}
+                />
+                {/*
+                 * Capacity is the only seat number an operator sets. The
+                 * previous form also exposed an "available seats" input and
+                 * inferred bookings by subtracting it from capacity — the
+                 * inverse of how availability actually works, and a number that
+                 * drifted from reality the moment a booking was taken.
+                 */}
+                <TextField
+                  label={t("ops.editor.availability.totalSeats")}
                   type="number"
                   value={form.total_seats}
                   error={errors.total_seats}
+                  hint={t("ops.editor.availability.capacityHint")}
                   onChange={(v) => update("total_seats", v)}
                 />
               </FieldGrid>
-              {form.total_seats && (
-                <p className="mt-4 text-caption text-muted-foreground">
-                  {Math.max(0, Number(form.total_seats) - Number(form.seats || 0))} of{" "}
-                  {form.total_seats} seats booked.
-                </p>
-              )}
+              <SeatPanel packageId={id} totalSeats={form.total_seats} />
             </SettingsCard>
           )}
 
           {tab === "booking" && (
-            <SettingsCard title="Booking" description="What travellers see when they reserve.">
+            <SettingsCard
+              title={t("ops.editor.tabs.booking")}
+              description={t("ops.editor.booking.cardDescription")}
+            >
               <FieldGrid>
                 <TextField
-                  label="Meeting point"
+                  label={t("ops.editor.booking.meetingPoint")}
                   hint="Where travellers gather before departure."
                   wide
                   value={form.meeting_point}
                   onChange={(v) => update("meeting_point", v)}
                 />
+                <TextField
+                  label={t("ops.editor.booking.meetingPointFr")}
+                  value={form.meeting_point_fr}
+                  onChange={(v) => update("meeting_point_fr", v)}
+                />
+                <TextField
+                  label={t("ops.editor.booking.meetingPointEn")}
+                  value={form.meeting_point_en}
+                  onChange={(v) => update("meeting_point_en", v)}
+                />
               </FieldGrid>
               <div className="mt-6 grid gap-3 rounded-xl border border-border-subtle bg-surface-sunken/40 p-4 text-small">
                 <p className="flex items-center justify-between gap-3">
-                  <span className="text-muted-foreground">Bookable on the website</span>
+                  <span className="text-muted-foreground">
+                    {t("ops.editor.booking.bookableOnWebsite")}
+                  </span>
                   <span className="font-medium">
-                    {form.status === "published" && Number(form.seats || 0) > 0 ? "Yes" : "No"}
+                    {form.status === "published"
+                      ? t("ops.editor.booking.yes")
+                      : t("ops.editor.booking.no")}
                   </span>
                 </p>
                 <p className="flex items-center justify-between gap-3">
-                  <span className="text-muted-foreground">Required documents configured</span>
+                  <span className="text-muted-foreground">
+                    {t("ops.editor.booking.requiredDocsConfigured")}
+                  </span>
                   <span className="font-medium">{form.required_documents.length}</span>
                 </p>
                 <Link
                   to="/admin/bookings"
                   className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
                 >
-                  Open bookings <ExternalLink className="h-3.5 w-3.5" />
+                  {t("ops.editor.booking.openBookings")}
+                  <ExternalLink className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </SettingsCard>
@@ -777,18 +1128,60 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
         </div>
       </div>
 
+      {/*
+       * In-app unsaved-changes guard. Three outcomes, matching what the
+       * operator actually wants at that moment: keep the work, drop it, or go
+       * back to editing. `window.confirm` cannot express the first.
+       */}
+      <AlertDialog open={blocker.status === "blocked"}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("ops.editor.unsaved.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("ops.editor.unsaved.body")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => blocker.reset?.()}>
+              {t("ops.editor.unsaved.stay")}
+            </AlertDialogCancel>
+            <Button
+              variant="outline"
+              onClick={() => {
+                // Baseline is reset first so the guard does not re-fire.
+                baselineRef.current = JSON.stringify(form);
+                blocker.proceed?.();
+              }}
+            >
+              {t("ops.editor.unsaved.discard")}
+            </Button>
+            <AlertDialogAction
+              onClick={async () => {
+                await save();
+                blocker.proceed?.();
+              }}
+            >
+              {t("ops.editor.unsaved.saveAndLeave")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* -------------------------------- preview -------------------------------- */}
       <Sheet open={previewOpen} onOpenChange={setPreviewOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-3xl">
+        {/* The end edge in both directions — the sheet primitive's sides are
+            physical, so the direction is chosen here rather than restyling it. */}
+        <SheetContent
+          side={i18n.dir() === "rtl" ? "left" : "right"}
+          className="w-full sm:max-w-3xl"
+        >
           <SheetHeader>
-            <SheetTitle>Live preview</SheetTitle>
+            <SheetTitle>{t("ops.editor.previewTitle")}</SheetTitle>
           </SheetHeader>
           {publicPath && (
             <div className="mt-4 h-[calc(100vh-8rem)] overflow-hidden rounded-xl border border-border-subtle">
               <iframe
                 key={`${publicPath}-${lastSaved?.getTime() ?? 0}`}
                 src={publicPath}
-                title="Package preview"
+                title={t("ops.editor.previewFrameTitle")}
                 className="h-full w-full bg-background"
               />
             </div>
@@ -800,7 +1193,8 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
               rel="noreferrer"
               className="mt-3 inline-flex items-center gap-1 text-caption font-medium text-primary hover:underline"
             >
-              Open in a new tab <ExternalLink className="h-3.5 w-3.5" />
+              {t("ops.editor.openInNewTab")}
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           )}
         </SheetContent>

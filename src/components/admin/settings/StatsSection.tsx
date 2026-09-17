@@ -8,25 +8,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
-import { AutoSaveBar, IconPicker, SettingsCard, SettingsSection, useLastSaved } from "./parts";
+import { SaveBar, IconPicker, SettingsCard, SettingsSection, useLastSaved } from "./parts";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import { LocalizedField } from "@/components/admin/LocalizedField";
 
 interface StatDraft {
   id: string | null;
   tempId: string;
   label: string;
+  label_fr: string;
+  label_en: string;
   value: string;
   icon: string;
 }
 
 export function StatsSection() {
+  const { t } = useTranslation("admin");
   const qc = useQueryClient();
   const query = useQuery({
     queryKey: ["admin-site-stats"] as const,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("site_stats")
-        .select("id,label,value,icon,sort_order")
+        .select("id,label,label_fr,label_en,value,icon,sort_order")
         .order("sort_order");
       if (error) throw error;
       return data;
@@ -39,6 +44,8 @@ export function StatsSection() {
         id: r.id,
         tempId: r.id,
         label: r.label ?? "",
+        label_fr: r.label_fr ?? "",
+        label_en: r.label_en ?? "",
         value: r.value ?? "",
         icon: r.icon ?? "",
       })),
@@ -63,6 +70,9 @@ export function StatsSection() {
         if (!it.label.trim() || !it.value.trim()) continue;
         const payload = {
           label: it.label.trim(),
+          // Empty stays NULL so the documented public fallback applies.
+          label_fr: it.label_fr.trim() || null,
+          label_en: it.label_en.trim() || null,
           value: it.value.trim(),
           icon: it.icon || null,
           sort_order: i,
@@ -77,7 +87,7 @@ export function StatsSection() {
       }
     },
     onSuccess: () => {
-      toast.success("Statistics updated");
+      toast.success(t("content.settings.stats.updated"));
       qc.invalidateQueries({ queryKey: ["admin-site-stats"] });
       qc.invalidateQueries({ queryKey: ["site_stats"] });
     },
@@ -108,12 +118,12 @@ export function StatsSection() {
     });
   }
 
-  if (query.isLoading) return <Skeleton className="h-72 w-full rounded-2xl" />;
+  if (query.isLoading) return <Skeleton className="h-72 w-full rounded-card" />;
 
   return (
     <SettingsSection
-      title="Statistics"
-      description="The achievement counters on your homepage. Drag the cards to change the order travellers see them in."
+      title={t("content.settings.nav.statistics.label")}
+      description={t("content.settings.stats.description")}
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((it, index) => (
@@ -128,7 +138,7 @@ export function StatsSection() {
             }}
             onDragEnd={() => setDragIndex(null)}
             className={cn(
-              "group rounded-2xl border border-border-subtle bg-card p-5 shadow-sm transition-all",
+              "group rounded-card border border-border-subtle bg-card p-5 transition-all",
               dragIndex === index && "opacity-60 ring-2 ring-primary/40",
             )}
           >
@@ -142,7 +152,7 @@ export function StatsSection() {
                   size="icon"
                   variant="ghost"
                   className="h-8 w-8"
-                  aria-label="Move up"
+                  aria-label={t("content.settings.stats.moveUp")}
                   disabled={index === 0}
                   onClick={() => move(index, index - 1)}
                 >
@@ -152,7 +162,7 @@ export function StatsSection() {
                   size="icon"
                   variant="ghost"
                   className="h-8 w-8"
-                  aria-label="Move down"
+                  aria-label={t("content.settings.stats.moveDown")}
                   disabled={index === items.length - 1}
                   onClick={() => move(index, index + 1)}
                 >
@@ -162,7 +172,7 @@ export function StatsSection() {
                   size="icon"
                   variant="ghost"
                   className="h-8 w-8 text-destructive"
-                  aria-label="Remove statistic"
+                  aria-label={t("content.settings.stats.removeStatistic")}
                   onClick={() => setItems((l) => l.filter((x) => x.tempId !== it.tempId))}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -175,30 +185,33 @@ export function StatsSection() {
                 <DynamicIcon name={it.icon} className="h-5 w-5" />
               </span>
               <div className="min-w-0">
-                <p className="text-h5 font-bold tabular-nums">{it.value || "0"}</p>
-                <p className="truncate text-caption text-muted-foreground">{it.label || "Label"}</p>
+                <p className="text-h5 font-bold tabular-nums">
+                  {it.value || t("content.settings.stats.valueFallback")}
+                </p>
+                <p className="truncate text-caption text-muted-foreground">
+                  {it.label || t("content.settings.stats.labelFallback")}
+                </p>
               </div>
             </div>
 
             <div className="grid gap-3">
               <div className="grid gap-1.5">
-                <Label className="text-caption">Icon</Label>
+                <Label className="text-caption">{t("content.settings.stats.icon")}</Label>
                 <IconPicker value={it.icon} onChange={(v) => patch(it.tempId, { icon: v })} />
               </div>
+              <LocalizedField
+                label={t("content.settings.stats.label")}
+                values={{ base: it.label, fr: it.label_fr, en: it.label_en }}
+                onChange={(v) =>
+                  patch(it.tempId, { label: v.base, label_fr: v.fr, label_en: v.en })
+                }
+              />
               <div className="grid gap-1.5">
-                <Label className="text-caption">Label</Label>
-                <Input
-                  value={it.label}
-                  onChange={(e) => patch(it.tempId, { label: e.target.value })}
-                  placeholder="Happy travellers"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label className="text-caption">Value</Label>
+                <Label className="text-caption">{t("content.settings.stats.value")}</Label>
                 <Input
                   value={it.value}
                   onChange={(e) => patch(it.tempId, { value: e.target.value })}
-                  placeholder="12 000+"
+                  placeholder={t("content.settings.stats.valuePlaceholder")}
                 />
               </div>
             </div>
@@ -210,23 +223,32 @@ export function StatsSection() {
           onClick={() =>
             setItems((l) => [
               ...l,
-              { id: null, tempId: `new-${Date.now()}`, label: "", value: "", icon: "sparkles" },
+              {
+                id: null,
+                tempId: `new-${Date.now()}`,
+                label: "",
+                label_fr: "",
+                label_en: "",
+                value: "",
+                icon: "sparkles",
+              },
             ])
           }
-          className="flex min-h-56 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-surface-sunken/30 text-small text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+          className="flex min-h-56 flex-col items-center justify-center gap-2 rounded-card border border-dashed border-border bg-surface-sunken/30 text-small text-muted-foreground transition-colors hover:border-primary hover:text-primary"
         >
-          <Plus className="h-5 w-5" /> Add statistic card
+          <Plus className="h-5 w-5" />
+          {t("content.settings.stats.addCard")}
         </button>
       </div>
 
-      <SettingsCard title="Tip">
+      <SettingsCard title={t("content.settings.stats.tipTitle")}>
         <p className="text-small leading-relaxed text-muted-foreground">
           Keep values short and human — “12 000+” reads better than “12034”. Three to four cards
           work best on mobile.
         </p>
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={dirty}
         saving={save.isPending}
         lastSaved={lastSaved}

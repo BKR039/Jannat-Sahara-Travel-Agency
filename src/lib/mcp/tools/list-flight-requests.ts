@@ -8,9 +8,25 @@ export default defineTool({
   description:
     "List customer flight quote requests with route, dates, passengers, cabin class and status. Requires an admin or staff account.",
   inputSchema: {
-    status: z.string().trim().min(1).optional().describe("Filter by request status (e.g. new, in_progress, completed)."),
-    reference: z.string().trim().min(1).optional().describe("Look up a single request by its reference number."),
-    limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of requests to return."),
+    status: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("Filter by request status (e.g. new, in_progress, completed)."),
+    reference: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("Look up a single request by its reference number."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(20)
+      .describe("Maximum number of requests to return."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ status, reference, limit }, ctx) => {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { adminDocTitle } from "@/lib/admin/doc-title";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,15 +10,40 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { PageHeader, AdminCard, EmptyState } from "@/components/admin/ui";
 import type { Database } from "@/integrations/supabase/types";
+import { useTranslation } from "react-i18next";
+import { LocalizedField } from "@/components/admin/LocalizedField";
+import { ErrorState } from "@/components/admin/kit";
 
-export const Route = createFileRoute("/admin/faq")({ component: FaqAdminPage });
+export const Route = createFileRoute("/admin/faq")({
+  head: () => ({
+    meta: [{ title: adminDocTitle("faq") }],
+  }),
+  component: FaqAdminPage,
+});
 type F = Database["public"]["Tables"]["faqs"]["Row"];
 
 function FaqAdminPage() {
+  const { t } = useTranslation("admin");
   const qc = useQueryClient();
   const [editing, setEditing] = useState<F | null>(null);
   const [creating, setCreating] = useState(false);
@@ -31,24 +57,49 @@ function FaqAdminPage() {
     },
   });
 
-  function invalidate() { qc.invalidateQueries({ queryKey: ["admin-faqs"] }); qc.invalidateQueries({ queryKey: ["faqs"] }); }
+  function invalidate() {
+    qc.invalidateQueries({ queryKey: ["admin-faqs"] });
+    qc.invalidateQueries({ queryKey: ["faqs"] });
+  }
 
   const remove = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("faqs").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { toast.success("Deleted"); invalidate(); },
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("faqs").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(t("content.common.deleted"));
+      invalidate();
+    },
   });
 
   const toggle = useMutation({
-    mutationFn: async (f: F) => { const { error } = await supabase.from("faqs").update({ active: !f.active }).eq("id", f.id); if (error) throw error; },
+    mutationFn: async (f: F) => {
+      const { error } = await supabase.from("faqs").update({ active: !f.active }).eq("id", f.id);
+      if (error) throw error;
+    },
     onSuccess: invalidate,
   });
 
   return (
     <>
-      <PageHeader title="FAQ" actions={<Button onClick={() => setCreating(true)}><Plus className="me-2 h-4 w-4" /> New FAQ</Button>} />
+      <PageHeader
+        title={t("content.faq.pageTitle")}
+        actions={
+          <Button onClick={() => setCreating(true)}>
+            <Plus className="me-2 h-4 w-4" />
+            {t("content.faq.newFaq")}
+          </Button>
+        }
+      />
       <AdminCard>
-        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
-          <EmptyState title="No FAQs yet" icon={HelpCircle} />
+        {list.isLoading ? (
+          <p className="text-small text-muted-foreground">{t("content.faq.loading")}</p>
+        ) : list.isError ? (
+          // A failed query must never look like an empty table.
+          <ErrorState onRetry={() => list.refetch()} />
+        ) : !list.data?.length ? (
+          <EmptyState title={t("content.faq.empty")} icon={HelpCircle} />
         ) : (
           <div className="divide-y divide-border -mx-4 sm:-mx-5">
             {list.data.map((f) => (
@@ -56,16 +107,48 @@ function FaqAdminPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{f.question}</p>
                   <p className="mt-1 text-small text-muted-foreground line-clamp-2">{f.answer}</p>
-                  {f.category && <p className="mt-1 text-caption text-muted-foreground">Category: {f.category}</p>}
+                  {f.category && (
+                    <p className="mt-1 text-caption text-muted-foreground">
+                      {t("content.faq.category")}: {f.category}
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Switch checked={f.active} onCheckedChange={() => toggle.mutate(f)} />
-                  <Button size="icon" variant="ghost" onClick={() => setEditing(f)}><Edit3 className="h-4 w-4" /></Button>
+                  <Switch
+                    checked={f.active}
+                    onCheckedChange={() => toggle.mutate(f)}
+                    aria-label={t("content.common.toggleActive")}
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label={t("content.common.edit")}
+                    onClick={() => setEditing(f)}
+                  >
+                    <Edit3 className="h-4 w-4" />
+                  </Button>
                   <AlertDialog>
-                    <AlertDialogTrigger asChild><Button size="icon" variant="ghost" className="text-destructive"><Trash2 className="h-4 w-4" /></Button></AlertDialogTrigger>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={t("content.common.delete")}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
                     <AlertDialogContent>
-                      <AlertDialogHeader><AlertDialogTitle>Delete FAQ?</AlertDialogTitle><AlertDialogDescription>{f.question}</AlertDialogDescription></AlertDialogHeader>
-                      <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => remove.mutate(f.id)}>Delete</AlertDialogAction></AlertDialogFooter>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t("content.faq.deleteTitle")}</AlertDialogTitle>
+                        <AlertDialogDescription>{f.question}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("ops.common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => remove.mutate(f.id)}>
+                          {t("ops.common.delete")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
@@ -76,16 +159,40 @@ function FaqAdminPage() {
       </AdminCard>
 
       {(editing || creating) && (
-        <FaqEditor initial={editing} onClose={() => { setEditing(null); setCreating(false); }} onSaved={() => { invalidate(); setEditing(null); setCreating(false); }} />
+        <FaqEditor
+          initial={editing}
+          onClose={() => {
+            setEditing(null);
+            setCreating(false);
+          }}
+          onSaved={() => {
+            invalidate();
+            setEditing(null);
+            setCreating(false);
+          }}
+        />
       )}
     </>
   );
 }
 
-function FaqEditor({ initial, onClose, onSaved }: { initial: F | null; onClose: () => void; onSaved: () => void }) {
+function FaqEditor({
+  initial,
+  onClose,
+  onSaved,
+}: {
+  initial: F | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const { t } = useTranslation("admin");
   const [f, setF] = useState({
     question: initial?.question ?? "",
+    question_fr: initial?.question_fr ?? "",
+    question_en: initial?.question_en ?? "",
     answer: initial?.answer ?? "",
+    answer_fr: initial?.answer_fr ?? "",
+    answer_en: initial?.answer_en ?? "",
     category: initial?.category ?? "",
     sort_order: initial?.sort_order ?? 0,
     active: initial?.active ?? true,
@@ -94,9 +201,21 @@ function FaqEditor({ initial, onClose, onSaved }: { initial: F | null; onClose: 
   const isEdit = !!initial;
 
   async function save() {
-    if (!f.question.trim() || !f.answer.trim()) return toast.error("Question and answer required");
+    if (!f.question.trim() || !f.answer.trim())
+      return toast.error(t("content.faq.toasts.questionAnswerRequired"));
     setSaving(true);
-    const payload = { question: f.question.trim(), answer: f.answer.trim(), category: f.category.trim() || null, sort_order: Number(f.sort_order) || 0, active: f.active };
+    const payload = {
+      question: f.question.trim(),
+      // Empty stays NULL so the documented public fallback applies.
+      question_fr: f.question_fr.trim() || null,
+      question_en: f.question_en.trim() || null,
+      answer: f.answer.trim(),
+      answer_fr: f.answer_fr.trim() || null,
+      answer_en: f.answer_en.trim() || null,
+      category: f.category.trim() || null,
+      sort_order: Number(f.sort_order) || 0,
+      active: f.active,
+    };
     try {
       if (isEdit && initial) {
         const { error } = await supabase.from("faqs").update(payload).eq("id", initial.id);
@@ -105,24 +224,59 @@ function FaqEditor({ initial, onClose, onSaved }: { initial: F | null; onClose: 
         const { error } = await supabase.from("faqs").insert(payload);
         if (error) throw error;
       }
-      toast.success("Saved"); onSaved();
-    } catch (err) { toast.error(err instanceof Error ? err.message : "Save failed"); } finally { setSaving(false); }
+      toast.success(t("content.faq.toasts.saved"));
+      onSaved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{isEdit ? "Edit FAQ" : "New FAQ"}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>
+            {isEdit ? t("content.faq.editTitle") : t("content.faq.newTitle")}
+          </DialogTitle>
+        </DialogHeader>
         <div className="grid gap-3">
-          <div className="grid gap-1"><Label>Question *</Label><Input value={f.question} onChange={(e) => setF({ ...f, question: e.target.value })} /></div>
-          <div className="grid gap-1"><Label>Answer *</Label><Textarea rows={5} value={f.answer} onChange={(e) => setF({ ...f, answer: e.target.value })} /></div>
-          <div className="grid gap-1"><Label>Category</Label><Input value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })} /></div>
-          <div className="grid gap-1"><Label>Sort order</Label><Input type="number" value={f.sort_order} onChange={(e) => setF({ ...f, sort_order: Number(e.target.value) || 0 })} /></div>
-          <div className="flex items-center gap-2"><Switch checked={f.active} onCheckedChange={(v) => setF({ ...f, active: v })} /><Label>Active</Label></div>
+          <LocalizedField
+            label={t("content.faq.fields.question")}
+            values={{ base: f.question, fr: f.question_fr, en: f.question_en }}
+            onChange={(v) => setF({ ...f, question: v.base, question_fr: v.fr, question_en: v.en })}
+          />
+          <LocalizedField
+            label={t("content.faq.fields.answer")}
+            rows={5}
+            values={{ base: f.answer, fr: f.answer_fr, en: f.answer_en }}
+            onChange={(v) => setF({ ...f, answer: v.base, answer_fr: v.fr, answer_en: v.en })}
+          />
+          <div className="grid gap-1">
+            <Label>{t("content.faq.category")}</Label>
+            <Input value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })} />
+          </div>
+          <div className="grid gap-1">
+            <Label>{t("content.faq.fields.sortOrder")}</Label>
+            <Input
+              type="number"
+              value={f.sort_order}
+              onChange={(e) => setF({ ...f, sort_order: Number(e.target.value) || 0 })}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch checked={f.active} onCheckedChange={(v) => setF({ ...f, active: v })} />
+            <Label>{t("content.faq.fields.active")}</Label>
+          </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>
+            {t("ops.common.cancel")}
+          </Button>
+          <Button onClick={save} disabled={saving}>
+            {saving ? t("content.common.saving") : t("content.common.save")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

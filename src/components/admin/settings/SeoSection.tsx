@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  AutoSaveBar,
+  SaveBar,
   FieldGrid,
   ImageField,
   SerpPreview,
@@ -10,11 +10,23 @@ import {
   TextAreaField,
   TextField,
 } from "./parts";
-import { combine, maxLen, required, url, useSiteSettings, type SettingSpec } from "./useSiteSettings";
+import {
+  combine,
+  maxLen,
+  required,
+  url,
+  useSiteSettings,
+  type SettingSpec,
+} from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
 
 const SPECS: SettingSpec[] = [
   { key: "seo_site_title", label: "Site title", validate: combine(required, maxLen(60)) },
-  { key: "seo_meta_description", label: "Meta description", validate: combine(required, maxLen(160)) },
+  {
+    key: "seo_meta_description",
+    label: "Meta description",
+    validate: combine(required, maxLen(160)),
+  },
   { key: "seo_keywords", label: "Keywords" },
   { key: "seo_og_image", label: "Share image" },
   { key: "seo_canonical_base", label: "Canonical base URL", validate: url },
@@ -23,22 +35,26 @@ const SPECS: SettingSpec[] = [
 ];
 
 export function SeoSection() {
+  const { t } = useTranslation("admin");
   const s = useSiteSettings("seo", SPECS);
 
-  if (s.loading) return <Skeleton className="h-72 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-72 w-full rounded-card" />;
 
   const base = (s.form.seo_canonical_base ?? "").replace(/^https?:\/\//, "") || "janatsahara.tn";
 
   return (
     <SettingsSection
-      title="SEO"
-      description="How your website appears in Google and when shared on social media."
+      title={t("content.settings.seo.title")}
+      description={t("content.settings.seo.description")}
     >
-      <SettingsCard title="Search appearance" description="Title and description for the homepage.">
+      <SettingsCard
+        title={t("content.settings.nav.seo.label")}
+        description={t("content.settings.seo.searchAppearanceDescription")}
+      >
         <FieldGrid>
           <TextField
-            label="Site title"
-            hint="Under 60 characters performs best."
+            label={t("content.settings.seo.siteTitle")}
+            hint={t("content.settings.seo.hints.siteTitle")}
             maxCount={60}
             error={s.errors.seo_site_title}
             wide
@@ -48,8 +64,8 @@ export function SeoSection() {
         </FieldGrid>
         <div className="mt-5 grid gap-5">
           <TextAreaField
-            label="Meta description"
-            hint="Under 160 characters. Describe your services and destinations."
+            label={t("content.settings.seo.metaDescription")}
+            hint={t("content.settings.seo.hints.metaDescription")}
             rows={3}
             value={s.form.seo_meta_description ?? ""}
             onChange={(v) => s.set("seo_meta_description", v)}
@@ -58,8 +74,8 @@ export function SeoSection() {
             <p className="-mt-3 text-caption text-destructive">{s.errors.seo_meta_description}</p>
           )}
           <TextField
-            label="Keywords"
-            hint="Comma separated. Used for internal search hints."
+            label={t("content.settings.seo.keywords")}
+            hint={t("content.settings.seo.hints.keywords")}
             wide
             value={s.form.seo_keywords ?? ""}
             onChange={(v) => s.set("seo_keywords", v)}
@@ -67,7 +83,10 @@ export function SeoSection() {
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Live preview" description="Updates as you type.">
+      <SettingsCard
+        title={t("content.settings.livePreview.title")}
+        description={t("content.settings.seo.livePreviewDescription")}
+      >
         <SerpPreview
           title={s.form.seo_site_title ?? ""}
           description={s.form.seo_meta_description ?? ""}
@@ -75,43 +94,49 @@ export function SeoSection() {
         />
       </SettingsCard>
 
-      <SettingsCard title="Social sharing" description="Image shown on Facebook, WhatsApp and X.">
+      <SettingsCard
+        title={t("content.settings.seo.socialSharingTitle")}
+        description={t("content.settings.seo.socialSharingDescription")}
+      >
         <ImageField
-          label="Share image"
-          hint="Recommended 1200×630."
+          label={t("content.settings.seo.shareImage")}
+          hint={t("content.settings.seo.hints.shareImage")}
           folder="seo"
           value={s.form.seo_og_image ?? ""}
           onChange={(v) => s.set("seo_og_image", v)}
         />
       </SettingsCard>
 
-      <SettingsCard title="Technical" description="Canonical domain, indexing and verification.">
+      <SettingsCard
+        title={t("content.settings.seo.technicalTitle")}
+        description={t("content.settings.seo.technicalDescription")}
+      >
         <FieldGrid>
           <TextField
-            label="Canonical base URL"
+            label={t("content.settings.seo.canonicalBaseUrl")}
             placeholder="https://janatsahara.tn"
             error={s.errors.seo_canonical_base}
             value={s.form.seo_canonical_base ?? ""}
             onChange={(v) => s.set("seo_canonical_base", v)}
           />
           <TextField
-            label="Google verification code"
-            hint="The content value of the google-site-verification tag."
+            label={t("content.settings.seo.googleVerificationCode")}
+            hint={t("content.settings.seo.hints.googleVerification")}
             value={s.form.seo_google_verification ?? ""}
             onChange={(v) => s.set("seo_google_verification", v)}
           />
         </FieldGrid>
         <div className="mt-5">
           <SwitchField
-            label="Allow search engines to index the website"
-            hint="Turn off only while the site is under construction."
+            label={t("content.settings.seo.allowIndexing")}
+            hint={t("content.settings.seo.hints.indexing")}
             checked={s.bool("seo_indexing_enabled")}
             onChange={(v) => s.setBool("seo_indexing_enabled", v)}
           />
         </div>
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

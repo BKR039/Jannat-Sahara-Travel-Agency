@@ -126,7 +126,7 @@ export function ServiceGrid({
             </span>
             {active && (
               <span className="absolute top-4 end-4 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Check className="h-3.5 w-3.5" />
+                <Check className="h-4 w-4" />
               </span>
             )}
           </button>
@@ -178,28 +178,30 @@ export function PackageOption({
       <div className="flex flex-1 flex-col gap-3 p-5">
         <h3 className="text-h5 font-bold leading-snug">{L(pkg, "title")}</h3>
         {L(pkg, "short_description", "empty") && (
-          <p className="line-clamp-2 text-small text-muted-foreground">{L(pkg, "short_description", "empty")}</p>
+          <p className="line-clamp-2 text-small text-muted-foreground">
+            {L(pkg, "short_description", "empty")}
+          </p>
         )}
         <ul className="mt-auto space-y-1.5 text-caption text-muted-foreground">
           {L(pkg, "destination", "empty") && (
             <li className="flex items-center gap-2">
-              <MapPin className="h-3.5 w-3.5 text-primary" /> {L(pkg, "destination", "empty")}
+              <MapPin className="h-4 w-4 text-primary" /> {L(pkg, "destination", "empty")}
             </li>
           )}
           {pkg.departure_date && (
             <li className="flex items-center gap-2">
-              <CalendarDays className="h-3.5 w-3.5 text-primary" />
+              <CalendarDays className="h-4 w-4 text-primary" />
               {new Date(pkg.departure_date).toLocaleDateString()}
             </li>
           )}
           {L(pkg, "duration", "empty") && (
             <li className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5 text-primary" /> {L(pkg, "duration", "empty")}
+              <Clock className="h-4 w-4 text-primary" /> {L(pkg, "duration", "empty")}
             </li>
           )}
           {typeof pkg.seats === "number" && (
             <li className="flex items-center gap-2">
-              <Users className="h-3.5 w-3.5 text-primary" /> {pkg.seats} {t("package.seats")}
+              <Users className="h-4 w-4 text-primary" /> {pkg.seats} {t("package.seats")}
             </li>
           )}
         </ul>
@@ -397,7 +399,6 @@ export function PassengerForm({
           </select>
         </div>
 
-
         {isPrimary && (
           <>
             <div className="grid gap-2">
@@ -423,7 +424,6 @@ export function PassengerForm({
             </div>
           </>
         )}
-
 
         {showPassport && (
           <div className="md:col-span-2">

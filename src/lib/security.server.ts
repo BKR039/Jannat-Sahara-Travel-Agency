@@ -83,6 +83,17 @@ export async function enforceRateLimit(options: {
 
 /* -------------------------------------------------- sanitization */
 
+/*
+ * `no-control-regex` is disabled deliberately and only here.
+ *
+ * The rule exists to catch control characters written into a pattern by
+ * accident. This pattern exists precisely to match them, so that
+ * `sanitizeText` can strip them out of visitor input before it is stored —
+ * the thing the rule warns about is the requirement. Narrowing the class to
+ * satisfy the linter would remove characters from the filter, not from the
+ * input.
+ */
+// eslint-disable-next-line no-control-regex
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
 /**
@@ -115,7 +126,10 @@ export function sanitizeEmail(value: string): string {
 
 /** Header values must never carry CR/LF (header injection). */
 export function sanitizeHeaderValue(value: string, maxLength = 254): string {
-  return value.replace(/[\r\n]/g, "").trim().slice(0, maxLength);
+  return value
+    .replace(/[\r\n]/g, "")
+    .trim()
+    .slice(0, maxLength);
 }
 
 /* -------------------------------------------------- upload validation */
@@ -151,7 +165,9 @@ export function magicBytesMatch(bytes: Uint8Array, mime: string): boolean {
     case "image/png":
       return startsWith(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a);
     case "image/webp":
-      return startsWith(0x52, 0x49, 0x46, 0x46) && String.fromCharCode(...bytes.slice(8, 12)) === "WEBP";
+      return (
+        startsWith(0x52, 0x49, 0x46, 0x46) && String.fromCharCode(...bytes.slice(8, 12)) === "WEBP"
+      );
     case "image/heic":
       return String.fromCharCode(...bytes.slice(4, 8)) === "ftyp";
     case "application/pdf":

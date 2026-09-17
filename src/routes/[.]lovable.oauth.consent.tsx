@@ -101,14 +101,17 @@ function Consent() {
           <div>
             <h1 className="text-h4 font-bold tracking-tight">Connect {clientName}</h1>
             <p className="mt-2 text-small text-muted-foreground">
-              {clientName} is requesting access to Janat Sahara Travel on your behalf. It will be able to use the
-              agency tools with exactly the permissions your account has.
+              {clientName} is requesting access to Janat Sahara Travel on your behalf. It will be
+              able to use the agency tools with exactly the permissions your account has.
             </p>
           </div>
         </div>
 
         {error && (
-          <p role="alert" className="mb-4 rounded-lg bg-destructive/10 p-3 text-caption text-destructive">
+          <p
+            role="alert"
+            className="mb-4 rounded-lg bg-destructive/10 p-3 text-caption text-destructive"
+          >
             {error}
           </p>
         )}
@@ -118,7 +121,12 @@ function Consent() {
             {busy && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             Approve
           </Button>
-          <Button variant="outline" className="w-full" disabled={busy} onClick={() => decide(false)}>
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={busy}
+            onClick={() => decide(false)}
+          >
             Deny
           </Button>
         </div>

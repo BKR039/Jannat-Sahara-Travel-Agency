@@ -9,15 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VisaRouteImport } from './routes/visa'
 import { Route as UmrahRouteImport } from './routes/umrah'
 import { Route as TripsRouteImport } from './routes/trips'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BranchesRouteImport } from './routes/branches'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
 import { Route as BookingRouteImport } from './routes/booking'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -33,12 +35,15 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminServicesRouteImport } from './routes/admin.services'
 import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminHotelsRouteImport } from './routes/admin.hotels'
 import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
 import { Route as AdminFlightRequestsRouteImport } from './routes/admin.flight-requests'
+import { Route as AdminFeaturesRouteImport } from './routes/admin.features'
 import { Route as AdminFaqRouteImport } from './routes/admin.faq'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminBranchesRouteImport } from './routes/admin.branches'
@@ -52,11 +57,6 @@ import { Route as AdminPackagesIdRouteImport } from './routes/admin.packages.$id
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
-const VisaRoute = VisaRouteImport.update({
-  id: '/visa',
-  path: '/visa',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const UmrahRoute = UmrahRouteImport.update({
   id: '/umrah',
   path: '/umrah',
@@ -65,6 +65,16 @@ const UmrahRoute = UmrahRouteImport.update({
 const TripsRoute = TripsRouteImport.update({
   id: '/trips',
   path: '/trips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -95,6 +105,11 @@ const FaqRoute = FaqRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BranchesRoute = BranchesRouteImport.update({
+  id: '/branches',
+  path: '/branches',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingSuccessRoute = BookingSuccessRouteImport.update({
@@ -172,6 +187,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminServicesRoute = AdminServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRequestsRoute = AdminRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
@@ -192,6 +212,11 @@ const AdminMessagesRoute = AdminMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHotelsRoute = AdminHotelsRouteImport.update({
+  id: '/hotels',
+  path: '/hotels',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminGalleryRoute = AdminGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -200,6 +225,11 @@ const AdminGalleryRoute = AdminGalleryRouteImport.update({
 const AdminFlightRequestsRoute = AdminFlightRequestsRouteImport.update({
   id: '/flight-requests',
   path: '/flight-requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeaturesRoute = AdminFeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFaqRoute = AdminFaqRouteImport.update({
@@ -274,15 +304,17 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/booking': typeof BookingRoute
   '/booking-success': typeof BookingSuccessRoute
+  '/branches': typeof BranchesRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
-  '/visa': typeof VisaRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/admins': typeof AdminAdminsRoute
@@ -291,12 +323,15 @@ export interface FileRoutesByFullPath {
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faq': typeof AdminFaqRoute
+  '/admin/features': typeof AdminFeaturesRoute
   '/admin/flight-requests': typeof AdminFlightRequestsRoute
   '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/hotels': typeof AdminHotelsRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/requests': typeof AdminRequestsRoute
+  '/admin/services': typeof AdminServicesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -317,15 +352,17 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRouteWithChildren
   '/booking': typeof BookingRoute
   '/booking-success': typeof BookingSuccessRoute
+  '/branches': typeof BranchesRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
-  '/visa': typeof VisaRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/admins': typeof AdminAdminsRoute
@@ -334,12 +371,15 @@ export interface FileRoutesByTo {
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faq': typeof AdminFaqRoute
+  '/admin/features': typeof AdminFeaturesRoute
   '/admin/flight-requests': typeof AdminFlightRequestsRoute
   '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/hotels': typeof AdminHotelsRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/requests': typeof AdminRequestsRoute
+  '/admin/services': typeof AdminServicesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -362,15 +402,17 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/booking': typeof BookingRoute
   '/booking-success': typeof BookingSuccessRoute
+  '/branches': typeof BranchesRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/flights': typeof FlightsRoute
   '/gallery': typeof GalleryRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trips': typeof TripsRoute
   '/umrah': typeof UmrahRoute
-  '/visa': typeof VisaRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/admins': typeof AdminAdminsRoute
@@ -379,12 +421,15 @@ export interface FileRoutesById {
   '/admin/branches': typeof AdminBranchesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/faq': typeof AdminFaqRoute
+  '/admin/features': typeof AdminFeaturesRoute
   '/admin/flight-requests': typeof AdminFlightRequestsRoute
   '/admin/gallery': typeof AdminGalleryRoute
+  '/admin/hotels': typeof AdminHotelsRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/requests': typeof AdminRequestsRoute
+  '/admin/services': typeof AdminServicesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -408,15 +453,17 @@ export interface FileRouteTypes {
     | '/blog'
     | '/booking'
     | '/booking-success'
+    | '/branches'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
     | '/mcp'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/trips'
     | '/umrah'
-    | '/visa'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/admins'
@@ -425,12 +472,15 @@ export interface FileRouteTypes {
     | '/admin/branches'
     | '/admin/customers'
     | '/admin/faq'
+    | '/admin/features'
     | '/admin/flight-requests'
     | '/admin/gallery'
+    | '/admin/hotels'
     | '/admin/messages'
     | '/admin/notifications'
     | '/admin/reports'
     | '/admin/requests'
+    | '/admin/services'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -451,15 +501,17 @@ export interface FileRouteTypes {
     | '/blog'
     | '/booking'
     | '/booking-success'
+    | '/branches'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
     | '/mcp'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/trips'
     | '/umrah'
-    | '/visa'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/admins'
@@ -468,12 +520,15 @@ export interface FileRouteTypes {
     | '/admin/branches'
     | '/admin/customers'
     | '/admin/faq'
+    | '/admin/features'
     | '/admin/flight-requests'
     | '/admin/gallery'
+    | '/admin/hotels'
     | '/admin/messages'
     | '/admin/notifications'
     | '/admin/reports'
     | '/admin/requests'
+    | '/admin/services'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -495,15 +550,17 @@ export interface FileRouteTypes {
     | '/blog'
     | '/booking'
     | '/booking-success'
+    | '/branches'
     | '/contact'
     | '/faq'
     | '/flights'
     | '/gallery'
     | '/mcp'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/trips'
     | '/umrah'
-    | '/visa'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/admins'
@@ -512,12 +569,15 @@ export interface FileRouteTypes {
     | '/admin/branches'
     | '/admin/customers'
     | '/admin/faq'
+    | '/admin/features'
     | '/admin/flight-requests'
     | '/admin/gallery'
+    | '/admin/hotels'
     | '/admin/messages'
     | '/admin/notifications'
     | '/admin/reports'
     | '/admin/requests'
+    | '/admin/services'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/blog/$slug'
@@ -540,15 +600,17 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   BookingRoute: typeof BookingRoute
   BookingSuccessRoute: typeof BookingSuccessRoute
+  BranchesRoute: typeof BranchesRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   FlightsRoute: typeof FlightsRoute
   GalleryRoute: typeof GalleryRoute
   McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TripsRoute: typeof TripsRoute
   UmrahRoute: typeof UmrahRoute
-  VisaRoute: typeof VisaRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
@@ -561,13 +623,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/visa': {
-      id: '/visa'
-      path: '/visa'
-      fullPath: '/visa'
-      preLoaderRoute: typeof VisaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/umrah': {
       id: '/umrah'
       path: '/umrah'
@@ -580,6 +635,20 @@ declare module '@tanstack/react-router' {
       path: '/trips'
       fullPath: '/trips'
       preLoaderRoute: typeof TripsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -622,6 +691,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/branches': {
+      id: '/branches'
+      path: '/branches'
+      fullPath: '/branches'
+      preLoaderRoute: typeof BranchesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/booking-success': {
@@ -729,6 +805,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/services': {
+      id: '/admin/services'
+      path: '/services'
+      fullPath: '/admin/services'
+      preLoaderRoute: typeof AdminServicesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/requests': {
       id: '/admin/requests'
       path: '/requests'
@@ -757,6 +840,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMessagesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/hotels': {
+      id: '/admin/hotels'
+      path: '/hotels'
+      fullPath: '/admin/hotels'
+      preLoaderRoute: typeof AdminHotelsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/gallery': {
       id: '/admin/gallery'
       path: '/gallery'
@@ -769,6 +859,13 @@ declare module '@tanstack/react-router' {
       path: '/flight-requests'
       fullPath: '/admin/flight-requests'
       preLoaderRoute: typeof AdminFlightRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/features': {
+      id: '/admin/features'
+      path: '/features'
+      fullPath: '/admin/features'
+      preLoaderRoute: typeof AdminFeaturesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/faq': {
@@ -865,12 +962,15 @@ interface AdminRouteChildren {
   AdminBranchesRoute: typeof AdminBranchesRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
   AdminFaqRoute: typeof AdminFaqRoute
+  AdminFeaturesRoute: typeof AdminFeaturesRoute
   AdminFlightRequestsRoute: typeof AdminFlightRequestsRoute
   AdminGalleryRoute: typeof AdminGalleryRoute
+  AdminHotelsRoute: typeof AdminHotelsRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRequestsRoute: typeof AdminRequestsRoute
+  AdminServicesRoute: typeof AdminServicesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -885,12 +985,15 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBranchesRoute: AdminBranchesRoute,
   AdminCustomersRoute: AdminCustomersRoute,
   AdminFaqRoute: AdminFaqRoute,
+  AdminFeaturesRoute: AdminFeaturesRoute,
   AdminFlightRequestsRoute: AdminFlightRequestsRoute,
   AdminGalleryRoute: AdminGalleryRoute,
+  AdminHotelsRoute: AdminHotelsRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRequestsRoute: AdminRequestsRoute,
+  AdminServicesRoute: AdminServicesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -918,15 +1021,17 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   BookingRoute: BookingRoute,
   BookingSuccessRoute: BookingSuccessRoute,
+  BranchesRoute: BranchesRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   FlightsRoute: FlightsRoute,
   GalleryRoute: GalleryRoute,
   McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TripsRoute: TripsRoute,
   UmrahRoute: UmrahRoute,
-  VisaRoute: VisaRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,

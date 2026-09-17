@@ -79,13 +79,13 @@ export function PackageSelector() {
             setSelectedId(null);
           }}
           className={cn(
-            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-caption font-semibold transition-colors duration-base",
+            "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-badge border px-4 py-2 text-caption font-semibold transition-colors duration-base",
             service === key
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border bg-card text-muted-foreground",
           )}
         >
-          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+          <Icon className="h-4 w-4" aria-hidden="true" />
           {t(`categories.${key}`)}
         </button>
       ))}
@@ -136,7 +136,6 @@ export function PackageSelector() {
           sheetHeader={sheetTabs}
         />
 
-
         <p className="mt-4 text-small text-muted-foreground">
           {t("explorer.results", { count: byService.length })}
         </p>
@@ -160,7 +159,8 @@ export function PackageSelector() {
                 <h3 className="text-card-title">{L(selected, "title")}</h3>
                 {L(selected, "destination", "empty") && (
                   <p className="mt-1 inline-flex items-center gap-1.5 text-small text-muted-foreground">
-                    <MapPin className="h-4 w-4" aria-hidden="true" /> {L(selected, "destination", "empty")}
+                    <MapPin className="h-4 w-4" aria-hidden="true" />{" "}
+                    {L(selected, "destination", "empty")}
                   </p>
                 )}
               </div>
@@ -168,24 +168,25 @@ export function PackageSelector() {
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-caption text-muted-foreground sm:grid-cols-3">
                 {selected.departure_date && (
                   <div className="inline-flex items-center gap-1.5">
-                    <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
                     {fmtDate(selected.departure_date)}
                   </div>
                 )}
                 {L(selected, "duration", "empty") && (
                   <div className="inline-flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {L(selected, "duration", "empty")}
+                    <Clock className="h-4 w-4" aria-hidden="true" />{" "}
+                    {L(selected, "duration", "empty")}
                   </div>
                 )}
                 {L(selected, "hotel", "base") && (
                   <div className="inline-flex items-center gap-1.5">
-                    <Hotel className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Hotel className="h-4 w-4" aria-hidden="true" />
                     <span className="line-clamp-1">{L(selected, "hotel", "base")}</span>
                   </div>
                 )}
                 {seatsLeft(selected) != null && (
                   <div className="inline-flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Users className="h-4 w-4" aria-hidden="true" />
                     {t("selector.seatsLeft", { count: seatsLeft(selected)! })}
                   </div>
                 )}

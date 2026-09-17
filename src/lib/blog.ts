@@ -8,7 +8,9 @@ function parseTags(raw: unknown): string[] {
   if (typeof raw === "string") {
     try {
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed.filter((t): t is string => typeof t === "string") : [raw];
+      return Array.isArray(parsed)
+        ? parsed.filter((t): t is string => typeof t === "string")
+        : [raw];
     } catch {
       return [raw];
     }
@@ -27,7 +29,6 @@ export function articleTags(article: TagSource, lang?: string): string[] {
   }
   return parseTags(article.tags);
 }
-
 
 export function articleCategory(article: TagSource, lang?: string): string | null {
   return articleTags(article, lang)[0] ?? null;

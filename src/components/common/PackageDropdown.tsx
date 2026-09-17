@@ -63,7 +63,13 @@ type Props = {
   onOpenChange?: (open: boolean) => void;
 };
 
-export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onOpenChange }: Props) {
+export function PackageDropdown({
+  packages,
+  selected,
+  onSelect,
+  sheetHeader,
+  onOpenChange,
+}: Props) {
   const { t, i18n } = useTranslation();
   const { L, price } = useLocalized();
   const isMobile = useIsMobile();
@@ -81,20 +87,18 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
   const results = useMemo(() => {
     const q = term.trim().toLowerCase();
     if (!q) return packages;
-    return packages.filter(
-      (p) =>
-        [
-          p.title,
-          (p as Record<string, unknown>).title_fr,
-          (p as Record<string, unknown>).title_en,
-          p.destination,
-          (p as Record<string, unknown>).destination_fr,
-          (p as Record<string, unknown>).destination_en,
-          p.city,
-          (p as Record<string, unknown>).city_fr,
-          (p as Record<string, unknown>).city_en,
-        ].some((v) => typeof v === "string" && v.toLowerCase().includes(q)),
-
+    return packages.filter((p) =>
+      [
+        p.title,
+        (p as Record<string, unknown>).title_fr,
+        (p as Record<string, unknown>).title_en,
+        p.destination,
+        (p as Record<string, unknown>).destination_fr,
+        (p as Record<string, unknown>).destination_en,
+        p.city,
+        (p as Record<string, unknown>).city_fr,
+        (p as Record<string, unknown>).city_en,
+      ].some((v) => typeof v === "string" && v.toLowerCase().includes(q)),
     );
   }, [packages, term]);
 
@@ -204,7 +208,9 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
 
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
-                        <span className="line-clamp-1 text-small font-bold text-foreground">{L(p, "title", "base")}</span>
+                        <span className="line-clamp-1 text-small font-bold text-foreground">
+                          {L(p, "title", "base")}
+                        </span>
                         {badge && BadgeIcon && (
                           <span
                             className={cn(
@@ -212,41 +218,55 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
                               BADGE_STYLE[badge],
                             )}
                           >
-                            <BadgeIcon className="h-3 w-3" aria-hidden="true" />
+                            <BadgeIcon className="h-3.5 w-3.5" aria-hidden="true" />
                             {t(`selector.badges.${badge}`)}
                           </span>
                         )}
-                        {isSelected && <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
+                        {isSelected && (
+                          <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                        )}
                       </span>
 
                       {L(p, "destination", "empty") && (
                         <span className="mt-1 flex items-center gap-1 text-caption text-muted-foreground">
-                          <MapPin className="h-3 w-3" aria-hidden="true" /> {L(p, "destination", "empty")}
+                          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                          {L(p, "destination", "empty")}
                         </span>
                       )}
 
                       <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-muted-foreground">
                         {L(p, "duration", "empty") && (
                           <span className="inline-flex items-center gap-1">
-                            <Clock className="h-3 w-3" aria-hidden="true" /> {L(p, "duration", "empty")}
+                            <Clock className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                            {L(p, "duration", "empty")}
                           </span>
                         )}
                         {p.departure_date && (
                           <span className="inline-flex items-center gap-1">
-                            <CalendarDays className="h-3 w-3" aria-hidden="true" /> {fmtDate(p.departure_date)}
+                            <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                            {fmtDate(p.departure_date)}
                           </span>
                         )}
                         {s != null && (
-                          <span className={cn("inline-flex items-center gap-1", limited && "text-destructive")}>
-                            <Users className="h-3 w-3" aria-hidden="true" />
-                            {limited ? t("selector.limited", { count: s }) : t("selector.available")}
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1",
+                              limited && "text-destructive",
+                            )}
+                          >
+                            <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                            {limited
+                              ? t("selector.limited", { count: s })
+                              : t("selector.available")}
                           </span>
                         )}
                       </span>
                     </span>
 
                     <span className="shrink-0 text-end">
-                      <span className="block text-caption text-muted-foreground">{t("package.from")}</span>
+                      <span className="block text-caption text-muted-foreground">
+                        {t("package.from")}
+                      </span>
                       <span className="block text-small font-extrabold text-primary">
                         {price(effectivePrice(p), p.currency ?? "TND")}
                       </span>
@@ -279,7 +299,12 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
           {selected && (
             <span className="relative hidden h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-sunken sm:block">
               {selected.cover && (
-                <img src={selected.cover} alt="" loading="lazy" className="h-full w-full object-cover" />
+                <img
+                  src={selected.cover}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
               )}
             </span>
           )}
@@ -294,12 +319,14 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
               <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-caption text-muted-foreground">
                 {L(selected, "destination", "empty") && (
                   <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-3 w-3" aria-hidden="true" /> {L(selected, "destination", "empty")}
+                    <MapPin className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                    {L(selected, "destination", "empty")}
                   </span>
                 )}
                 {L(selected, "duration", "empty") && (
                   <span className="inline-flex items-center gap-1">
-                    <Clock className="h-3 w-3" aria-hidden="true" /> {L(selected, "duration", "empty")}
+                    <Clock className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                    {L(selected, "duration", "empty")}
                   </span>
                 )}
                 <span className="font-semibold text-primary">
@@ -319,7 +346,7 @@ export function PackageDropdown({ packages, selected, onSelect, sheetHeader, onO
       </button>
 
       {open && !isMobile && (
-        <div className="absolute inset-x-0 z-30 mt-2 origin-top overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-lg ds-reveal">
+        <div className="absolute inset-x-0 z-30 mt-2 origin-top overflow-hidden rounded-card border border-border-subtle bg-card shadow-lg ds-reveal">
           {panel}
         </div>
       )}

@@ -1,4 +1,5 @@
-import { cabinLabel, type FlightRequestInputType } from "./flight-request.schema";
+import { type FlightRequestInputType } from "./flight-request.schema";
+import { cabinLabel } from "./flight-request.labels";
 
 const LANGUAGE_NAMES: Record<string, string> = {
   ar: "Arabic (العربية)",

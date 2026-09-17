@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { Article } from "@/lib/queries";
 import { articleCategory, readingMinutes } from "@/lib/blog";
 import { ArticleMeta, CategoryBadge } from "./ArticleMeta";
@@ -22,7 +22,9 @@ export function ArticleCard({
 
   return (
     <article
-      className="ds-reveal group flex h-full flex-col overflow-hidden rounded-xl border border-border-subtle bg-card shadow-sm transition-all duration-base ease-standard hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl"
+      /* Border-first: no resting shadow, and the hover reads as a change of
+         border and tint rather than the card lifting off the page. */
+      className="ds-reveal group flex h-full flex-col overflow-hidden rounded-card border border-border-subtle bg-card transition-[border-color,transform] duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 motion-reduce:transform-none"
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
@@ -40,7 +42,10 @@ export function ArticleCard({
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-foreground/50 to-transparent" />
         {category && (
           <div className="absolute top-3 start-3">
-            <CategoryBadge category={category} className="bg-card/95 ring-transparent backdrop-blur" />
+            <CategoryBadge
+              category={category}
+              className="bg-card/95 ring-transparent backdrop-blur"
+            />
           </div>
         )}
         <span className="absolute bottom-3 end-3 rounded-full bg-card/90 px-2.5 py-1 text-caption font-semibold text-foreground backdrop-blur">
@@ -59,10 +64,13 @@ export function ArticleCard({
         <button
           type="button"
           onClick={() => onOpen(article.slug)}
-          className="mt-auto inline-flex items-center gap-1.5 self-start text-caption font-semibold text-primary transition-transform duration-base hover:gap-2.5"
+          className="mt-auto inline-flex min-h-11 items-center gap-1.5 self-start text-caption font-semibold text-primary transition-transform duration-base hover:gap-2.5"
         >
           {t("blog.readMore")}
-          <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden />
+          {/* `ArrowLeft` here pointed backwards in both directions: left in
+              LTR, and right once the RTL rotation flipped it. Forward is
+              rightward in LTR and leftward in RTL, which is what this is. */}
+          <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
         </button>
       </div>
     </article>

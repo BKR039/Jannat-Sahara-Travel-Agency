@@ -8,9 +8,23 @@ export default defineTool({
   description:
     "List customer bookings with contact details, package, traveller counts, total price and status. Requires an admin or staff account.",
   inputSchema: {
-    status: z.enum(["new", "pending", "confirmed", "cancelled"]).optional().describe("Filter by booking status."),
-    search: z.string().trim().min(1).optional().describe("Case-insensitive match on the customer name."),
-    limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of bookings to return."),
+    status: z
+      .enum(["new", "pending", "confirmed", "cancelled"])
+      .optional()
+      .describe("Filter by booking status."),
+    search: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("Case-insensitive match on the customer name."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(20)
+      .describe("Maximum number of bookings to return."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ status, search, limit }, ctx) => {

@@ -20,7 +20,12 @@
       "faq": "الأسئلة الشائعة",
       "notifications": "الإشعارات",
       "settings": "الإعدادات",
-      "team": "الفريق"
+      "team": "الفريق",
+      "hotels": "الفنادق",
+      "services": "الخدمات",
+      "features": "لماذا تختارنا",
+      "flightRequests": "طلبات الطيران",
+      "messages": "الرسائل"
     },
     "closeNavigation": "إغلاق القائمة",
     "openNavigation": "فتح القائمة",
@@ -42,7 +47,8 @@
       "accessDeniedTitle": "تم رفض الوصول",
       "accessDeniedDescription": "حسابك لا يملك صلاحية الوصول إلى لوحة التحكم. تواصل مع المشرف العام لطلب الوصول.",
       "signOut": "تسجيل الخروج",
-      "backToSite": "العودة إلى الموقع"
+      "backToSite": "العودة إلى الموقع",
+      "loading": "جارٍ تحميل لوحة التحكم…"
     },
     "dashboard": {
       "title": "مركز التحكم",
@@ -56,24 +62,74 @@
         "travellers": "المسافرون",
         "travellersHint": "البالغون والأطفال والرضع",
         "upcomingDepartures": "المغادرات القادمة",
-        "upcomingDeparturesHint": "رحلات بتاريخ مغادرة مستقبلي"
+        "upcomingDeparturesHint": "رحلات بتاريخ مغادرة مستقبلي",
+        "customRequests": "طلبات العمرة",
+        "customRequestsHint": "{{total}} إجمالًا · {{actionable}} قيد المعالجة"
       },
       "insights": {
         "title": "رؤى ذكية",
         "emptyTitle": "لا شيء يحتاج انتباهك",
         "emptyDescription": "لم يتم اكتشاف مخاطر سعة، أو طلبات دون رد، أو اتجاهات غير معتادة.",
-        "open": "فتح"
+        "open": "فتح",
+        "custom": {
+          "action": "فتح الطلبات",
+          "awaitingContact": {
+            "title": "طلب عمرة واحد ينتظر أول رد",
+            "title_other": "{{count}} طلبات عمرة تنتظر أول رد",
+            "body": "مفتوحة منذ أكثر من 24 ساعة دون تسجيل أي تواصل.",
+            "title_zero": "لا طلبات عمرة تنتظر أول رد",
+            "title_one": "طلب عمرة واحد ينتظر أول رد",
+            "title_two": "طلبا عمرة ينتظران أول رد",
+            "title_few": "{{count}} طلبات عمرة تنتظر أول رد",
+            "title_many": "{{count}} طلب عمرة ينتظر أول رد"
+          },
+          "departingSoon": {
+            "title": "طلب واحد غير محسوم وموعد سفره خلال 30 يومًا",
+            "title_other": "{{count}} طلبات غير محسومة ومواعيد سفرها خلال 30 يومًا",
+            "body": "الأقرب هو {{reference}}، ويغادر خلال {{days}} يومًا تقريبًا.",
+            "title_zero": "لا طلبات غير محسومة ومواعيد سفرها خلال 30 يومًا",
+            "title_one": "طلب واحد غير محسوم وموعد سفره خلال 30 يومًا",
+            "title_two": "طلبان غير محسومان ومواعيد سفرهما خلال 30 يومًا",
+            "title_few": "{{count}} طلبات غير محسومة ومواعيد سفرها خلال 30 يومًا",
+            "title_many": "{{count}} طلبًا غير محسوم وموعد سفره خلال 30 يومًا"
+          },
+          "awaitingOffer": {
+            "title": "{{count}} طلبات مخصصة بلا عرض سعر",
+            "body": "تواصلت الوكالة مع هؤلاء المسافرين لكن لم يُرسَل أي عرض."
+          },
+          "volumeUp": {
+            "title": "ارتفعت طلبات العمرة بنسبة {{percent}}٪ هذا الشهر",
+            "body": "{{count}} هذا الشهر مقابل {{previous}} الشهر الماضي."
+          },
+          "volumeDown": {
+            "title": "انخفضت طلبات العمرة بنسبة {{percent}}٪ هذا الشهر",
+            "body": "{{count}} هذا الشهر مقابل {{previous}} الشهر الماضي."
+          },
+          "largeParty": {
+            "title": "طلب مجموعة كبيرة واحد مفتوح",
+            "title_other": "{{count}} طلبات مجموعات كبيرة مفتوحة",
+            "body": "{{reference}} يطلب {{travellers}} مسافرين.",
+            "title_zero": "لا طلبات مجموعات كبيرة مفتوحة",
+            "title_one": "طلب مجموعة كبيرة واحد مفتوح",
+            "title_two": "طلبا مجموعات كبيرة مفتوحان",
+            "title_few": "{{count}} طلبات مجموعات كبيرة مفتوحة",
+            "title_many": "{{count}} طلب مجموعة كبيرة مفتوح"
+          }
+        }
       },
       "revenueTrend": {
         "title": "اتجاه الإيرادات",
-        "description": "قيمة الحجوزات خلال آخر 12 شهرًا"
+        "description": "قيمة الحجوزات خلال آخر 12 شهرًا",
+        "emptyTitle": "لا توجد إيرادات مسجّلة بعد",
+        "emptyDescription": "سيظهر اتجاه الإيرادات هنا بمجرد تسجيل أول حجز مدفوع."
       },
       "workQueue": {
         "title": "قائمة الانتظار",
         "description": "في انتظار الرد الأول",
         "newBookings": "طلبات حجز جديدة",
         "newRequests": "طلبات رحلات جديدة",
-        "unreadMessages": "رسائل غير مقروءة"
+        "unreadMessages": "رسائل غير مقروءة",
+        "customRequests": "طلبات العمرة المخصصة"
       },
       "nextDepartures": {
         "title": "المغادرات القادمة",
@@ -86,6 +142,31 @@
         "allBookings": "جميع الحجوزات",
         "emptyTitle": "لا توجد حجوزات بعد",
         "generalEnquiry": "استفسار عام"
+      },
+      "customRequests": {
+        "title": "طلبات العمرة المخصصة",
+        "description": "{{actionable}} من {{total}} ما زالت تنتظر قرارًا.",
+        "viewAll": "عرض الكل",
+        "emptyTitle": "لا شيء في الانتظار",
+        "emptyDescription": "تمت معالجة جميع طلبات العمرة المخصصة.",
+        "errorTitle": "تعذّر تحميل الطلبات",
+        "errorDescription": "حدّث الصفحة للمحاولة مرة أخرى.",
+        "noDates": "لم تُحدَّد التواريخ",
+        "travellers": "مسافر واحد",
+        "travellers_other": "{{count}} مسافرين",
+        "departingIn": "خلال يوم واحد",
+        "departingIn_other": "خلال {{count}} يومًا",
+        "awaitingReply": "بانتظار الرد",
+        "departingIn_zero": "اليوم",
+        "departingIn_one": "خلال يوم واحد",
+        "departingIn_two": "خلال يومين",
+        "departingIn_few": "خلال {{count}} أيام",
+        "departingIn_many": "خلال {{count}} يومًا",
+        "travellers_zero": "بدون مسافرين",
+        "travellers_one": "مسافر واحد",
+        "travellers_two": "مسافران",
+        "travellers_few": "{{count}} مسافرين",
+        "travellers_many": "{{count}} مسافرًا"
       }
     },
     "reports": {
@@ -122,7 +203,7 @@
     },
     "customers": {
       "title": "العملاء",
-      "description": "أشخاص مستخرجون من طلبات الحجز. تواصل معهم مباشرة.",
+      "description": "كل من حجز أو استفسر أو استخدم مُصمّم رحلة العمرة.",
       "exportCsv": "تصدير CSV",
       "searchPlaceholder": "ابحث بالاسم أو الهاتف أو البريد الإلكتروني…",
       "loading": "جارٍ التحميل…",
@@ -135,7 +216,50 @@
         "categories": "الفئات",
         "lastBooking": "آخر حجز",
         "contact": "تواصل"
-      }
+      },
+      "noMatchTitle": "لا يوجد عميل مطابق",
+      "noMatchDescription": "جرّب اسمًا أو رقم هاتف أو بريدًا إلكترونيًا آخر.",
+      "emptyDescription": "يظهر العملاء هنا فور وصول أول حجز أو طلب.",
+      "notFound": "لم يعد لهذا العميل أي سجلات.",
+      "contact": "بيانات التواصل",
+      "counts": "{{bookings}} حجز · {{requests}} طلب",
+      "umrahRequests": "طلب عمرة واحد",
+      "umrahRequests_other": "{{count}} طلبات عمرة",
+      "relatedRecords": "السجل ({{count}})",
+      "noRelated": "لا توجد سجلات بعد.",
+      "status": {
+        "customer": "عميل",
+        "lead": "عميل محتمل",
+        "cancelled": "ملغى"
+      },
+      "matchedBy": {
+        "phone": "تم الربط عبر رقم الهاتف",
+        "email": "تم الربط عبر البريد الإلكتروني",
+        "unlinked": "غير مرتبط — لم يُقدَّم هاتف ولا بريد إلكتروني"
+      },
+      "related": {
+        "booking": "حجز",
+        "message": "رسالة",
+        "travellers": "مسافر واحد",
+        "travellers_other": "{{count}} مسافرين",
+        "umrah": "{{nights}} ليلة · مسافر واحد",
+        "umrah_other": "{{nights}} ليلة · {{count}} مسافرين",
+        "travellers_zero": "بدون مسافرين",
+        "travellers_one": "مسافر واحد",
+        "travellers_two": "مسافران",
+        "travellers_few": "{{count}} مسافرين",
+        "travellers_many": "{{count}} مسافرًا",
+        "umrah_zero": "{{nights}} ليلة · بدون مسافرين",
+        "umrah_one": "{{nights}} ليلة · مسافر واحد",
+        "umrah_two": "{{nights}} ليلة · مسافران",
+        "umrah_few": "{{nights}} ليلة · {{count}} مسافرين",
+        "umrah_many": "{{nights}} ليلة · {{count}} مسافرًا"
+      },
+      "umrahRequests_zero": "لا طلبات عمرة",
+      "umrahRequests_one": "طلب عمرة واحد",
+      "umrahRequests_two": "طلبا عمرة",
+      "umrahRequests_few": "{{count}} طلبات عمرة",
+      "umrahRequests_many": "{{count}} طلب عمرة"
     },
     "notifications": {
       "title": "الإشعارات",
@@ -145,7 +269,8 @@
       "loading": "جارٍ التحميل…",
       "emptyTitle": "لا توجد إشعارات بعد",
       "view": "عرض",
-      "markRead": "تعليم كمقروء"
+      "markRead": "تعليم كمقروء",
+      "delete": "حذف الإشعار"
     },
     "kit": {
       "insight": {
@@ -167,6 +292,34 @@
         "badge": "الفرنسية ناقصة",
         "title": "لا توجد ترجمة فرنسية بعد"
       }
+    },
+    "documentTitle": "{{section}} — لوحة تحكم جنة الصحراء",
+    "docSections": {
+      "dashboard": "لوحة التحكم",
+      "hotels": "الفنادق",
+      "requests": "الطلبات",
+      "reports": "التقارير",
+      "settings": "الإعدادات",
+      "packageEditor": "محرّر الباقات",
+      "services": "الخدمات",
+      "features": "لماذا تختارنا",
+      "customers": "العملاء",
+      "team": "الفريق",
+      "blog": "المدونة",
+      "bookings": "الحجوزات",
+      "branches": "الفروع",
+      "faq": "الأسئلة الشائعة",
+      "flightRequests": "طلبات الطيران",
+      "gallery": "المعرض",
+      "messages": "الرسائل",
+      "notifications": "الإشعارات",
+      "trips": "الرحلات",
+      "testimonials": "آراء العملاء"
+    },
+    "states": {
+      "errorTitle": "تعذّر تحميل البيانات",
+      "errorDescription": "حدث خطأ أثناء الاتصال. البيانات موجودة ولكن لم نتمكن من عرضها.",
+      "retry": "إعادة المحاولة"
     }
   }
 }

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   ArrowRight,
@@ -31,14 +32,12 @@ import { EmailSection } from "@/components/admin/settings/EmailSection";
 import { NotificationsSection } from "@/components/admin/settings/NotificationsSection";
 import { SecuritySection } from "@/components/admin/settings/SecuritySection";
 import { TeamSection } from "@/components/admin/settings/TeamSection";
+import { adminDocTitle } from "@/lib/admin/doc-title";
 
 export const Route = createFileRoute("/admin/settings")({
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Settings — Janat Sahara Admin" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: adminDocTitle("settings") }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: SettingsPage,
 });
@@ -72,134 +71,137 @@ interface Group {
   items: Entry[];
 }
 
-const GROUPS: Group[] = [
-  {
-    group: "Agency",
-    caption: "Who you are",
-    items: [
-      {
-        id: "general",
-        label: "General",
-        summary: "Your agency information",
-        detail: "Name, address and working hours",
-        icon: Building2,
-        component: GeneralSection,
-      },
-      {
-        id: "brand",
-        label: "Brand",
-        summary: "Your visual identity",
-        detail: "Logo, tagline and colours",
-        icon: Palette,
-        component: BrandSection,
-      },
-    ],
-  },
-  {
-    group: "Website",
-    caption: "What visitors see",
-    items: [
-      {
-        id: "homepage",
-        label: "Homepage",
-        summary: "What visitors see first",
-        detail: "Hero, about and call to action",
-        icon: Layout,
-        component: ContentSection,
-      },
-      {
-        id: "statistics",
-        label: "Statistics",
-        summary: "Your achievements",
-        detail: "Counters shown on the homepage",
-        icon: BarChart3,
-        component: StatsSection,
-      },
-      {
-        id: "seo",
-        label: "Search appearance",
-        summary: "How you appear on Google",
-        detail: "Titles, description and sharing image",
-        icon: Search,
-        component: SeoSection,
-      },
-    ],
-  },
-  {
-    group: "Communication",
-    caption: "How travellers reach you",
-    items: [
-      {
-        id: "contact",
-        label: "Contact",
-        summary: "Phone, email and WhatsApp",
-        detail: "Shown across the website",
-        icon: Contact,
-        component: ContactSection,
-      },
-      {
-        id: "branches",
-        label: "Branches",
-        summary: "Offices and locations",
-        detail: "Displayed on the contact map",
-        icon: MapPin,
-        component: BranchesSection,
-      },
-      {
-        id: "social",
-        label: "Social media",
-        summary: "Instagram, Facebook and more",
-        detail: "Channels linked in the footer",
-        icon: Share2,
-        component: SocialSection,
-      },
-      {
-        id: "email",
-        label: "Email",
-        summary: "Booking notifications",
-        detail: "Where new requests are delivered",
-        icon: Mail,
-        component: EmailSection,
-      },
-    ],
-  },
-  {
-    group: "System",
-    caption: "Access and alerts",
-    items: [
-      {
-        id: "notifications",
-        label: "Notifications",
-        summary: "How you receive alerts",
-        detail: "Dashboard and email alerts",
-        icon: Bell,
-        component: NotificationsSection,
-      },
-      {
-        id: "team",
-        label: "Team",
-        summary: "Manage team access",
-        detail: "Admins and their roles",
-        icon: Users,
-        component: TeamSection,
-      },
-      {
-        id: "security",
-        label: "Security",
-        summary: "Account protection",
-        detail: "Access policies and sessions",
-        icon: ShieldCheck,
-        component: SecuritySection,
-      },
-    ],
-  },
-];
-
-const ALL = GROUPS.flatMap((g) => g.items);
+function buildGroups(t: (key: string) => string): Group[] {
+  return [
+    {
+      group: t("content.settings.groups.agency.title"),
+      caption: t("content.settings.groups.agency.caption"),
+      items: [
+        {
+          id: "general",
+          label: t("content.settings.nav.general.label"),
+          summary: t("content.settings.nav.general.summary"),
+          detail: t("content.settings.nav.general.detail"),
+          icon: Building2,
+          component: GeneralSection,
+        },
+        {
+          id: "brand",
+          label: t("content.settings.nav.brand.label"),
+          summary: t("content.settings.nav.brand.summary"),
+          detail: t("content.settings.nav.brand.detail"),
+          icon: Palette,
+          component: BrandSection,
+        },
+      ],
+    },
+    {
+      group: t("content.settings.groups.website.title"),
+      caption: t("content.settings.groups.website.caption"),
+      items: [
+        {
+          id: "homepage",
+          label: t("content.settings.nav.homepage.label"),
+          summary: t("content.settings.nav.homepage.summary"),
+          detail: t("content.settings.nav.homepage.detail"),
+          icon: Layout,
+          component: ContentSection,
+        },
+        {
+          id: "statistics",
+          label: t("content.settings.nav.statistics.label"),
+          summary: t("content.settings.nav.statistics.summary"),
+          detail: t("content.settings.nav.statistics.detail"),
+          icon: BarChart3,
+          component: StatsSection,
+        },
+        {
+          id: "seo",
+          label: t("content.settings.nav.seo.label"),
+          summary: t("content.settings.nav.seo.summary"),
+          detail: t("content.settings.nav.seo.detail"),
+          icon: Search,
+          component: SeoSection,
+        },
+      ],
+    },
+    {
+      group: t("content.settings.groups.communication.title"),
+      caption: t("content.settings.groups.communication.caption"),
+      items: [
+        {
+          id: "contact",
+          label: t("content.settings.nav.contact.label"),
+          summary: t("content.settings.nav.contact.summary"),
+          detail: t("content.settings.nav.contact.detail"),
+          icon: Contact,
+          component: ContactSection,
+        },
+        {
+          id: "branches",
+          label: t("content.settings.nav.branches.label"),
+          summary: t("content.settings.nav.branches.summary"),
+          detail: t("content.settings.nav.branches.detail"),
+          icon: MapPin,
+          component: BranchesSection,
+        },
+        {
+          id: "social",
+          label: t("content.settings.nav.social.label"),
+          summary: t("content.settings.nav.social.summary"),
+          detail: t("content.settings.nav.social.detail"),
+          icon: Share2,
+          component: SocialSection,
+        },
+        {
+          id: "email",
+          label: t("content.settings.nav.email.label"),
+          summary: t("content.settings.nav.email.summary"),
+          detail: t("content.settings.nav.email.detail"),
+          icon: Mail,
+          component: EmailSection,
+        },
+      ],
+    },
+    {
+      group: t("content.settings.groups.system.title"),
+      caption: t("content.settings.groups.system.caption"),
+      items: [
+        {
+          id: "notifications",
+          label: t("content.settings.nav.notifications.label"),
+          summary: t("content.settings.nav.notifications.summary"),
+          detail: t("content.settings.nav.notifications.detail"),
+          icon: Bell,
+          component: NotificationsSection,
+        },
+        {
+          id: "team",
+          label: t("content.settings.nav.team.label"),
+          summary: t("content.settings.nav.team.summary"),
+          detail: t("content.settings.nav.team.detail"),
+          icon: Users,
+          component: TeamSection,
+        },
+        {
+          id: "security",
+          label: t("content.settings.nav.security.label"),
+          summary: t("content.settings.nav.security.summary"),
+          detail: t("content.settings.nav.security.detail"),
+          icon: ShieldCheck,
+          component: SecuritySection,
+        },
+      ],
+    },
+  ];
+}
 
 function SettingsPage() {
+  const { t } = useTranslation("admin");
+  const groups = useMemo(() => buildGroups(t), [t]);
+  const all = useMemo(() => groups.flatMap((g) => g.items), [groups]);
   const [open, setOpen] = useState<SectionId | null>(null);
-  const entry = open ? ALL.find((i) => i.id === open) ?? null : null;
+  const entry = open ? (all.find((i) => i.id === open) ?? null) : null;
 
   useEffect(() => {
     if (entry) window.scrollTo({ top: 0 });
@@ -210,14 +212,16 @@ function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl pb-16">
       <header className="pb-8">
-        <h1 className="text-h4 font-bold tracking-tight text-foreground">Settings</h1>
+        <h1 className="text-h4 font-bold tracking-tight text-foreground">
+          {t("content.settings.pageTitle")}
+        </h1>
         <p className="mt-1.5 text-small text-muted-foreground">
-          Manage your agency, website and communication.
+          {t("content.settings.pageDescription")}
         </p>
       </header>
 
       <div className="space-y-9">
-        {GROUPS.map((group) => (
+        {groups.map((group) => (
           <section key={group.group}>
             <div className="mb-3 flex items-baseline gap-2">
               <h2 className="text-body font-semibold tracking-tight text-foreground">
@@ -244,7 +248,7 @@ function SettingTile({ item, onOpen }: { item: Entry; onOpen: () => void }) {
       type="button"
       onClick={onOpen}
       className={cn(
-        "group flex w-full items-start gap-3.5 rounded-2xl border border-border-subtle bg-card p-4 text-start",
+        "group flex w-full items-start gap-3.5 rounded-card border border-border-subtle bg-card p-4 text-start",
         "transition-colors hover:border-primary/40 hover:bg-accent/40",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       )}
@@ -267,6 +271,7 @@ function SettingTile({ item, onOpen }: { item: Entry; onOpen: () => void }) {
 }
 
 function FocusedSetting({ entry, onBack }: { entry: Entry; onBack: () => void }) {
+  const { t } = useTranslation("admin");
   const Section = entry.component;
   return (
     <div className="mx-auto max-w-3xl pb-16">
@@ -277,7 +282,7 @@ function FocusedSetting({ entry, onBack }: { entry: Entry; onBack: () => void })
       >
         <ArrowLeft className="h-3.5 w-3.5 ltr:inline rtl:hidden" />
         <ArrowRight className="h-3.5 w-3.5 ltr:hidden rtl:inline" />
-        Settings
+        {t("content.settings.pageTitle")}
       </button>
 
       <header className="mb-7 flex flex-wrap items-end justify-between gap-3 border-b border-border-subtle pb-5">

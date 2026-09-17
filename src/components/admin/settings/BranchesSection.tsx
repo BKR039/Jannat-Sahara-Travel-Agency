@@ -47,14 +47,18 @@ type Branch = Database["public"]["Tables"]["branches"]["Row"];
 interface Draft {
   name: string;
   name_fr: string;
+  name_en: string;
   city: string;
   city_fr: string;
+  city_en: string;
   address: string;
   address_fr: string;
+  address_en: string;
   phone: string;
   email: string;
   working_hours: string;
   working_hours_fr: string;
+  working_hours_en: string;
   google_maps_url: string;
   image: string;
   latitude: string;
@@ -66,14 +70,18 @@ interface Draft {
 const EMPTY: Draft = {
   name: "",
   name_fr: "",
+  name_en: "",
   city: "",
   city_fr: "",
+  city_en: "",
   address: "",
   address_fr: "",
+  address_en: "",
   phone: "",
   email: "",
   working_hours: "",
   working_hours_fr: "",
+  working_hours_en: "",
   google_maps_url: "",
   image: "",
   latitude: "36.8065",
@@ -86,14 +94,18 @@ function toDraft(b: Branch): Draft {
   return {
     name: b.name ?? "",
     name_fr: b.name_fr ?? "",
+    name_en: b.name_en ?? "",
     city: b.city ?? "",
     city_fr: b.city_fr ?? "",
+    city_en: b.city_en ?? "",
     address: b.address ?? "",
     address_fr: b.address_fr ?? "",
+    address_en: b.address_en ?? "",
     phone: b.phone ?? "",
     email: b.email ?? "",
     working_hours: b.working_hours ?? "",
     working_hours_fr: b.working_hours_fr ?? "",
+    working_hours_en: b.working_hours_en ?? "",
     google_maps_url: b.google_maps_url ?? "",
     image: b.image ?? "",
     latitude: String(b.latitude ?? ""),
@@ -107,14 +119,19 @@ function toRow(d: Draft) {
   return {
     name: d.name.trim(),
     name_fr: d.name_fr.trim() || null,
+    // Empty stays NULL so the documented fallback applies; never copy another language in.
+    name_en: d.name_en.trim() || null,
     city: d.city.trim(),
     city_fr: d.city_fr.trim() || null,
+    city_en: d.city_en.trim() || null,
     address: d.address.trim(),
     address_fr: d.address_fr.trim() || null,
+    address_en: d.address_en.trim() || null,
     phone: d.phone.trim() || null,
     email: d.email.trim() || null,
     working_hours: d.working_hours.trim() || null,
     working_hours_fr: d.working_hours_fr.trim() || null,
+    working_hours_en: d.working_hours_en.trim() || null,
     google_maps_url: d.google_maps_url.trim() || null,
     image: d.image.trim() || null,
     latitude: Number(d.latitude),
@@ -130,7 +147,8 @@ function validate(d: Draft, e: (k: string) => string): Errors {
   if (!d.name.trim()) out.name = e("required");
   if (!d.city.trim()) out.city = e("required");
   if (!d.address.trim()) out.address = e("required");
-  if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim())) out.email = e("email");
+  if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim()))
+    out.email = e("email");
   if (d.phone.trim() && !/^[+\d][\d\s()-]{5,}$/.test(d.phone.trim())) out.phone = e("phone");
   if (d.google_maps_url.trim() && !/^https?:\/\/.+/.test(d.google_maps_url.trim()))
     out.google_maps_url = e("url");
@@ -173,14 +191,14 @@ export function BranchesSection() {
   const tb = (k: string) => t(`adminBranches.${k}`);
   const list = useBranches();
   const invalidate = useInvalidate();
-  const [view, setView] = useState<{ mode: "list" } | { mode: "edit"; id: string } | { mode: "new" }>(
-    { mode: "list" },
-  );
+  const [view, setView] = useState<
+    { mode: "list" } | { mode: "edit"; id: string } | { mode: "new" }
+  >({ mode: "list" });
 
   if (view.mode !== "list") {
-    const branch = view.mode === "edit" ? list.data?.find((b) => b.id === view.id) ?? null : null;
+    const branch = view.mode === "edit" ? (list.data?.find((b) => b.id === view.id) ?? null) : null;
     if (view.mode === "edit" && !branch) {
-      return <Skeleton className="h-72 w-full rounded-2xl" />;
+      return <Skeleton className="h-72 w-full rounded-card" />;
     }
     return (
       <BranchEditor
@@ -195,7 +213,7 @@ export function BranchesSection() {
     );
   }
 
-  if (list.isLoading) return <Skeleton className="h-72 w-full rounded-2xl" />;
+  if (list.isLoading) return <Skeleton className="h-72 w-full rounded-card" />;
 
   const branches = list.data ?? [];
 
@@ -219,7 +237,7 @@ export function BranchesSection() {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3 py-8 text-center">
-            <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
+            <span className="grid h-11 w-11 place-items-center rounded-card bg-primary/10 text-primary">
               <MapPin className="h-5 w-5" />
             </span>
             <p className="text-small text-muted-foreground">{tb("empty")}</p>
@@ -296,10 +314,14 @@ function BranchRow({ branch, onEdit }: { branch: Branch; onEdit: () => void }) {
   });
 
   return (
-    <div className="rounded-2xl border border-border-subtle bg-card p-4 sm:p-5">
+    <div className="rounded-card border border-border-subtle bg-card p-4 sm:p-5">
       <div className="flex flex-wrap items-start gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-          {branch.is_main_branch ? <Star className="h-4 w-4 fill-current" /> : <MapPin className="h-4 w-4" />}
+          {branch.is_main_branch ? (
+            <Star className="h-4 w-4 fill-current" />
+          ) : (
+            <MapPin className="h-4 w-4" />
+          )}
         </span>
 
         <div className="min-w-0 flex-1">
@@ -438,7 +460,7 @@ function BranchEditor({
 
   const errors = validate(draft, (k) => tb(`errors.${k}`));
   const dirty = JSON.stringify(draft) !== JSON.stringify(remote);
-  const err = (k: keyof Draft) => (submitted || touched[k] ? errors[k] ?? null : null);
+  const err = (k: keyof Draft) => (submitted || touched[k] ? (errors[k] ?? null) : null);
 
   function patch(p: Partial<Draft>) {
     setDraft((d) => ({ ...d, ...p }));
@@ -587,7 +609,7 @@ function BranchEditor({
             <TextField
               label={tb("fields.hours")}
               wide
-              placeholder="Lun – Sam : 09:00 – 18:00"
+              placeholder={tb("fields.hoursPlaceholder")}
               value={draft.working_hours}
               onChange={(v) => patch({ working_hours: v })}
             />
@@ -616,7 +638,7 @@ function BranchEditor({
         </div>
       </SettingsCard>
 
-      <SettingsCard title={tb("groups.translation")} description={tb("hints.translation")}>
+      <SettingsCard title={tb("groups.translationFr")} description={tb("hints.translation")}>
         <FieldGrid>
           <TextField
             label={tb("fields.name")}
@@ -647,7 +669,40 @@ function BranchEditor({
         </FieldGrid>
       </SettingsCard>
 
-      <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-subtle bg-card/95 px-4 py-3 shadow-[0_4px_16px_0_hsl(0_0%_0%/0.06)] backdrop-blur">
+      {/* English content (B-01). Left empty, the public site falls back exactly
+          as it does today — nothing is auto-translated or copied. */}
+      <SettingsCard title={tb("groups.translationEn")} description={tb("hints.translationEn")}>
+        <FieldGrid>
+          <TextField
+            label={tb("fields.name")}
+            value={draft.name_en}
+            onChange={(v) => patch({ name_en: v })}
+          />
+          <TextField
+            label={tb("fields.city")}
+            value={draft.city_en}
+            onChange={(v) => patch({ city_en: v })}
+          />
+          <Field label={tb("fields.address")} wide>
+            {(id) => (
+              <Textarea
+                id={id}
+                rows={2}
+                value={draft.address_en}
+                onChange={(e) => patch({ address_en: e.target.value })}
+              />
+            )}
+          </Field>
+          <TextField
+            label={tb("fields.hours")}
+            wide
+            value={draft.working_hours_en}
+            onChange={(v) => patch({ working_hours_en: v })}
+          />
+        </FieldGrid>
+      </SettingsCard>
+
+      <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-card border border-border-subtle bg-card/95 px-4 py-3 shadow-[0_4px_16px_0_hsl(0_0%_0%/0.06)] backdrop-blur">
         <span className="text-caption text-muted-foreground">
           {save.isPending ? (
             <span className="inline-flex items-center gap-1.5">
@@ -667,11 +722,7 @@ function BranchEditor({
           <Button variant="ghost" size="sm" onClick={onCancel} disabled={save.isPending}>
             {tb("cancel")}
           </Button>
-          <Button
-            size="sm"
-            onClick={submit}
-            disabled={save.isPending || (!dirty && !!branch)}
-          >
+          <Button size="sm" onClick={submit} disabled={save.isPending || (!dirty && !!branch)}>
             {tb("save")}
           </Button>
         </span>

@@ -60,7 +60,10 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div dir={dirFor(i18next.language)} className="min-h-screen bg-gradient-to-br from-background via-muted/40 to-accent/20 flex items-center justify-center p-4">
+    <div
+      dir={dirFor(i18next.language)}
+      className="min-h-screen bg-gradient-to-br from-background via-muted/40 to-accent/20 flex items-center justify-center p-4"
+    >
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center">
           <Logo />
@@ -75,7 +78,10 @@ function ResetPasswordPage() {
           {!ready ? (
             <p className="text-center text-small text-muted-foreground">
               {t("auth.waitingLink")}{" "}
-              <Link to="/auth" className="text-primary hover:underline">{t("auth.signInPageLink")}</Link>.
+              <Link to="/auth" className="text-primary hover:underline">
+                {t("auth.signInPageLink")}
+              </Link>
+              .
             </p>
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
@@ -83,14 +89,30 @@ function ResetPasswordPage() {
                 <Label htmlFor="pw">{t("auth.newPassword")}</Label>
                 <div className="relative">
                   <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="ps-9" required minLength={8} />
+                  <Input
+                    id="pw"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="ps-9"
+                    required
+                    minLength={8}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="pw2">{t("auth.confirmPassword")}</Label>
                 <div className="relative">
                   <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="pw2" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="ps-9" required minLength={8} />
+                  <Input
+                    id="pw2"
+                    type="password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    className="ps-9"
+                    required
+                    minLength={8}
+                  />
                 </div>
               </div>
               <Button type="submit" className="w-full" disabled={busy}>

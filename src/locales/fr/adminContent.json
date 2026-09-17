@@ -14,7 +14,9 @@
       "hidden": "Masqué",
       "uploadFailed": "Échec du téléversement",
       "saveFailed": "Échec de l'enregistrement",
-      "deleted": "Supprimé"
+      "deleted": "Supprimé",
+      "missingTranslations": "Manque : {{langs}}",
+      "toggleActive": "Basculer la visibilité"
     },
     "settings": {
       "pageTitle": "Paramètres",
@@ -161,7 +163,11 @@
         "headOfficeAddress": "Adresse du siège",
         "addressHint": "Rue, ville et pays.",
         "googleMapsLink": "Lien Google Maps",
-        "googleMapsHint": "Collez le lien de partage de l'emplacement de votre bureau."
+        "googleMapsHint": "Collez le lien de partage de l'emplacement de votre bureau.",
+        "hoursPlaceholder": "Lun – Sam : 09:00 – 18:00",
+        "hints": {
+          "mapsUrl": "Collez le lien de partage de l'emplacement de votre bureau."
+        }
       },
       "brand": {
         "title": "Identité de marque",
@@ -197,7 +203,15 @@
         "navTrips": "Voyages",
         "bookNow": "Réserver",
         "browseOffers": "Voir les offres",
-        "uploaded": "Téléversé"
+        "uploaded": "Téléversé",
+        "previewBook": "Réserver",
+        "previewBrowse": "Voir les offres",
+        "hints": {
+          "agencyNameInherited": "Hérité du profil de l'agence — le modifier ici le met à jour partout.",
+          "tagline": "Une courte ligne sous votre logo.",
+          "logo": "Carré, fond transparent. 512×512 recommandé.",
+          "favicon": "Icône d'onglet du navigateur. 64×64."
+        }
       },
       "homepage": {
         "title": "Contenu de la page d'accueil",
@@ -228,7 +242,13 @@
             "help": "Le dernier coup de pouce avant le pied de page. Une action claire fonctionne mieux."
           },
           "generic": "Bloc de contenu affiché sur le site public."
-        }
+        },
+        "hints": {
+          "heroImage": "Téléversez directement — inutile de coller une URL. 1920×1080 recommandé.",
+          "ctaLink": "Chemin interne comme /umrah ou un lien https complet."
+        },
+        "badgesField": "Badges du hero",
+        "badgesHint": "Séparez par des virgules. Le premier s'affiche au-dessus du titre."
       },
       "stats": {
         "title": "Statistiques",
@@ -272,7 +292,15 @@
         "googleVerificationCode": "Code de vérification Google",
         "googleVerificationHint": "La valeur de contenu de la balise google-site-verification.",
         "allowIndexing": "Autoriser les moteurs de recherche à indexer le site",
-        "allowIndexingHint": "Désactivez uniquement pendant la construction du site."
+        "allowIndexingHint": "Désactivez uniquement pendant la construction du site.",
+        "hints": {
+          "siteTitle": "Moins de 60 caractères fonctionne le mieux.",
+          "metaDescription": "Moins de 160 caractères. Décrivez vos services et destinations.",
+          "keywords": "Séparés par des virgules. Utilisés comme indices de recherche interne.",
+          "shareImage": "1200×630 recommandé.",
+          "googleVerification": "La valeur content de la balise google-site-verification.",
+          "indexing": "À désactiver uniquement pendant les travaux sur le site."
+        }
       },
       "contact": {
         "title": "Contact",
@@ -297,10 +325,11 @@
         "channelsTitle": "Canaux",
         "channelsDescription": "Laissez un champ vide pour masquer ce canal du site.",
         "exampleHint": "Exemple : {{placeholder}}",
-        "openChannel": "Ouvrir {{label}}",
+        "openChannel": "Ouvrir {{name}}",
         "livePreviewTitle": "Aperçu en direct",
         "livePreviewDescription": "À quoi ressemblera la ligne sociale du pied de page.",
-        "noChannels": "Aucun canal connecté pour le moment — la ligne sociale reste masquée."
+        "noChannels": "Aucun canal connecté pour le moment — la ligne sociale reste masquée.",
+        "example": "Exemple : {{value}}"
       },
       "email": {
         "title": "E-mail",
@@ -327,7 +356,14 @@
         "deliveryDescription": "Suspendre temporairement les notifications sortantes.",
         "bookingEmailsToggle": "Envoyer un e-mail pour chaque nouvelle réservation",
         "bookingEmailsHint": "Lorsque désactivé, les réservations sont toujours enregistrées et affichées dans le tableau de bord.",
-        "defaultFromName": "Janat Sahara Travel"
+        "defaultFromName": "Janat Sahara Travel",
+        "hints": {
+          "ownerRecipient": "Boîte de réception principale pour les notifications de réservation.",
+          "ccRecipients": "Facultatif. Séparez plusieurs adresses par des virgules.",
+          "replyTo": "Les réponses de votre équipe arrivent ici.",
+          "subjectPrefix": "Aide à filtrer les e-mails, par ex. [Booking].",
+          "bookingEmails": "Désactivé, les réservations restent enregistrées et visibles dans le tableau de bord."
+        }
       },
       "notifications": {
         "title": "Notifications",
@@ -345,7 +381,14 @@
         "housekeepingTitle": "Entretien",
         "housekeepingDescription": "Combien de temps les alertes lues restent dans la cloche.",
         "retentionLabel": "Conserver les notifications pendant (jours)",
-        "retentionHint": "Entre 1 et 365 jours."
+        "retentionHint": "Entre 1 et 365 jours.",
+        "hints": {
+          "newBooking": "Alerte l'équipe dès qu'un voyageur réserve un forfait.",
+          "newMessage": "Alerte lorsqu'une personne envoie le formulaire de contact.",
+          "newsletter": "Utile pendant la constitution de votre liste de diffusion.",
+          "dailyDigest": "Une seule alerte de synthèse au lieu de notifications isolées.",
+          "retention": "Entre 1 et 365 jours."
+        }
       },
       "security": {
         "title": "Sécurité",
@@ -364,7 +407,12 @@
         "auditLoggingHint": "Enregistre qui a changé quoi, et quand.",
         "sessionLength": "Durée de session (heures)",
         "sessionLengthHint": "Les administrateurs sont déconnectés après cette période d'inactivité. 1–720.",
-        "superAdminOnly": "Seul un super administrateur peut modifier les politiques d'accès."
+        "superAdminOnly": "Seul un super administrateur peut modifier les politiques d'accès.",
+        "hints": {
+          "require2fa": "Les administrateurs doivent confirmer un second facteur avant d'accéder au tableau de bord.",
+          "auditLogging": "Enregistre qui a modifié quoi, et quand.",
+          "sessionLength": "Les administrateurs sont déconnectés après cette période d'inactivité. 1–720."
+        }
       },
       "team": {
         "title": "Équipe",
@@ -377,6 +425,39 @@
       "branches": {
         "translationGroupTitle": "Traductions",
         "translationGroupHint": "Affiché aux voyageurs francophones et anglophones. Revient à l'arabe si vide."
+      },
+      "fields": {
+        "agency_name": {
+          "label": "Nom de l'agence",
+          "hint": "Affiché dans les e-mails, le pied de page et les données structurées."
+        },
+        "address": {
+          "label": "Adresse du siège"
+        },
+        "hours": {
+          "label": "Horaires d'ouverture"
+        },
+        "maps_url": {
+          "label": "Lien Google Maps"
+        },
+        "phone": {
+          "label": "Ligne fixe"
+        },
+        "mobile": {
+          "label": "Mobile"
+        },
+        "email": {
+          "label": "E-mail de contact",
+          "hint": "Publié sur le site pour les voyageurs."
+        },
+        "whatsapp": {
+          "label": "Lien WhatsApp",
+          "hint": "Lien wa.me complet, par ex. https://wa.me/21655123456"
+        },
+        "emergency": {
+          "label": "Contact d'urgence",
+          "hint": "Numéro facultatif hors horaires pour les voyageurs."
+        }
       }
     },
     "blog": {
@@ -516,6 +597,104 @@
       "toasts": {
         "invitationSent": "Invitation envoyée",
         "roleRemoved": "Rôle retiré"
+      }
+    },
+    "services": {
+      "pageTitle": "Services",
+      "pageDescription": "Les cartes de services affichées sur la page d'accueil, en arabe, français et anglais.",
+      "addItem": "Ajouter un service",
+      "editTitle": "Modifier le service",
+      "newTitle": "Nouveau service",
+      "formHint": "L'arabe est le texte par défaut. Le français et l'anglais sont facultatifs et ne sont jamais remplis automatiquement.",
+      "searchPlaceholder": "Rechercher un service…",
+      "emptyTitle": "Aucun service",
+      "emptyDescription": "Ajoutez les services proposés par l'agence pour qu'ils apparaissent sur la page d'accueil.",
+      "noMatchTitle": "Aucun service correspondant",
+      "noMatchDescription": "Essayez un autre terme ou réinitialisez les filtres.",
+      "deleteTitle": "Supprimer ce service ?",
+      "deleteDescription": "« {{name}} » sera retiré de la page d'accueil. Cette action est irréversible.",
+      "filters": {
+        "all": "Tous",
+        "active": "Visibles",
+        "inactive": "Masqués"
+      },
+      "fields": {
+        "title": "Titre",
+        "description": "Description",
+        "slug": "Page liée",
+        "slugHint": "La carte ouvre cette page, par exemple /umrah.",
+        "slugUnknown": "Aucune page publique n'utilise cette adresse — la carte ne mènerait nulle part.",
+        "icon": "Icône",
+        "iconHint": "Nom d'icône Lucide, par exemple moon ou plane.",
+        "cover": "Image de couverture",
+        "coverHint": "Enregistrée avec le service. Les cartes de la page d'accueil affichent actuellement l'icône, pas cette image.",
+        "sortOrder": "Ordre",
+        "sortOrderHint": "Les plus petits numéros apparaissent en premier.",
+        "active": "Visible sur le site",
+        "activeHint": "Les services masqués restent ici mais disparaissent de la page d'accueil."
+      },
+      "errors": {
+        "titleRequired": "Saisissez un titre d'au moins 2 caractères.",
+        "slugRequired": "Choisissez la page liée à cette carte.",
+        "slugInvalid": "Utilisez uniquement des minuscules, des chiffres et des tirets.",
+        "slugTaken": "Un autre service est déjà lié à cette page."
+      },
+      "actions": {
+        "activate": "Afficher sur le site",
+        "deactivate": "Masquer du site",
+        "upload": "Téléverser"
+      },
+      "toasts": {
+        "saved": "Service enregistré",
+        "deleted": "Service supprimé",
+        "activated": "Le service est maintenant visible",
+        "deactivated": "Le service est maintenant masqué",
+        "saveFailed": "Impossible d'enregistrer le service",
+        "uploadFailed": "Échec du téléversement"
+      }
+    },
+    "features": {
+      "pageTitle": "Pourquoi nous choisir",
+      "pageDescription": "Les raisons affichées dans la section « Pourquoi nous choisir » de la page d'accueil, en arabe, français et anglais.",
+      "addItem": "Ajouter une raison",
+      "editTitle": "Modifier la raison",
+      "newTitle": "Nouvelle raison",
+      "formHint": "L'arabe est le texte par défaut. Le français et l'anglais sont facultatifs et ne sont jamais remplis automatiquement.",
+      "searchPlaceholder": "Rechercher une raison…",
+      "emptyTitle": "Aucune raison",
+      "emptyDescription": "Ajoutez ce qui distingue l'agence pour l'afficher sur la page d'accueil.",
+      "noMatchTitle": "Aucune raison correspondante",
+      "noMatchDescription": "Essayez un autre terme ou réinitialisez les filtres.",
+      "deleteTitle": "Supprimer cette raison ?",
+      "deleteDescription": "« {{name}} » sera retirée de la page d'accueil. Cette action est irréversible.",
+      "filters": {
+        "all": "Toutes",
+        "active": "Visibles",
+        "inactive": "Masquées"
+      },
+      "fields": {
+        "title": "Titre",
+        "description": "Description",
+        "icon": "Icône",
+        "iconHint": "Nom d'icône Lucide, par exemple award ou shield-check.",
+        "sortOrder": "Ordre",
+        "sortOrderHint": "Les plus petits numéros apparaissent en premier.",
+        "active": "Visible sur le site",
+        "activeHint": "Les raisons masquées restent ici mais disparaissent de la page d'accueil."
+      },
+      "errors": {
+        "titleRequired": "Saisissez un titre d'au moins 2 caractères."
+      },
+      "actions": {
+        "activate": "Afficher sur le site",
+        "deactivate": "Masquer du site"
+      },
+      "toasts": {
+        "saved": "Raison enregistrée",
+        "deleted": "Raison supprimée",
+        "activated": "La raison est maintenant visible",
+        "deactivated": "La raison est maintenant masquée",
+        "saveFailed": "Impossible d'enregistrer la raison"
       }
     }
   }

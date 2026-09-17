@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SUPPORTED_LANGUAGES, normalizeLang, type SupportedLanguage } from "@/lib/i18n";
 
+// i18n-audit-ignore: a language switcher must name each language in that
+// language, so these literals are correct and must not be translated.
 const LABELS: Record<SupportedLanguage, string> = {
   ar: "العربية",
   fr: "Français",
   en: "English",
 };
 
+// i18n-audit-ignore: short codes shown in each language's own script.
 const SHORT: Record<SupportedLanguage, string> = {
   ar: "ع",
   fr: "FR",
@@ -31,7 +34,7 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
-          className="gap-2 rounded-full"
+          className="min-h-11 gap-2 rounded-full"
           aria-label={t("actions.changeLanguage")}
         >
           <Globe className="h-4 w-4" />

@@ -3,18 +3,19 @@ import type { Package } from "@/lib/queries";
 export type ServiceKey = "umrah" | "trip" | "flight" | "visa";
 export type PaxType = "adult" | "child" | "infant";
 
+/**
+ * Fields the booking form actually collects. Passport number, nationality,
+ * date of birth, passport expiry and emergency contact were deliberately
+ * removed from the flow (docs/07-workflows.md) — do not reintroduce them.
+ * The database columns remain for historical bookings.
+ */
 export interface Passenger {
   id: string;
   type: PaxType;
   fullName: string;
-  passportNumber: string;
-  nationality: string;
   gender: string;
-  dateOfBirth: string;
-  passportExpiry: string;
   phone: string;
   email: string;
-  emergencyContact: string;
   notes: string;
   passportPath: string | null;
   passportName: string | null;
@@ -36,14 +37,9 @@ export function emptyPassenger(type: PaxType): Passenger {
     id: randomId(),
     type,
     fullName: "",
-    passportNumber: "",
-    nationality: "",
     gender: "",
-    dateOfBirth: "",
-    passportExpiry: "",
     phone: "",
     email: "",
-    emergencyContact: "",
     notes: "",
     passportPath: null,
     passportName: null,
@@ -93,4 +89,10 @@ export function money(value: number, currency: string): string {
 }
 
 export const MAX_PASSPORT_BYTES = 8 * 1024 * 1024;
-export const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "application/pdf"];
+export const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "application/pdf",
+];

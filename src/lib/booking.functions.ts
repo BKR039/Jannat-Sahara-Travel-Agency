@@ -6,8 +6,13 @@ export const submitBooking = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderEmail } = await import("./booking-email.server");
-    const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail, sanitizeHeaderValue } =
-      await import("./security.server");
+    const {
+      enforceRateLimit,
+      sanitizeText,
+      sanitizeOptionalText,
+      sanitizeEmail,
+      sanitizeHeaderValue,
+    } = await import("./security.server");
 
     // Throttle abusive submissions per client (fails open on infra errors).
     await enforceRateLimit({ scope: "booking", limit: 5, windowSeconds: 900 });
@@ -45,7 +50,6 @@ export const submitBooking = createServerFn({ method: "POST" })
         total_price: data.totalPrice ?? null,
         currency: data.currency,
         communication_preference: data.communicationPreference ?? null,
-        emergency_contact: sanitizeOptionalText(primary.emergencyContact, 160),
         notes: sanitizeOptionalText(data.notes, 2000),
         passport_path: primary.passportPath ?? null,
         status: "new",
@@ -65,14 +69,9 @@ export const submitBooking = createServerFn({ method: "POST" })
         sort_order: i,
         is_primary: p.isPrimary,
         full_name: sanitizeText(p.fullName, 120),
-        passport_number: sanitizeOptionalText(p.passportNumber, 40),
-        nationality: sanitizeOptionalText(p.nationality, 80),
         gender: p.gender || null,
-        date_of_birth: p.dateOfBirth || null,
-        passport_expiry: p.passportExpiry || null,
         phone: sanitizeOptionalText(p.phone, 32),
         email: p.email ? sanitizeEmail(p.email) : null,
-        emergency_contact: sanitizeOptionalText(p.emergencyContact, 160),
         passport_path: p.passportPath || null,
         notes: sanitizeOptionalText(p.notes, 1000),
       })),
@@ -130,7 +129,9 @@ export const submitBooking = createServerFn({ method: "POST" })
           emailSent = true;
         }
       } else {
-        console.warn("[booking] RESEND_API_KEY or BOOKING_NOTIFICATION_EMAIL missing — skipping email");
+        console.warn(
+          "[booking] RESEND_API_KEY or BOOKING_NOTIFICATION_EMAIL missing — skipping email",
+        );
       }
     } catch (err) {
       console.error("[booking] email error", err);

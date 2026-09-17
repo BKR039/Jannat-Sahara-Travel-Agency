@@ -39,7 +39,11 @@ function BookingSuccess() {
           </div>
         )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button
+            asChild
+            size="lg"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             <Link to="/">
               <Home className="me-2 h-4 w-4" />
               {t("bookingSuccess.home")}

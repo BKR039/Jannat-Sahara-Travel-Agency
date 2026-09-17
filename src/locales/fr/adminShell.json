@@ -20,7 +20,12 @@
       "faq": "FAQ",
       "notifications": "Notifications",
       "settings": "Paramètres",
-      "team": "Équipe"
+      "team": "Équipe",
+      "hotels": "Hôtels",
+      "services": "Services",
+      "features": "Pourquoi nous choisir",
+      "flightRequests": "Demandes de vol",
+      "messages": "Messages"
     },
     "closeNavigation": "Fermer la navigation",
     "openNavigation": "Ouvrir la navigation",
@@ -42,7 +47,8 @@
       "accessDeniedTitle": "Accès refusé",
       "accessDeniedDescription": "Votre compte n'a pas la permission d'accéder au tableau de bord admin. Contactez votre super administrateur pour demander l'accès.",
       "signOut": "Déconnexion",
-      "backToSite": "Retour au site"
+      "backToSite": "Retour au site",
+      "loading": "Chargement de la console…"
     },
     "dashboard": {
       "title": "Centre de contrôle",
@@ -56,24 +62,62 @@
         "travellers": "Voyageurs",
         "travellersHint": "Adultes, enfants et bébés",
         "upcomingDepartures": "Départs à venir",
-        "upcomingDeparturesHint": "Voyages avec une date de départ future"
+        "upcomingDeparturesHint": "Voyages avec une date de départ future",
+        "customRequests": "Demandes Omra",
+        "customRequestsHint": "{{total}} au total · {{actionable}} en cours"
       },
       "insights": {
         "title": "Analyses intelligentes",
         "emptyTitle": "Rien ne nécessite votre attention",
         "emptyDescription": "Aucun risque de capacité, demande sans réponse ou tendance inhabituelle détecté.",
-        "open": "Ouvrir"
+        "open": "Ouvrir",
+        "custom": {
+          "action": "Ouvrir les demandes",
+          "awaitingContact": {
+            "title": "{{count}} demande Omra attend une première réponse",
+            "title_other": "{{count}} demandes Omra attendent une première réponse",
+            "body": "Ouvertes depuis plus de 24 heures sans aucun contact enregistré.",
+            "title_one": "1 demande Omra attend une première réponse"
+          },
+          "departingSoon": {
+            "title": "{{count}} demande non résolue avec un départ sous 30 jours",
+            "title_other": "{{count}} demandes non résolues avec un départ sous 30 jours",
+            "body": "La plus proche est {{reference}}, départ dans environ {{days}} jours.",
+            "title_one": "1 demande non résolue avec un départ sous 30 jours"
+          },
+          "awaitingOffer": {
+            "title": "{{count}} demandes sur mesure sans offre",
+            "body": "L'agence a échangé avec ces voyageurs mais aucune offre n'a été envoyée."
+          },
+          "volumeUp": {
+            "title": "Les demandes Omra augmentent de {{percent}} % ce mois-ci",
+            "body": "{{count}} ce mois-ci contre {{previous}} le mois dernier."
+          },
+          "volumeDown": {
+            "title": "Les demandes Omra baissent de {{percent}} % ce mois-ci",
+            "body": "{{count}} ce mois-ci contre {{previous}} le mois dernier."
+          },
+          "largeParty": {
+            "title": "{{count}} demande de groupe important est ouverte",
+            "title_other": "{{count}} demandes de groupe important sont ouvertes",
+            "body": "{{reference}} demande {{travellers}} voyageurs.",
+            "title_one": "1 demande de groupe important est ouverte"
+          }
+        }
       },
       "revenueTrend": {
         "title": "Tendance des revenus",
-        "description": "Valeur des réservations sur les 12 derniers mois"
+        "description": "Valeur des réservations sur les 12 derniers mois",
+        "emptyTitle": "Aucun revenu enregistré",
+        "emptyDescription": "La tendance apparaîtra dès la première réservation payée."
       },
       "workQueue": {
         "title": "File d'attente",
         "description": "En attente d'une première réponse",
         "newBookings": "Nouvelles demandes de réservation",
         "newRequests": "Nouvelles demandes de vol",
-        "unreadMessages": "Messages non lus"
+        "unreadMessages": "Messages non lus",
+        "customRequests": "Demandes Omra sur mesure"
       },
       "nextDepartures": {
         "title": "Prochains départs",
@@ -86,6 +130,23 @@
         "allBookings": "Toutes les réservations",
         "emptyTitle": "Aucune réservation pour l'instant",
         "generalEnquiry": "Demande générale"
+      },
+      "customRequests": {
+        "title": "Demandes Omra sur mesure",
+        "description": "{{actionable}} sur {{total}} attendent encore une décision.",
+        "viewAll": "Tout voir",
+        "emptyTitle": "Rien en attente",
+        "emptyDescription": "Toutes les demandes Omra sur mesure ont été traitées.",
+        "errorTitle": "Impossible de charger les demandes",
+        "errorDescription": "Actualisez la page pour réessayer.",
+        "noDates": "Aucune date fournie",
+        "travellers": "{{count}} voyageur",
+        "travellers_other": "{{count}} voyageurs",
+        "departingIn": "Dans {{count}} jour",
+        "departingIn_other": "Dans {{count}} jours",
+        "awaitingReply": "En attente de réponse",
+        "departingIn_one": "Dans 1 jour",
+        "travellers_one": "1 voyageur"
       }
     },
     "reports": {
@@ -122,7 +183,7 @@
     },
     "customers": {
       "title": "Clients",
-      "description": "Personnes issues des demandes de réservation. Contactez-les directement.",
+      "description": "Toutes les personnes ayant réservé, demandé un devis ou utilisé le configurateur Omra.",
       "exportCsv": "Exporter en CSV",
       "searchPlaceholder": "Rechercher par nom, téléphone, e-mail…",
       "loading": "Chargement…",
@@ -135,7 +196,38 @@
         "categories": "Catégories",
         "lastBooking": "Dernière réservation",
         "contact": "Contact"
-      }
+      },
+      "noMatchTitle": "Aucun client correspondant",
+      "noMatchDescription": "Essayez un autre nom, numéro de téléphone ou e-mail.",
+      "emptyDescription": "Les clients apparaissent ici dès la première réservation ou demande.",
+      "notFound": "Ce client n'a plus aucun enregistrement.",
+      "contact": "Coordonnées",
+      "counts": "{{bookings}} réservation(s) · {{requests}} demande(s)",
+      "umrahRequests": "{{count}} demande Omra",
+      "umrahRequests_other": "{{count}} demandes Omra",
+      "relatedRecords": "Historique ({{count}})",
+      "noRelated": "Aucun enregistrement pour le moment.",
+      "status": {
+        "customer": "Client",
+        "lead": "Prospect",
+        "cancelled": "Annulé"
+      },
+      "matchedBy": {
+        "phone": "Rapproché par numéro de téléphone",
+        "email": "Rapproché par adresse e-mail",
+        "unlinked": "Non rattaché — ni téléphone ni e-mail fourni"
+      },
+      "related": {
+        "booking": "Réservation",
+        "message": "Message",
+        "travellers": "{{count}} voyageur",
+        "travellers_other": "{{count}} voyageurs",
+        "umrah": "{{nights}} nuit(s) · {{count}} voyageur",
+        "umrah_other": "{{nights}} nuit(s) · {{count}} voyageurs",
+        "travellers_one": "1 voyageur",
+        "umrah_one": "{{nights}} nuit(s) · 1 voyageur"
+      },
+      "umrahRequests_one": "1 demande Omra"
     },
     "notifications": {
       "title": "Notifications",
@@ -145,7 +237,8 @@
       "loading": "Chargement…",
       "emptyTitle": "Aucune notification pour l'instant",
       "view": "Voir",
-      "markRead": "Marquer comme lu"
+      "markRead": "Marquer comme lu",
+      "delete": "Supprimer la notification"
     },
     "kit": {
       "insight": {
@@ -167,6 +260,34 @@
         "badge": "FR manquant",
         "title": "Pas encore de traduction française"
       }
+    },
+    "documentTitle": "{{section}} — Administration Janat Sahara",
+    "docSections": {
+      "dashboard": "Tableau de bord",
+      "hotels": "Hôtels",
+      "requests": "Demandes",
+      "reports": "Rapports",
+      "settings": "Paramètres",
+      "packageEditor": "Éditeur d’offres",
+      "services": "Services",
+      "features": "Pourquoi nous choisir",
+      "customers": "Clients",
+      "team": "Équipe",
+      "blog": "Blog",
+      "bookings": "Réservations",
+      "branches": "Agences",
+      "faq": "FAQ",
+      "flightRequests": "Demandes de vol",
+      "gallery": "Galerie",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "trips": "Voyages",
+      "testimonials": "Témoignages"
+    },
+    "states": {
+      "errorTitle": "Chargement impossible",
+      "errorDescription": "Une erreur est survenue. Les données existent mais n'ont pas pu être affichées.",
+      "retry": "Réessayer"
     }
   }
 }

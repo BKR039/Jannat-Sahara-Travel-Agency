@@ -5,8 +5,13 @@ import { FlightRequestInput } from "./flight-request.schema";
 export const submitFlightRequest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => FlightRequestInput.parse(d))
   .handler(async ({ data }) => {
-    const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail, sanitizeHeaderValue } =
-      await import("./security.server");
+    const {
+      enforceRateLimit,
+      sanitizeText,
+      sanitizeOptionalText,
+      sanitizeEmail,
+      sanitizeHeaderValue,
+    } = await import("./security.server");
     const { renderFlightRequestEmail } = await import("./flight-request-email.server");
 
     await enforceRateLimit({ scope: "flight_request", limit: 5, windowSeconds: 900 });
@@ -72,7 +77,13 @@ export const submitFlightRequest = createServerFn({ method: "POST" })
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ from, to: [to], subject: sanitizeHeaderValue(subject, 200), html, text }),
+          body: JSON.stringify({
+            from,
+            to: [to],
+            subject: sanitizeHeaderValue(subject, 200),
+            html,
+            text,
+          }),
         });
         if (!res.ok) {
           console.error(`[flight-request] resend failed [${res.status}]: ${await res.text()}`);

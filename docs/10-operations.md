@@ -9,10 +9,79 @@
 | `RESEND_API_KEY` | server | `booking.functions.ts`, `flight-request.functions.ts` |
 | `RESEND_FROM_EMAIL` | server | same (defaults to `onboarding@resend.dev`) |
 | `BOOKING_NOTIFICATION_EMAIL` | server | booking + flight-request notification recipient |
+| `VITE_SITE_URL` | client + SSR (`import.meta.env`) | `src/lib/seo.ts` — the production origin (e.g. `https://janatsahara.tn`) used for canonical links, `og:url` and `/sitemap.xml`. **Not a secret.** When unset, those URLs stay relative and the sitemap is served `no-store`; set it in production so canonicals are absolute. |
 
 Rules: never prefix a secret with `VITE_`; read `process.env` inside handlers only.
 The `.env` file and the Supabase vars are platform-managed. After changing an
 unprefixed secret, **re-publish** for production to pick it up.
+
+## Connecting a Supabase project
+
+`.env.example` is the template — copy it to `.env` and fill in real values.
+`.env` is git-ignored and must never be committed.
+
+Run the preflight before trusting any environment:
+
+```bash
+node scripts/supabase-preflight.mjs     # or: npm run preflight
+```
+
+It is read-only. It checks the required variables, reaches the project, reports
+which expected tables and storage buckets are missing, and — once a schema
+exists — verifies that an anonymous visitor can read the public content and
+**cannot** read bookings, requests, customers, notifications or private
+settings. Exit code 0 means the deployment is genuinely connected. It never
+prints a key or a row of customer data.
+
+Bootstrapping a fresh project:
+
+```bash
+# 1. point supabase/config.toml and .env at the SAME project ref
+npx supabase login                       # needs a personal access token
+npm run db:link                          # links to VITE_SUPABASE_PROJECT_ID
+npm run db:push                          # applies supabase/migrations in order
+# -> stops at 20260816150000 on a fresh project. See "Owner bootstrap" below.
+npm run db:push                          # re-run to apply the remainder
+npm run db:status                        # confirms which migrations are applied
+npm run preflight                        # verifies schema, buckets and RLS
+```
+
+### Owner bootstrap — expected mid-way stop
+
+`20260816150000` (security fix X-02) removes the automatic super_admin grant and
+refuses to run while nobody holds the role, so the agency cannot be locked out of
+its own dashboard. On a brand-new project `auth.users` is empty at that point, so
+the push stops with:
+
+> Aborting: no super_admin exists in public.user_roles. Grant super_admin to the
+> owner account first, then re-run this migration.
+
+That is the guard working, not a broken migration. To continue: sign up the
+owner's account and confirm the email while the earlier migrations are in place —
+the bootstrap trigger installed by `20260728122029` grants super_admin on
+confirmation — then re-run `npm run db:push`. The later migration then removes
+that trigger, leaving the role assignable only by an existing super_admin.
+
+If the owner address ever changes, grant the role manually with a one-off
+statement instead of re-introducing an email-based trigger.
+
+`supabase/migrations/20260821140000_*.sql` creates the two storage buckets
+(`media` public-read, `passports` private) with the size and MIME limits the
+application enforces. Storage policies alone do not create buckets, so without
+it every upload fails with "Bucket not found" while the policies look correct.
+
+### Seed data vs real business data
+
+There is no seed script; `20260728105042` inserts the original placeholder
+content. `20260821150000` then takes the fabricated records out of public
+circulation without deleting them — invented testimonials become inactive and
+demo packages return to draft, matched only by their stock-image hosts.
+
+Still needs a human before launch: `contact_info` (placeholder phone, email and
+address), `gallery_items` and `articles` (stock imagery and placeholder
+editorial), and the seeded `branches` address and coordinates. `services`,
+`features`, `site_settings` and `site_content` are structural defaults and are
+safe to keep.
 
 ## Third-party integrations
 

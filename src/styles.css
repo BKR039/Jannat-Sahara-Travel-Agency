@@ -194,16 +194,51 @@
   --state-selected: var(--color-orange-50);
 
   /* ---------- Gradients ---------- */
-  --gradient-sunrise: linear-gradient(135deg, var(--color-orange-400) 0%, var(--color-orange-600) 100%);
+  --gradient-sunrise: linear-gradient(
+    135deg,
+    var(--color-orange-400) 0%,
+    var(--color-orange-600) 100%
+  );
   --gradient-dune: linear-gradient(180deg, var(--color-gold-300) 0%, var(--color-gold-600) 100%);
-  --gradient-oasis-night: linear-gradient(160deg, var(--color-teal-700) 0%, var(--color-navy-800) 100%);
+  --gradient-oasis-night: linear-gradient(
+    160deg,
+    var(--color-teal-700) 0%,
+    var(--color-navy-800) 100%
+  );
   --gradient-card-border: linear-gradient(
     180deg,
     var(--color-terracotta-500) 0%,
     var(--color-orange-500) 60%,
     var(--color-terracotta-300) 100%
   );
-  --gradient-hero-scrim: linear-gradient(180deg, rgba(11, 27, 58, 0) 0%, rgba(11, 27, 58, 0.85) 100%);
+  --gradient-hero-scrim: linear-gradient(
+    180deg,
+    rgba(11, 27, 58, 0) 0%,
+    rgba(11, 27, 58, 0.85) 100%
+  );
+  /* Warm veil for photographic heroes.
+     The navy scrim above was being stacked with an 85%-opacity teal-to-navy
+     wash, which flattened the photography into a muddy block and introduced a
+     second colour world on top of the warm page. This is keyed to the same
+     warm dark the elevation ramp uses, and is weighted to the bottom so the
+     image stays readable while the text keeps its contrast. */
+  --gradient-hero-veil: linear-gradient(
+    180deg,
+    rgba(20, 18, 16, 0.24) 0%,
+    rgba(20, 18, 16, 0.44) 45%,
+    rgba(20, 18, 16, 0.76) 100%
+  );
+
+  /* Split hero (homepage).
+     The photograph occupies one side of the frame and the copy the other, so
+     there is no scrim over the copy at all — contrast comes from the ivory
+     canvas instead. These two only exist to dissolve the edge where the
+     photograph meets that canvas, which is what makes the two halves read as
+     one composition rather than a picture pasted next to some text.
+     Warm ivory, mixed from the existing gold/neutral ramps so the hero stays
+     in the same colour world as the rest of the page. */
+  --hero-canvas: color-mix(in srgb, var(--color-gold-50) 55%, var(--bg-canvas));
+  --hero-canvas-deep: color-mix(in srgb, var(--color-orange-50) 42%, var(--hero-canvas));
 
   /* ---------- Typography ---------- */
   --font-arabic-display: "Cairo", "Segoe UI", system-ui, sans-serif;
@@ -238,6 +273,10 @@
   --font-size-card-desc: 0.9375rem;
 
   --line-height-display: 1.08;
+  /* Arabic needs vertical room Latin does not: at 1.08 the homepage hero
+     clipped the ascenders and descenders of تبدأ من هنا. Applied by :lang(ar) below. */
+  --line-height-display-ar: 1.38;
+  --line-height-heading-ar: 1.45;
   --line-height-heading: 1.2;
   --line-height-body: 1.6;
   --line-height-tight: 1.35;
@@ -247,6 +286,25 @@
   --tracking-latin-tight: -0.01em;
   --tracking-latin-normal: 0;
   --tracking-latin-wide: 0.04em;
+
+  /* ---------- Spacing (spacing.css — was referenced but never ported) ----------
+     `ds-section` resolved to a hard-coded fallback because --space-layout-lg
+     did not exist. Defining the scale is what turns the 80/64/56/48/0 measured
+     across six pages into one rhythm. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+
+  --space-layout-sm: 48px;
+  --space-layout-md: 72px;
+  --space-layout-lg: 96px;
+  /* Hero breathes with the viewport rather than stepping at a breakpoint. */
+  --space-hero: clamp(56px, 4rem + 5vw, 140px);
 
   /* ---------- Radius ---------- */
   --radius-none: 0px;
@@ -270,11 +328,16 @@
   --shadow-inset-md: inset 0 2px 4px rgba(var(--shadow-color), 0.12);
 
   --ds-shadow-xs: 0 1px 2px rgba(var(--shadow-color), 0.06);
-  --ds-shadow-sm: 0 1px 2px rgba(var(--shadow-color), 0.05), 0 2px 6px rgba(var(--shadow-color), 0.06);
-  --ds-shadow-md: 0 2px 4px rgba(var(--shadow-color), 0.05), 0 8px 16px rgba(var(--shadow-color), 0.08);
-  --ds-shadow-lg: 0 4px 8px rgba(var(--shadow-color), 0.06), 0 16px 32px rgba(var(--shadow-color), 0.1);
-  --ds-shadow-xl: 0 8px 16px rgba(var(--shadow-color), 0.08), 0 24px 48px rgba(var(--shadow-color), 0.14);
-  --ds-shadow-2xl: 0 16px 24px rgba(var(--shadow-color), 0.1), 0 32px 64px rgba(var(--shadow-color), 0.18);
+  --ds-shadow-sm:
+    0 1px 2px rgba(var(--shadow-color), 0.05), 0 2px 6px rgba(var(--shadow-color), 0.06);
+  --ds-shadow-md:
+    0 2px 4px rgba(var(--shadow-color), 0.05), 0 8px 16px rgba(var(--shadow-color), 0.08);
+  --ds-shadow-lg:
+    0 4px 8px rgba(var(--shadow-color), 0.06), 0 16px 32px rgba(var(--shadow-color), 0.1);
+  --ds-shadow-xl:
+    0 8px 16px rgba(var(--shadow-color), 0.08), 0 24px 48px rgba(var(--shadow-color), 0.14);
+  --ds-shadow-2xl:
+    0 16px 24px rgba(var(--shadow-color), 0.1), 0 32px 64px rgba(var(--shadow-color), 0.18);
 
   /* ---------- Motion ---------- */
   --duration-instant: 80ms;
@@ -372,13 +435,26 @@
 @theme inline {
   /* Radius scale (DS radius.css) */
   --radius-xs: 6px;
+  /* Semantic radius utilities first: `rounded-card` names the role,
+     `rounded-lg` names a step. Feature code should prefer the role. */
+  --radius-input: 10px;
+  --radius-button: 14px;
+  --radius-card: 20px;
+  --radius-card-lg: 28px;
+  --radius-badge: 999px;
+
+  /* Tailwind's own scale IS the design system's, remapped so `rounded-lg`
+     renders the card radius. The steps above card-lg used to run
+     36 / 44 / 52px — outside the five-value semantic system, and the source of
+     the 44px Umrah card measured against 20px everywhere else. They collapse
+     onto card-lg so no feature class can leave the system. */
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
-  --radius-2xl: 36px;
-  --radius-3xl: 44px;
-  --radius-4xl: 52px;
+  --radius-2xl: 28px;
+  --radius-3xl: 28px;
+  --radius-4xl: 28px;
 
   /* Elevation */
   --shadow-2xs: var(--ds-shadow-xs);
@@ -546,6 +622,14 @@
   }
 }
 
+/* Arabic display metrics.
+   :lang(ar) rather than [dir=rtl] — the metric belongs to the script, and a
+   Latin string inside an RTL page should keep the tighter Latin leading. */
+:lang(ar) {
+  --line-height-display: var(--line-height-display-ar);
+  --line-height-heading: var(--line-height-heading-ar);
+}
+
 /* =============================================================
    DS semantic type styles (typography.css)
    ============================================================= */
@@ -651,6 +735,121 @@
 @utility bg-gradient-oasis-night {
   background-image: var(--gradient-oasis-night);
 }
+/* Side veil for the hero.
+   The vertical veil is weighted to the bottom, but the hero copy sits in the
+   upper third, so on a bright photograph the headline lost contrast. This
+   darkens only the edge the copy is anchored to and fades out well before the
+   focal point of the image, which keeps the photograph readable instead of
+   flattening the whole frame to buy contrast.
+
+   Direction-aware: the copy sits at the start edge, which is the right in
+   Arabic and the left in French/English. */
+.ds-hero-side-veil {
+  background-image: none;
+}
+/* Only where the copy occupies one side of the frame. On a phone the headline
+   spans the full width, so a side veil covers the whole photograph and turns
+   it black — the vertical veil alone is the right treatment there. */
+@media (min-width: 768px) {
+  .ds-hero-side-veil {
+    background-image: linear-gradient(
+      to right,
+      rgba(20, 18, 16, 0.72) 0%,
+      rgba(20, 18, 16, 0.38) 42%,
+      rgba(20, 18, 16, 0) 78%
+    );
+  }
+  [dir="rtl"] .ds-hero-side-veil {
+    background-image: linear-gradient(
+      to left,
+      rgba(20, 18, 16, 0.72) 0%,
+      rgba(20, 18, 16, 0.38) 42%,
+      rgba(20, 18, 16, 0) 78%
+    );
+  }
+}
+
+/* Directional wash for the full-bleed hero.
+   The photograph spans the whole section; this only lifts the side the copy
+   sits on to ivory so dark editorial type is readable, and is fully
+   transparent well before the middle of the frame. It is not a scrim over the
+   picture — the Kaaba side of the photograph is never touched.
+
+   Mirrored the same way .ds-hero-side-veil is: the copy sits at the start
+   edge, which is the right in Arabic and the left in French/English. */
+.ds-hero-wash {
+  /* Nothing below lg. The photograph gets its own block under the copy there,
+     so no copy is ever on top of it and a wash would only dull the picture. */
+  background-image: none;
+}
+@media (min-width: 1024px) {
+  /* Always anchored to the right, in both directions.
+     This is the one place the hero does not mirror, and the photograph is the
+     reason: the Kaaba sits about a fifth in from the left of the frame and a
+     full-bleed crop leaves no horizontal room to move it. Mirroring the wash
+     for French and English put the ivory straight over the Kaaba and erased
+     it — the copy has to stay on the side the subject is not. Alignment inside
+     the column is still logical, so Arabic reads right and Latin reads left. */
+  .ds-hero-wash {
+    background-image:
+      linear-gradient(
+        to left,
+        var(--hero-canvas) 0%,
+        var(--hero-canvas) 38%,
+        color-mix(in srgb, var(--hero-canvas) 90%, transparent) 48%,
+        color-mix(in srgb, var(--hero-canvas) 44%, transparent) 60%,
+        transparent 76%
+      ),
+      /* The top veil used to open at full ivory and run for 12% of the hero,
+         which read as a washed band under the navbar and made the photograph
+         look cropped rather than continuous. It now starts part-strength and
+         is gone within a few percent, so it reads as light in the frame
+         instead of a second layer over it. */
+        linear-gradient(
+          to bottom,
+          color-mix(in srgb, var(--hero-canvas) 34%, transparent) 0%,
+          color-mix(in srgb, var(--hero-canvas) 12%, transparent) 3%,
+          transparent 8%
+        ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--hero-canvas) 62%, transparent) 0%,
+        transparent 20%
+      );
+  }
+}
+
+/* Leaflet ships 30px zoom controls. The map is a first-class control surface
+   on the contact section, so its buttons meet the same 44px touch floor as
+   every other control on the site. Leaflet's own behaviour is untouched.
+
+   Leaflet's stylesheet arrives with the lazily imported map chunk, so it can
+   land after this file; its own rule is `.leaflet-touch .leaflet-bar a`, which
+   ties on specificity and would then win on order. These selectors carry one
+   more class each so ours applies regardless of load order. */
+.leaflet-container.leaflet-touch .leaflet-bar a,
+.leaflet-container .leaflet-bar a.leaflet-control-zoom-in,
+.leaflet-container .leaflet-bar a.leaflet-control-zoom-out {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+}
+
+@utility bg-hero-canvas {
+  background-color: var(--hero-canvas);
+  background-image: radial-gradient(120% 90% at 0% 0%, var(--hero-canvas-deep) 0%, transparent 55%);
+}
+[dir="rtl"] .bg-hero-canvas {
+  background-image: radial-gradient(
+    120% 90% at 100% 0%,
+    var(--hero-canvas-deep) 0%,
+    transparent 55%
+  );
+}
+
+@utility bg-gradient-hero-veil {
+  background-image: var(--gradient-hero-veil);
+}
 @utility bg-gradient-hero-scrim {
   background-image: var(--gradient-hero-scrim);
 }
@@ -670,6 +869,32 @@
   width: 100%;
   max-width: 1280px;
   padding-inline: 16px;
+}
+
+/*
+ * Icon that leads a run of text (patterns/icon-alignment).
+ *
+ * The recurring bug this replaces: an icon beside text that may wrap was
+ * pushed down with `mt-0.5` so it looked centred on the first line. That is a
+ * guess — it is wrong at every font size but the one it was eyeballed at, and
+ * it had to be re-guessed in every component. Here the icon is centred inside
+ * one line box of the surrounding text (`1lh`), so it lands on the first line
+ * whatever the type size or line height, in RTL as in LTR, with no offset.
+ *
+ * Put it on the icon itself inside a flex row; the row (not the text child)
+ * must carry the type styles, since `1lh` resolves against the icon's own
+ * inherited line-height.
+ */
+@utility ds-icon-lead {
+  flex: none;
+  align-self: flex-start;
+  block-size: var(--ds-icon-lead-size, 1rem);
+  inline-size: var(--ds-icon-lead-size, 1rem);
+  margin-block-start: calc((1lh - var(--ds-icon-lead-size, 1rem)) / 2);
+}
+/* 18px variant for body-sized text that needs a stronger mark. */
+@utility ds-icon-lead-lg {
+  --ds-icon-lead-size: 1.125rem;
 }
 
 /* Scroll reveal + stagger (patterns/motion-language.md) */
@@ -716,7 +941,9 @@
   border: none !important;
 }
 .janat-pin {
-  transition: transform var(--motion-scale), filter var(--motion-hover);
+  transition:
+    transform var(--motion-scale),
+    filter var(--motion-hover);
   transform-origin: bottom center;
 }
 .janat-pin:hover {
@@ -802,6 +1029,12 @@
   box-shadow: var(--ds-shadow-md);
   backdrop-filter: blur(12px);
 }
+/*
+ * Leaflet's zoom buttons default to 30px and were styled here to 38px — still
+ * under the 44px touch floor the rest of the site holds itself to, on the one
+ * control a thumb reaches for most on a map. They grow on touch-sized screens
+ * and stay compact where a pointer is doing the aiming.
+ */
 .janat-map .leaflet-control-zoom a {
   width: 38px;
   height: 38px;
@@ -815,6 +1048,19 @@
   background: var(--color-orange-500);
   color: #fff;
 }
+/*
+ * `!important` because Leaflet's own stylesheet is imported from the map
+ * module and therefore injected after this one: at equal specificity its
+ * 30px wins on source order, which is why the neighbouring rules in this
+ * block already carry it.
+ */
+@media (width < 48rem) {
+  .janat-map .leaflet-control-zoom a {
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+  }
+}
 .janat-map .leaflet-control-attribution {
   background: color-mix(in oklab, var(--bg-surface) 70%, transparent) !important;
   border-radius: 9999px;
@@ -823,4 +1069,29 @@
 }
 .janat-map .leaflet-popup-content {
   margin: 10px 12px;
+}
+
+/* =============================================================
+   Price & metric pairing (audit §08)
+   `4500 TND` wrapped to two lines in the programme table, splitting the
+   number from its currency. This keeps the pair atomic and lines digits up
+   in columns.
+   ============================================================= */
+@utility ds-metric {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+@utility ds-metric-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.01em;
+}
+@utility ds-metric-unit {
+  font-size: 0.72em;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
 }

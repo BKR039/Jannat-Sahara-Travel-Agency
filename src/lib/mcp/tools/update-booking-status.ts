@@ -8,9 +8,16 @@ export default defineTool({
   description: "Change the status of a booking. Requires an admin or staff account.",
   inputSchema: {
     booking_id: z.string().uuid().describe("The booking id."),
-    status: z.enum(["new", "pending", "confirmed", "cancelled"]).describe("The new booking status."),
+    status: z
+      .enum(["new", "pending", "confirmed", "cancelled"])
+      .describe("The new booking status."),
   },
-  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  annotations: {
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   handler: async ({ booking_id, status }, ctx) => {
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
@@ -25,10 +32,18 @@ export default defineTool({
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     if (!data) {
       return {
-        content: [{ type: "text", text: "No booking was updated — it may not exist or you may lack permission." }],
+        content: [
+          {
+            type: "text",
+            text: "No booking was updated — it may not exist or you may lack permission.",
+          },
+        ],
         isError: true,
       };
     }
-    return { content: [{ type: "text", text: JSON.stringify(data) }], structuredContent: { booking: data } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(data) }],
+      structuredContent: { booking: data },
+    };
   },
 });

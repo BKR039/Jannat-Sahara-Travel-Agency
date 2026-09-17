@@ -1,5 +1,14 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  /*
+   * `watermelon` is the vendored Astrix reference registry — third-party demo
+   * code kept to look at, never imported by the app. It ships button/menu
+   * variants this project's shadcn copies do not define, so it failed the
+   * project typecheck for reasons that say nothing about our code. Excluded
+   * for the same reason and on the same terms as scripts/i18n-audit.mjs
+   * already excludes it, so the check stays a measure of OUR source.
+   */
+  "exclude": ["src/components/watermelon"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",

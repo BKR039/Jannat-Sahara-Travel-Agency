@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { BookingFlow } from "@/components/booking/flow/BookingFlow";
+import { canonical } from "@/lib/seo";
 
 const searchSchema = z.object({
   pkg: z.string().max(200).optional(),
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/booking")({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "/booking" }],
+    links: [canonical("/booking")],
   }),
   component: BookingPage,
 });

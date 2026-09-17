@@ -49,9 +49,44 @@
       "deleteConfirmTitle": "حذف الباقة؟",
       "deleteConfirmDescription": "سيؤدي هذا إلى إزالة \"{{title}}\" نهائيًا.",
       "cancel": "إلغاء",
-      "toastDuplicated": "تم نسخ الباقة",
+      "toastDuplicated": "تم إنشاء نسخة: {{title}}",
       "toastStatusUpdated": "تم تحديث الحالة",
-      "toastDeleted": "تم حذف الباقة"
+      "toastDeleted": "تم حذف الباقة",
+      "seatsRemaining": "{{count}} متبقية",
+      "availability": {
+        "available": "متاح",
+        "limited": "شبه مكتمل",
+        "full": "مكتمل",
+        "unset": "السعة غير محددة"
+      },
+      "publication": {
+        "draft": "مسودة",
+        "published": "منشور",
+        "archived": "مخفي",
+        "sold_out": "مكتمل"
+      },
+      "actionPublish": "نشر",
+      "actionUnpublish": "إلغاء النشر",
+      "actionHide": "إخفاء",
+      "actionShow": "إظهار",
+      "deleteBlocked": {
+        "has_bookings": "لا يمكن حذف برنامج مرتبط بـ {{count}} حجز. أخفِ البرنامج بدلاً من حذفه."
+      },
+      "availabilityFilter": "المقاعد",
+      "availabilityAll": "كل المقاعد",
+      "deleteConfirmBody": "سيُحذف \"{{title}}\" نهائيًا، ولا يمكن التراجع عن ذلك.",
+      "listPanelTitle": "كل الباقات",
+      "resultCount_one": "نتيجة واحدة",
+      "resultCount_other": "{{count}} نتيجة",
+      "filtersLabel": "تصفية",
+      "noMatchTitle": "لا توجد باقات مطابقة",
+      "noMatchDescription": "جرّب توسيع البحث أو إزالة أحد عوامل التصفية.",
+      "clearFilters": "إزالة عوامل التصفية",
+      "noDeparture": "بدون تاريخ مغادرة",
+      "resultCount_zero": "لا نتائج",
+      "resultCount_two": "نتيجتان",
+      "resultCount_few": "{{count}} نتائج",
+      "resultCount_many": "{{count}} نتيجة"
     },
     "editor": {
       "backToPackages": "الباقات",
@@ -225,7 +260,14 @@
         "durationEn": "المدة (بالإنجليزية)",
         "availableSeats": "المقاعد المتاحة",
         "totalSeats": "إجمالي المقاعد",
-        "seatsBooked": "تم حجز {{booked}} من أصل {{total}} مقعد."
+        "seatsBooked": "تم حجز {{booked}} من أصل {{total}} مقعد.",
+        "capacity": "السعة الإجمالية",
+        "booked": "محجوز",
+        "remaining": "متبقي",
+        "capacityHint": "عدد المقاعد الإجمالي للبرنامج. المحجوز والمتبقي يُحسبان تلقائياً من الحجوزات.",
+        "capacityUnset": "السعة غير محددة",
+        "capacityUnsetHint": "حدد السعة الإجمالية لعرض المقاعد المحجوزة والمتبقية.",
+        "oversold": "عدد الحجوزات ({{booked}}) يتجاوز السعة المحددة ({{capacity}})."
       },
       "booking": {
         "cardTitle": "الحجز",
@@ -236,7 +278,9 @@
         "meetingPointEn": "نقطة التجمع (بالإنجليزية)",
         "bookableOnWebsite": "قابل للحجز عبر الموقع",
         "requiredDocsConfigured": "تم إعداد الوثائق المطلوبة",
-        "openBookings": "الحجوزات المفتوحة"
+        "openBookings": "الحجوزات المفتوحة",
+        "yes": "نعم",
+        "no": "لا"
       },
       "previewTitle": "معاينة مباشرة",
       "previewFrameTitle": "معاينة الباقة",
@@ -264,7 +308,72 @@
         "seoDescriptionLength": "اجعل وصف تحسين محركات البحث أقل من 160 حرفًا.",
         "coverRequired": "صورة الغلاف مطلوبة قبل النشر.",
         "shortDescriptionRequired": "الوصف المختصر مطلوب قبل النشر."
-      }
+      },
+      "header": {
+        "saved": "تم حفظ الباقة",
+        "draftCreated": "تم إنشاء المسودة",
+        "newPackage": "باقة جديدة",
+        "untitled": "باقة بدون عنوان",
+        "unsavedAutosaving": "توجد تغييرات غير محفوظة",
+        "draftNotCreated": "لم يتم إنشاء المسودة بعد",
+        "allSaved": "تم حفظ كل التغييرات",
+        "save": "حفظ",
+        "createDraft": "إنشاء مسودة",
+        "statusHint": "الباقات المنشورة فقط تظهر في الموقع.",
+        "savedAt": "حُفظ في {{time}}",
+        "issues_one": "مشكلة واحدة",
+        "issues_other": "{{count}} مشاكل",
+        "issues_zero": "لا مشاكل",
+        "issues_two": "مشكلتان",
+        "issues_few": "{{count}} مشاكل",
+        "issues_many": "{{count}} مشكلة"
+      },
+      "publication": {
+        "current": "الحالة الحالية",
+        "noActions": "لا توجد إجراءات متاحة لهذه الحالة.",
+        "explain": {
+          "draft": "مسودة: البرنامج غير ظاهر للزوار.",
+          "published": "منشور: البرنامج ظاهر في الموقع.",
+          "archived": "مخفي: البرنامج محفوظ في النظام لكنه غير ظاهر للزوار.",
+          "sold_out": "مكتمل: البرنامج ظاهر لكن لا توجد مقاعد متاحة."
+        },
+        "confirm": {
+          "cancel": "إلغاء",
+          "publish": {
+            "title": "نشر البرنامج؟",
+            "body": "سيصبح هذا البرنامج متاحاً للزوار على الموقع."
+          },
+          "unpublish": {
+            "title": "إلغاء نشر البرنامج؟",
+            "body": "سيعود البرنامج إلى وضع المسودة ولن يظهر للزوار."
+          },
+          "hide": {
+            "title": "إخفاء البرنامج؟",
+            "body": "سيبقى محفوظاً في الإدارة لكنه لن يظهر للزوار. هذا ليس حذفاً."
+          },
+          "show": {
+            "title": "إظهار البرنامج؟",
+            "body": "سيعود البرنامج للظهور في الموقع."
+          }
+        }
+      },
+      "unsaved": {
+        "title": "لديك تغييرات غير محفوظة",
+        "body": "إذا غادرت الآن ستفقد التغييرات التي لم تُحفظ.",
+        "saveAndLeave": "حفظ ومغادرة",
+        "discard": "مغادرة دون حفظ",
+        "stay": "البقاء"
+      },
+      "danger": {
+        "deleteBody": "سيتم حذف “{{title}}” نهائياً. لا يمكن التراجع عن هذا الإجراء."
+      },
+      "saveFailed": "تعذّر الحفظ",
+      "loading": "جارٍ فتح المحرّر…",
+      "slugHint": "يُستخدم في رابط الصفحة العامة.",
+      "issue_zero": "لا مشكلات",
+      "issue_two": "مشكلتان",
+      "issue_few": "{{count}} مشكلات",
+      "issue_many": "{{count}} مشكلة"
     },
     "fields": {
       "addItem": "إضافة عنصر",
@@ -312,10 +421,22 @@
       },
       "tripType": "نوع الرحلة",
       "types": {
-        "umrah": { "label": "عمرة", "hint": "باقة مكة والمدينة" },
-        "tour": { "label": "جولة", "hint": "رحلة منظمة إلى الخارج" },
-        "flight": { "label": "طيران", "hint": "تُعالج كطلبات" },
-        "other": { "label": "أخرى", "hint": "التأشيرات والخدمات" }
+        "umrah": {
+          "label": "عمرة",
+          "hint": "باقة مكة والمدينة"
+        },
+        "tour": {
+          "label": "جولة",
+          "hint": "رحلة منظمة إلى الخارج"
+        },
+        "flight": {
+          "label": "طيران",
+          "hint": "تُعالج كطلبات"
+        },
+        "other": {
+          "label": "أخرى",
+          "hint": "التأشيرات والخدمات"
+        }
       },
       "flightsWorkAsRequestsTitle": "الرحلات الجوية تعمل كطلبات",
       "flightsWorkAsRequestsDescription": "أنت لا تنشر تذاكر طيران. يرسل المسافرون طلب رحلة عبر الموقع (المغادرة، الوجهة، التواريخ، عدد المسافرين) ويصل إلى صندوق الوارد الخاص بك — تردّ بأفضل عرض عبر البريد الإلكتروني وتغلق الطلب بعد إنجازه.",
@@ -440,14 +561,141 @@
         "all": "الكل",
         "bookings": "الحجوزات",
         "flights": "الطيران",
-        "messages": "الرسائل"
+        "messages": "الرسائل",
+        "custom": "عمرة مخصّصة"
       },
       "emptyTitle": "لم يتم العثور على طلبات",
       "emptyDescription": "لا يوجد ما يطابق عوامل التصفية الحالية.",
       "email": "البريد الإلكتروني",
       "markStatus": "تحديد كـ {{status}}",
       "toastUpdated": "تم تحديث الطلب",
-      "toastUpdateFailed": "تعذّر تحديث هذا الطلب"
+      "toastUpdateFailed": "تعذّر تحديث هذا الطلب",
+      "statusLabel": "الحالة",
+      "notSpecified": "غير محدَّد",
+      "sections": {
+        "request": "الطلب",
+        "contact": "بيانات التواصل",
+        "dates": "تواريخ السفر",
+        "flights": "الطيران (تفضيلات مطلوبة)",
+        "travellers": "المسافرون",
+        "makkah": "مكة المكرمة",
+        "madinah": "المدينة المنورة",
+        "notes": "ملاحظات المسافر",
+        "customer": "العميل"
+      },
+      "fields": {
+        "reference": "رقم الطلب",
+        "status": "الحالة",
+        "received": "تاريخ الاستلام",
+        "assignedTo": "المسؤول",
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "whatsapp": "واتساب",
+        "contactPreference": "وسيلة التواصل المفضّلة",
+        "language": "اللغة",
+        "departure": "المغادرة",
+        "return": "العودة",
+        "departureAirport": "مطار المغادرة",
+        "returnAirport": "مطار العودة",
+        "party": "المجموعة",
+        "roomType": "نوع الغرفة",
+        "nights": "عدد الليالي",
+        "hotel": "الفندق",
+        "area": "المنطقة",
+        "budget": "الميزانية"
+      },
+      "flexibleAirport": "مرن — يحتاج إلى استشارة",
+      "travellers": {
+        "adults_zero": "بدون بالغين",
+        "adults_one": "بالغ واحد",
+        "adults_two": "بالغان",
+        "adults_few": "{{count}} بالغين",
+        "adults_many": "{{count}} بالغًا",
+        "adults_other": "{{count}} بالغ",
+        "children_zero": "بدون أطفال",
+        "children_one": "طفل واحد",
+        "children_two": "طفلان",
+        "children_few": "{{count}} أطفال",
+        "children_many": "{{count}} طفلًا",
+        "children_other": "{{count}} طفل",
+        "infants_zero": "بدون رُضّع",
+        "infants_one": "رضيع واحد",
+        "infants_two": "رضيعان",
+        "infants_few": "{{count}} رُضّع",
+        "infants_many": "{{count}} رضيعًا",
+        "infants_other": "{{count}} رضيع"
+      },
+      "viewCustomer": "عرض العميل",
+      "customerMatch": {
+        "phone": "مرتبط بهذا العميل عبر رقم الهاتف.",
+        "email": "مرتبط بهذا العميل عبر البريد الإلكتروني.",
+        "unlinked": "غير مرتبط بعميل — لم يُقدَّم هاتف ولا بريد إلكتروني."
+      },
+      "currentStatus": "الحالة الحالية: {{status}}",
+      "closedHint": "هذا الطلب مغلق. لم يعد بالإمكان تغيير حالته أو عرضه.",
+      "noActionsHint": "لا يوجد إجراء إضافي متاح من هذه الحالة.",
+      "confirmStatusTitle": "تعيين هذا الطلب كـ {{status}}؟",
+      "confirmStatusDescription": "سيؤدي هذا إلى إغلاق الطلب. سيغادر قائمة المعالجة ولن يعد بالإمكان تغيير عرضه.",
+      "confirmStatusAction": "تأكيد",
+      "errorTransition": "تغيير الحالة هذا غير مسموح به انطلاقًا من الحالة الحالية.",
+      "errorConflict": "قام شخص آخر بتعديل هذا الطلب. أعد فتحه لعرض الحالة الحالية.",
+      "errorClosed": "هذا الطلب مغلق ولم يعد بالإمكان تغييره.",
+      "errorTitle": "تعذّر تحميل الطلبات",
+      "errorDescription": "حدث خطأ أثناء الاتصال بقاعدة البيانات.",
+      "retry": "إعادة المحاولة",
+      "noMatchTitle": "لا توجد طلبات مطابقة لعوامل التصفية",
+      "noMatchDescription": "جرّب كلمة بحث أخرى أو أزل عوامل التصفية.",
+      "nextAction": "التالي: {{action}}",
+      "openRequest": "فتح طلب {{name}} {{reference}}",
+      "filters": {
+        "allStatuses": "كل الحالات",
+        "openOnly": "المفتوحة فقط",
+        "clear": "إزالة عوامل التصفية",
+        "showing": "{{count}} من {{total}}",
+        "stageOpen": "جديد / قيد المعالجة"
+      },
+      "urgency": {
+        "departure": "السفر قريب",
+        "waiting": "بانتظار الرد",
+        "inDays": "خلال يوم واحد",
+        "inDays_other": "خلال {{count}} يومًا",
+        "inDays_zero": "اليوم",
+        "inDays_one": "خلال يوم واحد",
+        "inDays_two": "خلال يومين",
+        "inDays_few": "خلال {{count}} أيام",
+        "inDays_many": "خلال {{count}} يومًا"
+      },
+      "summary": {
+        "flight": "من {{from}} إلى {{to}} · {{tripType}} · {{cabin}}",
+        "booking": "{{title}} · {{count}} مسافر",
+        "bookingNoTitle": "استفسار عام · {{count}} مسافر",
+        "customPackage": "عمرة · {{nights}} ليالٍ · {{count}} مسافرين",
+        "generalEnquiry": "استفسار عام"
+      },
+      "kinds": {
+        "flight": "طلب طيران",
+        "booking": "حجز",
+        "contact": "رسالة",
+        "custom_package": "عمرة مخصّصة"
+      },
+      "internalTitle": "ملاحظات الموظّف",
+      "internalHint": "معلومات داخلية لا يراها العميل.",
+      "internalPlaceholder": "ما دار في المكالمة، رد المورّد، خطوة المتابعة…",
+      "saveNotes": "حفظ الملاحظات",
+      "offerTitle": "السعر / العرض",
+      "offerHint": "العرض المرسل إلى العميل.",
+      "customerMessage": "رسالة العميل",
+      "priceColumn": "السعر",
+      "call": "اتّصال",
+      "whatsapp": "واتساب",
+      "noPrice": "لا يوجد سعر",
+      "subject": "الموضوع",
+      "package": "الباقة",
+      "cabin": "درجة السفر",
+      "tripType": "نوع الرحلة",
+      "route": "المسار",
+      "total": "الإجمالي"
     },
     "flightRequests": {
       "title": "طلبات الطيران",
@@ -489,7 +737,13 @@
         "assignedTo": "مكلّف إلى",
         "notes": "ملاحظات",
         "created": "تاريخ الإنشاء"
-      }
+      },
+      "deleteAria": "حذف الطلب",
+      "deleteTitle": "حذف طلب الطيران؟",
+      "deleteBody": "سيُحذف الطلب {{reference}} نهائيًا، ولا يمكن التراجع عن ذلك.",
+      "deleteConfirm": "حذف نهائي",
+      "deleteCancel": "إلغاء",
+      "toastDeleteFailed": "تعذّر حذف الطلب"
     },
     "messages": {
       "title": "رسائل التواصل",
@@ -505,6 +759,178 @@
       "cancel": "إلغاء",
       "delete": "حذف",
       "toastDeleted": "تم الحذف"
+    },
+    "statuses": {
+      "unread": "غير مقروءة",
+      "new": "جديد",
+      "reviewing": "قيد المراجعة",
+      "offer_preparing": "تحضير العرض",
+      "contacted": "تم التواصل",
+      "confirmed": "مؤكَّد",
+      "cancelled": "ملغى",
+      "waiting": "في الانتظار",
+      "quoted": "تم التسعير",
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل",
+      "resolved": "تمت المعالجة"
+    },
+    "hotels": {
+      "title": "الفنادق",
+      "description": "منشئ باقات العمرة يعرض هذه الفنادق فقط. عطّل أي فندق لإزالته من الطلبات الجديدة.",
+      "addHotel": "إضافة فندق",
+      "editHotel": "تعديل الفندق",
+      "searchPlaceholder": "ابحث عن فندق…",
+      "allCities": "كل المدن",
+      "makkah": "مكة المكرمة",
+      "madinah": "المدينة المنورة",
+      "all": "الكل",
+      "active": "مُفعَّل",
+      "inactive": "معطَّل",
+      "emptyTitle": "لا توجد فنادق بعد",
+      "emptyDescription": "أضف الفنادق التي تتعامل معها الوكالة، وستظهر فورًا في منشئ باقات العمرة.",
+      "noMatchTitle": "لا توجد فنادق مطابقة",
+      "noMatchDescription": "جرّب بحثًا أو تصفية مختلفة.",
+      "noAreaSet": "لم تُحدَّد المنطقة",
+      "requestCount_one": "طلب واحد",
+      "requestCount_other": "{{count}} طلبات",
+      "formHint": "التفاصيل التي يراها المسافر فقط. بدون تقييمات أو أسعار أو توفّر.",
+      "nameLabel": "اسم الفندق",
+      "namePlaceholder": "دار التوفيق",
+      "nameTooShort": "استخدم حرفين على الأقل.",
+      "cityLabel": "المدينة",
+      "areaLabel": "المنطقة",
+      "areaNotSet": "غير محدَّدة",
+      "areaHint": "تُعرض للمسافرين بلغتهم.",
+      "locationLabel": "الموقع",
+      "locationPlaceholder": "شارع إبراهيم الخليل",
+      "locationHint": "اختياري. يُستخدم عند عدم تحديد منطقة.",
+      "activeLabel": "مُفعَّل",
+      "activeHint": "الفنادق المعطَّلة تبقى في الطلبات السابقة لكن لا يمكن اختيارها من جديد.",
+      "saveHotel": "حفظ الفندق",
+      "saving": "جارٍ الحفظ…",
+      "activate": "تفعيل",
+      "deactivate": "تعطيل",
+      "deleteBlocked": "مستخدم في طلبات قائمة — عطّله بدل حذفه",
+      "deleteConfirmTitle": "حذف هذا الفندق؟",
+      "deleteConfirmDescription": "سيُحذف «{{name}}» من القائمة نهائيًا. عطّله بدلًا من ذلك إذا كنت قد تحتاجه لاحقًا.",
+      "areas": {
+        "haram_close": "قرب الحرم",
+        "central": "المنطقة المركزية",
+        "ibrahim_khalil": "إبراهيم الخليل",
+        "ajyad": "أجياد",
+        "very_close": "قريب جدًا",
+        "close": "قريب",
+        "value": "اقتصادي"
+      },
+      "toastSaved": "تم حفظ الفندق",
+      "toastActivated": "تم تفعيل الفندق",
+      "toastDeactivated": "تم تعطيل الفندق",
+      "toastDeleted": "تم حذف الفندق",
+      "errorDuplicate": "يوجد فندق بهذا الاسم في المدينة نفسها.",
+      "errorInUse": "هذا الفندق مستخدم في طلبات قائمة. عطّله بدل حذفه.",
+      "errorForbidden": "ليست لديك صلاحية للقيام بذلك.",
+      "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "requestCount_zero": "لا طلبات",
+      "requestCount_two": "طلبان",
+      "requestCount_few": "{{count}} طلبات",
+      "requestCount_many": "{{count}} طلبًا"
+    },
+    "offers": {
+      "title": "تحضير العرض",
+      "sentOn": "أُرسل في {{date}}",
+      "notSent": "لم يُرسل بعد",
+      "proposedHotels": "الفنادق المقترحة",
+      "addMakkahHotel": "أضف فندقًا في مكة…",
+      "addMadinahHotel": "أضف فندقًا في المدينة…",
+      "hotelsPlaceholder": "مكة: …\nالمدينة: …",
+      "proposedFlights": "الرحلات المقترحة",
+      "flightsPlaceholder": "شركة الطيران والمسار والمواعيد التي أكّدتها مع الناقل",
+      "flightsHint": "اكتب ما أكّدته فعليًا. النظام لا يتحقق من توفّر مقاعد الطيران.",
+      "amount": "قيمة العرض",
+      "amountPlaceholder": "اتركه فارغًا حتى يتوفّر السعر",
+      "amountInvalid": "أدخل رقمًا، أو اترك الحقل فارغًا.",
+      "currency": "العملة",
+      "notes": "ملاحظات العرض",
+      "notesPlaceholder": "ما يشمله العرض، وشروط الدفع، وأي معلومة يحتاجها المسافر",
+      "save": "حفظ العرض",
+      "saving": "جارٍ الحفظ…",
+      "send": "إرسال العرض",
+      "sendAgain": "إعادة الإرسال",
+      "sending": "جارٍ الإرسال…",
+      "sendHint": "احفظ أولًا — الإرسال يبعث العرض المحفوظ.",
+      "noEmailHint": "لا يوجد بريد إلكتروني في هذا الطلب؛ تواصل عبر الهاتف أو واتساب.",
+      "noEmailTitle": "لا يوجد بريد إلكتروني لهذا الطلب",
+      "toastSaved": "تم حفظ العرض",
+      "toastSaveFailed": "تعذّر حفظ العرض",
+      "toastSent": "تم إرسال العرض إلى العميل",
+      "errorNoEmail": "لم يترك المسافر بريدًا إلكترونيًا. تواصل معه عبر الهاتف أو واتساب.",
+      "errorEmpty": "احفظ تفاصيل العرض أولًا.",
+      "errorNotConfigured": "إرسال البريد الإلكتروني غير مُهيّأ على الخادم.",
+      "errorSendFailed": "تعذّر إرسال العرض. لم يُسجَّل أي إرسال.",
+      "review": "مراجعة العرض",
+      "backToEdit": "العودة إلى التعديل",
+      "previewTitle": "المراجعة قبل الإرسال",
+      "previewDescription": "هذا ما سيُرسل بالبريد الإلكتروني إلى {{email}}.",
+      "previewWarning": "يُسجَّل الإرسال على الطلب ولا يمكن التراجع عنه.",
+      "alreadySentHint": "تم إرسال هذا العرض بالفعل. لا تُعِدّ عرضًا جديدًا إلا إذا اتفقت الوكالة مع المسافر على تغيير.",
+      "errorAlreadySent": "سبق إرسال عرض لهذا الطلب.",
+      "errorClosed": "هذا الطلب مغلق ولم يعد بالإمكان تعديل عرضه.",
+      "errorNoAmount": "حدّد مبلغ العرض قبل الإرسال.",
+      "errorHotelUnknown": "أحد الفنادق المقترحة غير موجود في كتالوج الوكالة.",
+      "errorSentNotRecorded": "تم إرسال العرض بالبريد الإلكتروني لكن تعذّر تسجيله. أعد تحميل الطلب — لن تؤدي إعادة الإرسال إلى إرسال بريد ثانٍ."
+    },
+    "localized": {
+      "base": "الأساسي (عربي)",
+      "fr": "الفرنسية",
+      "en": "الإنجليزية",
+      "emptyHint": "لا تتم الترجمة تلقائيًا. إذا تُرك هذا الحقل فارغًا فلن يرى زوّار النسخة الإنجليزية هذا النص."
+    },
+    "notifications": {
+      "kinds": {
+        "custom_package": "طلب عمرة مخصص جديد",
+        "booking": "حجز جديد",
+        "contact": "رسالة جديدة",
+        "flight": "طلب طيران جديد"
+      }
+    },
+    "activity": {
+      "title": "النشاط",
+      "empty": "لا يوجد نشاط مسجَّل بعد.",
+      "errorTitle": "تعذّر تحميل سجل النشاط.",
+      "retry": "إعادة المحاولة",
+      "loading": "جارٍ التحميل…",
+      "loadMore": "عرض المزيد",
+      "actorSystem": "النظام",
+      "actorAdmin": "مسؤول",
+      "transition": "من {{from}} إلى {{to}}",
+      "events": {
+        "requestCreated": "تم إنشاء الطلب",
+        "statusChanged": "تغيّرت الحالة",
+        "offerUpdated": "تم إعداد العرض",
+        "offerSent": "تم إرسال العرض"
+      }
+    },
+    "categories": {
+      "umrah": "عمرة",
+      "trip": "رحلة",
+      "flight": "طيران",
+      "visa": "تأشيرة"
+    },
+    "stages": {
+      "state": {
+        "new": "جديد",
+        "processing": "قيد المعالجة",
+        "confirmed": "مؤكّد",
+        "declined": "مرفوض"
+      },
+      "action": {
+        "processing": "قيد المعالجة",
+        "confirmed": "تأكيد الطلب",
+        "declined": "رفض الطلب"
+      },
+      "title": "حالة الطلب",
+      "blockedHint": "انقل الطلب إلى «قيد المعالجة» أولاً.",
+      "detailedStatus": "الحالة التفصيلية: {{status}}"
     }
   }
 }

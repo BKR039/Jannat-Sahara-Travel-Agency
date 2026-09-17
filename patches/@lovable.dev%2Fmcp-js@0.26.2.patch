@@ -1,0 +1,14 @@
+diff --git a/dist/stacks/tanstack/vite.js b/dist/stacks/tanstack/vite.js
+index 1111111..2222222 100644
+--- a/dist/stacks/tanstack/vite.js
++++ b/dist/stacks/tanstack/vite.js
+@@ -11,7 +11,8 @@ function normalizePath(p) {
+ 	return p.split(sep).join("/");
+ }
+ function assertContains(parent, child, label) {
+-	if (child !== parent && !child.startsWith(parent + sep)) throw new Error(`@lovable.dev/mcp-js: ${label} must resolve under ${parent}, got ${child}`);
++	const p = normalizePath(parent), c = normalizePath(child);
++	if (c !== p && !c.startsWith(p + "/")) throw new Error(`@lovable.dev/mcp-js: ${label} must resolve under ${parent}, got ${child}`);
+ }
+ function wellKnownRouteFile(routesDir, urlPath) {
+ 	const segments = urlPath.replace(/^\//, "").split("/");

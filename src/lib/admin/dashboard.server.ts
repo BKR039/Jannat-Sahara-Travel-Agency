@@ -3,6 +3,8 @@
  * Everything here is deterministic and derived from real database rows.
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { TERMINAL_STATUSES } from "./request-status";
+import { DEPARTURE_SOON_DAYS, byUrgency, daysToDeparture, urgencyOf } from "./request-urgency";
 
 export type Severity = "info" | "opportunity" | "attention" | "critical";
 
@@ -13,17 +15,19 @@ export interface Insight {
   body: string;
   href?: string;
   actionLabel?: string;
+  /**
+   * Localized insights (Phase 7.2) carry i18n keys plus their numeric
+   * parameters instead of a server-rendered sentence, so the same insight
+   * reads correctly in Arabic, French and English. `title`/`body` stay
+   * populated as an English fallback for any client that ignores the keys.
+   */
+  titleKey?: string;
+  bodyKey?: string;
+  actionLabelKey?: string;
+  params?: Record<string, string | number>;
 }
 
-export async function assertAdmin(userId: string) {
-  const { data, error } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .in("role", ["super_admin", "admin", "staff"]);
-  if (error) throw new Error("Failed to verify permissions");
-  if (!data || data.length === 0) throw new Error("Forbidden: admin required");
-}
+// Authorization lives in ./authorize.server — this module only loads data.
 
 const DAY = 86_400_000;
 
@@ -31,7 +35,12 @@ function monthKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function travellers(b: { adults?: number | null; children?: number | null; infants?: number | null; people?: number | null }) {
+function travellers(b: {
+  adults?: number | null;
+  children?: number | null;
+  infants?: number | null;
+  people?: number | null;
+}) {
   const sum = (b.adults ?? 0) + (b.children ?? 0) + (b.infants ?? 0);
   return sum > 0 ? sum : (b.people ?? 0);
 }
@@ -47,7 +56,7 @@ export async function loadCommandCenter() {
   const now = new Date();
   const since = new Date(now.getTime() - DAY * 400).toISOString();
 
-  const [bookingsRes, packagesRes, flightsRes, messagesRes] = await Promise.all([
+  const [bookingsRes, packagesRes, flightsRes, messagesRes, customRes] = await Promise.all([
     supabaseAdmin
       .from("bookings")
       .select(
@@ -71,12 +80,21 @@ export async function loadCommandCenter() {
       .select("id, name, email, subject, status, handled, created_at")
       .gte("created_at", since)
       .order("created_at", { ascending: false }),
+    // Only the columns the dashboard actually reads — never the whole row.
+    supabaseAdmin
+      .from("custom_package_requests")
+      .select(
+        "id, reference, customer_name, customer_key, status, created_at, last_contact_at, departure_date, return_date, adults, children, infants, offer_sent_at",
+      )
+      .gte("created_at", since)
+      .order("created_at", { ascending: false }),
   ]);
 
   const bookings = bookingsRes.data ?? [];
   const packages = packagesRes.data ?? [];
   const flights = flightsRes.data ?? [];
   const messages = messagesRes.data ?? [];
+  const customRequests = customRes.data ?? [];
 
   /* ------------------------------- KPI window ------------------------------ */
   const startThis = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
@@ -131,19 +149,139 @@ export async function loadCommandCenter() {
     });
   }
 
+  /* ------------------- custom Umrah requests (Phase 7.2) ------------------- */
+  /**
+   * Statuses come from ./request-status, which mirrors the database CHECK
+   * constraint. Nothing here invents a status: "actionable" simply means the
+   * request has not reached one of the terminal statuses.
+   */
+  const isActionable = (status: string) => !TERMINAL_STATUSES.has(status);
+  const customTravellers = (r: {
+    adults: number | null;
+    children: number | null;
+    infants: number | null;
+  }) => (r.adults ?? 0) + (r.children ?? 0) + (r.infants ?? 0);
+
+  const customThis = customRequests.filter((r) => new Date(r.created_at).getTime() >= startThis);
+  const customPrev = customRequests.filter((r) => {
+    const t = new Date(r.created_at).getTime();
+    return t >= startPrev && t < startThis;
+  });
+  const customActionable = customRequests.filter((r) => isActionable(r.status));
+  const customNew = customRequests.filter((r) => r.status === "new");
+  const customClosed = customRequests.filter((r) => TERMINAL_STATUSES.has(r.status));
+
+  // Same 12-month convention the revenue and bookings series already use.
+  const monthlyCustom = new Map<string, number>();
+  customRequests.forEach((r) => {
+    const key = monthKey(new Date(r.created_at));
+    monthlyCustom.set(key, (monthlyCustom.get(key) ?? 0) + 1);
+  });
+  const customSeries: number[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    customSeries.push(monthlyCustom.get(monthKey(d)) ?? 0);
+  }
+
+  /** Waiting for a first reply: still new and older than a day. */
+  const customAwaitingContact = customNew.filter(
+    (r) => !r.last_contact_at && Date.now() - new Date(r.created_at).getTime() > DAY,
+  );
+
+  /** The agency has engaged but no offer has actually been sent yet. */
+  const customAwaitingOffer = customRequests.filter(
+    (r) =>
+      isActionable(r.status) &&
+      !r.offer_sent_at &&
+      (r.status === "reviewing" || r.status === "offer_preparing" || r.status === "contacted"),
+  );
+
+  /** Travel is close and the request is still open — same window as the queue. */
+  const customDepartingSoon = customActionable.filter((r) => {
+    const days = daysToDeparture(r.departure_date);
+    return days != null && days > 0 && days <= DEPARTURE_SOON_DAYS;
+  });
+
+  const customLargeParty = customActionable.filter((r) => customTravellers(r) >= 10);
+
+  /**
+   * The queue lists what needs a decision, most urgent first: travel closest,
+   * then longest waiting. Each entry carries the row id so the dashboard links
+   * straight to that request, and `customer_key` so it resolves to the same
+   * CRM customer Phase 7.1 established.
+   */
+  // Ordering and urgency come from ./request-urgency, shared with the inbox.
+  const asUrgency = (r: (typeof customActionable)[number]) => ({
+    status: r.status,
+    createdAt: r.created_at,
+    departureDate: r.departure_date,
+    lastContactAt: r.last_contact_at,
+  });
+
+  const customQueue = [...customActionable]
+    .sort((a, b) => byUrgency(asUrgency(a), asUrgency(b)))
+    .slice(0, 5)
+    .map((r) => {
+      const days = daysToDeparture(r.departure_date);
+      return {
+        id: r.id,
+        reference: r.reference,
+        customerName: r.customer_name,
+        customerKey: r.customer_key,
+        status: r.status,
+        createdAt: r.created_at,
+        departureDate: r.departure_date,
+        returnDate: r.return_date,
+        travellers: customTravellers(r),
+        daysToDeparture: days,
+        /** Why this row is urgent, or null when it is simply queued. */
+        urgency: urgencyOf(asUrgency(r)),
+      };
+    });
+
   const currency = bookings[0]?.currency ?? packages[0]?.currency ?? "TND";
 
   const kpis = {
     currency,
-    revenue: { value: revenueThis, delta: pct(revenueThis, revenuePrev), series: months.map((m) => m.revenue) },
-    bookings: { value: inThis.length, delta: pct(inThis.length, inPrev.length), series: months.map((m) => m.bookings) },
-    travellers: { value: travellersThis, delta: pct(travellersThis, travellersPrev), series: months.map((m) => m.bookings) },
+    revenue: {
+      value: revenueThis,
+      delta: pct(revenueThis, revenuePrev),
+      series: months.map((m) => m.revenue),
+    },
+    bookings: {
+      value: inThis.length,
+      delta: pct(inThis.length, inPrev.length),
+      series: months.map((m) => m.bookings),
+    },
+    travellers: {
+      value: travellersThis,
+      delta: pct(travellersThis, travellersPrev),
+      series: months.map((m) => m.bookings),
+    },
     upcomingTrips: { value: upcoming.length, delta: null as number | null, series: [] as number[] },
+    customRequests: {
+      value: customThis.length,
+      delta: pct(customThis.length, customPrev.length),
+      series: customSeries,
+      total: customRequests.length,
+      actionable: customActionable.length,
+      awaitingContact: customAwaitingContact.length,
+      closed: customClosed.length,
+    },
   };
 
   /* --------------------------- upcoming departures ------------------------- */
   const upcomingTrips = upcoming.slice(0, 6).map((p) => {
-    const capacity = p.total_seats ?? p.seats ?? null;
+    /*
+     * Capacity is `total_seats` and only `total_seats`.
+     *
+     * This used to fall back to `seats`, but `seats` is the *remaining* count
+     * the public cards read for their sold-out badge — not a capacity. Falling
+     * back to it meant a programme with 16 seats left and 32 travellers booked
+     * reported 32 booked out of a capacity of 16. Where no capacity is
+     * configured the answer is "unknown", not a substituted number.
+     */
+    const capacity = p.total_seats ?? null;
     const booked = bookedByPackage.get(p.id) ?? 0;
     return {
       id: p.id,
@@ -203,7 +341,10 @@ export async function loadCommandCenter() {
 
   // Uncontacted requests older than 24h
   const staleFlights = flights.filter(
-    (f) => f.status === "new" && !f.last_contact_at && Date.now() - new Date(f.created_at).getTime() > DAY,
+    (f) =>
+      f.status === "new" &&
+      !f.last_contact_at &&
+      Date.now() - new Date(f.created_at).getTime() > DAY,
   );
   const staleBookings = bookings.filter(
     (b) => b.status === "new" && Date.now() - new Date(b.created_at).getTime() > DAY,
@@ -265,7 +406,9 @@ export async function loadCommandCenter() {
       severity: "info",
       title: `${shift.key} demand is growing`,
       body: `${shift.key} generated ${Math.round(shift.delta)}% more requests this month compared with the previous month.`,
-      href: "/admin/trips",
+      // The trips screen is served at /admin/packages. This insight used to
+      // link to a path the router never registered, so it dead-ended (A-03).
+      href: "/admin/packages",
       actionLabel: "Open trips",
     });
   }
@@ -282,14 +425,16 @@ export async function loadCommandCenter() {
       severity: "attention",
       title: `${lowOccupancy.title} is filling slowly`,
       body: `Only ${lowOccupancy.booked} of ${lowOccupancy.capacity} seats are taken and departure is close. A promotion or a price adjustment could help.`,
-      href: "/admin/trips",
+      href: "/admin/packages",
       actionLabel: "Edit trip",
     });
   }
 
   // Pending payments
   const awaitingPayment = bookings.filter(
-    (b) => ACTIVE_BOOKING.includes(b.status) && (b.payment_status === "unpaid" || b.payment_status === "partially_paid"),
+    (b) =>
+      ACTIVE_BOOKING.includes(b.status) &&
+      (b.payment_status === "unpaid" || b.payment_status === "partially_paid"),
   );
   if (awaitingPayment.length >= 3) {
     const amount = awaitingPayment.reduce(
@@ -319,6 +464,129 @@ export async function loadCommandCenter() {
     });
   }
 
+  /* ------------- custom Umrah request insights (Phase 7.2) ---------------- */
+  /**
+   * Every rule below is deterministic and counts real rows. Each one is gated
+   * on having enough data to say something true — when the condition is not
+   * met the insight is simply not produced, rather than padded with a
+   * meaningless "0 requests" card. Text is emitted as i18n keys + numbers so
+   * the same insight reads correctly in Arabic, French and English.
+   */
+  const customInsight = (
+    id: string,
+    severity: Severity,
+    key: string,
+    params: Record<string, string | number>,
+    english: { title: string; body: string },
+  ): Insight => ({
+    id,
+    severity,
+    title: english.title,
+    body: english.body,
+    titleKey: `shell.dashboard.insights.custom.${key}.title`,
+    bodyKey: `shell.dashboard.insights.custom.${key}.body`,
+    actionLabelKey: "shell.dashboard.insights.custom.action",
+    params,
+    href: "/admin/requests",
+    actionLabel: "Open requests",
+  });
+
+  if (customAwaitingContact.length > 0) {
+    insights.push(
+      customInsight(
+        "custom-awaiting-contact",
+        customAwaitingContact.length >= 5 ? "critical" : "attention",
+        "awaitingContact",
+        { count: customAwaitingContact.length },
+        {
+          title: `${customAwaitingContact.length} custom Umrah request(s) waiting for a first reply`,
+          body: "These requests have been open for more than 24 hours without any contact.",
+        },
+      ),
+    );
+  }
+
+  if (customDepartingSoon.length > 0) {
+    const soonest = customDepartingSoon.reduce((a, b) =>
+      new Date(a.departure_date as string) <= new Date(b.departure_date as string) ? a : b,
+    );
+    const days = Math.max(
+      0,
+      Math.floor((new Date(soonest.departure_date as string).getTime() - Date.now()) / DAY),
+    );
+    insights.push(
+      customInsight(
+        "custom-departing-soon",
+        days <= 14 ? "critical" : "attention",
+        "departingSoon",
+        { count: customDepartingSoon.length, days, reference: soonest.reference },
+        {
+          title: `${customDepartingSoon.length} unresolved request(s) travelling within 30 days`,
+          body: `The closest is ${soonest.reference}, departing in about ${days} day(s).`,
+        },
+      ),
+    );
+  }
+
+  // Two or more is a workload signal; a single one is just normal traffic.
+  if (customAwaitingOffer.length >= 2) {
+    insights.push(
+      customInsight(
+        "custom-awaiting-offer",
+        "attention",
+        "awaitingOffer",
+        { count: customAwaitingOffer.length },
+        {
+          title: `${customAwaitingOffer.length} custom requests have no offer yet`,
+          body: "The agency has engaged with these travellers but no offer has been sent.",
+        },
+      ),
+    );
+  }
+
+  // Only compare periods when this month has a real sample and a real change.
+  const customDelta = pct(customThis.length, customPrev.length);
+  if (customThis.length >= 3 && customDelta != null && Math.abs(customDelta) >= 25) {
+    insights.push(
+      customInsight(
+        "custom-volume-trend",
+        customDelta > 0 ? "opportunity" : "info",
+        customDelta > 0 ? "volumeUp" : "volumeDown",
+        {
+          count: customThis.length,
+          previous: customPrev.length,
+          percent: Math.abs(Math.round(customDelta)),
+        },
+        {
+          title: `Custom Umrah requests are ${customDelta > 0 ? "up" : "down"} ${Math.abs(Math.round(customDelta))}% this month`,
+          body: `${customThis.length} this month against ${customPrev.length} last month.`,
+        },
+      ),
+    );
+  }
+
+  if (customLargeParty.length > 0) {
+    const biggest = customLargeParty.reduce((a, b) =>
+      customTravellers(a) >= customTravellers(b) ? a : b,
+    );
+    insights.push(
+      customInsight(
+        "custom-large-party",
+        "opportunity",
+        "largeParty",
+        {
+          count: customLargeParty.length,
+          travellers: customTravellers(biggest),
+          reference: biggest.reference,
+        },
+        {
+          title: `${customLargeParty.length} large group request(s) open`,
+          body: `${biggest.reference} asks for ${customTravellers(biggest)} travellers.`,
+        },
+      ),
+    );
+  }
+
   const order: Record<Severity, number> = { critical: 0, attention: 1, opportunity: 2, info: 3 };
   insights.sort((a, b) => order[a.severity] - order[b.severity]);
 
@@ -332,7 +600,9 @@ export async function loadCommandCenter() {
       newBookings: bookings.filter((b) => b.status === "new").length,
       newRequests: flights.filter((f) => f.status === "new").length,
       unreadMessages: unread.length,
+      customRequests: customActionable.length,
     },
+    customRequestQueue: customQueue,
   };
 }
 
@@ -382,7 +652,10 @@ export async function loadReports() {
     trend.push({ month: d.toLocaleDateString("en-GB", { month: "short" }), ...v });
   }
 
-  const byTrip = new Map<string, { title: string; bookings: number; revenue: number; travellers: number }>();
+  const byTrip = new Map<
+    string,
+    { title: string; bookings: number; revenue: number; travellers: number }
+  >();
   active.forEach((b) => {
     const key = b.package_id ?? b.package_title ?? "other";
     const title = b.package_title ?? "General enquiry";
@@ -392,7 +665,9 @@ export async function loadReports() {
     cur.travellers += travellers(b);
     byTrip.set(key, cur);
   });
-  const topTrips = Array.from(byTrip.values()).sort((a, b) => b.revenue - a.revenue).slice(0, 6);
+  const topTrips = Array.from(byTrip.values())
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 6);
 
   const byDestination = new Map<string, number>();
   active.forEach((b) => {
@@ -406,7 +681,12 @@ export async function loadReports() {
     .slice(0, 6);
 
   const leads = flights.length + messages.length + bookings.length;
-  const conversion = leads > 0 ? (bookings.filter((b) => b.status === "confirmed" || b.status === "completed").length / leads) * 100 : 0;
+  const conversion =
+    leads > 0
+      ? (bookings.filter((b) => b.status === "confirmed" || b.status === "completed").length /
+          leads) *
+        100
+      : 0;
 
   const customers = new Map<string, string>();
   bookings.forEach((b) => customers.set((b.phone ?? b.email ?? b.id).toLowerCase(), b.created_at));
@@ -430,11 +710,17 @@ export async function loadReports() {
     bookedByPackage.set(b.package_id, (bookedByPackage.get(b.package_id) ?? 0) + travellers(b));
   });
   const capacity = packages
-    .filter((p) => p.departure_date && new Date(p.departure_date).getTime() >= Date.now() - DAY && p.status !== "archived")
+    .filter(
+      (p) =>
+        p.departure_date &&
+        new Date(p.departure_date).getTime() >= Date.now() - DAY &&
+        p.status !== "archived",
+    )
     .slice(0, 8)
     .map((p) => ({
       title: p.title,
-      capacity: p.total_seats ?? p.seats ?? 0,
+      // Same rule as above: `seats` is remaining, never a capacity.
+      capacity: p.total_seats ?? 0,
       booked: bookedByPackage.get(p.id) ?? 0,
       departure_date: p.departure_date,
     }));

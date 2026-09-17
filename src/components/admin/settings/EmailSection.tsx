@@ -1,13 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Mail } from "lucide-react";
-import {
-  AutoSaveBar,
-  FieldGrid,
-  SettingsCard,
-  SettingsSection,
-  SwitchField,
-  TextField,
-} from "./parts";
+import { SaveBar, FieldGrid, SettingsCard, SettingsSection, SwitchField, TextField } from "./parts";
 import {
   combine,
   email,
@@ -17,6 +10,7 @@ import {
   useSiteSettings,
   type SettingSpec,
 } from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
 
 const SPECS: SettingSpec[] = [
   { key: "email_owner_recipient", label: "Owner recipient", validate: combine(required, email) },
@@ -28,31 +22,35 @@ const SPECS: SettingSpec[] = [
 ];
 
 export function EmailSection() {
+  const { t } = useTranslation("admin");
   const s = useSiteSettings("email", SPECS);
 
-  if (s.loading) return <Skeleton className="h-72 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-72 w-full rounded-card" />;
 
   const prefix = s.form.email_subject_prefix ?? "";
   const from = s.form.email_from_name || "Janat Sahara Travel";
 
   return (
     <SettingsSection
-      title="Email"
-      description="Where booking notifications are delivered and how they are labelled."
+      title={t("content.settings.nav.email.label")}
+      description={t("content.settings.email.description")}
     >
-      <SettingsCard title="Recipients" description="Who receives every new booking.">
+      <SettingsCard
+        title={t("content.settings.email.recipientsTitle")}
+        description={t("content.settings.email.recipientsDescription")}
+      >
         <FieldGrid>
           <TextField
-            label="Owner recipient"
-            hint="Primary inbox for booking notifications."
+            label={t("content.settings.email.ownerRecipient")}
+            hint={t("content.settings.email.hints.ownerRecipient")}
             placeholder="owner@janatsahara.tn"
             error={s.errors.email_owner_recipient}
             value={s.form.email_owner_recipient ?? ""}
             onChange={(v) => s.set("email_owner_recipient", v)}
           />
           <TextField
-            label="CC recipients"
-            hint="Optional. Separate several addresses with commas."
+            label={t("content.settings.email.ccRecipients")}
+            hint={t("content.settings.email.hints.ccRecipients")}
             error={s.errors.email_cc_recipient}
             value={s.form.email_cc_recipient ?? ""}
             onChange={(v) => s.set("email_cc_recipient", v)}
@@ -60,24 +58,27 @@ export function EmailSection() {
         </FieldGrid>
       </SettingsCard>
 
-      <SettingsCard title="Sender identity" description="How the notification appears in the inbox.">
+      <SettingsCard
+        title={t("content.settings.email.senderIdentityTitle")}
+        description={t("content.settings.email.senderIdentityDescription")}
+      >
         <FieldGrid>
           <TextField
-            label="From name"
+            label={t("content.settings.email.fromName")}
             error={s.errors.email_from_name}
             value={s.form.email_from_name ?? ""}
             onChange={(v) => s.set("email_from_name", v)}
           />
           <TextField
-            label="Reply-to address"
-            hint="Replies from your team go here."
+            label={t("content.settings.email.replyToAddress")}
+            hint={t("content.settings.email.hints.replyTo")}
             error={s.errors.email_reply_to}
             value={s.form.email_reply_to ?? ""}
             onChange={(v) => s.set("email_reply_to", v)}
           />
           <TextField
-            label="Subject prefix"
-            hint="Helps filter emails, e.g. [Booking]."
+            label={t("content.settings.email.subjectPrefix")}
+            hint={t("content.settings.email.hints.subjectPrefix")}
             error={s.errors.email_subject_prefix}
             value={prefix}
             onChange={(v) => s.set("email_subject_prefix", v)}
@@ -85,7 +86,10 @@ export function EmailSection() {
         </FieldGrid>
       </SettingsCard>
 
-      <SettingsCard title="Live preview" description="Inbox row preview of a new booking email.">
+      <SettingsCard
+        title={t("content.settings.livePreview.title")}
+        description={t("content.settings.email.livePreviewDescription")}
+      >
         <div className="flex items-start gap-3 rounded-xl border border-border-subtle bg-card p-4 shadow-sm">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-primary">
             <Mail className="h-4 w-4" />
@@ -103,16 +107,19 @@ export function EmailSection() {
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Delivery" description="Temporarily pause outgoing notifications.">
+      <SettingsCard
+        title={t("content.settings.email.deliveryTitle")}
+        description={t("content.settings.email.deliveryDescription")}
+      >
         <SwitchField
-          label="Send an email for every new booking"
-          hint="When off, bookings are still saved and shown in the dashboard."
+          label={t("content.settings.email.bookingEmailsToggle")}
+          hint={t("content.settings.email.hints.bookingEmails")}
           checked={s.bool("email_booking_enabled")}
           onChange={(v) => s.setBool("email_booking_enabled", v)}
         />
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

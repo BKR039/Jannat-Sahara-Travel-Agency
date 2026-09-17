@@ -1,123 +1,136 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { PlaneTakeoff, Download, Trash2, CheckCircle2, Search } from "lucide-react";
+import { Download, PlaneTakeoff, Trash2 } from "lucide-react";
+import { deleteRequest, listRequests } from "@/lib/admin/command.functions";
 import { Button } from "@/components/ui/button";
-import { PageHeader, AdminCard, EmptyState } from "@/components/admin/ui";
-import { FLIGHT_REQUEST_STATUSES, STATUS_LABELS, CABIN_LABELS_AR } from "@/lib/flight-request.schema";
+import { PageHeader } from "@/components/admin/ui";
+import {
+  Drawer,
+  EmptyState,
+  ErrorState,
+  SearchInput,
+  SkeletonRows,
+  Panel,
+  shortDate,
+  useDebounced,
+} from "@/components/admin/kit";
+import { adminDocTitle } from "@/lib/admin/doc-title";
+import { cabinLabel } from "@/lib/flight-request.labels";
+import type { CabinClass } from "@/lib/flight-request.schema";
+import { matchesStageFilter, stageOf, type StageFilter } from "@/lib/admin/request-workflow";
+import {
+  RequestDetail,
+  StageBadge,
+  type UnifiedRequest,
+} from "@/components/admin/requests/RequestDetail";
+import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/admin/flight-requests")({ component: FlightRequestsPage });
+export const Route = createFileRoute("/admin/flight-requests")({
+  head: () => ({
+    meta: [{ title: adminDocTitle("flightRequests") }],
+  }),
+  component: FlightRequestsPage,
+});
 
-type Row = {
-  id: string;
-  reference: string;
-  status: string;
-  name: string;
-  phone: string;
-  email: string;
-  from_airport: string;
-  to_airport: string;
-  trip_type: string;
-  departure_date: string;
-  return_date: string | null;
-  adults: number;
-  children: number;
-  infants: number;
-  cabin_class: string;
-  notes: string | null;
-  internal_notes: string | null;
-  assigned_to: string | null;
-  admin_reply: string | null;
-  completed_at: string | null;
-  created_at: string;
-};
+/**
+ * Flight requests.
+ *
+ * This screen and the unified inbox used to be two different products over one
+ * table: the inbox opened a drawer, this page expanded a row into a second
+ * form with its own status `<select>` carrying all six raw statuses, its own
+ * reply box, its own "mark completed" button and an assignee field — six
+ * competing controls where the job has one decision. It now shows the list and
+ * hands the request to the same `RequestDetail` the inbox uses, so an operator
+ * learns the workflow once. What is genuinely particular to this screen — the
+ * CSV export and deleting a request — stays here.
+ *
+ * Reads and writes still go through the server functions: `flight_requests`
+ * grants authenticated admins no SELECT under RLS, so a browser query would
+ * return nothing and a browser delete would silently match no row.
+ */
 
-const statusTone: Record<string, string> = {
-  new: "bg-accent text-primary",
-  contacted: "bg-secondary-muted text-brand-gold",
-  waiting: "bg-muted text-muted-foreground",
-  quoted: "bg-secondary-muted text-brand-gold",
-  confirmed: "bg-mint-muted text-brand-green",
-  cancelled: "bg-destructive/10 text-destructive",
-};
+const STAGE_FILTERS: StageFilter[] = ["all", "open", "confirmed", "declined"];
 
 function FlightRequestsPage() {
+  const { t } = useTranslation("admin");
   const qc = useQueryClient();
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<string>("all");
+  const [search, setSearch] = useState("");
+  const [stage, setStage] = useState<StageFilter>("all");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<UnifiedRequest | null>(null);
+  const debounced = useDebounced(search);
 
+  const fetchRequests = useServerFn(listRequests);
   const list = useQuery({
     queryKey: ["admin-flight-requests"] as const,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("flight_requests")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(500);
-      if (error) throw error;
-      return data as Row[];
+      const rows = (await fetchRequests()) as unknown as UnifiedRequest[];
+      return rows
+        .filter((r) => r.kind === "flight")
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     },
   });
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["admin-flight-requests"] });
-
-  const update = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Partial<Row> }) => {
-      const { error } = await supabase.from("flight_requests").update(patch).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Saved");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
+  const removeRequest = useServerFn(deleteRequest);
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("flight_requests").delete().eq("id", id);
-      if (error) throw error;
+      await removeRequest({ data: { id, kind: "flight" as const } });
     },
     onSuccess: () => {
-      toast.success("Deleted");
-      invalidate();
+      toast.success(t("ops.flightRequests.toastDeleted"));
+      qc.invalidateQueries({ queryKey: ["admin-flight-requests"] });
+      qc.invalidateQueries({ queryKey: ["admin-requests"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: () => toast.error(t("ops.flightRequests.toastDeleteFailed")),
   });
 
   const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debounced.trim().toLowerCase();
     return (list.data ?? []).filter((r) => {
-      if (status !== "all" && r.status !== status) return false;
+      if (!matchesStageFilter(stage, "flight", r.status)) return false;
       if (!q) return true;
-      return `${r.reference} ${r.name} ${r.phone} ${r.email} ${r.from_airport} ${r.to_airport}`
-        .toLowerCase()
-        .includes(q);
+      return [r.reference, r.name, r.phone, r.email, r.summary]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q));
     });
-  }, [list.data, query, status]);
+  }, [list.data, debounced, stage]);
+
+  const active = (list.data ?? []).find((r) => r.id === openId) ?? null;
 
   function exportCsv() {
     const headers = [
-      "Reference",
-      "Status",
-      "Name",
-      "Phone",
-      "Email",
-      "From",
-      "To",
-      "Trip type",
-      "Departure",
-      "Return",
-      "Adults",
-      "Children",
-      "Infants",
-      "Cabin",
-      "Assigned to",
-      "Notes",
-      "Created",
-    ];
+      "reference",
+      "status",
+      "name",
+      "phone",
+      "email",
+      "from",
+      "to",
+      "tripType",
+      "departure",
+      "return",
+      "adults",
+      "children",
+      "infants",
+      "cabin",
+      "assignedTo",
+      "notes",
+      "created",
+    ].map((k) => t(`ops.flightRequests.csvHeaders.${k}`));
     const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const csv = [
       headers.join(","),
@@ -128,24 +141,24 @@ function FlightRequestsPage() {
           r.name,
           r.phone,
           r.email,
-          r.from_airport,
-          r.to_airport,
-          r.trip_type,
-          r.departure_date,
-          r.return_date,
-          r.adults,
-          r.children,
-          r.infants,
-          r.cabin_class,
-          r.assigned_to,
-          r.notes,
+          r.detail["from_airport"],
+          r.detail["to_airport"],
+          r.detail["trip_type"],
+          r.detail["departure_date"],
+          r.detail["return_date"],
+          r.detail["adults"],
+          r.detail["children"],
+          r.detail["infants"],
+          r.detail["cabin_class"],
+          r.detail["assigned_to"],
+          r.detail["notes"],
           r.created_at,
         ]
           .map(esc)
           .join(","),
       ),
     ].join("\n");
-    const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
+    const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
     const a = document.createElement("a");
     a.href = url;
     a.download = `flight-requests-${new Date().toISOString().slice(0, 10)}.csv`;
@@ -156,189 +169,150 @@ function FlightRequestsPage() {
   return (
     <>
       <PageHeader
-        title="Flight requests"
-        description="Inbound flight inquiries — prepare offers and contact the customer."
+        title={t("ops.flightRequests.title")}
+        description={t("ops.flightRequests.description")}
         actions={
           <Button variant="outline" onClick={exportCsv} disabled={!rows.length}>
-            <Download className="me-2 h-4 w-4" /> Export CSV
+            <Download className="me-2 h-4 w-4" aria-hidden="true" />
+            {t("ops.flightRequests.exportCsv")}
           </Button>
         }
       />
 
-      <AdminCard>
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute inset-y-0 start-3 my-auto h-4 w-4 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search reference, name, phone, route…"
-              className="h-10 w-full rounded-md border border-border-subtle bg-background ps-9 pe-3 text-small focus:border-primary focus:outline-none"
-            />
-          </div>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="h-10 rounded-md border border-border-subtle bg-background px-3 text-small focus:border-primary focus:outline-none"
-          >
-            <option value="all">All statuses</option>
-            {FLIGHT_REQUEST_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-wrap items-center gap-2">
+          {STAGE_FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              aria-pressed={stage === f}
+              onClick={() => setStage(f)}
+              className={cn(
+                "h-9 rounded-full border px-3.5 text-caption font-semibold transition-colors max-md:h-11",
+                stage === f
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+              )}
+            >
+              {f === "all"
+                ? t("ops.requests.filters.allStatuses")
+                : f === "open"
+                  ? t("ops.requests.filters.stageOpen")
+                  : t(`ops.stages.state.${f}`)}
+            </button>
+          ))}
         </div>
-
-        {list.isLoading ? (
-          <p className="text-small text-muted-foreground">Loading…</p>
-        ) : !rows.length ? (
-          <EmptyState title="No flight requests yet" icon={PlaneTakeoff} />
-        ) : (
-          <div className="-mx-4 divide-y divide-border sm:-mx-5">
-            {rows.map((r) => (
-              <RequestRow
-                key={r.id}
-                row={r}
-                onPatch={(patch) => update.mutate({ id: r.id, patch })}
-                onDelete={() => remove.mutate(r.id)}
-              />
-            ))}
-          </div>
-        )}
-      </AdminCard>
-    </>
-  );
-}
-
-function RequestRow({
-  row,
-  onPatch,
-  onDelete,
-}: {
-  row: Row;
-  onPatch: (patch: Partial<Row>) => void;
-  onDelete: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [assigned, setAssigned] = useState(row.assigned_to ?? "");
-  const [reply, setReply] = useState(row.admin_reply ?? "");
-
-  return (
-    <div className={`px-4 py-4 sm:px-5 ${row.status === "new" ? "bg-primary/5" : ""}`}>
-      <div className="flex flex-wrap items-center gap-3">
-        <span
-          className={`rounded-full px-2.5 py-1 text-caption font-semibold ${statusTone[row.status] ?? "bg-muted"}`}
-        >
-          {STATUS_LABELS[row.status as keyof typeof STATUS_LABELS] ?? row.status}
-        </span>
-        <span dir="ltr" className="text-small font-bold text-foreground">
-          {row.reference}
-        </span>
-        <span className="text-small text-muted-foreground">
-          {row.from_airport} → {row.to_airport}
-        </span>
-        <span className="text-caption text-muted-foreground">
-          {row.departure_date}
-          {row.return_date ? ` – ${row.return_date}` : ""} ·{" "}
-          {row.adults + row.children + row.infants} pax ·{" "}
-          {CABIN_LABELS_AR[row.cabin_class as keyof typeof CABIN_LABELS_AR] ?? row.cabin_class}
-        </span>
-        <div className="ms-auto flex items-center gap-2">
-          <select
-            value={row.status}
-            onChange={(e) => onPatch({ status: e.target.value })}
-            className="h-9 rounded-md border border-border-subtle bg-background px-2 text-caption"
-          >
-            {FLIGHT_REQUEST_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
-          <Button size="sm" variant="ghost" onClick={() => setOpen((v) => !v)}>
-            {open ? "Hide" : "Details"}
-          </Button>
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder={t("ops.flightRequests.searchPlaceholder")}
+          className="sm:ms-auto sm:max-w-sm"
+        />
       </div>
 
-      {open && (
-        <div className="mt-4 grid gap-4 rounded-lg border border-border-subtle bg-muted/40 p-4 md:grid-cols-2">
-          <div className="space-y-1 text-small">
-            <p className="font-semibold text-foreground">{row.name}</p>
-            <p dir="ltr" className="text-muted-foreground">
-              {row.phone}
-            </p>
-            <p dir="ltr" className="text-muted-foreground">
-              {row.email}
-            </p>
-            <p className="text-caption text-muted-foreground">
-              Created {new Date(row.created_at).toLocaleString()}
-              {row.completed_at ? ` · Completed ${new Date(row.completed_at).toLocaleString()}` : ""}
-            </p>
-            {row.notes && (
-              <p className="mt-2 whitespace-pre-wrap rounded-md bg-background p-3 text-small">
-                {row.notes}
-              </p>
-            )}
+      <Panel className="mt-4" bodyClassName="p-0 sm:p-0">
+        {list.isLoading ? (
+          <div className="p-4">
+            <SkeletonRows rows={5} />
           </div>
+        ) : list.isError ? (
+          <ErrorState onRetry={() => list.refetch()} />
+        ) : !rows.length ? (
+          <div className="p-4">
+            <EmptyState title={t("ops.flightRequests.emptyTitle")} icon={PlaneTakeoff} />
+          </div>
+        ) : (
+          <ul className="divide-y divide-border-subtle">
+            {rows.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 sm:px-5">
+                <button
+                  type="button"
+                  onClick={() => setOpenId(r.id)}
+                  aria-label={t("ops.requests.openRequest", {
+                    name: r.name,
+                    reference: r.reference ?? "",
+                  })}
+                  className="-mx-2 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-3 text-start transition-colors hover:bg-accent focus-visible:bg-accent"
+                >
+                  <div className="min-w-0 flex-1 basis-44">
+                    <p className="flex items-center gap-2 truncate text-small font-medium">
+                      <span className="truncate">{r.name}</span>
+                      {r.reference && (
+                        <span className="shrink-0 text-caption text-muted-foreground" dir="ltr">
+                          {r.reference}
+                        </span>
+                      )}
+                    </p>
+                    <p className="truncate text-caption text-muted-foreground">
+                      {String(r.detail["from_airport"] ?? "")} →{" "}
+                      {String(r.detail["to_airport"] ?? "")}
+                    </p>
+                  </div>
 
-          <div className="space-y-3">
-            <div>
-              <label className="text-caption font-semibold text-muted-foreground">
-                Assigned employee
-              </label>
-              <input
-                value={assigned}
-                onChange={(e) => setAssigned(e.target.value)}
-                onBlur={() => assigned !== (row.assigned_to ?? "") && onPatch({ assigned_to: assigned || null })}
-                placeholder="Employee name"
-                className="mt-1 h-10 w-full rounded-md border border-border-subtle bg-background px-3 text-small focus:border-primary focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="text-caption font-semibold text-muted-foreground">
-                Reply / offer sent to customer
-              </label>
-              <textarea
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                rows={3}
-                placeholder="Offer details, airline, fare…"
-                className="mt-1 w-full rounded-md border border-border-subtle bg-background p-3 text-small focus:border-primary focus:outline-none"
-              />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                size="sm"
-                onClick={() => onPatch({ admin_reply: reply || null, status: row.status === "new" ? "contacted" : row.status })}
-              >
-                Save reply
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  onPatch({ status: "confirmed", completed_at: new Date().toISOString() })
-                }
-              >
-                <CheckCircle2 className="me-1.5 h-4 w-4" /> Mark completed
-              </Button>
-              <a
-                href={`https://wa.me/${row.phone.replace(/[^\d]/g, "")}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex h-9 items-center rounded-md border border-border-subtle px-3 text-caption font-semibold hover:border-primary hover:text-primary"
-              >
-                WhatsApp
-              </a>
-              <Button size="sm" variant="ghost" onClick={onDelete}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+                  {r.departureDate && (
+                    <span className="whitespace-nowrap text-caption text-muted-foreground">
+                      {shortDate(r.departureDate)}
+                    </span>
+                  )}
+                  {r.travellers ? (
+                    <span className="whitespace-nowrap text-caption text-muted-foreground">
+                      {r.travellers} {t("ops.flightRequests.paxSuffix")}
+                    </span>
+                  ) : null}
+                  <span className="hidden whitespace-nowrap text-caption text-muted-foreground md:inline">
+                    {cabinLabel(String(r.detail["cabin_class"] ?? "economy") as CabinClass)}
+                  </span>
+
+                  <StageBadge stage={stageOf("flight", r.status)} />
+                </button>
+
+                {/* Irreversible, so it asks first — and the icon button says
+                    what it does for anyone not looking at the icon. */}
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={t("ops.flightRequests.deleteAria")}
+                  onClick={() => setConfirmDelete(r)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Drawer
+        open={!!active}
+        onClose={() => setOpenId(null)}
+        title={active?.name ?? ""}
+        description={active ? t("ops.requests.kinds.flight") : undefined}
+      >
+        {active && <RequestDetail key={active.id} row={active} />}
+      </Drawer>
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("ops.flightRequests.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("ops.flightRequests.deleteBody", { reference: confirmDelete?.reference ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("ops.flightRequests.deleteCancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const target = confirmDelete;
+                setConfirmDelete(null);
+                if (target) remove.mutate(target.id);
+              }}
+            >
+              {t("ops.flightRequests.deleteConfirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

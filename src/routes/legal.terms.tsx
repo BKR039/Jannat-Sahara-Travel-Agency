@@ -3,6 +3,7 @@ import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/legal/terms")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/legal/terms")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "/legal/terms" }],
+    links: [canonical("/legal/terms")],
   }),
   component: TermsPage,
 });
@@ -27,6 +28,7 @@ function TermsPage() {
         <SectionHeading
           eyebrow={t("footer.legal")}
           title={t("footer.terms")}
+          as="h1"
           description=""
         />
         <div className="mt-10 space-y-6 text-body leading-relaxed text-foreground">

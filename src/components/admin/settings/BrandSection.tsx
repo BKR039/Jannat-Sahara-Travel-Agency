@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Disclosure } from "@/components/admin/kit";
 import { uploadMedia } from "@/lib/admin/media";
 import { cn } from "@/lib/utils";
-import { AutoSaveBar, SettingsCard, SettingsSection, TextField } from "./parts";
+import { SaveBar, SettingsCard, SettingsSection, TextField } from "./parts";
 import { hexColor, maxLen, url, useSiteSettings, type SettingSpec } from "./useSiteSettings";
 import { useContactSettings } from "./useContactSettings";
+import { useTranslation } from "react-i18next";
 
 const DEFAULT_PRIMARY = "#EE5A24";
 const DEFAULT_ACCENT = "#C9982E";
@@ -21,8 +22,6 @@ const SPECS: SettingSpec[] = [
   { key: "brand_favicon_url", label: "Favicon" },
   { key: "brand_primary_color", label: "Primary colour", validate: hexColor },
   { key: "brand_accent_color", label: "Secondary colour", validate: hexColor },
-  { key: "brand_website_url", label: "Website URL", validate: url },
-  { key: "brand_canonical_url", label: "Canonical URL", validate: url },
 ];
 
 /* ------------------------------- asset uploader ------------------------------ */
@@ -40,6 +39,7 @@ function AssetUploader({
   onChange: (v: string) => void;
   size?: "lg" | "sm";
 }) {
+  const { t } = useTranslation("admin");
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -48,9 +48,9 @@ function AssetUploader({
     setBusy(true);
     try {
       onChange(await uploadMedia(file, "brand"));
-      toast.success("Uploaded");
+      toast.success(t("content.settings.brand.uploaded"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      toast.error(e instanceof Error ? e.message : t("content.common.uploadFailed"));
     } finally {
       setBusy(false);
     }
@@ -63,7 +63,11 @@ function AssetUploader({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        aria-label={value ? `Replace ${label}` : `Upload ${label}`}
+        aria-label={
+          value
+            ? t("content.settings.parts.replaceLabel", { label })
+            : t("content.settings.parts.uploadLabel", { label })
+        }
         className={cn(
           "relative shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-surface-sunken/60 transition-colors hover:border-primary/50",
           box,
@@ -84,9 +88,7 @@ function AssetUploader({
       </button>
 
       <div className="min-w-0">
-        <p className="text-small font-medium text-foreground">
-          {label}
-        </p>
+        <p className="text-small font-medium text-foreground">{label}</p>
         {hint && <p className="mt-0.5 text-caption text-muted-foreground">{hint}</p>}
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <input
@@ -103,7 +105,8 @@ function AssetUploader({
             disabled={busy}
             onClick={() => inputRef.current?.click()}
           >
-            <CloudUpload className="me-2 h-3.5 w-3.5" /> {value ? "Replace" : "Upload"}
+            <CloudUpload className="me-2 h-3.5 w-3.5" />{" "}
+            {value ? t("content.settings.parts.replace") : t("content.settings.parts.upload")}
           </Button>
           {value && (
             <Button
@@ -113,7 +116,8 @@ function AssetUploader({
               className="text-destructive"
               onClick={() => onChange("")}
             >
-              <Trash2 className="me-2 h-3.5 w-3.5" /> Remove
+              <Trash2 className="me-2 h-3.5 w-3.5" />
+              {t("content.settings.parts.remove")}
             </Button>
           )}
         </div>
@@ -137,6 +141,7 @@ function SwatchField({
   error?: string | null;
   onChange: (v: string) => void;
 }) {
+  const { t } = useTranslation("admin");
   const safe = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) ? value : fallback;
   return (
     <div className="grid gap-2">
@@ -151,7 +156,7 @@ function SwatchField({
             value={safe}
             onChange={(e) => onChange(e.target.value.toUpperCase())}
             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-            aria-label={`${label} picker`}
+            aria-label={t("content.settings.parts.colourPicker", { label })}
           />
         </label>
         <Input
@@ -181,8 +186,10 @@ function BrandStage({
   primary: string;
   accent: string;
 }) {
+  const { t } = useTranslation("admin");
+  const { t: tc } = useTranslation("common");
   return (
-    <div className="overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm">
+    <div className="overflow-hidden rounded-card border border-border-subtle bg-card">
       {/* navigation preview */}
       <div className="flex items-center justify-between gap-3 border-b border-border-subtle px-4 py-3">
         <div className="flex min-w-0 items-center gap-2.5">
@@ -194,13 +201,15 @@ function BrandStage({
             )}
           </span>
           <span className="truncate text-small font-semibold text-foreground">
-            {name || "Agency name"}
+            {name || t("content.settings.brand.agencyNameFallback")}
           </span>
         </div>
+        {/* Nav sample uses the real public labels so the preview follows the
+            admin's language instead of being pinned to Arabic. */}
         <div className="hidden items-center gap-3 text-caption text-muted-foreground sm:flex">
-          <span>الرئيسية</span>
-          <span>العمرة</span>
-          <span>الرحلات</span>
+          <span>{tc("nav.home")}</span>
+          <span>{tc("nav.umrah")}</span>
+          <span>{tc("nav.trips")}</span>
         </div>
       </div>
 
@@ -209,15 +218,21 @@ function BrandStage({
         className="px-5 py-7 text-center"
         style={{ background: `linear-gradient(135deg, ${primary} 0%, ${accent} 100%)` }}
       >
-        <span className="mx-auto grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-white/95 shadow-sm">
+        <span className="mx-auto grid h-16 w-16 place-items-center overflow-hidden rounded-card bg-white/95">
           {logo ? (
             <img src={logo} alt="" className="h-full w-full object-contain p-1.5" />
           ) : (
-            <span className="text-caption text-neutral-500">Logo</span>
+            <span className="text-caption text-neutral-500">
+              {t("content.settings.brand.logo")}
+            </span>
           )}
         </span>
-        <p className="mt-3 truncate text-h5 font-bold text-white">{name || "Agency name"}</p>
-        <p className="mt-1 line-clamp-2 text-small text-white/90">{tagline || "Your tagline"}</p>
+        <p className="mt-3 truncate text-h5 font-bold text-white">
+          {name || t("content.settings.brand.agencyNameFallback")}
+        </p>
+        <p className="mt-1 line-clamp-2 text-small text-white/90">
+          {tagline || t("content.settings.brand.taglineFallback")}
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 px-5 py-4">
@@ -225,13 +240,13 @@ function BrandStage({
           className="rounded-xl px-4 py-2 text-small font-semibold text-white shadow-sm"
           style={{ backgroundColor: primary }}
         >
-          احجز الآن
+          {t("content.settings.brand.previewBook")}
         </span>
         <span
           className="rounded-xl border px-4 py-2 text-small font-semibold"
           style={{ borderColor: accent, color: accent }}
         >
-          تصفح العروض
+          {t("content.settings.brand.previewBrowse")}
         </span>
       </div>
     </div>
@@ -241,12 +256,13 @@ function BrandStage({
 /* ---------------------------------- section --------------------------------- */
 
 export function BrandSection() {
+  const { t } = useTranslation("admin");
   const s = useSiteSettings("brand", SPECS);
   const contact = useContactSettings([
     { key: "agency_name", label: "Agency name", icon: "building-2", sort_order: 0 },
   ]);
 
-  if (s.loading) return <Skeleton className="h-96 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-96 w-full rounded-card" />;
 
   const primary = s.form.brand_primary_color || DEFAULT_PRIMARY;
   const accent = s.form.brand_accent_color || DEFAULT_ACCENT;
@@ -259,23 +275,26 @@ export function BrandSection() {
 
   return (
     <SettingsSection
-      title="Brand identity"
-      description="Your logo, voice and colours — exactly as travellers see them on the public website."
+      title={t("content.settings.brand.title")}
+      description={t("content.settings.brand.description")}
     >
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         {/* ------------------------------- left column ------------------------------ */}
         <div className="min-w-0 space-y-5">
-          <SettingsCard title="Brand identity" description="The name and voice of your agency.">
+          <SettingsCard
+            title={t("content.settings.brand.title")}
+            description={t("content.settings.brand.identityDescription")}
+          >
             <div className="space-y-5">
               <TextField
-                label="Agency name"
-                hint="Inherited from your agency profile — editing it here updates it everywhere."
+                label={t("content.settings.general.agencyName")}
+                hint={t("content.settings.brand.hints.agencyNameInherited")}
                 value={contact.form.agency_name ?? ""}
                 onChange={(v) => contact.set("agency_name", v)}
               />
               <TextField
-                label="Tagline"
-                hint="One short line under your logo."
+                label={t("content.settings.brand.tagline")}
+                hint={t("content.settings.brand.hints.tagline")}
                 error={s.errors.brand_tagline}
                 value={s.form.brand_tagline ?? ""}
                 onChange={(v) => s.set("brand_tagline", v)}
@@ -283,18 +302,21 @@ export function BrandSection() {
             </div>
           </SettingsCard>
 
-          <SettingsCard title="Brand assets" description="PNG, SVG or JPG.">
+          <SettingsCard
+            title={t("content.settings.brand.assetsTitle")}
+            description={t("content.settings.brand.assetsDescription")}
+          >
             <div className="space-y-5">
               <AssetUploader
-                label="Logo"
-                hint="Square, transparent background. 512×512 recommended."
+                label={t("content.settings.brand.logo")}
+                hint={t("content.settings.brand.hints.logo")}
                 value={s.form.brand_logo_url ?? ""}
                 onChange={(v) => s.set("brand_logo_url", v)}
               />
               <div className="border-t border-border-subtle pt-5">
                 <AssetUploader
-                  label="Favicon"
-                  hint="Browser-tab icon. 64×64."
+                  label={t("content.settings.brand.favicon")}
+                  hint={t("content.settings.brand.hints.favicon")}
                   size="sm"
                   value={s.form.brand_favicon_url ?? ""}
                   onChange={(v) => s.set("brand_favicon_url", v)}
@@ -304,8 +326,8 @@ export function BrandSection() {
           </SettingsCard>
 
           <SettingsCard
-            title="Brand colours"
-            description="Used for buttons, badges and highlights."
+            title={t("content.settings.brand.coloursTitle")}
+            description={t("content.settings.brand.coloursDescription")}
             actions={
               <Button
                 type="button"
@@ -317,20 +339,21 @@ export function BrandSection() {
                   s.set("brand_accent_color", DEFAULT_ACCENT);
                 }}
               >
-                <RotateCcw className="me-2 h-3.5 w-3.5" /> Reset to brand defaults
+                <RotateCcw className="me-2 h-3.5 w-3.5" />
+                {t("content.settings.brand.resetToDefaults")}
               </Button>
             }
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <SwatchField
-                label="Primary colour"
+                label={t("content.settings.brand.primaryColour")}
                 fallback={DEFAULT_PRIMARY}
                 error={s.errors.brand_primary_color}
                 value={s.form.brand_primary_color ?? ""}
                 onChange={(v) => s.set("brand_primary_color", v)}
               />
               <SwatchField
-                label="Secondary colour"
+                label={t("content.settings.brand.secondaryColour")}
                 fallback={DEFAULT_ACCENT}
                 error={s.errors.brand_accent_color}
                 value={s.form.brand_accent_color ?? ""}
@@ -339,32 +362,15 @@ export function BrandSection() {
             </div>
           </SettingsCard>
 
-          <Disclosure label="Advanced settings">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <TextField
-                label="Website URL"
-                hint="Used in emails and structured data."
-                placeholder="https://janatsahara.tn"
-                error={s.errors.brand_website_url}
-                value={s.form.brand_website_url ?? ""}
-                onChange={(v) => s.set("brand_website_url", v)}
-              />
-              <TextField
-                label="Canonical URL"
-                hint="Preferred address search engines should index."
-                placeholder="https://janatsahara.tn"
-                error={s.errors.brand_canonical_url}
-                value={s.form.brand_canonical_url ?? ""}
-                onChange={(v) => s.set("brand_canonical_url", v)}
-              />
-            </div>
-          </Disclosure>
+          {/* The site's own address lives in Settings -> SEO -> "Canonical base
+              URL". The duplicate brand_website_url / brand_canonical_url keys
+              are deprecated and no longer edited or read. */}
         </div>
 
         {/* ------------------------------ right column ----------------------------- */}
         <aside className="min-w-0 xl:sticky xl:top-20 xl:self-start">
           <p className="mb-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
-            Live preview
+            {t("content.settings.livePreview.title")}
           </p>
           <BrandStage
             logo={s.form.brand_logo_url ?? ""}
@@ -374,13 +380,13 @@ export function BrandSection() {
             accent={accent}
           />
           <p className="mt-2 text-caption leading-relaxed text-muted-foreground">
-            Updates instantly as you edit. Published to the public website when you save.
+            {t("content.settings.brand.livePreviewNote")}
           </p>
         </aside>
       </div>
 
       {/* save control — rendered into the page header slot */}
-      <AutoSaveBar
+      <SaveBar
         dirty={dirty}
         saving={saving}
         hasErrors={hasErrors}
@@ -394,7 +400,6 @@ export function BrandSection() {
           contact.discard();
         }}
       />
-
     </SettingsSection>
   );
 }

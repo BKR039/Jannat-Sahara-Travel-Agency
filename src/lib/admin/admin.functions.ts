@@ -4,35 +4,13 @@ import { z } from "zod";
 
 export type AppRole = "super_admin" | "admin" | "staff";
 
-async function requireSuperAdmin(userId: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "super_admin")
-    .maybeSingle();
-  if (error) throw new Error("Failed to verify permissions");
-  if (!data) throw new Error("Forbidden: super admin required");
-}
-
-async function requireAdmin(userId: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .in("role", ["super_admin", "admin"]);
-  if (error) throw new Error("Failed to verify permissions");
-  if (!data || data.length === 0) throw new Error("Forbidden: admin required");
-}
-
 /**
  * List admin/staff users with their roles.
  */
 export const listAdmins = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { requireAdmin } = await import("./authorize.server");
     await requireAdmin(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: roleRows, error } = await supabaseAdmin
@@ -58,9 +36,7 @@ export const listAdmins = createServerFn({ method: "GET" })
           email: u.user.email ?? null,
           created_at: u.user.created_at,
           last_sign_in_at: u.user.last_sign_in_at ?? null,
-          roles: (roleRows ?? [])
-            .filter((r) => r.user_id === id)
-            .map((r) => r.role as AppRole),
+          roles: (roleRows ?? []).filter((r) => r.user_id === id).map((r) => r.role as AppRole),
         });
       }
     }
@@ -80,17 +56,22 @@ export const inviteAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InviteInput.parse(d))
   .handler(async ({ context, data }) => {
+    const { requireSuperAdmin } = await import("./authorize.server");
     await requireSuperAdmin(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Try to invite via email
-    const { data: invited, error: invErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email);
+    const { data: invited, error: invErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+      data.email,
+    );
     let userId: string | undefined = invited?.user?.id;
 
     if (invErr) {
       // User likely already exists — look them up
       const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-      const existing = list?.users?.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+      const existing = list?.users?.find(
+        (u) => u.email?.toLowerCase() === data.email.toLowerCase(),
+      );
       if (!existing) throw new Error(`Failed to invite user: ${invErr.message}`);
       userId = existing.id;
     }
@@ -123,6 +104,7 @@ export const removeUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => RemoveRoleInput.parse(d))
   .handler(async ({ context, data }) => {
+    const { requireSuperAdmin } = await import("./authorize.server");
     await requireSuperAdmin(context.userId);
     if (data.userId === context.userId && data.role === "super_admin") {
       throw new Error("You cannot remove your own super_admin role");
@@ -152,6 +134,7 @@ export const getPassportSignedUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ path: z.string().min(1).max(500) }).parse(d))
   .handler(async ({ context, data }) => {
+    const { requireAdmin } = await import("./authorize.server");
     await requireAdmin(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error } = await supabaseAdmin.storage
@@ -167,6 +150,7 @@ export const getPassportSignedUrl = createServerFn({ method: "POST" })
 export const getDashboardStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { requireAdmin } = await import("./authorize.server");
     await requireAdmin(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -198,10 +182,22 @@ export const getDashboardStats = createServerFn({ method: "GET" })
       contactMessages,
     ] = await Promise.all([
       count("packages", [["status", "eq", "published"]]),
-      count("packages", [["status", "eq", "published"], ["category", "eq", "umrah"]]),
-      count("packages", [["status", "eq", "published"], ["category", "eq", "trip"]]),
-      count("packages", [["status", "eq", "published"], ["category", "eq", "flight"]]),
-      count("packages", [["status", "eq", "published"], ["category", "eq", "visa"]]),
+      count("packages", [
+        ["status", "eq", "published"],
+        ["category", "eq", "umrah"],
+      ]),
+      count("packages", [
+        ["status", "eq", "published"],
+        ["category", "eq", "trip"],
+      ]),
+      count("packages", [
+        ["status", "eq", "published"],
+        ["category", "eq", "flight"],
+      ]),
+      count("packages", [
+        ["status", "eq", "published"],
+        ["category", "eq", "visa"],
+      ]),
       count("bookings"),
       count("bookings", [["status", "eq", "new"]]),
       count("bookings", [["status", "eq", "pending"]]),

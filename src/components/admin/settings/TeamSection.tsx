@@ -2,24 +2,26 @@ import { Link } from "@tanstack/react-router";
 import { Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SettingsCard, SettingsSection } from "./parts";
+import { useTranslation } from "react-i18next";
 
 export function TeamSection() {
+  const { t } = useTranslation("admin");
   return (
     <SettingsSection
-      title="Team"
-      description="Who can sign in to the admin dashboard and what they are allowed to do."
+      title={t("content.settings.nav.team.label")}
+      description={t("content.settings.team.description")}
     >
       <SettingsCard
-        title="Team members"
-        description="Invite colleagues, change roles or revoke access."
+        title={t("content.settings.team.membersTitle")}
+        description={t("content.settings.team.membersDescription")}
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="flex items-center gap-2.5 text-small text-muted-foreground">
             <Users className="h-4 w-4 text-primary" />
-            Team access is managed on the Admins page.
+            {t("content.settings.team.managedElsewhere")}
           </p>
           <Button asChild size="sm">
-            <Link to="/admin/admins">Manage team</Link>
+            <Link to="/admin/admins">{t("content.settings.team.manageTeam")}</Link>
           </Button>
         </div>
       </SettingsCard>

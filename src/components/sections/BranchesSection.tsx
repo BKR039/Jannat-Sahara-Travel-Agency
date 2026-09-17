@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
   MapPin,
   Phone,
+  PhoneCall,
   Mail,
   Clock,
   Navigation,
@@ -31,11 +32,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { IconBadge } from "@/components/common/IconBadge";
 import { cn } from "@/lib/utils";
 import { useInView } from "@/hooks/useInView";
 import { useLocalized } from "@/lib/localize";
 
 import { branchesQuery, contactInfoQuery, type Branch, type ContactInfo } from "@/lib/queries";
+import { jsonLd as jsonLdScript } from "@/lib/seo";
 
 const BranchesMap = lazy(() => import("./BranchesMap"));
 
@@ -47,10 +50,14 @@ const SOCIAL_ICONS: Record<string, typeof Facebook> = {
   whatsapp: MessageCircle,
 };
 
-const SOCIAL_KEYS = ["facebook", "instagram", "youtube", "twitter", "tiktok"];
-
+/**
+ * wa.me needs a country code. Branch numbers are stored exactly as the agency
+ * records them, which for Tunisian lines is the bare 8-digit local number, so
+ * prefix 216 in the link only. The stored value is never rewritten.
+ */
 function whatsappHref(phone: string) {
-  return `https://wa.me/${phone.replace(/[^\d]/g, "")}`;
+  const digits = phone.replace(/[^\d]/g, "");
+  return `https://wa.me/${digits.length === 8 ? `216${digits}` : digits}`;
 }
 
 /** Turns a raw wa.me link (or any digits) into a readable +216 55 123 456. */
@@ -115,7 +122,6 @@ const BranchTile = memo(function BranchTile({
       ref={(el) => {
         refStore.current[branch.id] = el;
       }}
-
       tabIndex={0}
       role="button"
       aria-pressed={active}
@@ -137,7 +143,7 @@ const BranchTile = memo(function BranchTile({
     >
       <span
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
           active
             ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
             : "bg-primary/10 text-primary group-hover:scale-105",
@@ -150,17 +156,33 @@ const BranchTile = memo(function BranchTile({
         )}
       </span>
 
+      {/*
+       * Real branch names run to ~45 characters of Arabic
+       * ("وكالة جنة الصحراء للاسفار فرع المروج تونس"), so nothing here may
+       * truncate: the name wraps, and the address clamps to two lines with the
+       * full value always shown in the panel below.
+       */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-caption font-semibold uppercase tracking-[0.16em] text-primary/80">
+        <p className="text-caption font-semibold uppercase tracking-[0.06em] text-primary/80">
           {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} ·{" "}
           {L(branch, "city", "base")}
         </p>
-        <h3 className="mt-0.5 truncate text-small font-bold leading-snug text-foreground">
+        <h3 className="mt-0.5 text-small font-bold leading-snug text-foreground [overflow-wrap:anywhere]">
           {L(branch, "name", "base")}
         </h3>
-        <p className="mt-0.5 line-clamp-1 text-caption leading-relaxed text-muted-foreground">
+        <p className="mt-0.5 line-clamp-2 text-caption leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
           {L(branch, "address", "base")}
         </p>
+        {/* Plain text, not a link: the card itself is the control. */}
+        {branch.phone && (
+          <p
+            dir="ltr"
+            className="mt-1.5 inline-flex items-center gap-1.5 text-caption font-semibold text-foreground/80"
+          >
+            <Phone className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
+            {branch.phone}
+          </p>
+        )}
       </div>
 
       {active && (
@@ -172,11 +194,10 @@ const BranchTile = memo(function BranchTile({
   );
 });
 
-
 /* ------------------------------------------- active branch detail panel */
 
 const ACTION_BTN =
-  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background/70 text-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50";
 
 function ActiveBranchPanel({ branch }: { branch: Branch }) {
   const { t } = useTranslation();
@@ -185,35 +206,104 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
   const address = L(branch, "address", "base");
   const name = L(branch, "name", "base");
 
+  // Address and name are rendered in the identity block, not as facts, so the
+  // hierarchy reads type → name → address → phone → actions. Whatever the
+  // agency has not filled in simply drops out; the layout does not assume a
+  // fixed number of facts the way the old five-track grid did.
   const facts = [
-    hours
-      ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours, tight: true }
-      : null,
     branch.phone
-      ? { key: "phone", icon: Phone, label: t("branches.info.phone"), value: branch.phone, ltr: true }
+      ? {
+          key: "phone",
+          icon: Phone,
+          label: t("branches.info.phone"),
+          value: branch.phone,
+          ltr: true,
+        }
       : null,
     branch.email
-      ? { key: "email", icon: Mail, label: t("branches.info.email"), value: branch.email, ltr: true }
+      ? {
+          key: "email",
+          icon: Mail,
+          label: t("branches.info.email"),
+          value: branch.email,
+          ltr: true,
+        }
       : null,
-    { key: "address", icon: Building2, label: t("branches.info.headquarters"), value: address },
+    hours ? { key: "hours", icon: Clock, label: t("branches.info.hours"), value: hours } : null,
   ].filter(Boolean) as {
     key: string;
     icon: typeof Clock;
     label: string;
     value: string;
     ltr?: boolean;
-    tight?: boolean;
   }[];
 
   return (
     <div
       key={branch.id}
-      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-3.5 md:px-6"
+      className="ds-reveal border-t border-border/50 bg-gradient-to-r from-primary/8 via-card/60 to-card/40 px-4 py-3 md:px-5"
     >
-      {/* one grid: actions + 4 info blocks; 5 intentional columns on desktop */}
-      <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-[0.7fr_1.45fr_1fr_1.2fr_1.65fr] lg:gap-x-5">
-        {/* actions — compact group, first column on desktop, last row on mobile */}
-        <div className="order-last col-span-2 flex items-center gap-2 lg:order-first lg:col-span-1 lg:self-center">
+      {/*
+       * Always stacked. This used to switch to a single row at the `lg`
+       * *viewport* breakpoint, which stopped describing reality once the panel
+       * moved inside the explorer's map column: at 1440 that column is roughly
+       * 400px, so three tracks on one row squeezed the identity block to a few
+       * pixels and `overflow-wrap: anywhere` broke the Arabic branch name one
+       * character per line. A column is the honest layout for this container.
+       */}
+      <div className="flex flex-col gap-4">
+        {/* identity: icon + type · city → name → address */}
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/25">
+            {branch.is_main_branch ? (
+              <Star className="h-4 w-4 fill-current" aria-hidden="true" />
+            ) : (
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+            )}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-caption font-semibold uppercase tracking-[0.14em] text-primary/80">
+              {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} ·{" "}
+              {L(branch, "city", "base")}
+            </p>
+            <h3 className="mt-1 text-card-title font-bold leading-snug text-foreground [overflow-wrap:anywhere]">
+              {name}
+            </h3>
+            <p className="mt-1.5 flex items-start gap-2 text-small leading-relaxed text-muted-foreground">
+              <Building2 className="ds-icon-lead text-primary" aria-hidden="true" />
+              {/* Never clamped: the address is the whole point of the card. */}
+              <span className="min-w-0 [overflow-wrap:anywhere]">{address}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* facts — wrap onto as many rows as they need */}
+        {facts.length > 0 && (
+          <div className="flex min-w-0 flex-wrap items-start gap-x-6 gap-y-3">
+            {facts.map((f) => (
+              <div key={f.key} className="flex min-w-0 items-center gap-2.5">
+                <IconBadge icon={f.icon} size="sm" tone="accent" />
+                <div className="min-w-0">
+                  <p className="text-caption font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    {f.label}
+                  </p>
+                  <p
+                    dir={f.ltr ? "ltr" : undefined}
+                    className={cn(
+                      "mt-0.5 text-small font-semibold leading-snug text-foreground [overflow-wrap:anywhere]",
+                      f.ltr && "text-start",
+                    )}
+                  >
+                    {f.value}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* actions — always a separate group, never shrink into the text */}
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           {branch.phone && (
             <>
               <a
@@ -222,9 +312,9 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                 rel="noopener noreferrer"
                 title={t("branches.whatsapp")}
                 aria-label={t("branches.whatsapp")}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
-                <MessageCircle className="h-[17px] w-[17px]" strokeWidth={2} />
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
               </a>
               <a
                 href={`tel:${branch.phone.replace(/\s+/g, "")}`}
@@ -232,7 +322,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
                 aria-label={t("branches.call")}
                 className={ACTION_BTN}
               >
-                <Phone className="h-[17px] w-[17px]" strokeWidth={2} />
+                <Phone className="h-5 w-5" aria-hidden="true" />
               </a>
             </>
           )}
@@ -244,7 +334,7 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
             aria-label={t("branches.directions")}
             className={ACTION_BTN}
           >
-            <Navigation className="h-[17px] w-[17px]" strokeWidth={2} />
+            <Navigation className="h-5 w-5" aria-hidden="true" />
           </a>
           <button
             type="button"
@@ -253,254 +343,11 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
             onClick={() => copyToClipboard(`${name} — ${address}`, t("branches.addressCopied"))}
             className={ACTION_BTN}
           >
-            <Copy className="h-[17px] w-[17px]" strokeWidth={2} />
+            <Copy className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-
-        {/* info blocks — identical internal structure: icon + (label / value) */}
-        {facts.map((f) => (
-          <div
-            key={f.key}
-            className="flex min-w-0 items-center gap-2.5 border-border/40 lg:border-s lg:ps-5"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-lg bg-primary/10 text-primary">
-              <f.icon className="h-3.5 w-3.5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-caption font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                {f.label}
-              </p>
-              <p
-                dir={f.ltr ? "ltr" : undefined}
-                className={cn(
-                  "mt-0.5 text-small font-semibold leading-snug text-foreground",
-                  f.ltr && "text-start",
-                  f.ltr || f.tight
-                    ? "whitespace-nowrap [font-size:0.8125rem]"
-                    : "lg:line-clamp-2",
-                )}
-                style={f.ltr || f.tight ? undefined : { overflowWrap: "anywhere", wordBreak: "normal" }}
-              >
-                {f.value}
-              </p>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
-  );
-}
-
-
-/* --------------------------------------------------------- info panel */
-
-type InfoRow = {
-  key: string;
-  icon: typeof Phone;
-  title: string;
-  value: string;
-  href?: string;
-  external?: boolean;
-  copy?: string;
-  ltr?: boolean;
-  actionLabel?: string;
-};
-
-function useContactRows(items: ContactInfo[]) {
-  const { t } = useTranslation();
-  const { L } = useLocalized();
-  const phone = items.find((i) => i.key === "phone" || i.key === "mobile");
-  const whatsapp = items.find((i) => i.key === "whatsapp");
-  const email = items.find((i) => i.key === "email");
-  const address = items.find((i) => i.key === "address" || i.key === "headquarters");
-  const hours = items.find((i) => i.key === "hours" || i.key === "working_hours");
-
-  const rows: InfoRow[] = [];
-  if (whatsapp)
-    rows.push({
-      key: "whatsapp",
-      icon: MessageCircle,
-      title: t("branches.info.whatsapp"),
-      value: prettyPhone(whatsapp.value) || phone?.value || whatsapp.value,
-      href: whatsappHref(whatsapp.value),
-      external: true,
-      ltr: true,
-      actionLabel: t("branches.whatsapp"),
-    });
-  if (phone)
-    rows.push({
-      key: "phone",
-      icon: Phone,
-      title: t("branches.info.phone"),
-      value: phone.value,
-      href: `tel:${phone.value.replace(/\s+/g, "")}`,
-      copy: phone.value,
-      ltr: true,
-      actionLabel: t("branches.call"),
-    });
-  if (email)
-    rows.push({
-      key: "email",
-      icon: Mail,
-      title: t("branches.info.email"),
-      value: email.value,
-      href: `mailto:${email.value}`,
-      copy: email.value,
-      ltr: true,
-      actionLabel: t("branches.copy"),
-    });
-  if (address) {
-    const value = L(address, "value", "base");
-    rows.push({
-      key: "address",
-      icon: Building2,
-      title: t("branches.info.headquarters"),
-      value,
-      copy: value,
-      actionLabel: t("branches.copyAddress"),
-    });
-  }
-  if (hours) {
-    const value = L(hours, "value", "empty");
-    if (value)
-      rows.push({
-        key: "hours",
-        icon: Clock,
-        title: t("branches.info.hours"),
-        value,
-      });
-  }
-  return rows;
-}
-
-function InfoPanel({ items }: { items: ContactInfo[] }) {
-  const { t } = useTranslation();
-  const rows = useContactRows(items);
-  const socials = items.filter((i) => SOCIAL_KEYS.includes(i.key));
-
-  if (rows.length === 0 && socials.length === 0) return null;
-
-  return (
-    <aside className="ds-reveal relative flex flex-col self-start overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card/90 to-card/60 shadow-lg shadow-primary/5 backdrop-blur-xl">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -top-24 end-[-15%] h-56 w-56 rounded-full bg-primary/10 blur-3xl"
-      />
-
-      <div className="relative border-b border-border/50 px-5 py-4">
-        <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-          {t("branches.contactKicker")}
-        </p>
-        <h3 className="mt-1 text-h5 font-bold leading-snug text-foreground">
-          {t("branches.info.title")}
-        </h3>
-      </div>
-
-      <ul className="relative flex flex-1 flex-col gap-1 p-3">
-        {rows.map((r, i) => (
-          <li
-            key={r.key}
-            style={{ animationDelay: `${i * 50}ms` }}
-            className="ds-reveal group flex min-h-14 items-center gap-4 rounded-lg px-2.5 py-2.5 transition-colors duration-base ease-standard hover:bg-muted/40"
-          >
-            <span
-              aria-hidden
-              className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-base ease-standard group-hover:scale-105",
-                r.key === "whatsapp"
-                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-                  : "bg-primary/10 text-primary",
-              )}
-            >
-              <r.icon className="h-[18px] w-[18px]" strokeWidth={2} />
-            </span>
-
-            <div className="min-w-0 flex-1">
-              <p className="text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                {r.title}
-              </p>
-              {r.href ? (
-                <a
-                  href={r.href}
-                  target={r.external ? "_blank" : undefined}
-                  rel={r.external ? "noopener noreferrer" : undefined}
-                  dir={r.ltr ? "ltr" : undefined}
-                  aria-label={`${r.title}: ${r.value}`}
-                  className={cn(
-                    "mt-0.5 block break-words text-small font-semibold leading-relaxed text-foreground transition-colors duration-base hover:text-primary",
-                    r.ltr && "text-start",
-                  )}
-                >
-                  {r.value}
-                </a>
-              ) : (
-                <p
-                  dir={r.ltr ? "ltr" : undefined}
-                  className={cn(
-                    "mt-0.5 break-words text-small font-semibold leading-relaxed text-foreground",
-                    r.ltr && "text-start",
-                  )}
-                >
-                  {r.value}
-                </p>
-              )}
-            </div>
-
-            {r.copy ? (
-              <button
-                type="button"
-                aria-label={t("branches.copy")}
-                title={t("branches.copy")}
-                onClick={() => copyToClipboard(r.copy!, t("branches.copied"))}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-0 transition-all duration-base ease-standard hover:bg-primary/10 hover:text-primary focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100 sm:opacity-60"
-              >
-                <Copy className="h-4 w-4" />
-              </button>
-            ) : r.href && r.external ? (
-              <a
-                href={r.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={r.actionLabel ?? r.title}
-                title={r.actionLabel ?? r.title}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-60 transition-all duration-base ease-standard hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            ) : (
-              <span aria-hidden className="h-9 w-9 shrink-0" />
-            )}
-          </li>
-        ))}
-      </ul>
-
-
-      {socials.length > 0 && (
-        <div className="relative flex items-center justify-between gap-4 border-t border-border/50 bg-muted/30 px-5 py-3.5">
-          <p className="text-caption font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            {t("branches.contactCard.follow")}
-          </p>
-          <div className="flex items-center gap-2">
-            {socials.map((s) => {
-              const Icon = SOCIAL_ICONS[s.key] ?? Sparkles;
-              return (
-                <a
-                  key={s.id}
-                  href={s.value}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label ?? s.key}
-                  title={s.label ?? s.key}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/70 text-primary transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </aside>
   );
 }
 
@@ -542,7 +389,6 @@ function Field({
   );
 }
 
-
 function ContactForm({
   branches,
   info,
@@ -568,7 +414,10 @@ function ContactForm({
     e.preventDefault();
     const formEl = e.currentTarget;
     const form = new FormData(formEl);
-    const branchName = branches.find((b) => b.id === branchId)?.name;
+    // Localized through the same helper the branch UI uses, so the subject
+    // matches the language the visitor is actually reading.
+    const selectedBranch = branches.find((b) => b.id === branchId);
+    const branchName = selectedBranch ? L(selectedBranch, "name", "base") : "";
     const subjectRaw = String(form.get("subject") ?? "");
     const subject = branchName ? `[${branchName}] ${subjectRaw}` : subjectRaw;
     setLoading(true);
@@ -596,7 +445,7 @@ function ContactForm({
   };
 
   return (
-    <div className="ds-reveal relative h-full overflow-hidden rounded-xl border border-border/50 bg-card/80 p-5 shadow-xl shadow-primary/10 backdrop-blur-xl md:p-7">
+    <div className="ds-reveal relative h-full overflow-hidden rounded-card-lg border border-border-subtle bg-card p-5 md:p-7">
       <span
         aria-hidden
         className="pointer-events-none absolute -top-28 start-[-10%] h-64 w-64 rounded-full bg-primary/10 blur-3xl"
@@ -631,7 +480,10 @@ function ContactForm({
         {branches.length > 0 && (
           <div className="sm:col-span-2">
             <Select value={branchId} onValueChange={setBranchId}>
-              <SelectTrigger className="h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 text-input transition-[border-color,box-shadow] duration-base ease-standard hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]">
+              <SelectTrigger
+                aria-label={t("branches.form.selectBranch")}
+                className="h-14 w-full rounded-lg border border-border/60 bg-background/60 px-4 text-input transition-[border-color,box-shadow] duration-base ease-standard hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_14%,transparent)]"
+              >
                 <SelectValue placeholder={t("branches.form.selectBranch")} />
               </SelectTrigger>
               <SelectContent className="rounded-lg">
@@ -664,7 +516,7 @@ function ContactForm({
           <button
             type="submit"
             disabled={loading}
-            className="group inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:opacity-60"
+            className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-6 sm:flex-1 text-button font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:opacity-60"
           >
             {loading ? (
               <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
@@ -678,7 +530,7 @@ function ContactForm({
               href={whatsappHref(whatsappItem.value)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-6 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="inline-flex h-14 shrink-0 items-center justify-center gap-2 rounded-full border border-border/60 bg-background/60 px-5 text-small font-semibold text-foreground/80 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               <MessageCircle className="h-4 w-4 shrink-0" />
               {t("branches.form.whatsappInstead")}
@@ -686,7 +538,6 @@ function ContactForm({
           )}
         </div>
       </form>
-
     </div>
   );
 }
@@ -709,7 +560,6 @@ export function BranchesSection() {
     rootMargin: "250px 0px",
   });
 
-
   useEffect(() => setMounted(true), []);
 
   /** city id = base column value (stable), label = localized value */
@@ -727,7 +577,17 @@ export function BranchesSection() {
       const cityOk = city === "all" || b.city === city;
       const qOk =
         !q ||
-        [b.name, b.name_fr, b.name_en, b.city, b.city_fr, b.city_en, b.address, b.address_fr, b.address_en]
+        [
+          b.name,
+          b.name_fr,
+          b.name_en,
+          b.city,
+          b.city_fr,
+          b.city_en,
+          b.address,
+          b.address_fr,
+          b.address_en,
+        ]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q));
       return cityOk && qOk;
@@ -781,7 +641,7 @@ export function BranchesSection() {
       {jsonLd.length > 0 && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
         />
       )}
 
@@ -801,7 +661,13 @@ export function BranchesSection() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
-      <div className="relative mx-auto flex max-w-7xl flex-col gap-8 px-4 md:px-6 lg:px-8">
+      {/*
+       * The composition grows with the screen instead of stopping at one cap.
+       * On a 1920 display the old fixed 86rem left ~270px of empty page on each
+       * side while the branch list inside was too narrow to read; the wider cap
+       * and the roomier gutters spend that space on the content.
+       */}
+      <div className="relative mx-auto flex w-full max-w-[86rem] flex-col gap-6 px-4 md:px-6 lg:px-8 2xl:max-w-[104rem] 2xl:px-12">
         {/* ---------- header ---------- */}
         <header className="ds-reveal flex flex-col gap-3">
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-caption font-semibold uppercase tracking-[0.22em] text-primary backdrop-blur">
@@ -822,21 +688,44 @@ export function BranchesSection() {
           </p>
         </header>
 
-        {/* ---------- large contact card: branches + map + live details ---------- */}
-        <div className="ds-reveal overflow-hidden rounded-2xl border border-border/50 bg-card/60 shadow-2xl shadow-primary/10 backdrop-blur-xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12">
-            {/* branch selector */}
-            <div className="order-2 flex flex-col border-border/50 lg:order-1 lg:col-span-5 lg:border-e xl:col-span-4">
-              <div className="flex flex-col gap-3 border-b border-border/50 bg-muted/30 px-4 py-3.5 md:px-5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-                    {t("branches.ourBranches")}
-                  </p>
-                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-caption font-bold text-primary">
-                    {filtered.length} {t("branches.branchesCount")}
-                  </span>
-                </div>
-                <div className="relative">
+        {/*
+         * One row, two experiences: where we are, and how to reach us.
+         *
+         * The standalone "general contact information" card that used to sit
+         * beside the form is gone — it restated the branch phone, e-mail and
+         * head-office address that the selected branch already shows, so the
+         * section asked the visitor to read the same details twice and pushed
+         * the form below the fold. Those values are unchanged in the database
+         * and still render inside the selected-branch panel and the footer.
+         *
+         * The map leads at 1.15fr because it carries the photography-like
+         * weight; `items-start` keeps both cards on the same top edge whatever
+         * their natural heights.
+         */}
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.9fr)_minmax(340px,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,2.05fr)_minmax(380px,1fr)] 2xl:grid-cols-[minmax(0,2.6fr)_minmax(420px,1fr)]">
+          {/* ---------- where we are: one branch explorer ---------- */}
+          <div className="ds-reveal flex h-full flex-col overflow-hidden rounded-card-lg border border-border-subtle bg-card">
+            {/*
+             * Search and the city filters span the whole card, above the split.
+             *
+             * They used to live inside the branch-picker column, which is the
+             * narrowest part of the layout: at 1440 the chip row needed 431px
+             * and had 297px, so two of the four cities were scrolled out of
+             * sight with nothing saying so. No width the picker column can
+             * reasonably take would fit them — the controls belong to the whole
+             * explorer, not to one of its two panes, and up here they get the
+             * card's full width. The picker keeps the space it used to spend on
+             * a header for branch tiles instead.
+             */}
+            <div className="flex flex-col gap-2.5 border-b border-border/50 bg-muted/30 px-4 py-3 md:px-5 md:py-3.5">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+                  {t("branches.ourBranches")}
+                </p>
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-caption font-bold text-primary">
+                  {filtered.length} {t("branches.branchesCount")}
+                </span>
+                <div className="relative ms-auto w-full sm:w-64 xl:w-72">
                   <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="search"
@@ -847,98 +736,122 @@ export function BranchesSection() {
                     className="h-11 w-full rounded-full border border-border/60 bg-background/70 ps-10 pe-4 text-small text-foreground outline-none transition-all duration-base ease-standard placeholder:text-muted-foreground hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_12%,transparent)]"
                   />
                 </div>
-                {cities.length > 1 && (
-                  <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
-                    {[{ id: "all", label: t("branches.allCities") }, ...cities].map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => setCity(c.id)}
-                        aria-pressed={city === c.id}
-                        className={cn(
-                          "h-9 shrink-0 rounded-full border px-3.5 text-caption font-semibold transition-all duration-base ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                          city === c.id
-                            ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-                            : "border-border/60 bg-background/60 text-muted-foreground hover:border-primary/40 hover:text-foreground",
-                        )}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              {cities.length > 1 && (
+                /*
+                 * Wraps rather than scrolls. A chip row that overflows its
+                 * container hides options behind an edge with nothing to say so;
+                 * wrapping shows every city at every width, and the toolbar is
+                 * now wide enough that it stays one line on desktop anyway.
+                 */
+                <div
+                  role="group"
+                  aria-label={t("branches.allCities")}
+                  className="flex flex-wrap gap-2"
+                >
+                  {[{ id: "all", label: t("branches.allCities") }, ...cities].map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setCity(c.id)}
+                      aria-pressed={city === c.id}
+                      className={cn(
+                        "h-11 shrink-0 rounded-full border px-4 text-caption font-semibold transition-all duration-base ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                        city === c.id
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+                          : "border-border/60 bg-background/60 text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                      )}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              <div className="flex max-h-[320px] flex-col gap-2.5 overflow-y-auto p-3.5 md:p-4 lg:max-h-[372px]">
-                {isLoading ? (
-                  [0, 1, 2].map((i) => (
-                    <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/50" />
-                  ))
-                ) : filtered.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <MapPin className="mx-auto h-7 w-7 text-muted-foreground/60" />
-                    <p className="mt-3 text-small font-semibold text-foreground">
-                      {t("branches.noResults")}
+            {/*
+             * The explorer owns its own two-column layout: the map takes the
+             * larger share and the branch picker sits beside it, sharing one
+             * outer surface. Below `md` they stack — map, selected branch, then
+             * the picker — because a side-by-side pair at phone width leaves
+             * both halves too narrow to use.
+             */}
+            <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_minmax(250px,1.05fr)] lg:grid-cols-[minmax(0,1.68fr)_minmax(275px,1.05fr)] xl:grid-cols-[minmax(0,1.62fr)_minmax(310px,1.05fr)] lg:min-h-[400px]">
+              {/* map + the selected branch's live details */}
+              <div className="order-1 flex min-w-0 flex-col">
+                {/* map — chunk + tiles load only once the panel nears the viewport */}
+                <div
+                  ref={mapRef}
+                  className="relative h-[320px] sm:h-[380px] md:h-auto md:min-h-[310px] md:flex-1"
+                >
+                  <Suspense fallback={<MapSkeleton />}>
+                    {mounted && mapInView && filtered.length > 0 ? (
+                      <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
+                    ) : (
+                      <MapSkeleton />
+                    )}
+                  </Suspense>
+
+                  <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/85 px-4 py-3 shadow-xl backdrop-blur-xl md:block">
+                    <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
+                      {activeBranch ? L(activeBranch, "city", "base") : t("branches.ourBranches")}
+                    </p>
+                    <p className="mt-0.5 text-small font-bold leading-snug text-foreground">
+                      {activeBranch
+                        ? L(activeBranch, "name", "base")
+                        : `${filtered.length} ${t("branches.branchesCount")}`}
+                    </p>
+                    <p className="mt-0.5 line-clamp-2 text-caption leading-relaxed text-muted-foreground">
+                      {activeBranch ? L(activeBranch, "address", "base") : t("branches.selectHint")}
                     </p>
                   </div>
-                ) : (
-                  filtered.map((b, i) => (
-                    <BranchTile
-                      key={b.id}
-                      branch={b}
-                      index={i}
-                      active={b.id === activeId}
-                      onSelect={setActiveId}
-                      refStore={cardRefs}
+                </div>
 
-                    />
-                  ))
-                )}
+                {/* live details for the selected branch */}
+                {activeBranch && <ActiveBranchPanel branch={activeBranch} />}
+              </div>
+              {/*
+               * Side by side, the picker must take the row's height rather than
+               * set it. A grid item is sized by its content even with
+               * `min-height: 0`, so the tile list made the row as tall as every
+               * branch stacked up and the map sat in a column padded with empty
+               * space. Taking the scroller out of flow (`md:absolute inset-0`)
+               * leaves the row height to the map column and lets the tiles
+               * scroll inside exactly that height, so both halves end level.
+               * Below `md` the two are stacked, so it goes back in flow.
+               */}
+              <div className="order-2 flex min-w-0 flex-col border-t border-border/50 md:relative md:border-t-0 md:border-s">
+                <div className="flex max-h-[320px] min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 md:absolute md:inset-0 md:max-h-none md:p-3.5">
+                  {isLoading ? (
+                    [0, 1, 2].map((i) => (
+                      <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/50" />
+                    ))
+                  ) : filtered.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <MapPin className="mx-auto h-7 w-7 text-muted-foreground/60" />
+                      <p className="mt-3 text-small font-semibold text-foreground">
+                        {t("branches.noResults")}
+                      </p>
+                    </div>
+                  ) : (
+                    filtered.map((b, i) => (
+                      <BranchTile
+                        key={b.id}
+                        branch={b}
+                        index={i}
+                        active={b.id === activeId}
+                        onSelect={setActiveId}
+                        refStore={cardRefs}
+                      />
+                    ))
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* map — chunk + tiles load only once the panel nears the viewport */}
-            <div
-              ref={mapRef}
-              className="relative order-1 h-[300px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-[480px] xl:col-span-8"
-            >
-              <Suspense fallback={<MapSkeleton />}>
-                {mounted && mapInView && filtered.length > 0 ? (
-                  <BranchesMap branches={filtered} activeId={activeId} onSelect={setActiveId} />
-                ) : (
-                  <MapSkeleton />
-                )}
-              </Suspense>
-
-
-              <div className="pointer-events-none absolute top-4 start-4 z-[500] hidden max-w-xs rounded-lg border border-border/50 bg-background/85 px-4 py-3 shadow-xl backdrop-blur-xl md:block">
-                <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-                  {activeBranch ? L(activeBranch, "city", "base") : t("branches.ourBranches")}
-                </p>
-                <p className="mt-0.5 text-small font-bold leading-snug text-foreground">
-                  {activeBranch
-                    ? L(activeBranch, "name", "base")
-                    : `${filtered.length} ${t("branches.branchesCount")}`}
-                </p>
-                <p className="mt-0.5 line-clamp-2 text-caption leading-relaxed text-muted-foreground">
-                  {activeBranch ? L(activeBranch, "address", "base") : t("branches.selectHint")}
-                </p>
-              </div>
-            </div>
           </div>
 
-          {/* live details for the selected branch */}
-          {activeBranch && <ActiveBranchPanel branch={activeBranch} />}
-        </div>
-
-        {/* ---------- form + general contact information ---------- */}
-        <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <ContactForm branches={branches} info={info} defaultBranchId={activeId} />
-          </div>
-          <div className="lg:col-span-5">
-            <InfoPanel items={info} />
-          </div>
+          {/* ---------- how to reach us ---------- */}
+          <ContactForm branches={branches} info={info} defaultBranchId={activeId} />
         </div>
       </div>
     </section>

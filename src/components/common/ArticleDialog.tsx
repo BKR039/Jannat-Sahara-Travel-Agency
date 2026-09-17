@@ -1,6 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { articleBySlugQuery, articlesQuery } from "@/lib/queries";
 import { articleCategory, articleTags } from "@/lib/blog";
 import { ArticleMeta, CategoryBadge } from "@/components/blog/ArticleMeta";
@@ -18,7 +24,10 @@ export function ArticleDialog({
 }) {
   const { t } = useTranslation();
   const { lang, L } = useLocalized();
-  const { data: article, isLoading } = useQuery({ ...articleBySlugQuery(slug ?? ""), enabled: !!slug });
+  const { data: article, isLoading } = useQuery({
+    ...articleBySlugQuery(slug ?? ""),
+    enabled: !!slug,
+  });
   const { data: all } = useQuery({ ...articlesQuery(), enabled: !!slug });
 
   const category = article ? articleCategory(article, lang) : null;
@@ -27,7 +36,10 @@ export function ArticleDialog({
   const excerpt = L(article, "excerpt", "empty");
   const content = L(article, "content", "empty");
   const related = (all ?? [])
-    .filter((a) => a.slug !== slug && (!tags.length || articleTags(a, lang).some((tag) => tags.includes(tag))))
+    .filter(
+      (a) =>
+        a.slug !== slug && (!tags.length || articleTags(a, lang).some((tag) => tags.includes(tag))),
+    )
     .slice(0, 3);
 
   return (
@@ -84,11 +96,17 @@ export function ArticleDialog({
               </div>
             )}
 
-            <ShareButtons slug={article.slug} title={title} className="border-t border-border-subtle pt-4" />
+            <ShareButtons
+              slug={article.slug}
+              title={title}
+              className="border-t border-border-subtle pt-4"
+            />
 
             {related.length > 0 && (
               <div className="border-t border-border-subtle pt-4">
-                <h4 className="mb-3 text-card-title font-bold text-foreground">{t("blog.relatedArticles")}</h4>
+                <h4 className="mb-3 text-card-title font-bold text-foreground">
+                  {t("blog.relatedArticles")}
+                </h4>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {related.map((r) => (
                     <button

@@ -20,7 +20,12 @@
       "faq": "FAQ",
       "notifications": "Notifications",
       "settings": "Settings",
-      "team": "Team"
+      "team": "Team",
+      "hotels": "Hotels",
+      "services": "Services",
+      "features": "Why choose us",
+      "flightRequests": "Flight requests",
+      "messages": "Messages"
     },
     "closeNavigation": "Close navigation",
     "openNavigation": "Open navigation",
@@ -42,7 +47,8 @@
       "accessDeniedTitle": "Access denied",
       "accessDeniedDescription": "Your account doesn't have permission to access the admin dashboard. Contact your super admin to request access.",
       "signOut": "Sign out",
-      "backToSite": "Back to site"
+      "backToSite": "Back to site",
+      "loading": "Loading the console…"
     },
     "dashboard": {
       "title": "Command center",
@@ -56,24 +62,62 @@
         "travellers": "Travellers",
         "travellersHint": "Adults, children and infants",
         "upcomingDepartures": "Upcoming departures",
-        "upcomingDeparturesHint": "Trips with a future departure date"
+        "upcomingDeparturesHint": "Trips with a future departure date",
+        "customRequests": "Umrah requests",
+        "customRequestsHint": "{{total}} in total · {{actionable}} open"
       },
       "insights": {
         "title": "Smart insights",
         "emptyTitle": "Nothing needs attention",
         "emptyDescription": "No capacity risks, unanswered requests or unusual trends were detected.",
-        "open": "Open"
+        "open": "Open",
+        "custom": {
+          "action": "Open requests",
+          "awaitingContact": {
+            "title": "{{count}} Umrah request waiting for a first reply",
+            "title_other": "{{count}} Umrah requests waiting for a first reply",
+            "body": "Open for more than 24 hours with no contact recorded.",
+            "title_one": "1 Umrah request waiting for a first reply"
+          },
+          "departingSoon": {
+            "title": "{{count}} unresolved request travelling within 30 days",
+            "title_other": "{{count}} unresolved requests travelling within 30 days",
+            "body": "The closest is {{reference}}, departing in about {{days}} days.",
+            "title_one": "1 unresolved request travelling within 30 days"
+          },
+          "awaitingOffer": {
+            "title": "{{count}} custom requests have no offer yet",
+            "body": "The agency has engaged with these travellers but no offer has been sent."
+          },
+          "volumeUp": {
+            "title": "Umrah requests are up {{percent}}% this month",
+            "body": "{{count}} this month against {{previous}} last month."
+          },
+          "volumeDown": {
+            "title": "Umrah requests are down {{percent}}% this month",
+            "body": "{{count}} this month against {{previous}} last month."
+          },
+          "largeParty": {
+            "title": "{{count}} large group request is open",
+            "title_other": "{{count}} large group requests are open",
+            "body": "{{reference}} asks for {{travellers}} travellers.",
+            "title_one": "1 large group request is open"
+          }
+        }
       },
       "revenueTrend": {
         "title": "Revenue trend",
-        "description": "Last 12 months of booking value"
+        "description": "Last 12 months of booking value",
+        "emptyTitle": "No revenue recorded yet",
+        "emptyDescription": "The trend appears here once the first paid booking is recorded."
       },
       "workQueue": {
         "title": "Work queue",
         "description": "Waiting for a first answer",
         "newBookings": "New booking requests",
         "newRequests": "New flight requests",
-        "unreadMessages": "Unread messages"
+        "unreadMessages": "Unread messages",
+        "customRequests": "Custom Umrah requests"
       },
       "nextDepartures": {
         "title": "Next departures",
@@ -86,6 +130,23 @@
         "allBookings": "All bookings",
         "emptyTitle": "No bookings yet",
         "generalEnquiry": "General enquiry"
+      },
+      "customRequests": {
+        "title": "Custom Umrah requests",
+        "description": "{{actionable}} of {{total}} still need a decision.",
+        "viewAll": "View all",
+        "emptyTitle": "Nothing waiting",
+        "emptyDescription": "Every custom Umrah request has been handled.",
+        "errorTitle": "Could not load requests",
+        "errorDescription": "Refresh the page to try again.",
+        "noDates": "No dates given",
+        "travellers": "{{count}} traveller",
+        "travellers_other": "{{count}} travellers",
+        "departingIn": "In {{count}} day",
+        "departingIn_other": "In {{count}} days",
+        "awaitingReply": "Awaiting reply",
+        "departingIn_one": "In 1 day",
+        "travellers_one": "1 traveller"
       }
     },
     "reports": {
@@ -122,7 +183,7 @@
     },
     "customers": {
       "title": "Customers",
-      "description": "People derived from booking requests. Contact them directly.",
+      "description": "Everyone who has booked, enquired or used the Umrah Builder.",
       "exportCsv": "Export CSV",
       "searchPlaceholder": "Search by name, phone, email…",
       "loading": "Loading…",
@@ -135,7 +196,38 @@
         "categories": "Categories",
         "lastBooking": "Last booking",
         "contact": "Contact"
-      }
+      },
+      "noMatchTitle": "No matching customer",
+      "noMatchDescription": "Try another name, phone number or email address.",
+      "emptyDescription": "Customers appear here as soon as the first booking or request arrives.",
+      "notFound": "This customer no longer has any records.",
+      "contact": "Contact details",
+      "counts": "{{bookings}} booking(s) · {{requests}} request(s)",
+      "umrahRequests": "{{count}} Umrah request",
+      "umrahRequests_other": "{{count}} Umrah requests",
+      "relatedRecords": "History ({{count}})",
+      "noRelated": "No records yet.",
+      "status": {
+        "customer": "Customer",
+        "lead": "Lead",
+        "cancelled": "Cancelled"
+      },
+      "matchedBy": {
+        "phone": "Matched by phone number",
+        "email": "Matched by email address",
+        "unlinked": "Not linked — no phone or email was given"
+      },
+      "related": {
+        "booking": "Booking",
+        "message": "Message",
+        "travellers": "{{count}} traveller",
+        "travellers_other": "{{count}} travellers",
+        "umrah": "{{nights}} night(s) · {{count}} traveller",
+        "umrah_other": "{{nights}} night(s) · {{count}} travellers",
+        "travellers_one": "1 traveller",
+        "umrah_one": "{{nights}} night(s) · 1 traveller"
+      },
+      "umrahRequests_one": "1 Umrah request"
     },
     "notifications": {
       "title": "Notifications",
@@ -145,7 +237,8 @@
       "loading": "Loading…",
       "emptyTitle": "No notifications yet",
       "view": "View",
-      "markRead": "Mark read"
+      "markRead": "Mark read",
+      "delete": "Delete notification"
     },
     "kit": {
       "insight": {
@@ -167,6 +260,34 @@
         "badge": "FR missing",
         "title": "No French translation yet"
       }
+    },
+    "documentTitle": "{{section}} — Janat Sahara Admin",
+    "docSections": {
+      "dashboard": "Dashboard",
+      "hotels": "Hotels",
+      "requests": "Requests",
+      "reports": "Reports",
+      "settings": "Settings",
+      "packageEditor": "Package editor",
+      "services": "Services",
+      "features": "Why choose us",
+      "customers": "Customers",
+      "team": "Team",
+      "blog": "Blog",
+      "bookings": "Bookings",
+      "branches": "Branches",
+      "faq": "FAQ",
+      "flightRequests": "Flight requests",
+      "gallery": "Gallery",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "trips": "Trips",
+      "testimonials": "Testimonials"
+    },
+    "states": {
+      "errorTitle": "Could not load data",
+      "errorDescription": "Something went wrong while connecting. The records exist but could not be shown.",
+      "retry": "Retry"
     }
   }
 }

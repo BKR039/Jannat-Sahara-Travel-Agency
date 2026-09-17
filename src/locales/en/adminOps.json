@@ -49,9 +49,40 @@
       "deleteConfirmTitle": "Delete package?",
       "deleteConfirmDescription": "This will remove \"{{title}}\" permanently.",
       "cancel": "Cancel",
-      "toastDuplicated": "Package duplicated",
+      "toastDuplicated": "Copy created: {{title}}",
       "toastStatusUpdated": "Status updated",
-      "toastDeleted": "Package deleted"
+      "toastDeleted": "Package deleted",
+      "seatsRemaining": "{{count}} left",
+      "availability": {
+        "available": "Available",
+        "limited": "Almost full",
+        "full": "Full",
+        "unset": "Capacity not set"
+      },
+      "publication": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Hidden",
+        "sold_out": "Full"
+      },
+      "actionPublish": "Publish",
+      "actionUnpublish": "Unpublish",
+      "actionHide": "Hide",
+      "actionShow": "Show",
+      "deleteBlocked": {
+        "has_bookings": "Cannot delete a programme linked to {{count}} booking(s). Hide it instead."
+      },
+      "availabilityFilter": "Seats",
+      "availabilityAll": "All seats",
+      "deleteConfirmBody": "“{{title}}” will be permanently deleted. This cannot be undone.",
+      "listPanelTitle": "All programmes",
+      "resultCount_one": "{{count}} result",
+      "resultCount_other": "{{count}} results",
+      "filtersLabel": "Filter",
+      "noMatchTitle": "No programmes match",
+      "noMatchDescription": "Widen the search or clear one of the filters.",
+      "clearFilters": "Clear filters",
+      "noDeparture": "No departure date"
     },
     "editor": {
       "backToPackages": "Packages",
@@ -225,7 +256,14 @@
         "durationEn": "Duration (English)",
         "availableSeats": "Available seats",
         "totalSeats": "Total seats",
-        "seatsBooked": "{{booked}} of {{total}} seats booked."
+        "seatsBooked": "{{booked}} of {{total}} seats booked.",
+        "capacity": "Total capacity",
+        "booked": "Booked",
+        "remaining": "Remaining",
+        "capacityHint": "Total seats for this programme. Booked and remaining are calculated from bookings.",
+        "capacityUnset": "Capacity not set",
+        "capacityUnsetHint": "Set a total capacity to see booked and remaining seats.",
+        "oversold": "Bookings ({{booked}}) exceed the configured capacity ({{capacity}})."
       },
       "booking": {
         "cardTitle": "Booking",
@@ -236,7 +274,9 @@
         "meetingPointEn": "Meeting point (English)",
         "bookableOnWebsite": "Bookable on the website",
         "requiredDocsConfigured": "Required documents configured",
-        "openBookings": "Open bookings"
+        "openBookings": "Open bookings",
+        "yes": "Yes",
+        "no": "No"
       },
       "previewTitle": "Live preview",
       "previewFrameTitle": "Package preview",
@@ -264,7 +304,64 @@
         "seoDescriptionLength": "Keep the SEO description under 160 characters.",
         "coverRequired": "A cover image is required before publishing.",
         "shortDescriptionRequired": "A short description is required before publishing."
-      }
+      },
+      "header": {
+        "saved": "Package saved",
+        "draftCreated": "Draft created",
+        "newPackage": "New package",
+        "untitled": "Untitled package",
+        "unsavedAutosaving": "Unsaved changes",
+        "draftNotCreated": "Draft not created yet",
+        "allSaved": "All changes saved",
+        "save": "Save",
+        "createDraft": "Create draft",
+        "statusHint": "Only published packages appear on the website.",
+        "savedAt": "Saved at {{time}}",
+        "issues_one": "1 issue",
+        "issues_other": "{{count}} issues"
+      },
+      "publication": {
+        "current": "Current status",
+        "noActions": "No actions available for this status.",
+        "explain": {
+          "draft": "Draft: not visible to visitors.",
+          "published": "Published: live on the website.",
+          "archived": "Hidden: kept in admin but not visible to visitors.",
+          "sold_out": "Full: visible but no seats available."
+        },
+        "confirm": {
+          "cancel": "Cancel",
+          "publish": {
+            "title": "Publish programme?",
+            "body": "It will become visible to visitors on the website."
+          },
+          "unpublish": {
+            "title": "Unpublish programme?",
+            "body": "It returns to draft and will no longer be visible."
+          },
+          "hide": {
+            "title": "Hide programme?",
+            "body": "It stays in admin but becomes invisible to visitors. This is not a deletion."
+          },
+          "show": {
+            "title": "Show programme?",
+            "body": "It will be visible on the website again."
+          }
+        }
+      },
+      "unsaved": {
+        "title": "You have unsaved changes",
+        "body": "If you leave now, your unsaved changes will be lost.",
+        "saveAndLeave": "Save and leave",
+        "discard": "Leave without saving",
+        "stay": "Stay"
+      },
+      "danger": {
+        "deleteBody": "“{{title}}” will be permanently removed. This cannot be undone."
+      },
+      "saveFailed": "Could not save",
+      "loading": "Opening the editor…",
+      "slugHint": "Used in the public URL."
     },
     "fields": {
       "addItem": "Add item",
@@ -312,10 +409,22 @@
       },
       "tripType": "Trip type",
       "types": {
-        "umrah": { "label": "Umrah", "hint": "Makkah & Madinah package" },
-        "tour": { "label": "Tour", "hint": "Organised trip abroad" },
-        "flight": { "label": "Flight", "hint": "Handled as requests" },
-        "other": { "label": "Other", "hint": "Visa & services" }
+        "umrah": {
+          "label": "Umrah",
+          "hint": "Makkah & Madinah package"
+        },
+        "tour": {
+          "label": "Tour",
+          "hint": "Organised trip abroad"
+        },
+        "flight": {
+          "label": "Flight",
+          "hint": "Handled as requests"
+        },
+        "other": {
+          "label": "Other",
+          "hint": "Visa & services"
+        }
       },
       "flightsWorkAsRequestsTitle": "Flights work as requests",
       "flightsWorkAsRequestsDescription": "You don't publish flight tickets. Travellers submit a flight request from the website (from, to, dates, travellers) and it lands in your inbox — you reply with the best option by email and close the request once it's done.",
@@ -440,14 +549,125 @@
         "all": "All",
         "bookings": "Bookings",
         "flights": "Flights",
-        "messages": "Messages"
+        "messages": "Messages",
+        "custom": "Custom Umrah"
       },
       "emptyTitle": "No requests found",
       "emptyDescription": "Nothing matches the current filters.",
       "email": "Email",
       "markStatus": "Mark {{status}}",
       "toastUpdated": "Request updated",
-      "toastUpdateFailed": "Could not update this request"
+      "toastUpdateFailed": "Could not update this request",
+      "statusLabel": "Status",
+      "notSpecified": "Not specified",
+      "sections": {
+        "request": "Request",
+        "contact": "Contact",
+        "dates": "Travel dates",
+        "flights": "Flights (requested preferences)",
+        "travellers": "Travellers",
+        "makkah": "Makkah",
+        "madinah": "Madinah",
+        "notes": "Traveller notes",
+        "customer": "Customer"
+      },
+      "fields": {
+        "reference": "Reference",
+        "status": "Status",
+        "received": "Received",
+        "assignedTo": "Assigned to",
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "contactPreference": "Preferred contact",
+        "language": "Language",
+        "departure": "Departure",
+        "return": "Return",
+        "departureAirport": "Departure airport",
+        "returnAirport": "Return airport",
+        "party": "Party",
+        "roomType": "Room preference",
+        "nights": "Nights",
+        "hotel": "Hotel",
+        "area": "Area",
+        "budget": "Budget"
+      },
+      "flexibleAirport": "Flexible — needs advice",
+      "travellers": {
+        "adults_one": "1 adult",
+        "adults_other": "{{count}} adults",
+        "children_one": "1 child",
+        "children_other": "{{count}} children",
+        "infants_one": "1 infant",
+        "infants_other": "{{count}} infants"
+      },
+      "viewCustomer": "View customer",
+      "customerMatch": {
+        "phone": "Linked to this customer by phone number.",
+        "email": "Linked to this customer by email address.",
+        "unlinked": "Not linked to a customer — no phone or email was given."
+      },
+      "currentStatus": "Current status: {{status}}",
+      "closedHint": "This request is closed. Its status and offer can no longer be changed.",
+      "noActionsHint": "No further action is available from this status.",
+      "confirmStatusTitle": "Mark this request as {{status}}?",
+      "confirmStatusDescription": "This closes the request. It will leave the actionable queue and its offer can no longer be changed.",
+      "confirmStatusAction": "Confirm",
+      "errorTransition": "That status change is not allowed from the current status.",
+      "errorConflict": "Someone else changed this request. Reopen it to see the current state.",
+      "errorClosed": "This request is closed and can no longer be changed.",
+      "errorTitle": "Unable to load requests",
+      "errorDescription": "Something went wrong reaching the database.",
+      "retry": "Try again",
+      "noMatchTitle": "No requests match your filters",
+      "noMatchDescription": "Try a different search term or clear the filters.",
+      "nextAction": "Next: {{action}}",
+      "openRequest": "Open request from {{name}} {{reference}}",
+      "filters": {
+        "allStatuses": "Any status",
+        "openOnly": "Open only",
+        "clear": "Clear filters",
+        "showing": "{{count}} of {{total}}",
+        "stageOpen": "New / in progress"
+      },
+      "urgency": {
+        "departure": "Departing soon",
+        "waiting": "Awaiting reply",
+        "inDays": "In {{count}} day",
+        "inDays_other": "In {{count}} days",
+        "inDays_one": "In 1 day"
+      },
+      "summary": {
+        "flight": "{{from}} → {{to}} · {{tripType}} · {{cabin}}",
+        "booking": "{{title}} · {{count}} traveller(s)",
+        "bookingNoTitle": "General enquiry · {{count}} traveller(s)",
+        "customPackage": "Umrah · {{nights}} night(s) · {{count}} traveller(s)",
+        "generalEnquiry": "General enquiry"
+      },
+      "kinds": {
+        "flight": "Flight request",
+        "booking": "Booking",
+        "contact": "Message",
+        "custom_package": "Custom Umrah"
+      },
+      "internalTitle": "Staff notes",
+      "internalHint": "Internal information, never shown to the customer.",
+      "internalPlaceholder": "What was discussed, the supplier's answer, the follow-up…",
+      "saveNotes": "Save notes",
+      "offerTitle": "Price / offer",
+      "offerHint": "The offer sent to the customer.",
+      "customerMessage": "Customer message",
+      "priceColumn": "Price",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "noPrice": "No price",
+      "subject": "Subject",
+      "package": "Package",
+      "cabin": "Cabin",
+      "tripType": "Trip type",
+      "route": "Route",
+      "total": "Total"
     },
     "flightRequests": {
       "title": "Flight requests",
@@ -489,7 +709,13 @@
         "assignedTo": "Assigned to",
         "notes": "Notes",
         "created": "Created"
-      }
+      },
+      "deleteAria": "Delete request",
+      "deleteTitle": "Delete this flight request?",
+      "deleteBody": "Request {{reference}} will be permanently deleted. This cannot be undone.",
+      "deleteConfirm": "Delete permanently",
+      "deleteCancel": "Cancel",
+      "toastDeleteFailed": "Could not delete the request"
     },
     "messages": {
       "title": "Contact messages",
@@ -505,6 +731,174 @@
       "cancel": "Cancel",
       "delete": "Delete",
       "toastDeleted": "Deleted"
+    },
+    "statuses": {
+      "unread": "Unread",
+      "new": "New",
+      "reviewing": "Reviewing",
+      "offer_preparing": "Offer preparing",
+      "contacted": "Contacted",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "waiting": "Waiting",
+      "quoted": "Quoted",
+      "pending": "Pending",
+      "completed": "Completed",
+      "resolved": "Resolved"
+    },
+    "hotels": {
+      "title": "Hotels",
+      "description": "The Umrah Builder offers exactly these hotels. Deactivate one to remove it from new requests.",
+      "addHotel": "Add hotel",
+      "editHotel": "Edit hotel",
+      "searchPlaceholder": "Search hotels…",
+      "allCities": "All cities",
+      "makkah": "Makkah",
+      "madinah": "Madinah",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive",
+      "emptyTitle": "No hotels yet",
+      "emptyDescription": "Add the hotels your agency works with. They appear in the Umrah Builder immediately.",
+      "noMatchTitle": "No hotels match your filters",
+      "noMatchDescription": "Try a different search or filter.",
+      "noAreaSet": "No area set",
+      "requestCount_one": "1 request",
+      "requestCount_other": "{{count}} requests",
+      "formHint": "Only the details the Builder shows travellers. No ratings, prices or availability.",
+      "nameLabel": "Hotel name",
+      "namePlaceholder": "Dar El Tawfik",
+      "nameTooShort": "Use at least 2 characters.",
+      "cityLabel": "City",
+      "areaLabel": "Area",
+      "areaNotSet": "Not set",
+      "areaHint": "Shown to travellers in their own language.",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Ibrahim Al Khalil Street",
+      "locationHint": "Optional. Used when no area is set.",
+      "activeLabel": "Active",
+      "activeHint": "Inactive hotels stay on past requests but cannot be chosen again.",
+      "saveHotel": "Save hotel",
+      "saving": "Saving…",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "deleteBlocked": "Used by requests — deactivate instead",
+      "deleteConfirmTitle": "Delete this hotel?",
+      "deleteConfirmDescription": "“{{name}}” will be removed from the catalogue. This cannot be undone. Deactivate instead if you may use it again.",
+      "areas": {
+        "haram_close": "Close to the Haram",
+        "central": "Central area",
+        "ibrahim_khalil": "Ibrahim Al Khalil",
+        "ajyad": "Ajyad",
+        "very_close": "Very close",
+        "close": "Close",
+        "value": "Value"
+      },
+      "toastSaved": "Hotel saved",
+      "toastActivated": "Hotel activated",
+      "toastDeactivated": "Hotel deactivated",
+      "toastDeleted": "Hotel deleted",
+      "errorDuplicate": "A hotel with that name already exists in this city.",
+      "errorInUse": "This hotel is used by existing requests. Deactivate it instead of deleting it.",
+      "errorForbidden": "You do not have permission to do that.",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "offers": {
+      "title": "Prepare offer",
+      "sentOn": "Sent {{date}}",
+      "notSent": "Not sent yet",
+      "proposedHotels": "Proposed hotels",
+      "addMakkahHotel": "Add Makkah hotel…",
+      "addMadinahHotel": "Add Madinah hotel…",
+      "hotelsPlaceholder": "Makkah: …\nMadinah: …",
+      "proposedFlights": "Proposed flights",
+      "flightsPlaceholder": "Airline, route and times you have confirmed with the carrier",
+      "flightsHint": "Type what you have actually confirmed. The system does not check airline availability.",
+      "amount": "Offer amount",
+      "amountPlaceholder": "Leave empty until you have a price",
+      "amountInvalid": "Enter a number, or leave it empty.",
+      "currency": "Currency",
+      "notes": "Offer notes",
+      "notesPlaceholder": "What is included, payment terms, anything the traveller should know",
+      "save": "Save offer",
+      "saving": "Saving…",
+      "send": "Send offer",
+      "sendAgain": "Send again",
+      "sending": "Sending…",
+      "sendHint": "Save first — sending emails the saved offer.",
+      "noEmailHint": "No email on this request; contact by phone or WhatsApp.",
+      "noEmailTitle": "No email address on this request",
+      "toastSaved": "Offer saved",
+      "toastSaveFailed": "Could not save the offer",
+      "toastSent": "Offer sent to the customer",
+      "errorNoEmail": "This traveller did not leave an email address. Contact them by phone or WhatsApp.",
+      "errorEmpty": "Save some offer details first.",
+      "errorNotConfigured": "Email sending is not configured on the server.",
+      "errorSendFailed": "The offer could not be sent. Nothing was marked as sent.",
+      "review": "Review offer",
+      "backToEdit": "Back to edit",
+      "previewTitle": "Review before sending",
+      "previewDescription": "This is what will be emailed to {{email}}.",
+      "previewWarning": "Sending is recorded on the request and cannot be undone.",
+      "alreadySentHint": "This offer has already been sent. Prepare a new one only if the agency agreed a change with the traveller.",
+      "errorAlreadySent": "An offer has already been sent for this request.",
+      "errorClosed": "This request is closed and its offer can no longer be changed.",
+      "errorNoAmount": "Set an offer amount before sending.",
+      "errorHotelUnknown": "A proposed hotel is not in the agency catalogue.",
+      "errorSentNotRecorded": "The offer was emailed but could not be recorded. Reload the request — sending again will not send a second email."
+    },
+    "localized": {
+      "base": "Base (Arabic)",
+      "fr": "French",
+      "en": "English",
+      "emptyHint": "Not translated automatically. If left empty, English visitors will not see this text."
+    },
+    "notifications": {
+      "kinds": {
+        "custom_package": "New custom Umrah request",
+        "booking": "New booking",
+        "contact": "New message",
+        "flight": "New flight request"
+      }
+    },
+    "activity": {
+      "title": "Activity",
+      "empty": "No activity recorded yet.",
+      "errorTitle": "Could not load the activity history.",
+      "retry": "Try again",
+      "loading": "Loading…",
+      "loadMore": "Load more",
+      "actorSystem": "System",
+      "actorAdmin": "Admin",
+      "transition": "{{from}} → {{to}}",
+      "events": {
+        "requestCreated": "Request created",
+        "statusChanged": "Status changed",
+        "offerUpdated": "Offer prepared",
+        "offerSent": "Offer sent"
+      }
+    },
+    "categories": {
+      "umrah": "Umrah",
+      "trip": "Trip",
+      "flight": "Flight",
+      "visa": "Visa"
+    },
+    "stages": {
+      "state": {
+        "new": "New",
+        "processing": "In progress",
+        "confirmed": "Confirmed",
+        "declined": "Declined"
+      },
+      "action": {
+        "processing": "In progress",
+        "confirmed": "Confirm request",
+        "declined": "Decline request"
+      },
+      "title": "Request status",
+      "blockedHint": "Move the request to “In progress” first.",
+      "detailedStatus": "Detailed status: {{status}}"
     }
   }
 }

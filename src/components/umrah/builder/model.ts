@@ -1,9 +1,19 @@
-import type {
-  BudgetLevel,
-  ContactPreference,
-  MadinahArea,
-  MakkahArea,
-  RoomType,
+import {
+  BUDGET_LEVELS,
+  CONTACT_PREFERENCES,
+  MADINAH_AREAS,
+  MAKKAH_AREAS,
+  NIGHTS_LIMITS,
+  ROOM_TYPES,
+  TRAVELLER_LIMITS,
+  earliestDepartureISO,
+  isRealISODate,
+  latestDepartureISO,
+  type BudgetLevel,
+  type ContactPreference,
+  type MadinahArea,
+  type MakkahArea,
+  type RoomType,
 } from "@/lib/umrah-builder.schema";
 
 /** Client-side state of the custom Umrah package builder. */
@@ -80,14 +90,133 @@ export type BuilderStep = (typeof BUILDER_STEPS)[number];
 
 const STORAGE_KEY = "janat-umrah-builder-draft";
 
+/**
+ * How long an in-progress draft is kept. The draft holds the visitor's contact
+ * details, so it is not left in browser storage indefinitely — an abandoned
+ * request expires instead of lingering on a shared device.
+ */
+const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface StoredDraft {
+  savedAt: number;
+  state: BuilderState;
+}
+
+const clampCount = (value: unknown, min: number, max: number, fallback: number): number => {
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(n)));
+};
+
+const pickEnum = <T extends string>(value: unknown, allowed: readonly T[]): T | "" =>
+  typeof value === "string" && (allowed as readonly string[]).includes(value) ? (value as T) : "";
+
+const asString = (value: unknown, max: number): string =>
+  typeof value === "string" ? value.slice(0, max) : "";
+
+const asDate = (value: unknown): string =>
+  typeof value === "string" && isRealISODate(value) ? value : "";
+
+/**
+ * Rebuild a trustworthy state from whatever is in storage.
+ *
+ * A draft is attacker-editable and can also be stale (an old build's shape, a
+ * date that has since passed, a hotel that was removed). Everything is coerced
+ * back into range here so restored data can never bypass the same rules a fresh
+ * session enforces. Hotel ids are kept as-is but re-checked against the live
+ * catalogue by `HotelSelector`.
+ */
+function sanitizeDraft(raw: unknown): BuilderState {
+  const d = (raw ?? {}) as Record<string, unknown>;
+  const departureDate = asDate(d["departureDate"]);
+  const returnDate = asDate(d["returnDate"]);
+
+  // Drop dates that are no longer bookable rather than restoring an invalid range.
+  const earliest = earliestDepartureISO();
+  const latest = latestDepartureISO();
+  const datesUsable =
+    !!departureDate &&
+    !!returnDate &&
+    returnDate >= departureDate &&
+    departureDate >= earliest &&
+    departureDate <= latest;
+
+  const mode = (v: unknown): "hotel" | "area" | "" => (v === "hotel" || v === "area" ? v : "");
+  const hotelId = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
+
+  return {
+    departureDate: datesUsable ? departureDate : "",
+    returnDate: datesUsable ? returnDate : "",
+    departureAirport: asString(d["departureAirport"], 120),
+    returnAirport: asString(d["returnAirport"], 120),
+    airportFlexible: d["airportFlexible"] === true,
+    makkahNights: clampCount(
+      d["makkahNights"],
+      NIGHTS_LIMITS.min,
+      NIGHTS_LIMITS.max,
+      INITIAL_STATE.makkahNights,
+    ),
+    makkahMode: mode(d["makkahMode"]),
+    makkahHotelId: hotelId(d["makkahHotelId"]),
+    makkahHotelName: asString(d["makkahHotelName"], 200),
+    makkahArea: pickEnum(d["makkahArea"], MAKKAH_AREAS),
+    makkahPreference: pickEnum(d["makkahPreference"], BUDGET_LEVELS),
+    madinahNights: clampCount(
+      d["madinahNights"],
+      NIGHTS_LIMITS.min,
+      NIGHTS_LIMITS.max,
+      INITIAL_STATE.madinahNights,
+    ),
+    madinahMode: mode(d["madinahMode"]),
+    madinahHotelId: hotelId(d["madinahHotelId"]),
+    madinahHotelName: asString(d["madinahHotelName"], 200),
+    madinahArea: pickEnum(d["madinahArea"], MADINAH_AREAS),
+    madinahPreference: pickEnum(d["madinahPreference"], BUDGET_LEVELS),
+    adults: clampCount(
+      d["adults"],
+      TRAVELLER_LIMITS.adults.min,
+      TRAVELLER_LIMITS.adults.max,
+      INITIAL_STATE.adults,
+    ),
+    children: clampCount(
+      d["children"],
+      TRAVELLER_LIMITS.children.min,
+      TRAVELLER_LIMITS.children.max,
+      INITIAL_STATE.children,
+    ),
+    infants: clampCount(
+      d["infants"],
+      TRAVELLER_LIMITS.infants.min,
+      TRAVELLER_LIMITS.infants.max,
+      INITIAL_STATE.infants,
+    ),
+    roomType: pickEnum(d["roomType"], ROOM_TYPES),
+    notes: asString(d["notes"], 2000),
+    name: asString(d["name"], 120),
+    phone: asString(d["phone"], 32),
+    whatsapp: asString(d["whatsapp"], 32),
+    email: asString(d["email"], 254),
+    contactPreference:
+      pickEnum(d["contactPreference"], CONTACT_PREFERENCES) || INITIAL_STATE.contactPreference,
+  };
+}
+
 /** Persist the in-progress configuration so a refresh never loses the work. */
 export function loadDraft(): BuilderState | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<BuilderState>;
-    return { ...INITIAL_STATE, ...parsed };
+    const parsed = JSON.parse(raw) as Partial<StoredDraft> & Partial<BuilderState>;
+
+    // Drafts written before the TTL was introduced have no `savedAt`; treat the
+    // whole object as the state so an in-progress request is not thrown away.
+    const isWrapped = typeof parsed?.savedAt === "number" && !!parsed?.state;
+    if (isWrapped && Date.now() - (parsed.savedAt as number) > DRAFT_TTL_MS) {
+      clearDraft();
+      return null;
+    }
+    return sanitizeDraft(isWrapped ? parsed.state : parsed);
   } catch {
     return null;
   }
@@ -96,7 +225,8 @@ export function loadDraft(): BuilderState | null {
 export function saveDraft(state: BuilderState) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const payload: StoredDraft = { savedAt: Date.now(), state };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   } catch {
     /* ignore quota errors */
   }
@@ -119,9 +249,11 @@ export function toISODate(date: Date): string {
 }
 
 export function parseISODate(value: string): Date | undefined {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
-  const [y, m, d] = value.split("-").map(Number);
-  const date = new Date(y!, (m ?? 1) - 1, d ?? 1);
+  // `isRealISODate` rejects impossible dates like 2026-02-30, which the Date
+  // constructor would otherwise silently roll over into the next month.
+  if (!isRealISODate(value)) return undefined;
+  const [y, m, d] = value.split("-").map(Number) as [number, number, number];
+  const date = new Date(y, m - 1, d);
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
@@ -142,7 +274,17 @@ export function travellersTotal(state: BuilderState): number {
 export function stepValid(step: BuilderStep, state: BuilderState): boolean {
   switch (step) {
     case "dates":
-      return !!state.departureDate && !!state.returnDate && state.returnDate >= state.departureDate;
+      // Mirrors the server rules in CustomPackageRequestInput so the client can
+      // never advance with a range the server will reject. `>` not `>=`: a
+      // same-day return is zero nights, which no stay can fit into — caught
+      // here rather than three steps later.
+      return (
+        isRealISODate(state.departureDate) &&
+        isRealISODate(state.returnDate) &&
+        state.returnDate > state.departureDate &&
+        state.departureDate >= earliestDepartureISO() &&
+        state.departureDate <= latestDepartureISO()
+      );
     case "flights":
       return state.airportFlexible || (!!state.departureAirport && !!state.returnAirport);
     case "makkah":
@@ -155,7 +297,9 @@ export function stepValid(step: BuilderStep, state: BuilderState): boolean {
       if (state.madinahNights === 0) return true;
       if (state.madinahMode === "hotel") return !!state.madinahHotelId;
       if (state.madinahMode === "area")
-        return !!state.madinahArea && (state.madinahArea !== "suggest" || !!state.madinahPreference);
+        return (
+          !!state.madinahArea && (state.madinahArea !== "suggest" || !!state.madinahPreference)
+        );
       return false;
     case "travellers":
       return state.adults >= 1;
@@ -178,7 +322,12 @@ export function stepValid(step: BuilderStep, state: BuilderState): boolean {
 export function buildWhatsAppMessage(
   state: BuilderState,
   t: (key: string, options?: Record<string, unknown>) => string,
-  fmt: { date: (v: string) => string; area: (v: string) => string; budget: (v: string) => string },
+  fmt: {
+    date: (v: string) => string;
+    /** City is passed through: Makkah and Madinah have different area codes. */
+    area: (city: "makkah" | "madinah", v: string) => string;
+    budget: (v: string) => string;
+  },
 ): string {
   const lines: string[] = [t("umrahBuilder.whatsapp.intro"), ""];
 
@@ -192,30 +341,30 @@ export function buildWhatsAppMessage(
   lines.push("");
 
   const place = (
-    label: string,
+    city: "makkah" | "madinah",
     nights: number,
     hotel: string,
     area: string,
     budget: string,
   ) => {
     if (nights === 0) return;
-    lines.push(`${label}:`);
+    lines.push(`${t(`umrahBuilder.summary.${city}`)}:`);
     lines.push(t("umrahBuilder.summary.nightsCount", { count: nights }));
     if (hotel) lines.push(`${t("umrahBuilder.summary.hotel")}: ${hotel}`);
-    else if (area) lines.push(`${t("umrahBuilder.summary.area")}: ${fmt.area(area)}`);
+    else if (area) lines.push(`${t("umrahBuilder.summary.area")}: ${fmt.area(city, area)}`);
     if (budget) lines.push(`${t("umrahBuilder.summary.budget")}: ${fmt.budget(budget)}`);
     lines.push("");
   };
 
   place(
-    t("umrahBuilder.summary.makkah"),
+    "makkah",
     state.makkahNights,
     state.makkahHotelName,
     state.makkahArea,
     state.makkahPreference,
   );
   place(
-    t("umrahBuilder.summary.madinah"),
+    "madinah",
     state.madinahNights,
     state.madinahHotelName,
     state.madinahArea,
@@ -224,12 +373,15 @@ export function buildWhatsAppMessage(
 
   lines.push(`${t("umrahBuilder.summary.travellers")}:`);
   lines.push(t("umrahBuilder.summary.adultsCount", { count: state.adults }));
-  if (state.children) lines.push(t("umrahBuilder.summary.childrenCount", { count: state.children }));
+  if (state.children)
+    lines.push(t("umrahBuilder.summary.childrenCount", { count: state.children }));
   if (state.infants) lines.push(t("umrahBuilder.summary.infantsCount", { count: state.infants }));
 
   if (state.roomType) {
     lines.push("");
-    lines.push(`${t("umrahBuilder.summary.room")}: ${t(`umrahBuilder.room.types.${state.roomType}`)}`);
+    lines.push(
+      `${t("umrahBuilder.summary.room")}: ${t(`umrahBuilder.room.types.${state.roomType}`)}`,
+    );
   }
 
   if (state.notes.trim()) {

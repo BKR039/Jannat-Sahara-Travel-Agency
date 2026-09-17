@@ -168,7 +168,19 @@ export function formatNumber(value: number | string | null | undefined, lang: st
   }).format(num);
 }
 
-/** "4 050 TND" — currency always trails the amount. */
+/**
+ * Currency shown in Arabic. The ISO code reads as a foreign abbreviation in an
+ * Arabic-first interface — "4.500 TND" where a Tunisian customer expects
+ * "4500 د.ت". Only codes with a well-established Arabic short form are mapped;
+ * anything else keeps the ISO code, which is always correct if not idiomatic.
+ */
+const CURRENCY_AR: Record<string, string> = {
+  TND: "د.ت",
+  SAR: "ر.س",
+  EUR: "€",
+  USD: "$",
+};
+
 export function formatPrice(
   value: number | string | null | undefined,
   lang: string,
@@ -176,7 +188,9 @@ export function formatPrice(
 ): string {
   const amount = formatNumber(value, lang);
   if (!amount) return "";
-  return `${amount} ${currency}`;
+  // `isArabic` normalizes, so "ar-TN" and "ar" both resolve.
+  const symbol = isArabic(lang) ? (CURRENCY_AR[currency] ?? currency) : currency;
+  return `${amount} ${symbol}`;
 }
 
 /**
@@ -193,7 +207,7 @@ export function useLocalized() {
   );
 
   const list = useCallback(
-    <T = unknown,>(row: Localizable, field: string) => localizeList<T>(row, field, lang),
+    <T = unknown>(row: Localizable, field: string) => localizeList<T>(row, field, lang),
     [lang],
   );
 
@@ -244,7 +258,8 @@ export function pickLocalizedList(
 ): string[] {
   if (!blob) return [];
   const suffix = langSuffix(lang);
-  const asList = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
+  const asList = (v: unknown) =>
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
   if (!suffix) return asList(blob[key]);
   const translated = asList(blob[`${key}${suffix}`]);
   if (translated.length > 0) return translated;

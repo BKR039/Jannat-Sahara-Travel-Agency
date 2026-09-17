@@ -12,11 +12,14 @@ import { parseISODate, toISODate, type BuilderState, type BuilderStep } from "./
 export function BuilderStepper({
   steps,
   current,
+  furthest,
   onSelect,
   labels,
 }: {
   steps: readonly BuilderStep[];
   current: number;
+  /** Highest step already validated — stays unlocked when the visitor goes back. */
+  furthest: number;
   onSelect: (index: number) => void;
   labels: Record<BuilderStep, string>;
 }) {
@@ -30,9 +33,9 @@ export function BuilderStepper({
             <button
               type="button"
               onClick={() => onSelect(i)}
-              disabled={i > current}
-            className={cn(
-                "flex items-center gap-2 rounded-full border px-4 py-2 text-caption transition-all duration-200",
+              disabled={i > Math.max(current, furthest)}
+              className={cn(
+                "flex min-h-11 items-center gap-2 rounded-badge border px-4 py-2 text-caption transition-all duration-200",
                 active &&
                   "border-primary/70 bg-primary/10 font-bold text-primary shadow-[inset_0_0_0_1px_transparent]",
                 done && "border-transparent bg-surface-sunken/70 font-semibold text-foreground/70",
@@ -251,7 +254,9 @@ export function DateRangeField({
           ))}
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-auto p-0">
+      {/* Cap the width on small screens so the month grid can never push the
+          page sideways; scroll inside the popover instead. */}
+      <PopoverContent align="start" className="w-auto max-w-[calc(100vw-2rem)] overflow-auto p-0">
         <Calendar
           mode="range"
           dir={lang === "ar" ? "rtl" : "ltr"}
@@ -300,7 +305,11 @@ export function SummaryBody({
   const { t } = useTranslation();
   const { longDate } = useLocalized();
 
-  const pending = <span className="text-caption text-muted-foreground">{t("umrahBuilder.summary.notChosen")}</span>;
+  const pending = (
+    <span className="text-caption text-muted-foreground">
+      {t("umrahBuilder.summary.notChosen")}
+    </span>
+  );
 
   const stay = (city: "makkah" | "madinah") => {
     const nights = city === "makkah" ? state.makkahNights : state.madinahNights;
@@ -384,7 +393,9 @@ export function SummaryPanel({ children }: { children: ReactNode }) {
       <aside className="hidden lg:block">
         <div className="sticky top-24 overflow-hidden rounded-3xl border border-border-subtle bg-card shadow-sm">
           <div className="border-b border-border-subtle bg-surface-sunken/50 px-5 py-4">
-            <h2 className="text-small font-bold tracking-wide">{t("umrahBuilder.summary.title")}</h2>
+            <h2 className="text-small font-bold tracking-wide">
+              {t("umrahBuilder.summary.title")}
+            </h2>
           </div>
           <div className="p-5">{children}</div>
         </div>

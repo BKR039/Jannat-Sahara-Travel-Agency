@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { AutoSaveBar, SettingsCard, SettingsSection, SwitchField, TextField } from "./parts";
+import { SaveBar, SettingsCard, SettingsSection, SwitchField, TextField } from "./parts";
 import { numberRange, useSiteSettings, type SettingSpec } from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
 
 const SPECS: SettingSpec[] = [
   { key: "notify_new_booking", label: "New booking" },
@@ -11,53 +12,57 @@ const SPECS: SettingSpec[] = [
 ];
 
 export function NotificationsSection() {
+  const { t } = useTranslation("admin");
   const s = useSiteSettings("notifications", SPECS);
 
-  if (s.loading) return <Skeleton className="h-64 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-64 w-full rounded-card" />;
 
   const enabled = SPECS.slice(0, 4).filter((x) => s.bool(x.key)).length;
 
   return (
     <SettingsSection
-      title="Notifications"
-      description="Choose which activity creates an alert in the admin dashboard bell."
+      title={t("content.settings.nav.notifications.label")}
+      description={t("content.settings.notifications.description")}
     >
       <SettingsCard
-        title="Dashboard alerts"
+        title={t("content.settings.notifications.dashboardAlertsTitle")}
         description={`${enabled} of 4 alert types enabled.`}
       >
         <div className="grid gap-3">
           <SwitchField
-            label="New booking received"
-            hint="Alerts the team as soon as a traveller reserves a package."
+            label={t("content.settings.notifications.newBooking")}
+            hint={t("content.settings.notifications.hints.newBooking")}
             checked={s.bool("notify_new_booking")}
             onChange={(v) => s.setBool("notify_new_booking", v)}
           />
           <SwitchField
-            label="New contact message"
-            hint="Alerts when someone submits the contact form."
+            label={t("content.settings.notifications.newMessage")}
+            hint={t("content.settings.notifications.hints.newMessage")}
             checked={s.bool("notify_new_message")}
             onChange={(v) => s.setBool("notify_new_message", v)}
           />
           <SwitchField
-            label="New newsletter subscriber"
-            hint="Useful while growing your mailing list."
+            label={t("content.settings.notifications.newsletter")}
+            hint={t("content.settings.notifications.hints.newsletter")}
             checked={s.bool("notify_newsletter")}
             onChange={(v) => s.setBool("notify_newsletter", v)}
           />
           <SwitchField
-            label="Daily activity digest"
-            hint="A single summary alert instead of individual pings."
+            label={t("content.settings.notifications.dailyDigest")}
+            hint={t("content.settings.notifications.hints.dailyDigest")}
             checked={s.bool("notify_daily_digest")}
             onChange={(v) => s.setBool("notify_daily_digest", v)}
           />
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Housekeeping" description="How long read alerts stay in the bell.">
+      <SettingsCard
+        title={t("content.settings.notifications.housekeepingTitle")}
+        description={t("content.settings.notifications.housekeepingDescription")}
+      >
         <TextField
-          label="Keep notifications for (days)"
-          hint="Between 1 and 365 days."
+          label={t("content.settings.notifications.retentionLabel")}
+          hint={t("content.settings.notifications.hints.retention")}
           type="number"
           error={s.errors.notify_retention_days}
           value={s.form.notify_retention_days ?? ""}
@@ -65,7 +70,7 @@ export function NotificationsSection() {
         />
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

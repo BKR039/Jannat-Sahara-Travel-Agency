@@ -1,26 +1,53 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { adminDocTitle } from "@/lib/admin/doc-title";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { deleteNotificationsFor } from "@/lib/admin/notification-cleanup";
 import { toast } from "sonner";
 import { Mail, Trash2, CheckCircle2, MailOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { PageHeader, AdminCard, EmptyState } from "@/components/admin/ui";
+import { useTranslation } from "react-i18next";
+import { ErrorState } from "@/components/admin/kit";
 
-export const Route = createFileRoute("/admin/messages")({ component: MessagesPage });
+export const Route = createFileRoute("/admin/messages")({
+  head: () => ({
+    meta: [{ title: adminDocTitle("messages") }],
+  }),
+  component: MessagesPage,
+});
 
 function MessagesPage() {
+  const { t } = useTranslation("admin");
   const qc = useQueryClient();
   const list = useQuery({
     queryKey: ["admin-contact-messages"] as const,
     queryFn: async () => {
-      const { data, error } = await supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).limit(500);
+      const { data, error } = await supabase
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
       return data;
     },
   });
 
-  function invalidate() { qc.invalidateQueries({ queryKey: ["admin-contact-messages"] }); qc.invalidateQueries({ queryKey: ["admin-dashboard-stats"] }); }
+  function invalidate() {
+    qc.invalidateQueries({ queryKey: ["admin-contact-messages"] });
+    qc.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
+  }
 
   const setHandled = useMutation({
     mutationFn: async ({ id, handled }: { id: string; handled: boolean }) => {
@@ -32,16 +59,29 @@ function MessagesPage() {
   });
 
   const remove = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("contact_messages").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { toast.success("Deleted"); invalidate(); },
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("contact_messages").delete().eq("id", id);
+      if (error) throw error;
+      // The record is gone; its notification must not outlive it.
+      await deleteNotificationsFor("contact_messages", id);
+    },
+    onSuccess: () => {
+      toast.success(t("ops.messages.toastDeleted"));
+      invalidate();
+    },
   });
 
   return (
     <>
-      <PageHeader title="Contact messages" description="Inbound messages from the public contact form." />
+      <PageHeader title={t("ops.messages.title")} description={t("ops.messages.description")} />
       <AdminCard>
-        {list.isLoading ? <p className="text-small text-muted-foreground">Loading…</p> : !list.data?.length ? (
-          <EmptyState title="No messages yet" icon={Mail} />
+        {list.isLoading ? (
+          <p className="text-small text-muted-foreground">{t("ops.messages.loading")}</p>
+        ) : list.isError ? (
+          // A failed query must never look like an empty table.
+          <ErrorState onRetry={() => list.refetch()} />
+        ) : !list.data?.length ? (
+          <EmptyState title={t("ops.messages.emptyTitle")} icon={Mail} />
         ) : (
           <div className="divide-y divide-border -mx-4 sm:-mx-5">
             {list.data.map((m) => (
@@ -50,24 +90,69 @@ function MessagesPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{m.name}</p>
-                      {!m.handled && <span className="text-caption font-bold uppercase text-primary">NEW</span>}
+                      {!m.handled && (
+                        <span className="text-caption font-bold uppercase text-primary">
+                          {t("ops.messages.newBadge")}
+                        </span>
+                      )}
                     </div>
                     <p className="text-caption text-muted-foreground">
-                      {m.email} {m.phone && `· ${m.phone}`} · {new Date(m.created_at).toLocaleString()}
+                      {m.email} {m.phone && `· ${m.phone}`} ·{" "}
+                      {new Date(m.created_at).toLocaleString()}
                     </p>
                     {m.subject && <p className="mt-2 text-small font-medium">{m.subject}</p>}
                     <p className="mt-1 whitespace-pre-wrap text-small">{m.message}</p>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Button size="sm" variant="outline" onClick={() => setHandled.mutate({ id: m.id, handled: !m.handled })}>
-                      {m.handled ? <><MailOpen className="me-2 h-4 w-4" /> Reopen</> : <><CheckCircle2 className="me-2 h-4 w-4" /> Mark handled</>}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setHandled.mutate({ id: m.id, handled: !m.handled })}
+                    >
+                      {m.handled ? (
+                        <>
+                          <MailOpen className="me-2 h-4 w-4" />
+                          {t("ops.messages.reopen")}
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="me-2 h-4 w-4" />
+                          {t("ops.messages.markHandled")}
+                        </>
+                      )}
                     </Button>
-                    <a className="text-caption text-primary hover:underline" href={`mailto:${m.email}`}>Reply by email</a>
+                    <a
+                      className="text-caption text-primary hover:underline"
+                      href={`mailto:${m.email}`}
+                    >
+                      {t("ops.messages.replyByEmail")}
+                    </a>
                     <AlertDialog>
-                      <AlertDialogTrigger asChild><Button size="sm" variant="ghost" className="text-destructive"><Trash2 className="h-4 w-4" /></Button></AlertDialogTrigger>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-label={t("ops.messages.delete")}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
                       <AlertDialogContent>
-                        <AlertDialogHeader><AlertDialogTitle>Delete message?</AlertDialogTitle><AlertDialogDescription>Cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                        <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => remove.mutate(m.id)}>Delete</AlertDialogAction></AlertDialogFooter>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {t("ops.messages.deleteConfirmTitle")}
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t("ops.messages.deleteConfirmDescription")}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{t("ops.messages.cancel")}</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => remove.mutate(m.id)}>
+                            {t("ops.messages.delete")}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>

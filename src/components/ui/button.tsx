@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  */
 const buttonVariants = cva(
   [
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-button",
     "font-semibold cursor-pointer select-none",
     "transition-[background-color,color,box-shadow,transform] duration-fast ease-standard",
     "active:scale-[0.98]",
@@ -23,8 +23,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover hover:shadow-brand-glow",
-        primary: "bg-primary text-primary-foreground hover:bg-primary-hover hover:shadow-brand-glow",
+        /* The sunrise gradient is the brand signature (audit §07). It was
+           defined as a token and never rendered anywhere; putting it on the
+           primary action — and only there — is what makes it a signature
+           rather than decoration. */
+        default:
+          "bg-gradient-sunrise text-primary-foreground hover:shadow-brand-glow hover:brightness-[1.04]",
+        primary:
+          "bg-gradient-sunrise text-primary-foreground hover:shadow-brand-glow hover:brightness-[1.04]",
+        /* Flat brand fill, for surfaces where the gradient would compete. */
+        solid: "bg-primary text-primary-foreground hover:bg-primary-hover",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm",
         outline:
           "border-[1.5px] border-primary text-primary bg-transparent hover:bg-accent hover:text-primary",
@@ -34,13 +42,23 @@ const buttonVariants = cva(
         danger: "bg-destructive text-primary-foreground hover:bg-destructive/90",
         dark: "bg-surface-dark-alt text-primary-foreground hover:bg-surface-dark",
       },
+      /*
+       * The compact sizes grow to the 44px touch floor below `md`.
+       *
+       * `sm` is a pointer-density size — it is what list rows, panel headers
+       * and card action bars use — and on a phone those are exactly the
+       * controls a thumb has to hit. Measured at 390px the admin programme
+       * list alone put 33 controls under 44px, all of them `size="sm"`.
+       * Raising the floor in the primitive fixes every screen at once rather
+       * than leaving each one to remember.
+       */
       size: {
-        sm: "h-9 px-4 text-small [&_svg]:size-4 rounded-sm",
+        sm: "h-9 max-md:h-11 px-4 text-small [&_svg]:size-4 rounded-input",
         default: "h-11 px-5 text-button [&_svg]:size-5",
         md: "h-11 px-5 text-button [&_svg]:size-5",
         lg: "h-13 px-6 text-[1.0625rem] [&_svg]:size-5",
         icon: "h-11 w-11 [&_svg]:size-5",
-        "icon-sm": "h-9 w-9 rounded-sm [&_svg]:size-4",
+        "icon-sm": "h-9 w-9 max-md:h-11 max-md:w-11 rounded-input [&_svg]:size-4",
       },
       fullWidth: {
         true: "w-full",
@@ -54,15 +72,24 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, size, fullWidth, asChild = false, isLoading, children, disabled, ...props },
+    {
+      className,
+      variant,
+      size,
+      fullWidth,
+      asChild = false,
+      isLoading,
+      children,
+      disabled,
+      ...props
+    },
     ref,
   ) => {
     const Comp = asChild ? Slot : "button";

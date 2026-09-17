@@ -1,19 +1,15 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AutoSaveBar,
-  Field,
-  FieldGrid,
-  SettingsCard,
-  SettingsSection,
-  TextField,
-} from "./parts";
-import { useContactSettings, type ContactFieldSpec } from "./useContactSettings";
+import { SaveBar, Field, FieldGrid, SettingsCard, SettingsSection, TextField } from "./parts";
+import { localeKey, useContactSettings, type ContactFieldSpec } from "./useContactSettings";
 import { combine, maxLen, required, url } from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
+import { LocalizedField } from "@/components/admin/LocalizedField";
 
 const FIELDS: ContactFieldSpec[] = [
   {
     key: "agency_name",
+    localized: true,
     label: "Agency name",
     icon: "building-2",
     sort_order: 0,
@@ -22,6 +18,7 @@ const FIELDS: ContactFieldSpec[] = [
   },
   {
     key: "address",
+    localized: true,
     label: "Head office address",
     icon: "map-pin",
     sort_order: 1,
@@ -31,6 +28,7 @@ const FIELDS: ContactFieldSpec[] = [
   },
   {
     key: "hours",
+    localized: true,
     label: "Working hours",
     icon: "clock",
     sort_order: 5,
@@ -47,57 +45,85 @@ const FIELDS: ContactFieldSpec[] = [
 ];
 
 export function GeneralSection() {
+  const { t } = useTranslation("admin");
   const s = useContactSettings(FIELDS);
 
   if (s.loading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-56" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+        <Skeleton className="h-64 w-full rounded-card" />
       </div>
     );
   }
 
   return (
     <SettingsSection
-      title="General"
-      description="The core identity of your agency. These details appear across the public website, booking confirmations and search engines."
+      title={t("content.settings.nav.general.label")}
+      description={t("content.settings.general.description")}
     >
-      <SettingsCard title="Agency identity" description="How your agency is named everywhere.">
+      <SettingsCard
+        title={t("content.settings.general.identityTitle")}
+        description={t("content.settings.general.identityDescription")}
+      >
         <FieldGrid>
-          <TextField
-            label="Agency name"
-            hint={FIELDS[0].hint}
-            error={s.errors.agency_name}
-            value={s.form.agency_name ?? ""}
-            onChange={(v) => s.set("agency_name", v)}
-          />
-          <TextField
-            label="Working hours"
-            placeholder="Mon – Sat: 9:00 – 18:00"
-            value={s.form.hours ?? ""}
-            onChange={(v) => s.set("hours", v)}
-          />
+          <div className="md:col-span-2">
+            <LocalizedField
+              label={t("content.settings.general.agencyName")}
+              values={{
+                base: s.form.agency_name ?? "",
+                fr: s.form[localeKey("agency_name", "fr")] ?? "",
+                en: s.form[localeKey("agency_name", "en")] ?? "",
+              }}
+              onChange={(v) => {
+                s.set("agency_name", v.base);
+                s.set(localeKey("agency_name", "fr"), v.fr);
+                s.set(localeKey("agency_name", "en"), v.en);
+              }}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <LocalizedField
+              label={t("content.settings.general.workingHours")}
+              values={{
+                base: s.form.hours ?? "",
+                fr: s.form[localeKey("hours", "fr")] ?? "",
+                en: s.form[localeKey("hours", "en")] ?? "",
+              }}
+              onChange={(v) => {
+                s.set("hours", v.base);
+                s.set(localeKey("hours", "fr"), v.fr);
+                s.set(localeKey("hours", "en"), v.en);
+              }}
+            />
+          </div>
         </FieldGrid>
       </SettingsCard>
 
-      <SettingsCard title="Location" description="Where travellers can find you.">
+      <SettingsCard
+        title={t("content.settings.general.locationTitle")}
+        description={t("content.settings.general.locationDescription")}
+      >
         <FieldGrid>
-          <Field
-            label="Head office address"
-            hint="Street, city and country."
-            error={s.errors.address}
-            wide
-          >
-            <Textarea
+          <div className="md:col-span-2">
+            <LocalizedField
+              label={t("content.settings.general.headOfficeAddress")}
               rows={2}
-              value={s.form.address ?? ""}
-              onChange={(e) => s.set("address", e.target.value)}
+              values={{
+                base: s.form.address ?? "",
+                fr: s.form[localeKey("address", "fr")] ?? "",
+                en: s.form[localeKey("address", "en")] ?? "",
+              }}
+              onChange={(v) => {
+                s.set("address", v.base);
+                s.set(localeKey("address", "fr"), v.fr);
+                s.set(localeKey("address", "en"), v.en);
+              }}
             />
-          </Field>
+          </div>
           <TextField
-            label="Google Maps link"
-            hint="Paste the share link of your office location."
+            label={t("content.settings.general.googleMapsLink")}
+            hint={t("content.settings.general.hints.mapsUrl")}
             error={s.errors.maps_url}
             wide
             value={s.form.maps_url ?? ""}
@@ -106,7 +132,7 @@ export function GeneralSection() {
         </FieldGrid>
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

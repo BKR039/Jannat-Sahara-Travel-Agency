@@ -8,10 +8,24 @@ export default defineTool({
   description:
     "List travel packages (Umrah, trips, flights, visa) with title, slug, destination, duration, price and status.",
   inputSchema: {
-    category: z.enum(["umrah", "trip", "flight", "visa"]).optional().describe("Filter by service category."),
+    category: z
+      .enum(["umrah", "trip", "flight", "visa"])
+      .optional()
+      .describe("Filter by service category."),
     status: z.enum(["published", "draft"]).optional().describe("Filter by publication status."),
-    search: z.string().trim().min(1).optional().describe("Case-insensitive match on the package title."),
-    limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of packages to return."),
+    search: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("Case-insensitive match on the package title."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(20)
+      .describe("Maximum number of packages to return."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ category, status, search, limit }, ctx) => {

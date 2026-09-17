@@ -1,9 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { adminDocTitle } from "@/lib/admin/doc-title";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "@/components/admin/ui";
 import { BranchesSection } from "@/components/admin/settings/BranchesSection";
 
-export const Route = createFileRoute("/admin/branches")({ component: BranchesAdminPage });
+export const Route = createFileRoute("/admin/branches")({
+  head: () => ({
+    meta: [{ title: adminDocTitle("branches") }],
+  }),
+  component: BranchesAdminPage,
+});
 
 function BranchesAdminPage() {
   const { t } = useTranslation();

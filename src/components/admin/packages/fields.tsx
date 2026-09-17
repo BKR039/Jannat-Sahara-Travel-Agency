@@ -19,6 +19,7 @@ import { uploadMedia } from "@/lib/admin/media";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { ItineraryItem } from "./model";
+import { useTranslation } from "react-i18next";
 
 /* -------------------------------- list editor ------------------------------- */
 
@@ -37,6 +38,7 @@ export function ListEditor({
   emptyTitle?: string;
   emptyDescription?: string;
 }) {
+  const { t } = useTranslation("admin");
   function set(i: number, v: string) {
     onChange(items.map((it, idx) => (idx === i ? v : it)));
   }
@@ -71,7 +73,7 @@ export function ListEditor({
                   type="button"
                   size="icon"
                   variant="ghost"
-                  aria-label="Move up"
+                  aria-label={t("ops.fields.moveUp")}
                   disabled={i === 0}
                   onClick={() => move(i, -1)}
                 >
@@ -81,7 +83,7 @@ export function ListEditor({
                   type="button"
                   size="icon"
                   variant="ghost"
-                  aria-label="Move down"
+                  aria-label={t("ops.fields.moveDown")}
                   disabled={i === items.length - 1}
                   onClick={() => move(i, 1)}
                 >
@@ -91,7 +93,7 @@ export function ListEditor({
                   type="button"
                   size="icon"
                   variant="ghost"
-                  aria-label="Remove"
+                  aria-label={t("ops.fields.remove")}
                   className="text-destructive"
                   onClick={() => onChange(items.filter((_, idx) => idx !== i))}
                 >
@@ -132,6 +134,7 @@ export function PairedListEditor({
   emptyTitle?: string;
   emptyDescription?: string;
 }) {
+  const { t } = useTranslation("admin");
   const fr = itemsAr.map((_, i) => itemsFr[i] ?? "");
 
   function setAr(i: number, v: string) {
@@ -162,10 +165,7 @@ export function PairedListEditor({
       ) : (
         <ul className="space-y-2">
           {itemsAr.map((item, i) => (
-            <li
-              key={i}
-              className="rounded-xl border border-border-subtle bg-surface-sunken/40 p-2"
-            >
+            <li key={i} className="rounded-xl border border-border-subtle bg-surface-sunken/40 p-2">
               <div className="flex items-start gap-2">
                 <GripVertical className="mt-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
                 <div className="grid flex-1 gap-2 sm:grid-cols-2">
@@ -194,7 +194,7 @@ export function PairedListEditor({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Move up"
+                    aria-label={t("ops.fields.moveUp")}
                     disabled={i === 0}
                     onClick={() => move(i, -1)}
                   >
@@ -204,7 +204,7 @@ export function PairedListEditor({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Move down"
+                    aria-label={t("ops.fields.moveDown")}
                     disabled={i === itemsAr.length - 1}
                     onClick={() => move(i, 1)}
                   >
@@ -214,7 +214,7 @@ export function PairedListEditor({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Remove"
+                    aria-label={t("ops.fields.remove")}
                     className="text-destructive"
                     onClick={() => remove(i)}
                   >
@@ -250,6 +250,7 @@ export function ItineraryEditor({
   items: ItineraryItem[];
   onChange: (next: ItineraryItem[]) => void;
 }) {
+  const { t } = useTranslation("admin");
   function set(i: number, patch: Partial<ItineraryItem>) {
     onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
   }
@@ -265,8 +266,8 @@ export function ItineraryEditor({
     <div className="space-y-3">
       {items.length === 0 ? (
         <EmptyState
-          title="No itinerary days yet"
-          description="Break the journey down day by day so travellers know exactly what to expect."
+          title={t("ops.fields.noItineraryTitle")}
+          description={t("ops.fields.noItineraryDescription")}
           icon={Plus}
         />
       ) : (
@@ -282,7 +283,7 @@ export function ItineraryEditor({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Move up"
+                    aria-label={t("ops.fields.moveUp")}
                     disabled={i === 0}
                     onClick={() => move(i, -1)}
                   >
@@ -292,7 +293,7 @@ export function ItineraryEditor({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Move down"
+                    aria-label={t("ops.fields.moveDown")}
                     disabled={i === items.length - 1}
                     onClick={() => move(i, 1)}
                   >
@@ -302,7 +303,7 @@ export function ItineraryEditor({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Remove day"
+                    aria-label={t("ops.fields.removeDay")}
                     className="text-destructive"
                     onClick={() => onChange(items.filter((_, idx) => idx !== i))}
                   >
@@ -313,14 +314,14 @@ export function ItineraryEditor({
               <div className="grid gap-3 md:grid-cols-[160px_1fr]">
                 <Input
                   value={item.day}
-                  placeholder="Day 1"
+                  placeholder={t("ops.fields.dayPlaceholder")}
                   className="bg-card"
                   onChange={(e) => set(i, { day: e.target.value })}
                 />
                 <Input
                   dir="rtl"
                   value={item.title}
-                  placeholder="Arrival in Jeddah (Arabic)"
+                  placeholder={t("ops.fields.titlePlaceholderAr")}
                   className="bg-card"
                   onChange={(e) => set(i, { title: e.target.value })}
                 />
@@ -328,7 +329,7 @@ export function ItineraryEditor({
                   dir="rtl"
                   rows={2}
                   value={item.description}
-                  placeholder="What happens on this day… (Arabic)"
+                  placeholder={t("ops.fields.descriptionPlaceholderAr")}
                   className="bg-card md:col-span-2"
                   onChange={(e) => set(i, { description: e.target.value })}
                 />
@@ -337,7 +338,7 @@ export function ItineraryEditor({
                   <Input
                     dir="ltr"
                     value={item.title_fr}
-                    placeholder="Arrival in Jeddah (French)"
+                    placeholder={t("ops.fields.titlePlaceholderFr")}
                     className="bg-card"
                     onChange={(e) => set(i, { title_fr: e.target.value })}
                   />
@@ -349,9 +350,25 @@ export function ItineraryEditor({
                   dir="ltr"
                   rows={2}
                   value={item.description_fr}
-                  placeholder="What happens on this day… (French)"
+                  placeholder={t("ops.fields.descriptionPlaceholderFr")}
                   className="bg-card md:col-span-2"
                   onChange={(e) => set(i, { description_fr: e.target.value })}
+                />
+                <div />
+                <Input
+                  dir="ltr"
+                  value={item.title_en}
+                  placeholder={t("ops.fields.titlePlaceholderEn")}
+                  className="bg-card"
+                  onChange={(e) => set(i, { title_en: e.target.value })}
+                />
+                <Textarea
+                  dir="ltr"
+                  rows={2}
+                  value={item.description_en}
+                  placeholder={t("ops.fields.descriptionPlaceholderEn")}
+                  className="bg-card md:col-span-2"
+                  onChange={(e) => set(i, { description_en: e.target.value })}
                 />
               </div>
             </li>
@@ -365,11 +382,20 @@ export function ItineraryEditor({
         onClick={() =>
           onChange([
             ...items,
-            { day: `Day ${items.length + 1}`, title: "", description: "", title_fr: "", description_fr: "" },
+            {
+              day: `Day ${items.length + 1}`,
+              title: "",
+              description: "",
+              title_en: "",
+              description_en: "",
+              title_fr: "",
+              description_fr: "",
+            },
           ])
         }
       >
-        <Plus className="me-2 h-4 w-4" /> Add day
+        <Plus className="me-2 h-4 w-4" />
+        {t("ops.fields.addDay")}
       </Button>
     </div>
   );
@@ -384,6 +410,7 @@ export function KeywordEditor({
   items: string[];
   onChange: (next: string[]) => void;
 }) {
+  const { t } = useTranslation("admin");
   const [draft, setDraft] = useState("");
   function add() {
     const parts = draft
@@ -418,7 +445,7 @@ export function KeywordEditor({
       <div className="flex gap-2">
         <Input
           value={draft}
-          placeholder="umrah ramadan, omra tunisie…"
+          placeholder={t("ops.fields.keywordPlaceholder")}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === ",") {
@@ -428,7 +455,7 @@ export function KeywordEditor({
           }}
         />
         <Button type="button" variant="outline" onClick={add} disabled={!draft.trim()}>
-          Add
+          {t("ops.fields.add")}
         </Button>
       </div>
     </div>
@@ -444,6 +471,7 @@ export function GalleryManager({
   items: string[];
   onChange: (next: string[]) => void;
 }) {
+  const { t } = useTranslation("admin");
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [url, setUrl] = useState("");
@@ -502,7 +530,7 @@ export function GalleryManager({
         <div className="flex flex-1 gap-2 min-w-[240px]">
           <Input
             value={url}
-            placeholder="Or paste an image URL"
+            placeholder={t("ops.fields.imageUrlPlaceholder")}
             onChange={(e) => setUrl(e.target.value)}
           />
           <Button
@@ -515,15 +543,15 @@ export function GalleryManager({
               setUrl("");
             }}
           >
-            Add
+            {t("ops.fields.add")}
           </Button>
         </div>
       </div>
 
       {items.length === 0 ? (
         <EmptyState
-          title="No gallery images"
-          description="Upload the photos travellers will see on the package page."
+          title={t("ops.fields.noGalleryTitle")}
+          description={t("ops.fields.noGalleryDescription")}
           icon={CloudUpload}
         />
       ) : (
@@ -545,7 +573,7 @@ export function GalleryManager({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Move earlier"
+                    aria-label={t("ops.fields.moveEarlier")}
                     disabled={i === 0}
                     onClick={() => move(i, -1)}
                   >
@@ -555,7 +583,7 @@ export function GalleryManager({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    aria-label="Move later"
+                    aria-label={t("ops.fields.moveLater")}
                     disabled={i === items.length - 1}
                     onClick={() => move(i, 1)}
                   >
@@ -566,7 +594,7 @@ export function GalleryManager({
                   type="button"
                   size="icon"
                   variant="ghost"
-                  aria-label="Remove image"
+                  aria-label={t("ops.fields.removeImage")}
                   className="text-destructive"
                   onClick={() => onChange(items.filter((_, idx) => idx !== i))}
                 >
@@ -575,7 +603,7 @@ export function GalleryManager({
               </div>
               {i === 0 && (
                 <span className="absolute start-2 top-2 rounded-full bg-primary px-2 py-0.5 text-caption font-semibold text-primary-foreground">
-                  Main
+                  {t("ops.fields.mainBadge")}
                 </span>
               )}
             </li>
@@ -599,6 +627,7 @@ export function PdfField({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const { t } = useTranslation("admin");
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -607,7 +636,7 @@ export function PdfField({
     setBusy(true);
     try {
       onChange(await uploadMedia(file, "packages/brochures"));
-      toast.success("Brochure uploaded");
+      toast.success(t("ops.fields.brochureUploaded"));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Upload failed");
     } finally {
@@ -618,7 +647,11 @@ export function PdfField({
   return (
     <Field label={label} hint={hint} wide>
       <div className="flex flex-wrap items-center gap-2">
-        <Input value={value} placeholder="https://…/brochure.pdf" onChange={(e) => onChange(e.target.value)} />
+        <Input
+          value={value}
+          placeholder={t("ops.fields.brochurePlaceholder")}
+          onChange={(e) => onChange(e.target.value)}
+        />
         <input
           ref={inputRef}
           type="file"
@@ -649,7 +682,8 @@ export function PdfField({
               "inline-flex items-center gap-1 text-caption font-medium text-primary hover:underline",
             )}
           >
-            <FileText className="h-4 w-4" /> Open
+            <FileText className="h-4 w-4" />
+            {t("ops.common.open")}
           </a>
         )}
       </div>

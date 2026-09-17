@@ -1,7 +1,17 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+
+/** Best-effort language hint. Never throws — this runs inside the error path. */
+function acceptLanguageHeader(): string | null {
+  try {
+    return getRequest()?.headers?.get("accept-language") ?? null;
+  } catch {
+    return null;
+  }
+}
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -11,7 +21,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
       throw error;
     }
     console.error(error);
-    return new Response(renderErrorPage(), {
+    return new Response(renderErrorPage(acceptLanguageHeader()), {
       status: 500,
       headers: { "content-type": "text/html; charset=utf-8" },
     });

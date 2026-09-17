@@ -47,7 +47,6 @@ export function SettingsSection({
   );
 }
 
-
 export function SettingsCard({
   title,
   description,
@@ -64,7 +63,7 @@ export function SettingsCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border-subtle bg-card shadow-[0_1px_2px_0_hsl(0_0%_0%/0.04)]",
+        "rounded-card border border-border-subtle bg-card shadow-[0_1px_2px_0_hsl(0_0%_0%/0.04)]",
         className,
       )}
     >
@@ -87,7 +86,6 @@ export function SettingsCard({
     </div>
   );
 }
-
 
 /** Responsive field grid — never more than two columns. */
 export function FieldGrid({ children, className }: { children: ReactNode; className?: string }) {
@@ -218,6 +216,7 @@ export function ImageField({
   folder: string;
   aspect?: string;
 }) {
+  const { t } = useTranslation("admin");
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -227,9 +226,9 @@ export function ImageField({
     try {
       const url = await uploadMedia(file, folder);
       onChange(url);
-      toast.success("Image uploaded");
+      toast.success(t("content.settings.parts.imageUploaded"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      toast.error(e instanceof Error ? e.message : t("content.common.uploadFailed"));
     } finally {
       setBusy(false);
     }
@@ -248,7 +247,11 @@ export function ImageField({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          aria-label={value ? `Replace ${label}` : `Upload ${label}`}
+          aria-label={
+            value
+              ? t("content.settings.parts.replaceLabel", { label })
+              : t("content.settings.parts.uploadLabel", { label })
+          }
           className={cn(
             "relative w-full shrink-0 overflow-hidden rounded-xl transition-colors sm:w-56",
             value
@@ -262,7 +265,7 @@ export function ImageField({
           ) : (
             <span className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
               <CloudUpload className="h-5 w-5" />
-              <span className="text-caption">Upload an image</span>
+              <span className="text-caption">{t("content.settings.parts.uploadAnImage")}</span>
             </span>
           )}
           {busy && (
@@ -279,7 +282,8 @@ export function ImageField({
             disabled={busy}
             onClick={() => inputRef.current?.click()}
           >
-            <CloudUpload className="me-2 h-4 w-4" /> {value ? "Replace" : "Upload"}
+            <CloudUpload className="me-2 h-4 w-4" />{" "}
+            {value ? t("content.settings.parts.replace") : t("content.settings.parts.upload")}
           </Button>
           {value && (
             <Button
@@ -289,14 +293,14 @@ export function ImageField({
               className="text-destructive"
               onClick={() => onChange("")}
             >
-              <Trash2 className="me-2 h-4 w-4" /> Remove
+              <Trash2 className="me-2 h-4 w-4" />
+              {t("content.settings.parts.remove")}
             </Button>
           )}
         </div>
       </div>
     </Field>
   );
-
 }
 
 /* -------------------------------- icon picker ------------------------------- */
@@ -337,6 +341,7 @@ const ICON_CHOICES = [
 ];
 
 export function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useTranslation("admin");
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const list = ICON_CHOICES.filter((n) => n.includes(q.trim().toLowerCase()));
@@ -350,12 +355,12 @@ export function IconPicker({ value, onChange }: { value: string; onChange: (v: s
       </PopoverTrigger>
       <PopoverContent className="w-72 p-3" align="start">
         <div className="relative mb-3">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search icons"
-            className="pl-8"
+            placeholder={t("content.settings.parts.searchIcons")}
+            className="ps-8"
           />
         </div>
         <div className="grid max-h-56 grid-cols-6 gap-1 overflow-y-auto">
@@ -392,29 +397,42 @@ export function useLastSaved(saving: boolean, success: boolean) {
   return saving ? null : at;
 }
 
+/**
+ * The one save control for settings and CMS screens.
+ *
+ * There used to be a second, `SaveBar`, whose only difference was the words
+ * on it — "Save now", "Saving automatically…". Those words described a
+ * behaviour the settings hooks no longer have (see `useSiteSettings`), and two
+ * save controls meant two answers to "has this been written yet". One control,
+ * one vocabulary, and it is the explicit one.
+ */
 export function SaveBar({
   dirty,
   saving,
+  hasErrors,
   lastSaved,
   onSave,
   onDiscard,
 }: {
   dirty: boolean;
   saving: boolean;
+  hasErrors?: boolean;
   lastSaved: Date | null;
   onSave: () => void;
   onDiscard: () => void;
 }) {
+  const { t } = useTranslation("admin");
   return (
     <StatusPill
       dirty={dirty}
       saving={saving}
+      hasErrors={hasErrors}
       lastSaved={lastSaved}
       onSave={onSave}
       onDiscard={onDiscard}
-      saveLabel="Save changes"
-      savedLabel="Saved"
-      pendingLabel="Unsaved changes"
+      saveLabel={t("content.settings.saveBar.saveChanges")}
+      savedLabel={t("content.settings.saveBar.saved")}
+      pendingLabel={t("content.settings.saveBar.unsavedChanges")}
     />
   );
 }
@@ -444,6 +462,7 @@ function StatusPill({
   savedLabel: string;
   pendingLabel: string;
 }) {
+  const { t } = useTranslation("admin");
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   useEffect(() => {
     setSlot(document.getElementById("settings-save-slot"));
@@ -457,13 +476,15 @@ function StatusPill({
         {state === "error" && (
           <>
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
-            <span className="truncate text-destructive">Check highlighted fields</span>
+            <span className="truncate text-destructive">
+              {t("content.settings.saveBar.checkHighlightedFields")}
+            </span>
           </>
         )}
         {state === "saving" && (
           <>
             <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-primary" />
-            <span className="truncate text-muted-foreground">Saving…</span>
+            <span className="truncate text-muted-foreground">{t("content.common.saving")}</span>
           </>
         )}
         {state === "dirty" && (
@@ -485,12 +506,17 @@ function StatusPill({
           size="sm"
           className="h-9 px-2.5 text-muted-foreground"
           onClick={onDiscard}
-          aria-label="Discard changes"
+          aria-label={t("content.settings.saveBar.discardChanges")}
         >
           <RotateCcw className="h-3.5 w-3.5" />
         </Button>
       )}
-      <Button size="sm" className="h-9 px-4" disabled={!dirty || saving || hasErrors} onClick={onSave}>
+      <Button
+        size="sm"
+        className="h-9 px-4"
+        disabled={!dirty || saving || hasErrors}
+        onClick={onSave}
+      >
         {saveLabel}
       </Button>
     </div>
@@ -507,8 +533,6 @@ function StatusPill({
   );
 }
 
-
-
 /* ------------------------------- live preview ------------------------------- */
 
 const DEVICES = {
@@ -518,11 +542,12 @@ const DEVICES = {
 } as const;
 
 export function LivePreview({ path = "/", reloadKey }: { path?: string; reloadKey?: number }) {
+  const { t } = useTranslation("admin");
   const [device, setDevice] = useState<keyof typeof DEVICES>("desktop");
   return (
     <SettingsCard
-      title="Live preview"
-      description="See how the public website renders your content."
+      title={t("content.settings.livePreview.title")}
+      description={t("content.settings.livePreview.description")}
       actions={
         <div className="flex gap-1 rounded-lg border border-border-subtle bg-surface-sunken/60 p-1">
           {(Object.keys(DEVICES) as (keyof typeof DEVICES)[]).map((k) => {
@@ -532,7 +557,7 @@ export function LivePreview({ path = "/", reloadKey }: { path?: string; reloadKe
                 key={k}
                 type="button"
                 onClick={() => setDevice(k)}
-                aria-label={DEVICES[k].label}
+                aria-label={t(`content.settings.livePreview.${k}`)}
                 aria-pressed={device === k}
                 className={cn(
                   "rounded-md p-1.5 transition-colors",
@@ -552,7 +577,7 @@ export function LivePreview({ path = "/", reloadKey }: { path?: string; reloadKe
         <iframe
           key={`${device}-${reloadKey ?? 0}`}
           src={path}
-          title="Website preview"
+          title={t("content.settings.livePreview.websiteTitle")}
           loading="lazy"
           className="h-[520px] rounded-lg border border-border-subtle bg-background"
           style={{ width: DEVICES[device].width, maxWidth: "100%" }}
@@ -560,39 +585,6 @@ export function LivePreview({ path = "/", reloadKey }: { path?: string; reloadKe
       </div>
     </SettingsCard>
   );
-}
-
-/* ------------------------------ auto-save status ---------------------------- */
-
-export function AutoSaveBar({
-  dirty,
-  saving,
-  hasErrors,
-  lastSaved,
-  onSave,
-  onDiscard,
-}: {
-  dirty: boolean;
-  saving: boolean;
-  hasErrors?: boolean;
-  lastSaved: Date | null;
-  onSave: () => void;
-  onDiscard: () => void;
-}) {
-  return (
-    <StatusPill
-      dirty={dirty}
-      saving={saving}
-      hasErrors={hasErrors}
-      lastSaved={lastSaved}
-      onSave={onSave}
-      onDiscard={onDiscard}
-      saveLabel="Save now"
-      savedLabel="All changes saved"
-      pendingLabel="Saving automatically…"
-    />
-  );
-
 }
 
 /* -------------------------------- toggle field ------------------------------ */
@@ -678,10 +670,11 @@ export function SerpPreview({
   description: string;
   urlLabel: string;
 }) {
+  const { t } = useTranslation("admin");
   return (
     <div className="rounded-xl border border-border-subtle bg-surface-sunken/40 p-5">
       <p className="mb-3 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
-        Google result preview
+        {t("content.settings.parts.googleResultPreview")}
       </p>
       <div className="rounded-lg bg-card p-4 shadow-sm">
         <p className="truncate text-caption text-success">{urlLabel}</p>
@@ -711,6 +704,7 @@ export function BrandPreview({
   primary: string;
   accent: string;
 }) {
+  const { t } = useTranslation("admin");
   return (
     <div className="overflow-hidden rounded-xl border border-border-subtle">
       <div
@@ -721,7 +715,9 @@ export function BrandPreview({
           {logo ? (
             <img src={logo} alt="" className="h-full w-full object-contain p-1" />
           ) : (
-            <span className="text-caption text-neutral-500">Logo</span>
+            <span className="text-caption text-neutral-500">
+              {t("content.settings.brand.logo")}
+            </span>
           )}
         </span>
         <span className="min-w-0 text-white">
@@ -734,13 +730,13 @@ export function BrandPreview({
           className="rounded-lg px-4 py-2 text-small font-semibold text-white"
           style={{ backgroundColor: primary }}
         >
-          Primary button
+          {t("content.settings.parts.primaryButton")}
         </span>
         <span
           className="rounded-lg px-4 py-2 text-small font-semibold text-white"
           style={{ backgroundColor: accent }}
         >
-          Accent button
+          {t("content.settings.parts.accentButton")}
         </span>
       </div>
     </div>
@@ -750,6 +746,7 @@ export function BrandPreview({
 /* ------------------------------ bilingual fields ----------------------------- */
 
 import { MissingFrBadge, isEmptyFr } from "@/components/admin/ui";
+import { useTranslation } from "react-i18next";
 
 /** Two-column Arabic/French pair for a single-line text field. */
 export function BilingualTextField({

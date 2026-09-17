@@ -3,6 +3,7 @@ import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/legal/privacy")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/legal/privacy")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "/legal/privacy" }],
+    links: [canonical("/legal/privacy")],
   }),
   component: PrivacyPage,
 });
@@ -27,6 +28,7 @@ function PrivacyPage() {
         <SectionHeading
           eyebrow={t("footer.legal")}
           title={t("footer.privacy")}
+          as="h1"
           description=""
         />
         <div className="mt-10 space-y-6 text-body leading-relaxed text-foreground">

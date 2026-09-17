@@ -25,7 +25,8 @@
     "menu": "Menu",
     "toggleTheme": "Changer le thème",
     "changeLanguage": "Changer de langue",
-    "viewDetails": "Détails"
+    "viewDetails": "Détails",
+    "discoverTrips": "Découvrir nos voyages"
   },
   "home": {
     "featuredPackages": "Offres phares",
@@ -48,6 +49,23 @@
       "destination": "Destination",
       "date": "Date",
       "search": "Rechercher"
+    },
+    "programmesEyebrow": "Omra",
+    "programmes": "Prochains programmes Omra",
+    "programmesDesc": "Nos programmes vers La Mecque et Médine, avec leurs dates de départ et de retour.",
+    "servicesEyebrow": "Nos prestations",
+    "whyUsEyebrow": "Pourquoi nous",
+    "galleryEyebrow": "Nos voyages",
+    "articlesEyebrow": "Le blog",
+    "branchesEyebrow": "Nos agences",
+    "finalCtaTitle": "Prêt à partir ?",
+    "finalCtaDesc": "Contactez notre équipe : nous vous aiderons à choisir le programme qui vous convient.",
+    "hero": {
+      "imageAlt": "La Grande Mosquée de La Mecque et la Kaaba",
+      "branchesLabel": "agences à votre service",
+      "mediaEyebrow": "La galerie",
+      "mediaTitle": "L'atmosphère de la Omra",
+      "mediaCta": "Parcourir la galerie"
     }
   },
   "categories": {
@@ -70,7 +88,22 @@
     "gallery": "Galerie",
     "related": "Offres similaires",
     "terms": "Conditions de réservation",
-    "faqTitle": "Questions fréquentes"
+    "faqTitle": "Questions fréquentes",
+    "soldOut": "Complet",
+    "dates": "Dates",
+    "perPerson": "par personne",
+    "overview": "Détails du voyage",
+    "destinations": "Destinations",
+    "makkah": "La Mecque",
+    "madinah": "Médine",
+    "departureLabel": "Départ",
+    "returnLabel": "Retour",
+    "ctaTitle": "Prêt pour la Omra ?",
+    "ctaDesc": "Réservez avec Janat Sahara, nous nous occupons du reste.",
+    "detailsPending": "Informations complémentaires bientôt disponibles",
+    "destinationsNote": "Les deux villes visitées par chaque programme Omra.",
+    "importantInfo": "Informations importantes",
+    "priceOnRequest": "Prix sur demande — contactez-nous pour les détails de ce programme."
   },
   "contact": {
     "title": "Contactez-nous",
@@ -82,7 +115,23 @@
     "message": "Message",
     "send": "Envoyer le message",
     "success": "Votre message a été envoyé avec succès",
-    "error": "Une erreur est survenue"
+    "error": "Une erreur est survenue",
+    "eyebrow": "Contact",
+    "methodsTitle": "Nous joindre",
+    "formTitle": "Envoyez-nous un message",
+    "formHint": "Remplissez le formulaire et nous vous répondrons rapidement.",
+    "callNow": "Appeler",
+    "whatsapp": "WhatsApp",
+    "required": "Requis",
+    "optional": "Facultatif",
+    "branchesCta": "Rendez-nous visite en agence",
+    "branchesCtaDesc": "Nos agences : Souk El Ahad, El Faouar, Kebili et El Mourouj.",
+    "branchesCtaAction": "Voir les agences",
+    "reassurance": {
+      "realOffices": "Des agences réelles que vous pouvez visiter en Tunisie.",
+      "personAnswers": "Votre message arrive à notre équipe et une personne vous répond.",
+      "noObligation": "Une demande ne vous engage à aucune réservation ni paiement."
+    }
   },
   "footer": {
     "quickLinks": "Liens rapides",
@@ -171,7 +220,9 @@
       "whatsapp": "WhatsApp",
       "email": "E-mail",
       "headquarters": "Siège social",
-      "hours": "Horaires"
+      "hours": "Horaires",
+      "emergency": "Numéro d’urgence",
+      "address": "Adresse"
     },
     "form": {
       "title": "Envoyez-nous un message",
@@ -189,7 +240,11 @@
     "office": "Bureau",
     "selectHint": "Sélectionnez une agence pour la voir sur la carte",
     "kicker": "Notre réseau",
-    "contactKicker": "Nous contacter"
+    "contactKicker": "Nous contacter",
+    "mapTitle": "Où nous trouver",
+    "mapDesc": "L'emplacement de nos agences sur la carte.",
+    "ctaTitle": "Une question avant de passer ?",
+    "ctaDesc": "Écrivez-nous et notre équipe vous répondra."
   },
   "bookingFlow": {
     "eyebrow": "Réservation en 3 étapes",
@@ -453,7 +508,12 @@
       "ogDescription": "Comment nous protégeons et utilisons vos données."
     },
     "packageDetail": {
-      "title": "Offre — Janat Sahara"
+      "title": "Offre — Janat Sahara",
+      "description": "Découvrez le détail de l’offre, les services inclus et réservez avec Janat Sahara Voyages."
+    },
+    "branches": {
+      "title": "Nos agences — Janat Sahara Voyages",
+      "description": "Adresses et numéros de téléphone des agences Janat Sahara à Souk El Ahad, El Faouar, Kebili et El Mourouj."
     }
   },
   "about": {
@@ -489,7 +549,9 @@
     "copyLink": "Copier le lien",
     "linkCopied": "Lien de l'article copié",
     "copyFailed": "Impossible de copier le lien",
-    "readMore": "Lire la suite"
+    "readMore": "Lire la suite",
+    "featured": "À la une",
+    "eyebrow": "Le blog"
   },
   "flightRequest": {
     "badge": "Billets d'avion",
@@ -505,7 +567,6 @@
     "departureLabel": "Date de départ",
     "returnLabel": "Date de retour",
     "passengersFieldLabel": "Voyageurs",
-    "passengersCount": "{{count}} voyageur(s)",
     "adultsLabel": "Adultes",
     "adultsHint": "12 ans et plus",
     "childrenLabel": "Enfants",
@@ -542,7 +603,61 @@
     "newRequestCta": "Envoyer une autre demande",
     "waMessage": "Bonjour, demande de billets d'avion n° {{ref}}",
     "noResults": "Aucun résultat correspondant",
-    "clearAria": "Effacer"
+    "clearAria": "Effacer",
+    "cabins": {
+      "economy": "Classe économique",
+      "premium_economy": "Économique premium",
+      "business": "Classe affaires",
+      "first": "Première classe"
+    },
+    "tripDetailsTitle": "Détails du voyage",
+    "contactDetailsTitle": "Coordonnées",
+    "swapAria": "Inverser le trajet",
+    "stepTrip": "Étape 1",
+    "stepContact": "Étape 2",
+    "useCustom": {
+      "from": "Utiliser « {{value}} » comme lieu de départ",
+      "to": "Utiliser « {{value}} » comme destination"
+    },
+    "customHint": {
+      "from": "Nous chercherons les vols disponibles au départ de ce lieu.",
+      "to": "Nous chercherons les vols disponibles vers cette destination."
+    },
+    "customBadge": "Saisie personnalisée",
+    "summaryTitle": "Résumé de votre demande",
+    "summaryTrip": "Type de voyage",
+    "summaryDates": "Dates",
+    "summaryTravellers": "Voyageurs",
+    "summaryCabin": "Classe",
+    "journeyTitle": "Votre trajet",
+    "journeyDescription": "Choisissez l'aéroport de départ, la destination et le type de voyage.",
+    "detailsTitle": "Détails du voyage",
+    "detailsDescription": "Dates, nombre de voyageurs et classe de voyage.",
+    "contactDescription": "Comment vous joindre avec les options disponibles.",
+    "stageComplete": "Terminé",
+    "pickDate": "Choisir une date",
+    "noResultsHint": "Saisissez une ville ou un aéroport — vous pouvez aussi utiliser votre saisie telle quelle.",
+    "summaryEmpty": "Choisissez un aéroport de départ et une destination pour voir le résumé de votre demande.",
+    "reassurance": {
+      "noPayment": "Une demande uniquement — aucune réservation ni paiement à ce stade.",
+      "teamReplies": "Notre équipe étudie votre demande et vous répond avec les options disponibles.",
+      "helpChoosing": "Nous vous aidons à choisir le vol le plus adapté à vos dates."
+    },
+    "fieldErrors": {
+      "name": "Veuillez saisir votre nom complet.",
+      "phone": "Veuillez saisir un numéro de téléphone valide.",
+      "email": "Veuillez saisir une adresse e-mail valide.",
+      "fromAirport": "Veuillez choisir un aéroport de départ.",
+      "toAirport": "Veuillez choisir une destination.",
+      "departureDate": "Veuillez choisir une date de départ.",
+      "returnDateRequired": "Veuillez choisir une date de retour.",
+      "returnDateOrder": "La date de retour doit suivre la date de départ.",
+      "adults": "Au moins un adulte est requis.",
+      "notes": "Les notes sont trop longues.",
+      "generic": "Veuillez vérifier ce champ."
+    },
+    "passengersCount_one": "1 voyageur",
+    "passengersCount_other": "{{count}} voyageurs"
   },
   "adminBranches": {
     "title": "Agences",
@@ -580,12 +695,15 @@
       "contact": "Contact",
       "location": "Localisation",
       "business": "Affichage",
-      "translation": "Traduction française"
+      "translation": "Traduction française",
+      "translationFr": "Traduction française",
+      "translationEn": "Traduction anglaise"
     },
     "hints": {
       "translation": "Utilisée lorsque le site est consulté en français.",
       "location": "Lien Google Maps et/ou coordonnées.",
-      "business": "Une agence inactive reste ici mais n'apparaît pas sur le site."
+      "business": "Une agence inactive reste ici mais n'apparaît pas sur le site.",
+      "translationEn": "Utilisée lorsque le site est consulté en anglais. Laissez vide pour reprendre le texte de base."
     },
     "fields": {
       "name": "Nom de l'agence",
@@ -599,7 +717,8 @@
       "lng": "Longitude",
       "photo": "Photo de l'agence",
       "mainBranch": "Agence principale",
-      "active": "Visible sur le site"
+      "active": "Visible sur le site",
+      "hoursPlaceholder": "Lun – Sam : 09:00 – 18:00"
     },
     "errors": {
       "required": "Ce champ est obligatoire",
@@ -656,7 +775,8 @@
     "passwordUpdated": "Mot de passe mis à jour",
     "passwordUpdateFailed": "Échec de la mise à jour du mot de passe",
     "seoTitle": "Connexion admin — Janat Sahara Travel",
-    "seoDescription": "Connexion sécurisée au tableau de bord de gestion Janat Sahara Travel."
+    "seoDescription": "Connexion sécurisée au tableau de bord de gestion Janat Sahara Travel.",
+    "backToWebsite": "Retour au site"
   },
   "umrahBuilder": {
     "cta": {
@@ -714,7 +834,7 @@
       "flexible": "Flexible — conseillez-moi",
       "flexibleTitle": "Je ne sais pas encore",
       "flexibleDesc": "Nous vous proposerons la meilleure option",
-      "note": "Les tarifs aériens sont confirmés lors de la préparation de l'offre."
+      "note": "Il s’agit d’une demande, pas d’une réservation. L’agence vérifie la disponibilité des vols et fixe le prix lors de la préparation de l’offre."
     },
     "travellers": {
       "title": "Combien de voyageurs ?",
@@ -772,15 +892,7 @@
       "select": "Choisir cet hôtel",
       "selected": "Sélectionné",
       "searchPlaceholder": "Rechercher un hôtel",
-      "distanceHaram": "{{value}} m du Haram",
-      "distanceMasjid": "{{value}} m de la Mosquée du Prophète",
       "empty": "Aucun résultat",
-      "sortLabel": "Trier par",
-      "sort": {
-        "distance": "Proche du Haram",
-        "name": "Nom",
-        "area": "Quartier"
-      },
       "errorTitle": "Impossible de charger la liste des hôtels",
       "errorHint": "Vous pouvez continuer votre demande, nous vous aiderons à choisir l'hôtel.",
       "noneTitle": "Aucun hôtel disponible pour le moment",
@@ -790,7 +902,8 @@
       "conciergeTitle": "Vous ne trouvez pas votre hôtel ?",
       "conciergeDesc": "Laissez-nous vous aider à choisir l'hôtel idéal selon le quartier, le budget et la distance du Haram.",
       "stayLabel": "Votre séjour",
-      "starsLabel": "{{count}} étoiles"
+      "staleTitle": "L’hôtel sélectionné n’est plus disponible",
+      "staleHint": "La liste des hôtels a changé depuis votre dernière visite. Veuillez choisir un autre hôtel ci-dessous."
     },
     "room": {
       "title": "Quel type de chambre ?",
@@ -849,17 +962,30 @@
       "room": "Veuillez choisir un type de chambre.",
       "name": "Veuillez indiquer votre nom complet.",
       "phone": "Veuillez saisir un numéro de téléphone valide.",
-      "email": "Veuillez saisir une adresse e-mail valide."
+      "email": "Veuillez saisir une adresse e-mail valide.",
+      "datePast": "La date de départ ne peut pas être dans le passé.",
+      "dateHorizon": "La date de départ est trop lointaine. Choisissez une date dans les deux prochaines années.",
+      "minStay": "La durée du séjour doit être d’au moins une nuit."
     },
     "success": {
       "title": "Votre demande a bien été envoyée",
       "subtitle": "Notre équipe vous contactera prochainement pour préparer votre offre personnalisée.",
       "reference": "Référence",
       "whatsapp": "Envoyer le résumé sur WhatsApp",
-      "back": "Retour à l'Omra"
+      "back": "Retour à l'Omra",
+      "next": {
+        "title": "Et maintenant ?",
+        "review": "Notre équipe étudie vos choix et vérifie la disponibilité des hôtels et des vols.",
+        "contact": "Nous vous contactons par le moyen que vous avez choisi pour confirmer les détails.",
+        "offer": "Nous vous envoyons une offre personnalisée avec les prix définitifs."
+      },
+      "call": "Appeler l’agence"
     },
     "errors": {
-      "submit": "Nous n'avons pas pu envoyer votre demande. Veuillez réessayer."
+      "submit": "Nous n'avons pas pu envoyer votre demande. Veuillez réessayer.",
+      "hotelUnavailable": "L’hôtel sélectionné n’est plus disponible. Choisissez-en un autre puis renvoyez votre demande.",
+      "hotelLookup": "Impossible de vérifier la liste des hôtels. Veuillez réessayer dans un instant.",
+      "rateLimited": "Vous avez envoyé plusieurs demandes en peu de temps. Patientez un moment avant de réessayer."
     },
     "whatsapp": {
       "intro": "Bonjour Janat Sahara, je souhaite un forfait Omra personnalisé :"
@@ -868,5 +994,23 @@
       "increase": "Augmenter {{label}}",
       "decrease": "Diminuer {{label}}"
     }
+  },
+  "offerEmail": {
+    "agency": "Janat Sahara Voyages",
+    "title": "Votre offre Omra",
+    "subject": "Votre offre personnalisée {{reference}} — Janat Sahara",
+    "greeting": "Bonjour {{name}},",
+    "intro": "Merci pour votre demande. Voici l’offre que nous avons préparée à partir de vos choix. Pour confirmer, répondez à cet e-mail ou contactez-nous.",
+    "referenceLabel": "Référence",
+    "datesLabel": "Dates de voyage",
+    "travellersLabel": "Voyageurs",
+    "hotelsLabel": "Hôtels proposés",
+    "flightsLabel": "Vols proposés",
+    "amountLabel": "Montant de l’offre",
+    "notesLabel": "Remarques",
+    "closing": "Cette offre est une proposition, pas une réservation confirmée. Nous restons à votre disposition.",
+    "adults": "{{count}} adulte(s)",
+    "children": "{{count}} enfant(s)",
+    "infants": "{{count}} bébé(s)"
   }
 }

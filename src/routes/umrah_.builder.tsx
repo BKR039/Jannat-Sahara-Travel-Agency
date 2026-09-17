@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import i18n from "@/lib/i18n";
 import { UmrahBuilder } from "@/components/umrah/builder/UmrahBuilder";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/umrah_/builder")({
   head: () => ({
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/umrah_/builder")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/umrah/builder" }],
+    links: [canonical("/umrah/builder")],
   }),
   component: UmrahBuilder,
 });

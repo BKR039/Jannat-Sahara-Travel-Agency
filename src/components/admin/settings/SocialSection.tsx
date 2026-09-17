@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
-import { AutoSaveBar, Field, SettingsCard, SettingsSection } from "./parts";
+import { SaveBar, Field, SettingsCard, SettingsSection } from "./parts";
 import { useContactSettings, type ContactFieldSpec } from "./useContactSettings";
 import { url as urlValidator } from "./useSiteSettings";
+import { useTranslation } from "react-i18next";
 
 const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
   {
@@ -59,20 +60,21 @@ const SOCIALS: (ContactFieldSpec & { placeholder: string })[] = [
 ];
 
 export function SocialSection() {
+  const { t } = useTranslation("admin");
   const s = useContactSettings(SOCIALS);
 
-  if (s.loading) return <Skeleton className="h-64 w-full rounded-2xl" />;
+  if (s.loading) return <Skeleton className="h-64 w-full rounded-card" />;
 
   const active = SOCIALS.filter((f) => (s.form[f.key] ?? "").trim());
 
   return (
     <SettingsSection
-      title="Social media"
-      description="Connect your channels once — they appear in the site footer, contact section and structured data automatically."
+      title={t("content.settings.nav.social.label")}
+      description={t("content.settings.social.description")}
     >
       <SettingsCard
-        title="Channels"
-        description="Leave a field empty to hide that channel from the website."
+        title={t("content.settings.social.channelsTitle")}
+        description={t("content.settings.social.channelsDescription")}
       >
         <div className="grid gap-5 md:grid-cols-2">
           {SOCIALS.map((f) => {
@@ -82,7 +84,7 @@ export function SocialSection() {
                 key={f.key}
                 label={f.label}
                 error={s.errors[f.key]}
-                hint={`Example: ${f.placeholder}`}
+                hint={t("content.settings.social.example", { value: f.placeholder })}
               >
                 <div className="flex gap-2">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border-subtle bg-surface-sunken/60 text-primary">
@@ -94,7 +96,14 @@ export function SocialSection() {
                     onChange={(e) => s.set(f.key, e.target.value)}
                   />
                   {value && !s.errors[f.key] && (
-                    <Button asChild variant="ghost" size="icon" aria-label={`Open ${f.label}`}>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="icon"
+                      /* The network names are proper nouns and stay as they
+                         are; the verb around them is what needs translating. */
+                      aria-label={t("content.settings.social.openChannel", { name: f.label })}
+                    >
                       <a href={value} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </a>
@@ -107,7 +116,10 @@ export function SocialSection() {
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Live preview" description="How the footer social row will look.">
+      <SettingsCard
+        title={t("content.settings.livePreview.title")}
+        description={t("content.settings.social.livePreviewDescription")}
+      >
         {active.length ? (
           <div className="flex flex-wrap gap-3">
             {active.map((f) => (
@@ -122,12 +134,12 @@ export function SocialSection() {
           </div>
         ) : (
           <p className="text-small text-muted-foreground">
-            No channels connected yet — the social row stays hidden.
+            {t("content.settings.social.noChannels")}
           </p>
         )}
       </SettingsCard>
 
-      <AutoSaveBar
+      <SaveBar
         dirty={s.dirty}
         saving={s.saving}
         hasErrors={s.hasErrors}

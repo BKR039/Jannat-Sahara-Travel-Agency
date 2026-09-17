@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/faq")({
       { property: "og:description", content: i18n.t("seo.faq.ogDescription") },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "/faq" }],
+    links: [canonical("/faq")],
   }),
   component: FaqPage,
 });
@@ -36,7 +37,7 @@ function FaqPage() {
   return (
     <SiteLayout>
       <section className="mx-auto max-w-3xl px-4 py-16 md:px-6">
-        <SectionHeading eyebrow="?" title={t("nav.faq")} description={t("brand.tagline")} />
+        <SectionHeading eyebrow="?" title={t("nav.faq")} as="h1" description={t("brand.tagline")} />
         {!data?.length ? (
           <EmptyState label={t("common.empty")} />
         ) : (

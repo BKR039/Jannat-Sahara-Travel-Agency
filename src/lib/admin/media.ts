@@ -9,17 +9,17 @@ function randomId(): string {
 
 function extOf(name: string): string {
   const parts = name.split(".");
-  return parts.length > 1 ? parts.pop()!.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8) : "bin";
+  return parts.length > 1
+    ? parts
+        .pop()!
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "")
+        .slice(0, 8)
+    : "bin";
 }
 
 const MAX_MEDIA_BYTES = 10 * 1024 * 1024;
-const ALLOWED_MEDIA_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-  "image/gif",
-];
+const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 
 /**
  * Upload a file to the media bucket and return its public URL.
@@ -32,7 +32,11 @@ export async function uploadMedia(file: File, folder: string): Promise<string> {
   if (!ALLOWED_MEDIA_TYPES.includes(file.type)) {
     throw new Error("Unsupported file type. Use JPG, PNG, WebP, AVIF or GIF.");
   }
-  const safeFolder = folder.replace(/[^a-zA-Z0-9/_-]/g, "").replace(/\.{2,}/g, "").slice(0, 64) || "misc";
+  const safeFolder =
+    folder
+      .replace(/[^a-zA-Z0-9/_-]/g, "")
+      .replace(/\.{2,}/g, "")
+      .slice(0, 64) || "misc";
   const path = `${safeFolder}/${randomId()}.${extOf(file.name)}`;
   const { error } = await supabase.storage
     .from(MEDIA_BUCKET)

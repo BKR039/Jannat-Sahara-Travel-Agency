@@ -49,9 +49,40 @@
       "deleteConfirmTitle": "Supprimer le forfait ?",
       "deleteConfirmDescription": "Cela supprimera définitivement « {{title}} ».",
       "cancel": "Annuler",
-      "toastDuplicated": "Forfait dupliqué",
+      "toastDuplicated": "Copie créée : {{title}}",
       "toastStatusUpdated": "Statut mis à jour",
-      "toastDeleted": "Forfait supprimé"
+      "toastDeleted": "Forfait supprimé",
+      "seatsRemaining": "{{count}} restante(s)",
+      "availability": {
+        "available": "Disponible",
+        "limited": "Presque complet",
+        "full": "Complet",
+        "unset": "Capacité non définie"
+      },
+      "publication": {
+        "draft": "Brouillon",
+        "published": "Publié",
+        "archived": "Masqué",
+        "sold_out": "Complet"
+      },
+      "actionPublish": "Publier",
+      "actionUnpublish": "Dépublier",
+      "actionHide": "Masquer",
+      "actionShow": "Afficher",
+      "deleteBlocked": {
+        "has_bookings": "Impossible de supprimer un programme lié à {{count}} réservation(s). Masquez-le plutôt."
+      },
+      "availabilityFilter": "Places",
+      "availabilityAll": "Toutes les places",
+      "deleteConfirmBody": "« {{title}} » sera définitivement supprimé. Cette action est irréversible.",
+      "listPanelTitle": "Tous les programmes",
+      "resultCount_one": "{{count}} résultat",
+      "resultCount_other": "{{count}} résultats",
+      "filtersLabel": "Filtrer",
+      "noMatchTitle": "Aucun programme ne correspond",
+      "noMatchDescription": "Élargissez la recherche ou retirez un filtre.",
+      "clearFilters": "Effacer les filtres",
+      "noDeparture": "Sans date de départ"
     },
     "editor": {
       "backToPackages": "Forfaits",
@@ -225,7 +256,14 @@
         "durationEn": "Durée (Anglais)",
         "availableSeats": "Places disponibles",
         "totalSeats": "Places totales",
-        "seatsBooked": "{{booked}} sur {{total}} places réservées."
+        "seatsBooked": "{{booked}} sur {{total}} places réservées.",
+        "capacity": "Capacité totale",
+        "booked": "Réservées",
+        "remaining": "Restantes",
+        "capacityHint": "Nombre total de places. Les places réservées et restantes sont calculées à partir des réservations.",
+        "capacityUnset": "Capacité non définie",
+        "capacityUnsetHint": "Définissez la capacité totale pour afficher les places réservées et restantes.",
+        "oversold": "Le nombre de réservations ({{booked}}) dépasse la capacité définie ({{capacity}})."
       },
       "booking": {
         "cardTitle": "Réservation",
@@ -236,7 +274,9 @@
         "meetingPointEn": "Point de rendez-vous (Anglais)",
         "bookableOnWebsite": "Réservable sur le site",
         "requiredDocsConfigured": "Documents requis configurés",
-        "openBookings": "Réservations ouvertes"
+        "openBookings": "Réservations ouvertes",
+        "yes": "Oui",
+        "no": "Non"
       },
       "previewTitle": "Aperçu en direct",
       "previewFrameTitle": "Aperçu du forfait",
@@ -264,7 +304,64 @@
         "seoDescriptionLength": "Gardez la description SEO en dessous de 160 caractères.",
         "coverRequired": "Une image de couverture est requise avant la publication.",
         "shortDescriptionRequired": "Une description courte est requise avant la publication."
-      }
+      },
+      "header": {
+        "saved": "Forfait enregistré",
+        "draftCreated": "Brouillon créé",
+        "newPackage": "Nouveau forfait",
+        "untitled": "Forfait sans titre",
+        "unsavedAutosaving": "Modifications non enregistrées",
+        "draftNotCreated": "Brouillon pas encore créé",
+        "allSaved": "Toutes les modifications sont enregistrées",
+        "save": "Enregistrer",
+        "createDraft": "Créer un brouillon",
+        "statusHint": "Seuls les forfaits publiés apparaissent sur le site.",
+        "savedAt": "Enregistré à {{time}}",
+        "issues_one": "1 problème",
+        "issues_other": "{{count}} problèmes"
+      },
+      "publication": {
+        "current": "Statut actuel",
+        "noActions": "Aucune action disponible pour ce statut.",
+        "explain": {
+          "draft": "Brouillon : non visible par les visiteurs.",
+          "published": "Publié : visible sur le site.",
+          "archived": "Masqué : conservé dans l'administration mais invisible pour les visiteurs.",
+          "sold_out": "Complet : visible mais sans places disponibles."
+        },
+        "confirm": {
+          "cancel": "Annuler",
+          "publish": {
+            "title": "Publier le programme ?",
+            "body": "Il deviendra visible par les visiteurs du site."
+          },
+          "unpublish": {
+            "title": "Dépublier le programme ?",
+            "body": "Il repassera en brouillon et ne sera plus visible."
+          },
+          "hide": {
+            "title": "Masquer le programme ?",
+            "body": "Il reste conservé dans l'administration mais devient invisible. Ce n'est pas une suppression."
+          },
+          "show": {
+            "title": "Afficher le programme ?",
+            "body": "Il redeviendra visible sur le site."
+          }
+        }
+      },
+      "unsaved": {
+        "title": "Modifications non enregistrées",
+        "body": "Si vous partez maintenant, vos modifications seront perdues.",
+        "saveAndLeave": "Enregistrer et quitter",
+        "discard": "Quitter sans enregistrer",
+        "stay": "Rester"
+      },
+      "danger": {
+        "deleteBody": "« {{title}} » sera supprimé définitivement. Cette action est irréversible."
+      },
+      "saveFailed": "Échec de l’enregistrement",
+      "loading": "Ouverture de l'éditeur…",
+      "slugHint": "Utilisé dans l'URL publique."
     },
     "fields": {
       "addItem": "Ajouter un élément",
@@ -312,10 +409,22 @@
       },
       "tripType": "Type de voyage",
       "types": {
-        "umrah": { "label": "Omra", "hint": "Forfait Makkah & Madinah" },
-        "tour": { "label": "Circuit", "hint": "Voyage organisé à l'étranger" },
-        "flight": { "label": "Vol", "hint": "Traité comme des demandes" },
-        "other": { "label": "Autre", "hint": "Visa & services" }
+        "umrah": {
+          "label": "Omra",
+          "hint": "Forfait Makkah & Madinah"
+        },
+        "tour": {
+          "label": "Circuit",
+          "hint": "Voyage organisé à l'étranger"
+        },
+        "flight": {
+          "label": "Vol",
+          "hint": "Traité comme des demandes"
+        },
+        "other": {
+          "label": "Autre",
+          "hint": "Visa & services"
+        }
       },
       "flightsWorkAsRequestsTitle": "Les vols fonctionnent comme des demandes",
       "flightsWorkAsRequestsDescription": "Vous ne publiez pas de billets d'avion. Les voyageurs soumettent une demande de vol depuis le site (départ, arrivée, dates, voyageurs) qui arrive dans votre boîte de réception — vous répondez avec la meilleure option par e-mail et clôturez la demande une fois terminée.",
@@ -440,14 +549,125 @@
         "all": "Tout",
         "bookings": "Réservations",
         "flights": "Vols",
-        "messages": "Messages"
+        "messages": "Messages",
+        "custom": "Omra sur mesure"
       },
       "emptyTitle": "Aucune demande trouvée",
       "emptyDescription": "Rien ne correspond aux filtres actuels.",
       "email": "E-mail",
       "markStatus": "Marquer {{status}}",
       "toastUpdated": "Demande mise à jour",
-      "toastUpdateFailed": "Impossible de mettre à jour cette demande"
+      "toastUpdateFailed": "Impossible de mettre à jour cette demande",
+      "statusLabel": "Statut",
+      "notSpecified": "Non renseigné",
+      "sections": {
+        "request": "Demande",
+        "contact": "Contact",
+        "dates": "Dates de voyage",
+        "flights": "Vols (préférences demandées)",
+        "travellers": "Voyageurs",
+        "makkah": "La Mecque",
+        "madinah": "Médine",
+        "notes": "Remarques du voyageur",
+        "customer": "Client"
+      },
+      "fields": {
+        "reference": "Référence",
+        "status": "Statut",
+        "received": "Reçue le",
+        "assignedTo": "Assignée à",
+        "name": "Nom",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "whatsapp": "WhatsApp",
+        "contactPreference": "Canal préféré",
+        "language": "Langue",
+        "departure": "Départ",
+        "return": "Retour",
+        "departureAirport": "Aéroport de départ",
+        "returnAirport": "Aéroport de retour",
+        "party": "Groupe",
+        "roomType": "Type de chambre",
+        "nights": "Nuits",
+        "hotel": "Hôtel",
+        "area": "Quartier",
+        "budget": "Budget"
+      },
+      "flexibleAirport": "Flexible — à conseiller",
+      "travellers": {
+        "adults_one": "1 adulte",
+        "adults_other": "{{count}} adultes",
+        "children_one": "1 enfant",
+        "children_other": "{{count}} enfants",
+        "infants_one": "1 bébé",
+        "infants_other": "{{count}} bébés"
+      },
+      "viewCustomer": "Voir le client",
+      "customerMatch": {
+        "phone": "Rattachée à ce client par numéro de téléphone.",
+        "email": "Rattachée à ce client par adresse e-mail.",
+        "unlinked": "Non rattachée à un client — ni téléphone ni e-mail fourni."
+      },
+      "currentStatus": "Statut actuel : {{status}}",
+      "closedHint": "Cette demande est clôturée. Son statut et son offre ne peuvent plus être modifiés.",
+      "noActionsHint": "Aucune action supplémentaire n'est possible depuis ce statut.",
+      "confirmStatusTitle": "Marquer cette demande comme {{status}} ?",
+      "confirmStatusDescription": "Cela clôture la demande. Elle quittera la file d'attente et son offre ne pourra plus être modifiée.",
+      "confirmStatusAction": "Confirmer",
+      "errorTransition": "Ce changement de statut n'est pas autorisé depuis le statut actuel.",
+      "errorConflict": "Quelqu'un d'autre a modifié cette demande. Rouvrez-la pour voir l'état actuel.",
+      "errorClosed": "Cette demande est clôturée et ne peut plus être modifiée.",
+      "errorTitle": "Impossible de charger les demandes",
+      "errorDescription": "Un problème est survenu lors de l'accès à la base de données.",
+      "retry": "Réessayer",
+      "noMatchTitle": "Aucune demande ne correspond à vos filtres",
+      "noMatchDescription": "Essayez un autre terme ou réinitialisez les filtres.",
+      "nextAction": "Suite : {{action}}",
+      "openRequest": "Ouvrir la demande de {{name}} {{reference}}",
+      "filters": {
+        "allStatuses": "Tous les statuts",
+        "openOnly": "En cours uniquement",
+        "clear": "Réinitialiser les filtres",
+        "showing": "{{count}} sur {{total}}",
+        "stageOpen": "Nouveau / en traitement"
+      },
+      "urgency": {
+        "departure": "Départ proche",
+        "waiting": "En attente de réponse",
+        "inDays": "Dans {{count}} jour",
+        "inDays_other": "Dans {{count}} jours",
+        "inDays_one": "Dans 1 jour"
+      },
+      "summary": {
+        "flight": "De {{from}} à {{to}} · {{tripType}} · {{cabin}}",
+        "booking": "{{title}} · {{count}} voyageur(s)",
+        "bookingNoTitle": "Demande générale · {{count}} voyageur(s)",
+        "customPackage": "Omra · {{nights}} nuit(s) · {{count}} voyageur(s)",
+        "generalEnquiry": "Demande générale"
+      },
+      "kinds": {
+        "flight": "Demande de vol",
+        "booking": "Réservation",
+        "contact": "Message",
+        "custom_package": "Omra sur mesure"
+      },
+      "internalTitle": "Notes de l'agent",
+      "internalHint": "Informations internes, invisibles pour le client.",
+      "internalPlaceholder": "Ce qui a été dit, la réponse du fournisseur, le suivi…",
+      "saveNotes": "Enregistrer les notes",
+      "offerTitle": "Prix / offre",
+      "offerHint": "L'offre envoyée au client.",
+      "customerMessage": "Message du client",
+      "priceColumn": "Prix",
+      "call": "Appeler",
+      "whatsapp": "WhatsApp",
+      "noPrice": "Pas de prix",
+      "subject": "Objet",
+      "package": "Forfait",
+      "cabin": "Classe",
+      "tripType": "Type de voyage",
+      "route": "Trajet",
+      "total": "Total"
     },
     "flightRequests": {
       "title": "Demandes de vol",
@@ -489,7 +709,13 @@
         "assignedTo": "Assigné à",
         "notes": "Notes",
         "created": "Créé"
-      }
+      },
+      "deleteAria": "Supprimer la demande",
+      "deleteTitle": "Supprimer cette demande de vol ?",
+      "deleteBody": "La demande {{reference}} sera définitivement supprimée. Cette action est irréversible.",
+      "deleteConfirm": "Supprimer définitivement",
+      "deleteCancel": "Annuler",
+      "toastDeleteFailed": "Impossible de supprimer la demande"
     },
     "messages": {
       "title": "Messages de contact",
@@ -505,6 +731,174 @@
       "cancel": "Annuler",
       "delete": "Supprimer",
       "toastDeleted": "Supprimé"
+    },
+    "statuses": {
+      "unread": "Non lu",
+      "new": "Nouveau",
+      "reviewing": "En cours d’examen",
+      "offer_preparing": "Offre en préparation",
+      "contacted": "Contacté",
+      "confirmed": "Confirmé",
+      "cancelled": "Annulé",
+      "waiting": "En attente",
+      "quoted": "Devis envoyé",
+      "pending": "En suspens",
+      "completed": "Terminé",
+      "resolved": "Traité"
+    },
+    "hotels": {
+      "title": "Hôtels",
+      "description": "Le générateur Omra propose exactement ces hôtels. Désactivez-en un pour le retirer des nouvelles demandes.",
+      "addHotel": "Ajouter un hôtel",
+      "editHotel": "Modifier l’hôtel",
+      "searchPlaceholder": "Rechercher un hôtel…",
+      "allCities": "Toutes les villes",
+      "makkah": "La Mecque",
+      "madinah": "Médine",
+      "all": "Tous",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "emptyTitle": "Aucun hôtel pour le moment",
+      "emptyDescription": "Ajoutez les hôtels avec lesquels l’agence travaille. Ils apparaissent aussitôt dans le générateur Omra.",
+      "noMatchTitle": "Aucun hôtel ne correspond",
+      "noMatchDescription": "Essayez une autre recherche ou un autre filtre.",
+      "noAreaSet": "Aucun quartier défini",
+      "requestCount_one": "1 demande",
+      "requestCount_other": "{{count}} demandes",
+      "formHint": "Uniquement les informations vues par le voyageur. Ni notes, ni prix, ni disponibilité.",
+      "nameLabel": "Nom de l’hôtel",
+      "namePlaceholder": "Dar El Tawfik",
+      "nameTooShort": "Saisissez au moins 2 caractères.",
+      "cityLabel": "Ville",
+      "areaLabel": "Quartier",
+      "areaNotSet": "Non défini",
+      "areaHint": "Affiché aux voyageurs dans leur langue.",
+      "locationLabel": "Adresse",
+      "locationPlaceholder": "Rue Ibrahim Al Khalil",
+      "locationHint": "Facultatif. Utilisé si aucun quartier n’est défini.",
+      "activeLabel": "Actif",
+      "activeHint": "Un hôtel inactif reste sur les demandes passées mais ne peut plus être choisi.",
+      "saveHotel": "Enregistrer l’hôtel",
+      "saving": "Enregistrement…",
+      "activate": "Activer",
+      "deactivate": "Désactiver",
+      "deleteBlocked": "Utilisé par des demandes — désactivez-le plutôt",
+      "deleteConfirmTitle": "Supprimer cet hôtel ?",
+      "deleteConfirmDescription": "« {{name}} » sera retiré du catalogue. Cette action est irréversible. Désactivez-le si vous comptez le réutiliser.",
+      "areas": {
+        "haram_close": "Proche du Haram",
+        "central": "Zone centrale",
+        "ibrahim_khalil": "Ibrahim Al Khalil",
+        "ajyad": "Ajyad",
+        "very_close": "Très proche",
+        "close": "Proche",
+        "value": "Économique"
+      },
+      "toastSaved": "Hôtel enregistré",
+      "toastActivated": "Hôtel activé",
+      "toastDeactivated": "Hôtel désactivé",
+      "toastDeleted": "Hôtel supprimé",
+      "errorDuplicate": "Un hôtel portant ce nom existe déjà dans cette ville.",
+      "errorInUse": "Cet hôtel est utilisé par des demandes existantes. Désactivez-le au lieu de le supprimer.",
+      "errorForbidden": "Vous n’avez pas les droits nécessaires.",
+      "errorGeneric": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "offers": {
+      "title": "Préparer l’offre",
+      "sentOn": "Envoyée le {{date}}",
+      "notSent": "Pas encore envoyée",
+      "proposedHotels": "Hôtels proposés",
+      "addMakkahHotel": "Ajouter un hôtel à La Mecque…",
+      "addMadinahHotel": "Ajouter un hôtel à Médine…",
+      "hotelsPlaceholder": "La Mecque : …\nMédine : …",
+      "proposedFlights": "Vols proposés",
+      "flightsPlaceholder": "Compagnie, itinéraire et horaires confirmés avec le transporteur",
+      "flightsHint": "Saisissez ce que vous avez réellement confirmé. Le système ne vérifie pas la disponibilité des vols.",
+      "amount": "Montant de l’offre",
+      "amountPlaceholder": "Laissez vide tant que le prix n’est pas fixé",
+      "amountInvalid": "Saisissez un nombre ou laissez le champ vide.",
+      "currency": "Devise",
+      "notes": "Remarques sur l’offre",
+      "notesPlaceholder": "Ce qui est inclus, les conditions de paiement, tout ce que le voyageur doit savoir",
+      "save": "Enregistrer l’offre",
+      "saving": "Enregistrement…",
+      "send": "Envoyer l’offre",
+      "sendAgain": "Renvoyer",
+      "sending": "Envoi…",
+      "sendHint": "Enregistrez d’abord — l’envoi expédie l’offre enregistrée.",
+      "noEmailHint": "Aucun e-mail sur cette demande ; contactez par téléphone ou WhatsApp.",
+      "noEmailTitle": "Aucune adresse e-mail sur cette demande",
+      "toastSaved": "Offre enregistrée",
+      "toastSaveFailed": "Impossible d’enregistrer l’offre",
+      "toastSent": "Offre envoyée au client",
+      "errorNoEmail": "Ce voyageur n’a pas laissé d’adresse e-mail. Contactez-le par téléphone ou WhatsApp.",
+      "errorEmpty": "Enregistrez d’abord les détails de l’offre.",
+      "errorNotConfigured": "L’envoi d’e-mails n’est pas configuré sur le serveur.",
+      "errorSendFailed": "L’offre n’a pas pu être envoyée. Rien n’a été marqué comme envoyé.",
+      "review": "Vérifier l'offre",
+      "backToEdit": "Revenir à la modification",
+      "previewTitle": "Vérification avant envoi",
+      "previewDescription": "Voici ce qui sera envoyé par e-mail à {{email}}.",
+      "previewWarning": "L'envoi est enregistré sur la demande et ne peut pas être annulé.",
+      "alreadySentHint": "Cette offre a déjà été envoyée. N'en préparez une nouvelle que si l'agence a convenu d'un changement avec le voyageur.",
+      "errorAlreadySent": "Une offre a déjà été envoyée pour cette demande.",
+      "errorClosed": "Cette demande est clôturée ; son offre ne peut plus être modifiée.",
+      "errorNoAmount": "Indiquez un montant avant d'envoyer l'offre.",
+      "errorHotelUnknown": "Un hôtel proposé ne figure pas dans le catalogue de l'agence.",
+      "errorSentNotRecorded": "L'offre a été envoyée par e-mail mais n'a pas pu être enregistrée. Rechargez la demande — un nouvel envoi n'enverra pas de second e-mail."
+    },
+    "localized": {
+      "base": "Base (arabe)",
+      "fr": "Français",
+      "en": "Anglais",
+      "emptyHint": "Aucune traduction automatique. Si ce champ reste vide, les visiteurs anglophones ne verront pas ce texte."
+    },
+    "notifications": {
+      "kinds": {
+        "custom_package": "Nouvelle demande Omra personnalisée",
+        "booking": "Nouvelle réservation",
+        "contact": "Nouveau message",
+        "flight": "Nouvelle demande de vol"
+      }
+    },
+    "activity": {
+      "title": "Activité",
+      "empty": "Aucune activité enregistrée pour le moment.",
+      "errorTitle": "Impossible de charger l'historique d'activité.",
+      "retry": "Réessayer",
+      "loading": "Chargement…",
+      "loadMore": "Afficher plus",
+      "actorSystem": "Système",
+      "actorAdmin": "Administrateur",
+      "transition": "{{from}} → {{to}}",
+      "events": {
+        "requestCreated": "Demande créée",
+        "statusChanged": "Statut modifié",
+        "offerUpdated": "Offre préparée",
+        "offerSent": "Offre envoyée"
+      }
+    },
+    "categories": {
+      "umrah": "Omra",
+      "trip": "Voyage",
+      "flight": "Vol",
+      "visa": "Visa"
+    },
+    "stages": {
+      "state": {
+        "new": "Nouveau",
+        "processing": "En traitement",
+        "confirmed": "Confirmé",
+        "declined": "Refusé"
+      },
+      "action": {
+        "processing": "En traitement",
+        "confirmed": "Confirmer la demande",
+        "declined": "Refuser la demande"
+      },
+      "title": "Statut de la demande",
+      "blockedHint": "Passez d'abord la demande en « en traitement ».",
+      "detailedStatus": "Statut détaillé : {{status}}"
     }
   }
 }

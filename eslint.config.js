@@ -6,7 +6,27 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".output", ".vinxi"] },
+  {
+    /*
+     * Build output, generated sources, and vendored reference material.
+     *
+     * `npm run lint` reported ~12,700 errors, of which only a few dozen were
+     * ours: 11,015 were phantom `Delete ␍` from `core.autocrlf` on Windows
+     * (now settled by prettier's `endOfLine: "auto"`), and 1,441 came from
+     * `integrations/supabase/types.ts` alone — a file docs/03-database.md says
+     * to never edit by hand. A signal that loud is a signal nobody reads, so
+     * the generated and vendored trees are excluded and lint speaks only about
+     * code someone can actually change.
+     */
+    ignores: [
+      "dist",
+      ".output",
+      ".vinxi",
+      "src/integrations/supabase/types.ts",
+      "src/integrations/supabase/auth-middleware.ts",
+      "src/components/watermelon/**",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { PackagesPage } from "@/components/sections/PackagesPage";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/trips")({
   head: () => ({
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/trips")({
       { property: "og:description", content: i18n.t("seo.trips.ogDescription") },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "/trips" }],
+    links: [canonical("/trips")],
   }),
   component: TripsRoute,
 });
@@ -24,7 +25,7 @@ function TripsRoute() {
       category="trip"
       title={t("nav.trips")}
       description={t("seo.trips.description")}
-      cover="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&q=80"
+      heroContentKey="trips_hero"
     />
   );
 }

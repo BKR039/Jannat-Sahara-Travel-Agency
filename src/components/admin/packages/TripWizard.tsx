@@ -30,6 +30,7 @@ import { Field, FieldGrid, ImageField, TextField } from "@/components/admin/sett
 import { Disclosure, money } from "@/components/admin/kit";
 import { cn } from "@/lib/utils";
 import { emptyForm, slugify, toPayload, type PackageCategory, type PackageForm } from "./model";
+import { useTranslation } from "react-i18next";
 
 type TripType = "umrah" | "flight" | "tour" | "other";
 
@@ -71,7 +72,9 @@ type Draft = {
   infant_price: string;
   discount_price: string;
   title_fr: string;
+  title_en: string;
   short_description_fr: string;
+  short_description_en: string;
 };
 
 function emptyDraft(): Draft {
@@ -96,13 +99,16 @@ function emptyDraft(): Draft {
     infant_price: "",
     discount_price: "",
     title_fr: "",
+    title_en: "",
     short_description_fr: "",
+    short_description_en: "",
   };
 }
 
 const STEPS = ["Basics", "Trip details", "Review & publish"] as const;
 
 export function TripWizard() {
+  const { t } = useTranslation("admin");
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [step, setStep] = useState(0);
@@ -167,6 +173,7 @@ export function TripWizard() {
       ...base,
       title: d.title.trim(),
       title_fr: d.title_fr.trim(),
+      title_en: d.title_en.trim(),
       slug: slugify(d.title),
       status,
       category,
@@ -174,6 +181,7 @@ export function TripWizard() {
       destination: d.destination.trim(),
       short_description: d.short_description.trim(),
       short_description_fr: d.short_description_fr.trim(),
+      short_description_en: d.short_description_en.trim(),
       description: d.description.trim(),
       duration,
       departure_date: d.departure_date,
@@ -198,23 +206,27 @@ export function TripWizard() {
         ...toPayload(buildForm(status)),
         accommodation: d.hotels
           .filter((h) => h.hotel.trim() || h.city.trim())
-          .map((h) => ({ city: h.city.trim(), hotel: h.hotel.trim(), nights: Number(h.nights) || 0 })),
+          .map((h) => ({
+            city: h.city.trim(),
+            hotel: h.hotel.trim(),
+            nights: Number(h.nights) || 0,
+          })),
         transport: d.flight_number.trim()
           ? `${d.airline.trim()} ${d.flight_number.trim()}`.trim()
           : null,
       };
-      const { data, error } = await supabase
-        .from("packages")
-        .insert(payload)
-        .select("id")
-        .single();
+      const { data, error } = await supabase.from("packages").insert(payload).select("id").single();
       if (error) throw error;
       return data.id as string;
     },
     onSuccess: (id, status) => {
       qc.invalidateQueries({ queryKey: ["admin-packages"] });
       qc.invalidateQueries({ queryKey: ["packages"] });
-      toast.success(status === "published" ? "Trip published" : "Draft saved");
+      toast.success(
+        status === "published"
+          ? t("ops.wizard.toastTripPublished")
+          : t("ops.wizard.toastDraftSaved"),
+      );
       void navigate({ to: "/admin/packages/$id", params: { id } });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -225,14 +237,13 @@ export function TripWizard() {
       <div className="mb-6 flex items-center gap-3">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/admin/packages">
-            <ArrowLeft className="me-2 h-4 w-4 rtl:-scale-x-100" /> Trips
+            <ArrowLeft className="me-2 h-4 w-4 rtl:-scale-x-100" />
+            {t("ops.wizard.back")}
           </Link>
         </Button>
         <div className="min-w-0">
-          <h1 className="truncate text-h4 font-bold tracking-tight">New trip</h1>
-          <p className="text-caption text-muted-foreground">
-            Three short steps — we handle the technical details.
-          </p>
+          <h1 className="truncate text-h4 font-bold tracking-tight">{t("ops.wizard.title")}</h1>
+          <p className="text-caption text-muted-foreground">{t("ops.wizard.subtitle")}</p>
         </div>
       </div>
 
@@ -240,19 +251,25 @@ export function TripWizard() {
 
       <div className="mt-6 space-y-5">
         {step === 0 && (
-          <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm sm:p-6">
+          <div className="rounded-card border border-border-subtle bg-card p-5 sm:p-6">
             <div className="space-y-6">
               <div>
-                <Label className="mb-2 block text-small font-semibold">Trip type</Label>
+                <Label className="mb-2 block text-small font-semibold">
+                  {t("ops.wizard.tripType")}
+                </Label>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {TRIP_TYPES.map((t) => {
-                    const Icon = t.icon;
-                    const active = d.type === t.key;
+                  {/* `type` rather than `t`: the old binding shadowed the
+                      translator inside this map, which is how these four cards
+                      ended up printing the English array instead of the
+                      `ops.wizard.types.*` entries that already existed. */}
+                  {TRIP_TYPES.map((type) => {
+                    const Icon = type.icon;
+                    const active = d.type === type.key;
                     return (
                       <button
-                        key={t.key}
+                        key={type.key}
                         type="button"
-                        onClick={() => set("type", t.key)}
+                        onClick={() => set("type", type.key)}
                         aria-pressed={active}
                         className={cn(
                           "rounded-xl border p-3 text-start transition-colors",
@@ -267,8 +284,12 @@ export function TripWizard() {
                             active ? "text-primary" : "text-muted-foreground",
                           )}
                         />
-                        <div className="text-small font-semibold">{t.label}</div>
-                        <div className="text-caption text-muted-foreground">{t.hint}</div>
+                        <div className="text-small font-semibold">
+                          {t(`ops.wizard.types.${type.key}.label`)}
+                        </div>
+                        <div className="text-caption text-muted-foreground">
+                          {t(`ops.wizard.types.${type.key}.hint`)}
+                        </div>
                       </button>
                     );
                   })}
@@ -277,30 +298,33 @@ export function TripWizard() {
 
               {isFlight ? (
                 <div className="rounded-xl border border-border-subtle bg-surface-sunken/50 p-5">
-                  <h2 className="text-small font-semibold">Flights work as requests</h2>
+                  <h2 className="text-small font-semibold">
+                    {t("ops.wizard.flightsWorkAsRequestsTitle")}
+                  </h2>
                   <p className="mt-1 text-caption leading-relaxed text-muted-foreground">
-                    You don't publish flight tickets. Travellers submit a flight request from the
-                    website (from, to, dates, travellers) and it lands in your inbox — you reply with
-                    the best option by email and close the request once it's done.
+                    {t("ops.wizard.flightsWorkAsRequestsDescription")}
                   </p>
                   <Button className="mt-4" asChild>
-                    <Link to="/admin/flight-requests">Open flight requests</Link>
+                    <Link to="/admin/flight-requests">{t("ops.wizard.openFlightRequests")}</Link>
                   </Button>
                 </div>
               ) : (
                 <>
                   <TextField
-                    label="Trip title"
+                    label={t("ops.wizard.tripTitle")}
                     value={d.title}
                     onChange={(v) => set("title", v)}
-                    placeholder="Umrah Ramadan — 12 days"
+                    placeholder={t("ops.wizard.tripTitlePlaceholder")}
                   />
-                  <Field label="Destination" hint="City or country travellers are going to">
+                  <Field
+                    label={t("ops.wizard.destination")}
+                    hint="City or country travellers are going to"
+                  >
                     <Input
                       value={d.destination}
                       onChange={(e) => set("destination", e.target.value)}
                       list="wizard-destinations"
-                      placeholder="Makkah & Madinah"
+                      placeholder={t("ops.wizard.destinationPlaceholder")}
                     />
                     <datalist id="wizard-destinations">
                       {(memory.data?.destinations ?? []).map((x) => (
@@ -308,16 +332,19 @@ export function TripWizard() {
                       ))}
                     </datalist>
                   </Field>
-                  <Field label="Short description" hint="One or two lines shown on the trip card">
+                  <Field
+                    label={t("ops.wizard.shortDescription")}
+                    hint="One or two lines shown on the trip card"
+                  >
                     <Textarea
                       rows={3}
                       value={d.short_description}
                       onChange={(e) => set("short_description", e.target.value)}
-                      placeholder="Full package with flights, 4★ hotels and guided visits."
+                      placeholder={t("ops.wizard.shortDescriptionPlaceholder")}
                     />
                   </Field>
                   <ImageField
-                    label="Cover image"
+                    label={t("ops.wizard.coverImage")}
                     value={d.cover}
                     onChange={(v) => set("cover", v)}
                     folder="packages"
@@ -330,49 +357,49 @@ export function TripWizard() {
 
         {step === 1 && (
           <>
-            <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm sm:p-6">
+            <div className="rounded-card border border-border-subtle bg-card p-5 sm:p-6">
               <FieldGrid>
                 <TextField
-                  label="Price per person"
+                  label={t("ops.wizard.pricePerPerson")}
                   value={d.price}
                   onChange={(v) => set("price", v)}
                   type="number"
                   placeholder="4200"
                 />
                 <TextField
-                  label="Available seats"
+                  label={t("ops.wizard.availableSeats")}
                   value={d.seats}
                   onChange={(v) => set("seats", v)}
                   type="number"
                   placeholder="40"
                 />
                 <TextField
-                  label="Departure date"
+                  label={t("ops.wizard.departureDate")}
                   value={d.departure_date}
                   onChange={(v) => set("departure_date", v)}
                   type="date"
                 />
                 <TextField
-                  label="Return date"
+                  label={t("ops.wizard.returnDate")}
                   value={d.return_date}
                   onChange={(v) => set("return_date", v)}
                   type="date"
                 />
                 <TextField
-                  label="Duration"
+                  label={t("ops.wizard.duration")}
                   hint="Leave empty and we'll compute it from the dates or nights"
                   value={d.duration}
                   onChange={(v) => set("duration", v)}
-                  placeholder="12 days"
+                  placeholder={t("ops.wizard.durationPlaceholder")}
                 />
               </FieldGrid>
             </div>
 
             {(d.type === "umrah" || d.type === "tour") && (
-              <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm sm:p-6">
+              <div className="rounded-card border border-border-subtle bg-card p-5 sm:p-6">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-small font-semibold">Hotels</h2>
+                    <h2 className="text-small font-semibold">{t("ops.wizard.hotelsTitle")}</h2>
                     <p className="text-caption text-muted-foreground">
                       City, hotel name and number of nights.
                       {nightsTotal > 0 ? ` Total: ${nightsTotal} nights.` : ""}
@@ -385,13 +412,14 @@ export function TripWizard() {
                       set("hotels", [...d.hotels, { city: "", hotel: "", nights: "" }])
                     }
                   >
-                    <Plus className="me-2 h-4 w-4" /> Add hotel
+                    <Plus className="me-2 h-4 w-4" />
+                    {t("ops.wizard.addHotel")}
                   </Button>
                 </div>
 
                 {d.hotels.length === 0 ? (
                   <p className="rounded-xl border border-dashed border-border-subtle p-4 text-caption text-muted-foreground">
-                    No hotels yet — add one if the trip includes accommodation.
+                    {t("ops.wizard.noHotelsYet")}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -402,27 +430,32 @@ export function TripWizard() {
                       >
                         <Input
                           value={h.city}
-                          placeholder="City (Makkah)"
+                          placeholder={t("ops.wizard.cityPlaceholder")}
                           onChange={(e) => updateHotel(i, { city: e.target.value })}
                         />
                         <Input
                           value={h.hotel}
-                          placeholder="Hotel name"
+                          placeholder={t("ops.wizard.hotelNamePlaceholder")}
                           list="wizard-hotels"
                           onChange={(e) => updateHotel(i, { hotel: e.target.value })}
                         />
                         <Input
                           value={h.nights}
                           type="number"
-                          placeholder="Nights"
+                          placeholder={t("ops.wizard.nightsPlaceholder")}
                           onChange={(e) => updateHotel(i, { nights: e.target.value })}
                         />
                         <Button
                           size="icon"
                           variant="ghost"
-                          aria-label="Remove hotel"
+                          aria-label={t("ops.wizard.removeHotel")}
                           className="text-destructive"
-                          onClick={() => set("hotels", d.hotels.filter((_, idx) => idx !== i))}
+                          onClick={() =>
+                            set(
+                              "hotels",
+                              d.hotels.filter((_, idx) => idx !== i),
+                            )
+                          }
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -438,27 +471,29 @@ export function TripWizard() {
               </div>
             )}
 
-            <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm sm:p-6">
-              <h2 className="mb-4 text-small font-semibold">Flight</h2>
+            <div className="rounded-card border border-border-subtle bg-card p-5 sm:p-6">
+              <h2 className="mb-4 text-small font-semibold">
+                {t("ops.wizard.types.flight.label")}
+              </h2>
               <FieldGrid>
                 <TextField
-                  label="Departure city"
+                  label={t("ops.wizard.departureCity")}
                   value={d.from_city}
                   onChange={(v) => set("from_city", v)}
-                  placeholder="Tunis"
+                  placeholder={t("ops.wizard.departureCityPlaceholder")}
                 />
                 <TextField
-                  label="Arrival city"
+                  label={t("ops.wizard.arrivalCity")}
                   value={d.to_city}
                   onChange={(v) => set("to_city", v)}
-                  placeholder="Jeddah"
+                  placeholder={t("ops.wizard.arrivalCityPlaceholder")}
                 />
-                <Field label="Airline" hint="Optional">
+                <Field label={t("ops.wizard.airline")} hint="Optional">
                   <Input
                     value={d.airline}
                     list="wizard-airlines"
                     onChange={(e) => set("airline", e.target.value)}
-                    placeholder="Saudia"
+                    placeholder={t("ops.wizard.airlinePlaceholder")}
                   />
                   <datalist id="wizard-airlines">
                     {(memory.data?.airlines ?? []).map((x) => (
@@ -467,18 +502,18 @@ export function TripWizard() {
                   </datalist>
                 </Field>
                 <TextField
-                  label="Flight number"
+                  label={t("ops.wizard.flightNumber")}
                   hint="Optional"
                   value={d.flight_number}
                   onChange={(v) => set("flight_number", v)}
-                  placeholder="SV 1234"
+                  placeholder={t("ops.wizard.flightNumberPlaceholder")}
                 />
               </FieldGrid>
             </div>
 
-            <Disclosure label="Advanced options">
+            <Disclosure label={t("ops.wizard.advancedOptions")}>
               <div className="space-y-5">
-                <Field label="Full description" hint="Shown on the trip page">
+                <Field label={t("ops.wizard.fullDescription")} hint="Shown on the trip page">
                   <Textarea
                     rows={5}
                     value={d.description}
@@ -487,34 +522,49 @@ export function TripWizard() {
                 </Field>
                 <FieldGrid>
                   <TextField
-                    label="Promotional price"
+                    label={t("ops.wizard.promotionalPrice")}
                     value={d.discount_price}
                     onChange={(v) => set("discount_price", v)}
                     type="number"
                   />
                   <TextField
-                    label="Child price"
+                    label={t("ops.wizard.childPrice")}
                     value={d.child_price}
                     onChange={(v) => set("child_price", v)}
                     type="number"
                   />
                   <TextField
-                    label="Infant price"
+                    label={t("ops.wizard.infantPrice")}
                     value={d.infant_price}
                     onChange={(v) => set("infant_price", v)}
                     type="number"
                   />
                   <TextField
-                    label="Title (French)"
+                    label={t("ops.wizard.titleFrench")}
                     value={d.title_fr}
                     onChange={(v) => set("title_fr", v)}
                   />
+                  <TextField
+                    label={t("ops.wizard.titleEnglish")}
+                    value={d.title_en}
+                    onChange={(v) => set("title_en", v)}
+                  />
                 </FieldGrid>
-                <Field label="Short description (French)">
+                <Field label={t("ops.wizard.shortDescriptionFrench")}>
                   <Textarea
                     rows={3}
                     value={d.short_description_fr}
                     onChange={(e) => set("short_description_fr", e.target.value)}
+                  />
+                </Field>
+                <Field
+                  label={t("ops.wizard.shortDescriptionEnglish")}
+                  hint={t("ops.localized.emptyHint")}
+                >
+                  <Textarea
+                    rows={3}
+                    value={d.short_description_en}
+                    onChange={(e) => set("short_description_en", e.target.value)}
                   />
                 </Field>
                 <p className="text-caption text-muted-foreground">
@@ -536,7 +586,8 @@ export function TripWizard() {
           disabled={step === 0}
           onClick={() => setStep((s) => Math.max(0, s - 1))}
         >
-          <ArrowLeft className="me-2 h-4 w-4 rtl:-scale-x-100" /> Back
+          <ArrowLeft className="me-2 h-4 w-4 rtl:-scale-x-100" />
+          {t("ops.wizard.backButton")}
         </Button>
 
         {step < 2 ? (
@@ -544,7 +595,8 @@ export function TripWizard() {
             disabled={step === 0 ? !step1Valid : !step2Valid}
             onClick={() => setStep((s) => s + 1)}
           >
-            Continue <ArrowRight className="ms-2 h-4 w-4 rtl:-scale-x-100" />
+            {t("ops.wizard.continue")}
+            <ArrowRight className="ms-2 h-4 w-4 rtl:-scale-x-100" />
           </Button>
         ) : (
           <div className="flex flex-wrap items-center gap-2">
@@ -553,7 +605,7 @@ export function TripWizard() {
               disabled={create.isPending}
               onClick={() => create.mutate("draft")}
             >
-              Save draft
+              {t("ops.wizard.saveDraft")}
             </Button>
             <Button disabled={create.isPending} onClick={() => create.mutate("published")}>
               {create.isPending ? (
@@ -622,10 +674,12 @@ function Stepper({ step }: { step: number }) {
 }
 
 function ReviewCard({ draft: d, nights }: { draft: Draft; nights: number }) {
+  const { t } = useTranslation("admin");
   const dates = [d.departure_date, d.return_date].filter(Boolean).join(" → ");
-  const duration = d.duration || (nights > 0 ? `${nights} nights` : autoDuration(d.departure_date, d.return_date));
+  const duration =
+    d.duration || (nights > 0 ? `${nights} nights` : autoDuration(d.departure_date, d.return_date));
   return (
-    <div className="overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm">
+    <div className="overflow-hidden rounded-card border border-border-subtle bg-card">
       {d.cover ? (
         <img
           src={d.cover}
@@ -634,7 +688,7 @@ function ReviewCard({ draft: d, nights }: { draft: Draft; nights: number }) {
         />
       ) : (
         <div className="flex h-40 items-center justify-center bg-surface-sunken/60 text-caption text-muted-foreground">
-          No cover image
+          {t("ops.wizard.noCoverImage")}
         </div>
       )}
       <div className="space-y-5 p-5 sm:p-6">
@@ -651,15 +705,15 @@ function ReviewCard({ draft: d, nights }: { draft: Draft; nights: number }) {
         </div>
 
         <dl className="grid gap-4 sm:grid-cols-3">
-          <Stat icon={CalendarDays} label="Dates" value={dates || "—"} />
-          <Stat icon={CalendarDays} label="Duration" value={duration || "—"} />
-          <Stat icon={Users} label="Seats" value={d.seats || "—"} />
+          <Stat icon={CalendarDays} label={t("ops.wizard.dates")} value={dates || "—"} />
+          <Stat icon={CalendarDays} label={t("ops.wizard.duration")} value={duration || "—"} />
+          <Stat icon={Users} label={t("ops.packagesList.table.seats")} value={d.seats || "—"} />
         </dl>
 
         {d.hotels.some((h) => h.hotel || h.city) && (
           <div>
             <h3 className="mb-2 text-caption font-semibold uppercase tracking-wide text-muted-foreground">
-              Hotels
+              {t("ops.wizard.hotelsTitle")}
             </h3>
             <ul className="space-y-1.5 text-small">
               {d.hotels
@@ -679,7 +733,9 @@ function ReviewCard({ draft: d, nights }: { draft: Draft; nights: number }) {
         )}
 
         <div className="flex items-end justify-between border-t border-border-subtle pt-4">
-          <span className="text-caption text-muted-foreground">Price per person</span>
+          <span className="text-caption text-muted-foreground">
+            {t("ops.wizard.pricePerPerson")}
+          </span>
           <span className="text-h5 font-bold text-primary">
             {d.price ? money(Number(d.price)) : "—"}
           </span>
@@ -689,15 +745,7 @@ function ReviewCard({ draft: d, nights }: { draft: Draft; nights: number }) {
   );
 }
 
-function Stat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Users;
-  label: string;
-  value: string;
-}) {
+function Stat({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: string }) {
   return (
     <div className="rounded-xl border border-border-subtle bg-surface-sunken/40 p-3">
       <dt className="flex items-center gap-1.5 text-caption text-muted-foreground">

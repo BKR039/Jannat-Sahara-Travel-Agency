@@ -49,8 +49,7 @@ export function renderCustomPackageEmail(args: {
     ["Notes", input.notes || "—"],
   ];
 
-  const esc = (v: string) =>
-    v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   const html = `<!doctype html><html><body style="margin:0;background:#f6f3ee;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#1d2433">
   <div style="max-width:640px;margin:0 auto;padding:24px">

@@ -15,25 +15,24 @@ import {
 } from "recharts";
 import { getReports } from "@/lib/admin/command.functions";
 import {
-  Page,
-  Panel,
+  EmptyState,
+  ErrorState,
   KpiCard,
   Occupancy,
-  EmptyState,
+  Page,
+  Panel,
   SkeletonKpis,
   SkeletonRows,
   money,
   shortDate,
 } from "@/components/admin/kit";
 import { useTranslation } from "react-i18next";
+import { adminDocTitle } from "@/lib/admin/doc-title";
 
 export const Route = createFileRoute("/admin/reports")({
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Reports — Janat Sahara Admin" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: adminDocTitle("reports") }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: ReportsPage,
 });
@@ -59,48 +58,67 @@ function ReportsPage() {
             label={t("shell.reports.kpi.revenue")}
             value={money(data.summary.revenue, currency)}
             icon={Wallet}
-            tone="primary"
           />
           <KpiCard
             label={t("shell.reports.kpi.bookings")}
             value={data.summary.bookings}
             icon={CalendarCheck}
-            tone="green"
           />
-          <KpiCard label={t("shell.reports.kpi.travellers")} value={data.summary.travellers} icon={Users} tone="gold" />
+          <KpiCard
+            label={t("shell.reports.kpi.travellers")}
+            value={data.summary.travellers}
+            icon={Users}
+          />
           <KpiCard
             label={t("shell.reports.kpi.averageBooking")}
             value={money(data.summary.averageValue, currency)}
             icon={TrendingUp}
-            tone="muted"
-            hint={t("shell.reports.kpi.conversionHint", { value: Math.round(data.summary.conversion) })}
+            hint={t("shell.reports.kpi.conversionHint", {
+              value: Math.round(data.summary.conversion),
+            })}
           />
         </div>
       )}
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <Panel title={t("shell.reports.revenueAndBookings.title")} description={t("shell.reports.revenueAndBookings.description")}>
+        <Panel
+          title={t("shell.reports.revenueAndBookings.title")}
+          description={t("shell.reports.revenueAndBookings.description")}
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.trend ?? []}>
                 <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.15} />
                 <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} width={48} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }}
+                />
                 <Bar dataKey="revenue" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </Panel>
 
-        <Panel title={t("shell.reports.newCustomers.title")} description={t("shell.reports.newCustomers.description")}>
+        <Panel
+          title={t("shell.reports.newCustomers.title")}
+          description={t("shell.reports.newCustomers.description")}
+        >
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data?.acquisition ?? []}>
                 <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.15} />
                 <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis fontSize={11} tickLine={false} axisLine={false} width={40} allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }} />
+                <YAxis
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={40}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }}
+                />
                 <Line
                   type="monotone"
                   dataKey="customers"
@@ -120,6 +138,9 @@ function ReportsPage() {
             <div className="p-4">
               <SkeletonRows rows={4} />
             </div>
+          ) : q.isError ? (
+            // A failed query must never look like an empty table.
+            <ErrorState onRetry={() => q.refetch()} />
           ) : (data?.topTrips.length ?? 0) === 0 ? (
             <div className="p-4">
               <EmptyState title={t("shell.reports.bestPerformingTrips.emptyTitle")} />
@@ -127,14 +148,22 @@ function ReportsPage() {
           ) : (
             <ul className="divide-y divide-border-subtle">
               {data!.topTrips.map((trip) => (
-                <li key={trip.title} className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+                <li
+                  key={trip.title}
+                  className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5"
+                >
                   <div className="min-w-0">
                     <p className="truncate text-small font-medium">{trip.title}</p>
                     <p className="text-caption text-muted-foreground">
-                      {t("shell.reports.bestPerformingTrips.summary", { bookings: trip.bookings, travellers: trip.travellers })}
+                      {t("shell.reports.bestPerformingTrips.summary", {
+                        bookings: trip.bookings,
+                        travellers: trip.travellers,
+                      })}
                     </p>
                   </div>
-                  <p className="text-small font-semibold tabular-nums">{money(trip.revenue, currency)}</p>
+                  <p className="text-small font-semibold tabular-nums">
+                    {money(trip.revenue, currency)}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -144,6 +173,8 @@ function ReportsPage() {
         <Panel title={t("shell.reports.capacity.title")}>
           {q.isLoading ? (
             <SkeletonRows rows={4} />
+          ) : q.isError ? (
+            <ErrorState onRetry={() => q.refetch()} />
           ) : (data?.capacity.length ?? 0) === 0 ? (
             <EmptyState title={t("shell.reports.capacity.emptyTitle")} />
           ) : (
@@ -164,7 +195,11 @@ function ReportsPage() {
         </Panel>
       </div>
 
-      <Panel title={t("shell.reports.topDestinations.title")} className="mt-6" bodyClassName="p-0 sm:p-0">
+      <Panel
+        title={t("shell.reports.topDestinations.title")}
+        className="mt-6"
+        bodyClassName="p-0 sm:p-0"
+      >
         {(data?.topDestinations.length ?? 0) === 0 ? (
           <div className="p-4">
             <EmptyState title={t("shell.reports.topDestinations.emptyTitle")} />
@@ -172,7 +207,10 @@ function ReportsPage() {
         ) : (
           <ul className="divide-y divide-border-subtle">
             {(data?.topDestinations ?? []).map((d) => (
-              <li key={d.destination} className="flex items-center justify-between px-4 py-3 sm:px-5">
+              <li
+                key={d.destination}
+                className="flex items-center justify-between px-4 py-3 sm:px-5"
+              >
                 <span className="truncate text-small">{d.destination}</span>
                 <span className="text-small font-semibold tabular-nums">{d.count}</span>
               </li>

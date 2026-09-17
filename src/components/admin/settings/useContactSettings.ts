@@ -14,22 +14,36 @@ export interface ContactFieldSpec {
   multiline?: boolean;
   sort_order: number;
   validate?: Validator;
+  /**
+   * Field whose value is prose the agency may want translated (address,
+   * working hours, agency name). Phone numbers, emails and URLs are
+   * language-neutral and must NOT be marked localized.
+   */
+  localized?: boolean;
 }
+
+/** Form key for a translation of `key`, e.g. `address@fr`. */
+export const localeKey = (key: string, lang: "fr" | "en") => `${key}@${lang}`;
 
 interface Row {
   id: string;
   key: string;
   label: string | null;
   value: string;
+  value_fr: string | null;
+  value_en: string | null;
   icon: string | null;
   sort_order: number | null;
 }
 
-const AUTOSAVE_DELAY = 1200;
-
 /**
  * Maps the flat contact_info key/value table onto a friendly, typed form model
- * with validation and debounced auto-save.
+ * with validation and an explicit save.
+ *
+ * Saving is explicit — never on a timer. See `useSiteSettings` for why: these
+ * rows are the phone numbers and addresses the public site prints, and a
+ * debounced write published every half-typed one of them. Clearing a field also
+ * deletes its row, so the timer could delete a contact channel mid-edit.
  */
 export function useContactSettings(specs: ContactFieldSpec[]) {
   const qc = useQueryClient();
@@ -38,7 +52,7 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("contact_info")
-        .select("id,key,label,value,icon,sort_order")
+        .select("id,key,label,value,value_fr,value_en,icon,sort_order")
         .order("sort_order");
       if (error) throw error;
       return data as Row[];
@@ -49,8 +63,19 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
 
   const remote = useMemo(() => {
     const map: Record<string, string> = {};
-    for (const s of specs) map[s.key] = "";
-    for (const r of query.data ?? []) if (r.key in map) map[r.key] = r.value ?? "";
+    for (const s of specs) {
+      map[s.key] = "";
+      if (s.localized) {
+        map[localeKey(s.key, "fr")] = "";
+        map[localeKey(s.key, "en")] = "";
+      }
+    }
+    for (const r of query.data ?? []) {
+      if (!(r.key in map)) continue;
+      map[r.key] = r.value ?? "";
+      if (localeKey(r.key, "fr") in map) map[localeKey(r.key, "fr")] = r.value_fr ?? "";
+      if (localeKey(r.key, "en") in map) map[localeKey(r.key, "en")] = r.value_en ?? "";
+    }
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.data, specKeys]);
@@ -66,7 +91,7 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
   }, [form, specKeys]);
 
   const hasErrors = Object.values(errors).some(Boolean);
-  const dirty = specs.some((s) => (form[s.key] ?? "") !== (remote[s.key] ?? ""));
+  const dirty = Object.keys(remote).some((k) => (form[k] ?? "") !== (remote[k] ?? ""));
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const save = useMutation({
@@ -74,7 +99,15 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
       const rows = query.data ?? [];
       for (const spec of specs) {
         const next = (values[spec.key] ?? "").trim();
-        if (next === (remote[spec.key] ?? "").trim()) continue;
+        // Empty translations stay NULL so the documented public fallback applies.
+        const fr = spec.localized ? (values[localeKey(spec.key, "fr")] ?? "").trim() || null : null;
+        const en = spec.localized ? (values[localeKey(spec.key, "en")] ?? "").trim() || null : null;
+        const changed =
+          next !== (remote[spec.key] ?? "").trim() ||
+          (spec.localized &&
+            ((fr ?? "") !== (remote[localeKey(spec.key, "fr")] ?? "").trim() ||
+              (en ?? "") !== (remote[localeKey(spec.key, "en")] ?? "").trim()));
+        if (!changed) continue;
         const existing = rows.find((r) => r.key === spec.key);
         if (existing) {
           if (!next) {
@@ -85,6 +118,7 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
               .from("contact_info")
               .update({
                 value: next,
+                ...(spec.localized ? { value_fr: fr, value_en: en } : {}),
                 label: existing.label ?? spec.label,
                 icon: existing.icon ?? spec.icon,
               })
@@ -96,6 +130,7 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
             key: spec.key,
             label: spec.label,
             value: next,
+            ...(spec.localized ? { value_fr: fr, value_en: en } : {}),
             icon: spec.icon,
             sort_order: spec.sort_order,
           });
@@ -110,15 +145,6 @@ export function useContactSettings(specs: ContactFieldSpec[]) {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  const saveRef = useRef(save);
-  saveRef.current = save;
-
-  useEffect(() => {
-    if (!dirty || hasErrors || query.isLoading) return;
-    const t = setTimeout(() => saveRef.current.mutate(form), AUTOSAVE_DELAY);
-    return () => clearTimeout(t);
-  }, [form, dirty, hasErrors, query.isLoading]);
 
   const set = useCallback((key: string, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));

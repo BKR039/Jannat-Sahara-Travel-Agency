@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Compass,
   MessageCircle,
+  Phone,
   Plane,
   Send,
   Users,
@@ -27,6 +28,8 @@ import {
   MADINAH_AREAS,
   MAKKAH_AREAS,
   ROOM_TYPES,
+  earliestDepartureISO,
+  latestDepartureISO,
   type BudgetLevel,
   type ContactPreference,
   type RoomType,
@@ -73,9 +76,17 @@ export function UmrahBuilder() {
 
   const [state, setState] = useState<BuilderState>(INITIAL_STATE);
   const [index, setIndex] = useState(0);
+  /**
+   * Highest step the visitor has validated. Going back to review an earlier
+   * answer must not re-lock the steps they already completed, so the stepper
+   * unlocks up to this marker rather than to the current index.
+   */
+  const [furthest, setFurthest] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ reference: string } | null>(null);
+  /** Guards against a second submit slipping through before `sending` renders. */
+  const inFlight = useRef(false);
 
   // Draft restore happens after hydration so SSR markup stays stable.
   useEffect(() => {
@@ -101,6 +112,11 @@ export function UmrahBuilder() {
     switch (s) {
       case "dates":
         if (!state.departureDate || !state.returnDate) return t("umrahBuilder.validation.dates");
+        if (state.departureDate < earliestDepartureISO())
+          return t("umrahBuilder.validation.datePast");
+        if (state.departureDate > latestDepartureISO())
+          return t("umrahBuilder.validation.dateHorizon");
+        if (state.returnDate === state.departureDate) return t("umrahBuilder.validation.minStay");
         return t("umrahBuilder.validation.dateOrder");
       case "flights":
         return t("umrahBuilder.validation.flights");
@@ -114,7 +130,8 @@ export function UmrahBuilder() {
         return t("umrahBuilder.validation.nights");
       case "contact":
         if (state.name.trim().length < 2) return t("umrahBuilder.validation.name");
-        if (!/^[+()\d\s-]{6,32}$/.test(state.phone.trim())) return t("umrahBuilder.validation.phone");
+        if (!/^[+()\d\s-]{6,32}$/.test(state.phone.trim()))
+          return t("umrahBuilder.validation.phone");
         return t("umrahBuilder.validation.email");
     }
   };
@@ -126,7 +143,9 @@ export function UmrahBuilder() {
     }
     setError(null);
     if (index < BUILDER_STEPS.length - 1) {
-      setIndex(index + 1);
+      const next = index + 1;
+      setIndex(next);
+      setFurthest((f) => Math.max(f, next));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       void send();
@@ -138,7 +157,20 @@ export function UmrahBuilder() {
     setIndex((i) => Math.max(0, i - 1));
   };
 
+  /** Maps a server error onto a translated, actionable message. */
+  function submitErrorMessage(err: unknown): string {
+    const raw = err instanceof Error ? err.message : String(err ?? "");
+    if (raw.includes("HOTEL_UNAVAILABLE")) return t("umrahBuilder.errors.hotelUnavailable");
+    if (raw.includes("HOTEL_LOOKUP_FAILED")) return t("umrahBuilder.errors.hotelLookup");
+    if (/too many requests|rate/i.test(raw)) return t("umrahBuilder.errors.rateLimited");
+    return t("umrahBuilder.errors.submit");
+  }
+
   async function send() {
+    // Double-tap protection: the ref flips synchronously, before React re-renders
+    // the disabled button, so a second tap cannot create a duplicate request.
+    if (inFlight.current) return;
+    inFlight.current = true;
     setSending(true);
     setError(null);
     try {
@@ -170,12 +202,17 @@ export function UmrahBuilder() {
           notes: state.notes.trim(),
         },
       });
+      // Success is shown only after the row is persisted and a real reference
+      // comes back. The draft is cleared only at that point, so a failed
+      // submission always leaves the visitor's work intact.
       setResult({ reference: res.reference });
       clearDraft();
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch {
-      setError(t("umrahBuilder.errors.submit"));
+    } catch (err) {
+      console.error("[umrah-builder] submission failed", err);
+      setError(submitErrorMessage(err));
     } finally {
+      inFlight.current = false;
       setSending(false);
     }
   }
@@ -212,6 +249,7 @@ export function UmrahBuilder() {
           <BuilderStepper
             steps={BUILDER_STEPS}
             current={index}
+            furthest={furthest}
             onSelect={setIndex}
             labels={
               Object.fromEntries(
@@ -224,7 +262,10 @@ export function UmrahBuilder() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0 space-y-6">
             {step === "dates" && (
-              <StepShell title={t("umrahBuilder.dates.title")} subtitle={t("umrahBuilder.dates.subtitle")}>
+              <StepShell
+                title={t("umrahBuilder.dates.title")}
+                subtitle={t("umrahBuilder.dates.subtitle")}
+              >
                 <DateRangeField
                   from={state.departureDate}
                   to={state.returnDate}
@@ -251,6 +292,11 @@ export function UmrahBuilder() {
                   <div className="space-y-1">
                     <AirportCombobox
                       id="builder-from"
+                      /* Without this the custom-airport affordance rendered
+                         `flightRequest.useCustom.undefined` — the Flights
+                         rebuild made the prop required and this caller was
+                         missed. */
+                      direction="from"
                       label={t("umrahBuilder.flights.departure")}
                       placeholder={t("umrahBuilder.flights.placeholder")}
                       value={state.departureAirport}
@@ -263,6 +309,7 @@ export function UmrahBuilder() {
                   <div className="space-y-1">
                     <AirportCombobox
                       id="builder-to"
+                      direction="to"
                       label={t("umrahBuilder.flights.return")}
                       placeholder={t("umrahBuilder.flights.placeholder")}
                       value={state.returnAirport}
@@ -286,7 +333,9 @@ export function UmrahBuilder() {
                     })
                   }
                 />
-                <p className="text-caption text-muted-foreground">{t("umrahBuilder.flights.note")}</p>
+                <p className="text-caption text-muted-foreground">
+                  {t("umrahBuilder.flights.note")}
+                </p>
               </StepShell>
             )}
 
@@ -335,7 +384,10 @@ export function UmrahBuilder() {
             )}
 
             {step === "room" && (
-              <StepShell title={t("umrahBuilder.room.title")} subtitle={t("umrahBuilder.room.subtitle")}>
+              <StepShell
+                title={t("umrahBuilder.room.title")}
+                subtitle={t("umrahBuilder.room.subtitle")}
+              >
                 <div className="grid gap-3 sm:grid-cols-2">
                   {ROOM_TYPES.map((type) => (
                     <ChoiceCard
@@ -426,7 +478,10 @@ export function UmrahBuilder() {
             )}
 
             {error && (
-              <p role="alert" className="rounded-2xl bg-destructive/10 p-4 text-small text-destructive">
+              <p
+                role="alert"
+                className="rounded-2xl bg-destructive/10 p-4 text-small text-destructive"
+              >
                 {error}
               </p>
             )}
@@ -462,8 +517,9 @@ export function UmrahBuilder() {
         </div>
       </div>
 
-      {/* Mobile sticky navigation */}
-      <div className="sticky bottom-0 z-30 border-t border-border-subtle bg-card/95 p-3 backdrop-blur sm:hidden">
+      {/* Mobile sticky navigation. `sticky` keeps it in flow so it never covers
+          the last field, and the safe-area inset clears the iOS home indicator. */}
+      <div className="sticky bottom-0 z-30 border-t border-border-subtle bg-card/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:hidden">
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={goBack} disabled={index === 0} className="min-h-11">
             <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
@@ -515,7 +571,10 @@ function StayStep({
   };
 
   return (
-    <StepShell title={t(`umrahBuilder.${city}.title`)} subtitle={t(`umrahBuilder.${city}.subtitle`)}>
+    <StepShell
+      title={t(`umrahBuilder.${city}.title`)}
+      subtitle={t(`umrahBuilder.${city}.subtitle`)}
+    >
       <Counter
         label={t("umrahBuilder.stay.nights")}
         hint={t("umrahBuilder.stay.nightsHint")}
@@ -555,6 +614,7 @@ function StayStep({
               to={state.returnDate}
               onSelect={(hotel, name) => set({ hotelId: hotel.id, hotelName: name })}
               onFallback={() => set({ mode: "area", hotelId: null, hotelName: "" })}
+              onStaleSelection={() => set({ hotelId: null, hotelName: "" })}
             />
           )}
 
@@ -605,15 +665,26 @@ function SuccessScreen({ state, reference }: { state: BuilderState; reference: s
   const { longDate } = useLocalized();
   const { data: info } = useQuery(contactInfoQuery());
 
-  const whatsappNumber = (info?.find((c) => c.key === "whatsapp")?.value ?? "").replace(/[^\d]/g, "");
+  const whatsappNumber = (info?.find((c) => c.key === "whatsapp")?.value ?? "").replace(
+    /[^\d]/g,
+    "",
+  );
+  const phone = info?.find((c) => c.key === "phone" || c.key === "mobile")?.value ?? "";
   const message = buildWhatsAppMessage(state, t, {
     date: (v) => longDate(v),
-    area: (v) => (v ? t(`umrahBuilder.areas.makkah.${v}`, { defaultValue: v }) : ""),
+    // City-aware: Makkah and Madinah use different area codes.
+    area: (city, v) => (v ? t(`umrahBuilder.areas.${city}.${v}`, { defaultValue: v }) : ""),
     budget: (v) => (v ? t(`umrahBuilder.budgets.${v}`, { defaultValue: v }) : ""),
   });
   const whatsappHref = whatsappNumber
     ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`${reference}\n\n${message}`)}`
     : null;
+
+  const steps = [
+    t("umrahBuilder.success.next.review"),
+    t("umrahBuilder.success.next.contact"),
+    t("umrahBuilder.success.next.offer"),
+  ];
 
   return (
     <section className="mx-auto flex max-w-2xl flex-col items-center gap-5 px-4 py-20 text-center md:px-6">
@@ -625,12 +696,37 @@ function SuccessScreen({ state, reference }: { state: BuilderState; reference: s
       <p className="rounded-full bg-surface-sunken px-5 py-2 text-small font-bold tracking-wide">
         {t("umrahBuilder.success.reference")}: {reference}
       </p>
+
+      {/* What happens next — ordered because the agency works through it in order. */}
+      <div className="w-full rounded-3xl border border-border-subtle bg-card p-6 text-start">
+        <h2 className="text-small font-bold">{t("umrahBuilder.success.next.title")}</h2>
+        <ol className="mt-3 space-y-3">
+          {steps.map((step, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-caption font-bold text-primary">
+                {i + 1}
+              </span>
+              <span className="min-w-0 break-words text-small text-muted-foreground">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
       <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
         {whatsappHref && (
           <Button asChild size="lg">
             <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-              <MessageCircle className="me-2 h-5 w-5" />
+              <MessageCircle className="me-2 h-5 w-5 shrink-0" />
               {t("umrahBuilder.success.whatsapp")}
+            </a>
+          </Button>
+        )}
+        {/* Always leave a way to reach the agency, even without WhatsApp configured. */}
+        {phone && (
+          <Button asChild variant={whatsappHref ? "outline" : "default"} size="lg">
+            <a href={`tel:${phone.replace(/\s+/g, "")}`} dir="ltr">
+              <Phone className="me-2 h-5 w-5 shrink-0" />
+              {t("umrahBuilder.success.call")}
             </a>
           </Button>
         )}

@@ -34,15 +34,11 @@ export function renderEmail(data: {
     ["Phone", primary?.phone ?? "—"],
     ["Email", primary?.email ?? "—"],
     ["Preferred contact", input.communicationPreference ?? "—"],
-    ["Emergency contact", primary?.emergencyContact ?? "—"],
     [
       "Travellers",
       `${input.adults} adult(s), ${input.children} child(ren), ${input.infants} infant(s)`,
     ],
-    [
-      "Total price",
-      input.totalPrice != null ? `${input.totalPrice} ${input.currency}` : "—",
-    ],
+    ["Total price", input.totalPrice != null ? `${input.totalPrice} ${input.currency}` : "—"],
     ["Notes", input.notes ?? "—"],
     ["Customer language", LANGUAGE_NAMES[input.locale ?? "ar"] ?? "Arabic (العربية)"],
   ];
@@ -50,13 +46,11 @@ export function renderEmail(data: {
   const passengerCards = input.passengers
     .map((p, i) => {
       const url = passportUrls[i];
+      // Passport/identity details are no longer collected by the booking form;
+      // the attached passport scan is the source of truth for them.
       const lines: Array<[string, string]> = [
         ["Type", p.type],
-        ["Passport no.", p.passportNumber ?? "—"],
-        ["Nationality", p.nationality ?? "—"],
         ["Gender", p.gender ?? "—"],
-        ["Date of birth", p.dateOfBirth ?? "—"],
-        ["Passport expiry", p.passportExpiry ?? "—"],
         ["Notes", p.notes ?? "—"],
       ];
       return `<div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin:10px 0">
@@ -113,11 +107,10 @@ export function renderEmail(data: {
     "",
     ...input.passengers.map(
       (p, i) =>
-        `- ${p.fullName} (${p.type})${p.isPrimary ? " [primary]" : ""} | passport ${p.passportNumber ?? "—"} | file ${passportUrls[i] ?? "—"}`,
+        `- ${p.fullName} (${p.type})${p.isPrimary ? " [primary]" : ""} | passport file ${passportUrls[i] ?? "—"}`,
     ),
   ].join("\n");
 
   const subject = `New booking — ${primary?.fullName ?? "Customer"} — ${input.packageTitle ?? "General"}`;
   return { html, text, subject };
 }
-

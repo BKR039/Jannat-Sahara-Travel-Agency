@@ -11,46 +11,10 @@ export const FLIGHT_REQUEST_STATUSES = [
   "cancelled",
 ] as const;
 
-export const CABIN_LABELS_AR: Record<(typeof CABIN_CLASSES)[number], string> = {
-  economy: "الدرجة الاقتصادية",
-  premium_economy: "اقتصادية مميزة",
-  business: "درجة رجال الأعمال",
-  first: "الدرجة الأولى",
-};
+export type CabinClass = (typeof CABIN_CLASSES)[number];
 
-export const CABIN_LABELS_FR: Record<(typeof CABIN_CLASSES)[number], string> = {
-  economy: "Classe économique",
-  premium_economy: "Économique premium",
-  business: "Classe affaires",
-  first: "Première classe",
-};
-
-/** English cabin labels (public English UI + internal notification emails). */
-export const CABIN_LABELS_EN: Record<(typeof CABIN_CLASSES)[number], string> = {
-  economy: "Economy",
-  premium_economy: "Premium economy",
-  business: "Business",
-  first: "First",
-};
-
-export function cabinLabel(
-  cabin: (typeof CABIN_CLASSES)[number],
-  lang: string | undefined,
-): string {
-  const base = (lang ?? "ar").split("-")[0];
-  if (base === "fr") return CABIN_LABELS_FR[cabin];
-  if (base === "en") return CABIN_LABELS_EN[cabin];
-  return CABIN_LABELS_AR[cabin];
-}
-
-export const STATUS_LABELS: Record<(typeof FLIGHT_REQUEST_STATUSES)[number], string> = {
-  new: "New",
-  contacted: "Contacted",
-  waiting: "Waiting",
-  quoted: "Quoted",
-  confirmed: "Confirmed",
-  cancelled: "Cancelled",
-};
+// Display labels are NOT stored here. This module holds stable wire values only;
+// the visible label is resolved through i18n in ./flight-request.labels.
 
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date");
 
