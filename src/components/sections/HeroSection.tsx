@@ -9,7 +9,6 @@ import {
   galleryQuery,
   statsQuery,
 } from "@/lib/queries";
-import { Container } from "@/components/common/Section";
 import { pickLocalizedList, useLocalized } from "@/lib/localize";
 import { HeroMedia } from "./hero/HeroMedia";
 import {
@@ -94,11 +93,10 @@ export function HeroSection() {
   const cardImage = gallery?.[0]?.image ?? null;
 
   return (
-    <section className="relative isolate overflow-hidden bg-hero-canvas">
+    <section className="relative isolate overflow-hidden bg-hero-canvas min-h-[36rem] lg:min-h-[clamp(42rem,85vh,52rem)] flex flex-col justify-center">
       {/*
        * The photograph is the LCP element. The preload hint has to mirror the
-       * img's srcSet/sizes exactly, otherwise the browser fetches the
-       * full-width file and then a second, narrower one for the element.
+       * img's srcSet/sizes exactly.
        */}
       {hero?.image && (
         <link
@@ -106,37 +104,31 @@ export function HeroSection() {
           as="image"
           href={hero.image}
           imageSrcSet={transformSrcSet(hero.image)}
-          imageSizes="100vw"
+          imageSizes="(min-width: 1024px) 55vw, 100vw"
           fetchPriority="high"
         />
       )}
 
-      <Container className="relative z-10">
-        {/*
-         * A tall first screen, but bounded: a flat 85vh pushes the CTAs off a
-         * short laptop or a phone in landscape, so the viewport height only
-         * applies between a floor and a ceiling. `lg:ml-auto` is physical, not
-         * logical — the copy stays opposite the Kaaba in both directions.
-         *
-         * Anchored to the top rather than centred. Centring made the whole
-         * composition depend on how much text a language happens to have: the
-         * headline started 42px lower in English than in French and the trust
-         * row moved 104px between Arabic and English, so the three heroes did
-         * not read as the same design. A fixed top offset puts the badge and
-         * the headline on the same line in every language, and the block grows
-         * downwards into space the layout already reserves.
-         */}
-        <div className="flex min-h-[24rem] flex-col justify-start pb-10 pt-12 lg:min-h-[clamp(38rem,84vh,50rem)] lg:pb-12 lg:pt-24">
-          <div className="lg:ml-auto lg:w-[46%] xl:w-[44%]">
+      {/*
+       * Full-width intelligent composition:
+       * In RTL (Arabic-first):
+       * - Right side: Hero copy (45-48% width), naturally anchored on the right.
+       * - Left side: Existing Kaaba image (52-55% width), anchored on the left edge.
+       * - Seamless transition connects them into one premium composition.
+       */}
+      <div className="relative z-10 w-full px-4 sm:px-8 lg:pe-12 xl:pe-16 2xl:pe-24 lg:ps-10 xl:ps-14">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          {/* Content column: naturally on the right in RTL, and explicitly pinned right in LTR */}
+          <div className="w-full py-10 lg:py-16 xl:py-20 lg:w-[48%] xl:w-[46%] 2xl:w-[44%] text-start [dir=ltr]:lg:ml-auto">
             <HeroCopy>
               <HeroEyebrow label={badges[0] ?? ""} />
 
-              <h1 className="ds-reveal mt-6 text-display text-balance text-foreground">
+              <h1 className="ds-reveal mt-5 font-display text-[clamp(2.15rem,1.75rem+2vw,3.75rem)] font-black leading-[1.28] sm:leading-[1.32] text-foreground">
                 {heroTitle || t("brand.tagline")}
               </h1>
 
               {(heroBody || heroSubtitle) && (
-                <p className="ds-reveal mt-6 text-body-lg leading-relaxed text-text-secondary">
+                <p className="ds-reveal mt-5 text-body-lg leading-relaxed text-text-secondary max-w-xl">
                   {heroBody || heroSubtitle}
                 </p>
               )}
@@ -152,34 +144,34 @@ export function HeroSection() {
             </HeroCopy>
           </div>
         </div>
-      </Container>
-
-      {/*
-       * Below lg this wrapper gives the photograph the page gutters and places
-       * it after the copy; from lg up it stops generating a box entirely so the
-       * media can position itself against the section and bleed full width.
-       */}
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:contents">
-        <HeroMedia
-          image={hero?.image ?? null}
-          alt={t("home.hero.imageAlt")}
-          objectPosition="22% 62%"
-        />
       </div>
 
       {/*
-       * Floats over the open courtyard on the left, opposite the copy and clear
-       * of the Kaaba, in both directions. Physical `left` on purpose — the card
-       * follows the photograph, not the text direction. Last in the section so
-       * it stays clickable above the container that shares its area.
+       * Left side in RTL (Media column):
+       * Anchored to the left edge on desktop, occupying 52-55% of the viewport.
+       * Below lg, it stacks cleanly below the copy with comfortable page margins.
        */}
-      <div className="absolute bottom-6 left-4 z-20 max-w-[18rem] sm:left-6 lg:bottom-10 lg:left-8">
-        <HeroMediaCard
-          image={cardImage}
-          eyebrow={t("home.hero.mediaEyebrow")}
-          title={t("home.hero.mediaTitle")}
-          cta={t("home.hero.mediaCta")}
-        />
+      <div className="w-full px-4 sm:px-6 pb-10 lg:p-0 lg:absolute lg:inset-y-0 lg:left-0 lg:w-[52%] xl:w-[54%] 2xl:w-[55%] lg:h-full z-0">
+        <div className="relative h-[20rem] sm:h-[26rem] lg:h-full w-full overflow-hidden rounded-card-lg lg:rounded-none shadow-sm lg:shadow-none">
+          <HeroMedia
+            image={hero?.image ?? null}
+            alt={t("home.hero.imageAlt")}
+            objectPosition="26% 50%"
+          />
+
+          {/*
+           * Teaser card: floats over the open courtyard on the left, clear of the Kaaba.
+           * Stays clickable above the photo in both desktop and mobile viewports.
+           */}
+          <div className="absolute bottom-4 left-4 z-20 max-w-[17rem] sm:bottom-6 sm:left-6 lg:bottom-10 lg:left-10 sm:max-w-[19rem]">
+            <HeroMediaCard
+              image={cardImage}
+              eyebrow={t("home.hero.mediaEyebrow")}
+              title={t("home.hero.mediaTitle")}
+              cta={t("home.hero.mediaCta")}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

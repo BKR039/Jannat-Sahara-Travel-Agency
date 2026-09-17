@@ -44,18 +44,21 @@ export interface HeroBenefit {
 export function HeroBenefits({ items }: { items: HeroBenefit[] }) {
   if (items.length === 0) return null;
   return (
-    <ul className="ds-reveal mt-8 grid gap-x-5 gap-y-4 xl:grid-cols-3">
+    <ul className="ds-reveal mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 sm:gap-4">
       {items.map((b) => (
-        <li key={b.id} className="flex items-start gap-3">
+        <li
+          key={b.id}
+          className="flex items-start gap-3 rounded-card bg-surface/40 p-2.5 sm:p-0 sm:bg-transparent border border-border/30 sm:border-0"
+        >
           {/* Same badge as the features section below: one icon language for
               the page, rather than a circle here and a rounded square there. */}
-          <IconBadge name={b.icon} size="md" tone="surface" className="bg-surface" />
+          <IconBadge name={b.icon} size="md" tone="surface" className="bg-surface shadow-xs shrink-0" />
           <span className="min-w-0">
             <span className="block text-small font-bold leading-snug text-foreground">
               {b.title}
             </span>
             {b.description && (
-              <span className="mt-0.5 block text-caption leading-relaxed text-muted-foreground">
+              <span className="mt-0.5 block text-caption leading-relaxed text-muted-foreground line-clamp-2">
                 {b.description}
               </span>
             )}
@@ -77,12 +80,12 @@ export function HeroActions({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="ds-reveal mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-      <Button asChild size="lg" className="group">
+    <div className="ds-reveal mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center">
+      <Button asChild size="lg" className="group font-bold px-6 shadow-brand-glow hover:shadow-brand-glow-lg transition-all">
         <Link to={primaryHref}>
           {primaryLabel}
           <ArrowRight
-            className="ms-1 h-5 w-5 shrink-0 transition-transform duration-base ease-standard group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+            className="ms-2 h-5 w-5 shrink-0 transition-transform duration-base ease-standard group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
             aria-hidden="true"
           />
         </Link>
@@ -95,10 +98,10 @@ export function HeroActions({
         asChild
         size="lg"
         variant="outline"
-        className="border-border-strong bg-surface/70 text-foreground hover:border-primary hover:bg-surface hover:text-primary"
+        className="border-border-strong bg-surface/80 text-foreground hover:border-primary hover:bg-surface hover:text-primary px-6 font-semibold backdrop-blur-xs transition-all"
       >
         <Link to="/flights">
-          <Plane className="me-1 h-5 w-5 shrink-0" aria-hidden="true" />
+          <Plane className="me-2 h-5 w-5 shrink-0" aria-hidden="true" />
           {t("nav.flights")}
         </Link>
       </Button>
@@ -126,15 +129,15 @@ export interface HeroStat {
 export function HeroTrust({ stats }: { stats: HeroStat[] }) {
   if (stats.length === 0) return null;
   return (
-    <dl className="ds-reveal mt-10 flex flex-wrap items-center gap-x-10 gap-y-4">
+    <dl className="ds-reveal mt-9 flex flex-wrap items-center gap-x-8 gap-y-4 pt-6 border-t border-border/50">
       {stats.map((s) => (
-        <div key={s.id} className="flex items-baseline gap-2">
+        <div key={s.id} className="flex items-baseline gap-2.5">
           <dt className="sr-only">{s.label}</dt>
           <dd className="flex items-baseline gap-2">
             <span className="text-h3 font-extrabold leading-none text-primary" dir="ltr">
               {s.value}
             </span>
-            <span className="max-w-[9rem] text-small font-medium leading-snug text-text-secondary">
+            <span className="max-w-[9.5rem] text-small font-medium leading-snug text-text-secondary">
               {s.label}
             </span>
           </dd>
@@ -168,7 +171,7 @@ export function HeroMediaCard({
     <Link
       to="/gallery"
       aria-label={`${title} — ${cta}`}
-      className="group flex items-center gap-3 rounded-card border border-border-subtle bg-surface/85 p-2.5 shadow-lg backdrop-blur-md transition-transform duration-base ease-standard hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="group flex items-center gap-3 rounded-card border border-border-subtle bg-surface/90 p-2.5 shadow-lg backdrop-blur-md transition-transform duration-base ease-standard hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <span className="relative block h-14 w-16 shrink-0 overflow-hidden rounded-input bg-surface-sunken">
         {image && (
@@ -194,5 +197,5 @@ export function HeroMediaCard({
 
 /** Content column: keeps the editorial measure honest at every width. */
 export function HeroCopy({ children }: { children: ReactNode }) {
-  return <div className="max-w-xl lg:max-w-[36rem]">{children}</div>;
+  return <div className="w-full max-w-xl lg:max-w-2xl xl:max-w-[42rem]">{children}</div>;
 }

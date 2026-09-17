@@ -33,12 +33,7 @@ export function HeroMedia({
   objectPosition: string;
 }) {
   return (
-    <div
-      className={[
-        "relative h-[19rem] w-full overflow-hidden rounded-card-lg sm:h-[24rem]",
-        "lg:absolute lg:inset-0 lg:-z-10 lg:h-full lg:rounded-none",
-      ].join(" ")}
-    >
+    <div className="relative h-full w-full overflow-hidden">
       {image ? (
         <img
           src={image}
@@ -47,7 +42,7 @@ export function HeroMedia({
           loading="eager"
           decoding="sync"
           fetchPriority="high"
-          sizes="100vw"
+          sizes="(min-width: 1024px) 55vw, 100vw"
           style={{ objectPosition }}
           className="h-full w-full object-cover"
         />
@@ -55,7 +50,7 @@ export function HeroMedia({
         <div className="h-full w-full bg-surface-sunken" aria-hidden="true" />
       )}
 
-      {/* Readability for the copy column, on one side, from lg only. */}
+      {/* Directional wash that softly dissolves the inner edge towards the copy */}
       <div className="ds-hero-wash pointer-events-none absolute inset-0" aria-hidden="true" />
     </div>
   );

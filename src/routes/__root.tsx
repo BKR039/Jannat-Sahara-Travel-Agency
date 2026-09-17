@@ -144,6 +144,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               { rel: "icon", href: "/favicon.ico", sizes: "any" },
               { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
             ]),
+        {
+          rel: "preload",
+          href: "/fonts/alfont_com_TheYearofHandicrafts-SemiBold.otf",
+          as: "font",
+          type: "font/otf",
+          crossOrigin: "anonymous",
+        },
+        {
+          rel: "preload",
+          href: "/fonts/alfont_com_TheYearofHandicrafts-Black.otf",
+          as: "font",
+          type: "font/otf",
+          crossOrigin: "anonymous",
+        },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         {
