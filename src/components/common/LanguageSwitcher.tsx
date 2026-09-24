@@ -34,7 +34,7 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
-          className="min-h-11 gap-2 rounded-full"
+          className="rounded-full"
           aria-label={t("actions.changeLanguage")}
         >
           <Globe className="h-4 w-4" />

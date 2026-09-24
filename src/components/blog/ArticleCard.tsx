@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
 import type { Article } from "@/lib/queries";
@@ -11,7 +12,7 @@ export function ArticleCard({
   index = 0,
 }: {
   article: Article;
-  onOpen: (slug: string) => void;
+  onOpen?: (slug: string) => void;
   index?: number;
 }) {
   const { t } = useTranslation();
@@ -20,13 +21,8 @@ export function ArticleCard({
   const title = L(article, "title");
   const excerpt = L(article, "excerpt", "empty");
 
-  return (
-    <article
-      /* Border-first: no resting shadow, and the hover reads as a change of
-         border and tint rather than the card lifting off the page. */
-      className="ds-reveal group flex h-full flex-col overflow-hidden rounded-card border border-border-subtle bg-card transition-[border-color,transform] duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 motion-reduce:transform-none"
-      style={{ animationDelay: `${index * 60}ms` }}
-    >
+  const cardContent = (
+    <>
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         {article.cover ? (
           <img
@@ -61,18 +57,45 @@ export function ArticleCard({
         {excerpt && (
           <p className="line-clamp-3 text-small leading-relaxed text-muted-foreground">{excerpt}</p>
         )}
-        <button
-          type="button"
-          onClick={() => onOpen(article.slug)}
-          className="mt-auto inline-flex min-h-11 items-center gap-1.5 self-start text-caption font-semibold text-primary transition-transform duration-base hover:gap-2.5"
-        >
+        <span className="mt-auto inline-flex min-h-11 items-center gap-1.5 self-start text-caption font-semibold text-primary transition-transform duration-base group-hover:gap-2.5">
           {t("blog.readMore")}
-          {/* `ArrowLeft` here pointed backwards in both directions: left in
-              LTR, and right once the RTL rotation flipped it. Forward is
-              rightward in LTR and leftward in RTL, which is what this is. */}
           <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
-        </button>
+        </span>
       </div>
-    </article>
+    </>
+  );
+
+  const containerClasses =
+    "ds-reveal group flex h-full flex-col overflow-hidden rounded-card border border-border-subtle bg-card transition-[border-color,transform] duration-base ease-standard hover:-translate-y-0.5 hover:border-primary/40 motion-reduce:transform-none";
+
+  if (onOpen) {
+    return (
+      <article
+        className={containerClasses}
+        style={{ animationDelay: `${index * 60}ms` }}
+        onClick={() => onOpen(article.slug)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpen(article.slug);
+          }
+        }}
+      >
+        {cardContent}
+      </article>
+    );
+  }
+
+  return (
+    <Link
+      to="/blog/$slug"
+      params={{ slug: article.slug }}
+      className={containerClasses}
+      style={{ animationDelay: `${index * 60}ms` }}
+    >
+      <article className="flex h-full flex-col">{cardContent}</article>
+    </Link>
   );
 }

@@ -14,12 +14,15 @@ import {
   Phone,
   Plane,
   Send,
+  Sparkles,
   Users,
 } from "lucide-react";
 import { AirportCombobox } from "@/components/flights/AirportCombobox";
+import { BuilderStepNavigation } from "@/components/common/BuilderStepNavigation";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/layout/SiteLayout";
-import { contactInfoQuery } from "@/lib/queries";
+import { cn } from "@/lib/utils";
+import { contactInfoQuery, packagesQuery } from "@/lib/queries";
 import { useLocalized } from "@/lib/localize";
 import { submitCustomPackageRequest } from "@/lib/umrah-builder.functions";
 import {
@@ -28,6 +31,7 @@ import {
   MADINAH_AREAS,
   MAKKAH_AREAS,
   ROOM_TYPES,
+  calculateTotalNights,
   earliestDepartureISO,
   latestDepartureISO,
   type BudgetLevel,
@@ -40,8 +44,10 @@ import {
   buildWhatsAppMessage,
   clearDraft,
   loadDraft,
+  rebalanceNights,
   saveDraft,
   stepValid,
+  totalTripNights,
   travellersTotal,
   tripDays,
   type BuilderState,
@@ -52,6 +58,7 @@ import {
   ChoiceCard,
   Counter,
   DateRangeField,
+  RouteVisualizer,
   StepShell,
   SummaryBody,
   SummaryPanel,
@@ -73,6 +80,11 @@ export function UmrahBuilder() {
   const { t } = useTranslation();
   const { lang, L } = useLocalized();
   const submit = useServerFn(submitCustomPackageRequest);
+
+  const { data: officialPackages } = useQuery(packagesQuery("umrah"));
+  const sortedOfficialTrips = (officialPackages ?? [])
+    .slice()
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
   const [state, setState] = useState<BuilderState>(INITIAL_STATE);
   const [index, setIndex] = useState(0);
@@ -119,11 +131,24 @@ export function UmrahBuilder() {
         if (state.returnDate === state.departureDate) return t("umrahBuilder.validation.minStay");
         return t("umrahBuilder.validation.dateOrder");
       case "flights":
+        if (
+          state.flightPreference === "stopover" &&
+          state.additionalDestination.trim().length < 2
+        ) {
+          return t("umrahBuilder.validation.destinationRequired");
+        }
         return t("umrahBuilder.validation.flights");
       case "travellers":
         return t("umrahBuilder.validation.adults");
       case "makkah":
+        if (state.makkahMode === "custom_hotel" && state.makkahHotelName.trim().length < 2) {
+          return t("umrahBuilder.validation.hotelRequired");
+        }
+        return t("umrahBuilder.validation.stay");
       case "madinah":
+        if (state.madinahMode === "custom_hotel" && state.madinahHotelName.trim().length < 2) {
+          return t("umrahBuilder.validation.hotelRequired");
+        }
         return t("umrahBuilder.validation.stay");
       case "room":
         if (!state.roomType) return t("umrahBuilder.validation.room");
@@ -187,12 +212,18 @@ export function UmrahBuilder() {
           departureAirport: state.departureAirport,
           returnAirport: state.returnAirport,
           airportFlexible: state.airportFlexible,
+          flightPreference: state.flightPreference || undefined,
+          transitHub: state.transitHub?.trim() || undefined,
+          additionalDestination: state.additionalDestination?.trim() || undefined,
+          destinationTiming: state.destinationTiming || undefined,
           makkahNights: state.makkahNights,
           makkahHotelId: state.makkahHotelId,
+          makkahHotelName: state.makkahHotelName?.trim() || undefined,
           makkahArea: state.makkahArea || undefined,
           makkahPreference: state.makkahPreference || undefined,
           madinahNights: state.madinahNights,
           madinahHotelId: state.madinahHotelId,
+          madinahHotelName: state.madinahHotelName?.trim() || undefined,
           madinahArea: state.madinahArea || undefined,
           madinahPreference: state.madinahPreference || undefined,
           adults: state.adults,
@@ -225,7 +256,64 @@ export function UmrahBuilder() {
     );
   }
 
-  const nights = tripDays(state.departureDate, state.returnDate) - 1;
+  const nights = totalTripNights(state);
+
+  const currentStepSummary = (() => {
+    switch (step) {
+      case "dates":
+        if (state.packageTitle) {
+          return `${state.packageTitle} (14 ${t("umrahBuilder.summary.nights", "ليلة")})`;
+        }
+        if (state.departureDate && state.returnDate) {
+          return `${state.departureDate} → ${state.returnDate} (${nights} ${t("umrahBuilder.summary.nights", "ليلة")})`;
+        }
+        return null;
+      case "flights":
+        if (state.flightPreference) {
+          const prefLabel = t(`umrahBuilder.flights.preferences.${state.flightPreference}`);
+          const route =
+            state.departureAirport && state.returnAirport
+              ? ` · ${state.departureAirport} → ${state.returnAirport}`
+              : "";
+          return `${prefLabel}${route}`;
+        }
+        return null;
+      case "travellers":
+        return `${state.adults} ${t("umrahBuilder.travellers.adults")}${
+          state.children > 0 ? ` · ${state.children} ${t("umrahBuilder.travellers.children")}` : ""
+        }${state.infants > 0 ? ` · ${state.infants} ${t("umrahBuilder.travellers.infants")}` : ""}`;
+      case "makkah":
+        if (state.makkahNights === 0) return t("umrahBuilder.stay.skipped", "تخطي مكة");
+        if (state.makkahHotelName) {
+          return `${state.makkahHotelName} (${state.makkahNights} ${t("umrahBuilder.summary.nights", "ليالٍ")})`;
+        }
+        if (state.makkahArea) {
+          return `${areaLabel("makkah", state.makkahArea)} (${state.makkahNights} ${t("umrahBuilder.summary.nights", "ليالٍ")})`;
+        }
+        return null;
+      case "madinah":
+        if (state.madinahNights === 0) return t("umrahBuilder.stay.skipped", "تخطي المدينة");
+        if (state.madinahHotelName) {
+          return `${state.madinahHotelName} (${state.madinahNights} ${t("umrahBuilder.summary.nights", "ليالٍ")})`;
+        }
+        if (state.madinahArea) {
+          return `${areaLabel("madinah", state.madinahArea)} (${state.madinahNights} ${t("umrahBuilder.summary.nights", "ليالٍ")})`;
+        }
+        return null;
+      case "room":
+        if (state.roomType) {
+          return `${t("umrahBuilder.room.title", "الغرفة")}: ${roomLabel}`;
+        }
+        return null;
+      case "contact":
+        if (state.name.trim()) {
+          return `${state.name.trim()}${state.phone.trim() ? ` · ${state.phone.trim()}` : ""}`;
+        }
+        return null;
+      default:
+        return null;
+    }
+  })();
 
   return (
     <SiteLayout>
@@ -266,19 +354,138 @@ export function UmrahBuilder() {
                 title={t("umrahBuilder.dates.title")}
                 subtitle={t("umrahBuilder.dates.subtitle")}
               >
+                {sortedOfficialTrips.length > 0 && (
+                  <div className="space-y-3 pb-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-small font-bold text-foreground">
+                        رحلات موسم العمرة الرسمي 2026–2027
+                      </p>
+                      <span className="text-caption font-semibold text-primary">
+                        14 يوم (14 يوماً)
+                      </span>
+                    </div>
+                    <div className="grid gap-2.5 sm:grid-cols-2">
+                      {sortedOfficialTrips.map((pkg) => {
+                        const isSelected =
+                          state.packageId === pkg.id ||
+                          (state.departureDate === pkg.departure_date &&
+                            state.returnDate === pkg.return_date &&
+                            state.flightRoute === pkg.flight_route);
+                        return (
+                          <button
+                            key={pkg.id}
+                            type="button"
+                            onClick={() => {
+                              const from = pkg.departure_date || "";
+                              const to = pkg.return_date || "";
+                              const isMadinahFirst = pkg.arrival_airport === "Madinah";
+                              const m = isMadinahFirst ? 6 : 8;
+                              const d = isMadinahFirst ? 8 : 6;
+
+                              patch({
+                                packageId: pkg.id,
+                                packageTitle: pkg.title,
+                                departureDate: from,
+                                returnDate: to,
+                                departureAirport: "TUN",
+                                arrivalAirport: pkg.arrival_airport || "Jeddah",
+                                returnAirport: pkg.departure_airport || "Madinah",
+                                flightRoute: pkg.flight_route || "",
+                                packagePrice: Number(pkg.price) || 0,
+                                packageNotes: pkg.notes || "",
+                                makkahNights: m,
+                                madinahNights: d,
+                              });
+                            }}
+                            className={cn(
+                              "flex flex-col items-start p-3.5 rounded-2xl border text-start transition-all",
+                              isSelected
+                                ? "border-primary bg-primary/10 shadow-sm ring-2 ring-primary/40"
+                                : "border-border-subtle bg-card hover:border-primary/40",
+                            )}
+                          >
+                            <div className="flex w-full items-center justify-between gap-1">
+                              <span className="text-small font-bold text-foreground">
+                                {pkg.title}
+                              </span>
+                              <span className="text-caption font-bold text-primary">
+                                {pkg.price} TND
+                              </span>
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-2 text-caption text-muted-foreground">
+                              <span>
+                                {pkg.departure_date} → {pkg.return_date}
+                              </span>
+                              <span>•</span>
+                              <span className="font-semibold text-foreground/90">
+                                {pkg.flight_route}
+                              </span>
+                            </div>
+                            {pkg.notes && pkg.notes !== "-" && (
+                              <span className="mt-1.5 inline-flex rounded-md bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                                {pkg.notes}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="relative my-4 flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border-subtle" />
+                      </div>
+                      <span className="relative bg-card px-3 text-caption text-muted-foreground">
+                        أو حدد تواريخ مخصصة بالتقويم
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <DateRangeField
                   from={state.departureDate}
                   to={state.returnDate}
-                  onChange={(from, to) => patch({ departureDate: from, returnDate: to })}
+                  onChange={(from, to) => {
+                    const newTotal = calculateTotalNights(from, to);
+                    if (newTotal > 0) {
+                      const currentTotal = state.makkahNights + state.madinahNights;
+                      let m = state.makkahNights;
+                      let d = state.madinahNights;
+                      if (currentTotal !== newTotal || m > newTotal) {
+                        if (currentTotal > 0) {
+                          m = Math.min(
+                            newTotal,
+                            Math.max(1, Math.round((state.makkahNights / currentTotal) * newTotal)),
+                          );
+                          d = newTotal - m;
+                        } else {
+                          m = Math.max(1, Math.ceil(newTotal * 0.6));
+                          d = newTotal - m;
+                        }
+                      }
+                      patch({
+                        departureDate: from,
+                        returnDate: to,
+                        makkahNights: m,
+                        madinahNights: d,
+                      });
+                    } else {
+                      patch({ departureDate: from, returnDate: to });
+                    }
+                  }}
                   labelFrom={t("umrahBuilder.dates.from")}
                   labelTo={t("umrahBuilder.dates.to")}
                   placeholder={t("umrahBuilder.dates.placeholder")}
                 />
                 {nights > 0 && (
-                  <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-caption font-semibold text-primary">
-                    <CalendarDays className="h-4 w-4" />
-                    {t("umrahBuilder.dates.duration", { count: nights })}
-                  </p>
+                  <div className="space-y-2">
+                    <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-caption font-semibold text-primary">
+                      <CalendarDays className="h-4 w-4" />
+                      {t("umrahBuilder.dates.duration", { count: nights })}
+                    </p>
+                    <p className="text-caption text-muted-foreground">
+                      {t("umrahBuilder.stay.allocationRule", { count: nights })}
+                    </p>
+                  </div>
                 )}
               </StepShell>
             )}
@@ -333,9 +540,121 @@ export function UmrahBuilder() {
                     })
                   }
                 />
-                <p className="text-caption text-muted-foreground">
-                  {t("umrahBuilder.flights.note")}
-                </p>
+
+                {/* Flight Itinerary Preference: Direct, Transit, Stopover */}
+                <div className="space-y-4 border-t border-border-subtle pt-5">
+                  <div className="space-y-1">
+                    <h3 className="text-small font-bold text-foreground">
+                      {t("umrahBuilder.flights.preferenceTitle")}
+                    </h3>
+                    <p className="text-caption text-muted-foreground">
+                      {t("umrahBuilder.flights.preferenceSubtitle")}
+                    </p>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <ChoiceCard
+                      selected={state.flightPreference === "direct"}
+                      icon={<Plane className="h-5 w-5" />}
+                      title={t("umrahBuilder.flights.preferences.direct")}
+                      description={t("umrahBuilder.flights.preferences.directDesc")}
+                      onClick={() =>
+                        patch({
+                          flightPreference: "direct",
+                          transitHub: "",
+                          additionalDestination: "",
+                        })
+                      }
+                    />
+                    <ChoiceCard
+                      selected={state.flightPreference === "transit"}
+                      icon={<Compass className="h-5 w-5" />}
+                      title={t("umrahBuilder.flights.preferences.transit")}
+                      description={t("umrahBuilder.flights.preferences.transitDesc")}
+                      onClick={() =>
+                        patch({
+                          flightPreference: "transit",
+                          additionalDestination: "",
+                        })
+                      }
+                    />
+                    <ChoiceCard
+                      selected={state.flightPreference === "stopover"}
+                      icon={<Sparkles className="h-5 w-5" />}
+                      title={t("umrahBuilder.flights.preferences.stopover")}
+                      description={t("umrahBuilder.flights.preferences.stopoverDesc")}
+                      onClick={() =>
+                        patch({
+                          flightPreference: "stopover",
+                          transitHub: "",
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* Transit Progressive Disclosure & Guidance */}
+                  {state.flightPreference === "transit" && (
+                    <div className="space-y-3.5 rounded-3xl border border-sky-200/60 bg-sky-50/50 p-5 dark:border-sky-900/40 dark:bg-sky-950/20">
+                      <p className="text-caption font-semibold leading-relaxed text-sky-900 dark:text-sky-300">
+                        {t("umrahBuilder.flights.differenceNote")}
+                      </p>
+                      <TextField
+                        id="builder-transit-hub"
+                        label={t("umrahBuilder.flights.transitHubLabel")}
+                        placeholder={t("umrahBuilder.flights.transitHubPlaceholder")}
+                        value={state.transitHub}
+                        onChange={(transitHub) => patch({ transitHub })}
+                      />
+                    </div>
+                  )}
+
+                  {/* Stopover Progressive Disclosure & Guidance */}
+                  {state.flightPreference === "stopover" && (
+                    <div className="space-y-4 rounded-3xl border border-amber-200/60 bg-amber-50/50 p-5 dark:border-amber-900/40 dark:bg-amber-950/20">
+                      <p className="text-caption font-semibold leading-relaxed text-amber-900 dark:text-amber-300">
+                        {t("umrahBuilder.flights.differenceNote")}
+                      </p>
+                      <TextField
+                        id="builder-stopover-dest"
+                        label={t("umrahBuilder.flights.stopoverCityLabel")}
+                        placeholder={t("umrahBuilder.flights.stopoverCityPlaceholder")}
+                        value={state.additionalDestination}
+                        onChange={(additionalDestination) => patch({ additionalDestination })}
+                        required
+                      />
+
+                      <div className="space-y-2">
+                        <label className="text-caption font-semibold text-muted-foreground">
+                          {t("umrahBuilder.flights.stopoverTimingLabel")}
+                        </label>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <ChoiceCard
+                            selected={state.destinationTiming === "after_umrah"}
+                            title={t("umrahBuilder.flights.stopoverTiming.after_umrah")}
+                            onClick={() => patch({ destinationTiming: "after_umrah" })}
+                          />
+                          <ChoiceCard
+                            selected={state.destinationTiming === "before_umrah"}
+                            title={t("umrahBuilder.flights.stopoverTiming.before_umrah")}
+                            onClick={() => patch({ destinationTiming: "before_umrah" })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Visual Itinerary Route Preview */}
+                  <div className="space-y-2 rounded-2xl border border-border-subtle bg-surface-sunken/40 p-4">
+                    <p className="text-caption font-bold uppercase tracking-wider text-muted-foreground">
+                      {t("umrahBuilder.flights.itineraryPreview")}
+                    </p>
+                    <RouteVisualizer state={state} />
+                  </div>
+
+                  <p className="text-caption text-muted-foreground">
+                    {t("umrahBuilder.flights.note")}
+                  </p>
+                </div>
               </StepShell>
             )}
 
@@ -486,21 +805,17 @@ export function UmrahBuilder() {
               </p>
             )}
 
-            {/* Desktop navigation */}
-            <div className="hidden items-center justify-between gap-3 sm:flex">
-              <Button variant="outline" onClick={goBack} disabled={index === 0}>
-                <ArrowLeft className="me-2 h-4 w-4 rtl:-scale-x-100" />
-                {t("umrahBuilder.nav.back")}
-              </Button>
-              <Button onClick={goNext} disabled={sending} size="lg">
-                {index === BUILDER_STEPS.length - 1
-                  ? sending
-                    ? t("umrahBuilder.nav.submitting")
-                    : t("umrahBuilder.nav.submit")
-                  : t("umrahBuilder.nav.next")}
-                <ArrowRight className="ms-2 h-4 w-4 rtl:-scale-x-100" />
-              </Button>
-            </div>
+            {/* Persistent Step Navigation */}
+            <BuilderStepNavigation
+              onBack={goBack}
+              onNext={goNext}
+              backDisabled={index === 0}
+              nextDisabled={sending}
+              isSubmitting={sending}
+              isFinalStep={index === BUILDER_STEPS.length - 1}
+              selectedSummary={currentStepSummary}
+              className="sm:rounded-2xl sm:border sm:border-border-subtle sm:bottom-4"
+            />
           </div>
 
           <SummaryPanel>
@@ -514,24 +829,6 @@ export function UmrahBuilder() {
               {t("umrahBuilder.summary.noPrice")}
             </p>
           </SummaryPanel>
-        </div>
-      </div>
-
-      {/* Mobile sticky navigation. `sticky` keeps it in flow so it never covers
-          the last field, and the safe-area inset clears the iOS home indicator. */}
-      <div className="sticky bottom-0 z-30 border-t border-border-subtle bg-card/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:hidden">
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={goBack} disabled={index === 0} className="min-h-11">
-            <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
-            <span className="sr-only">{t("umrahBuilder.nav.back")}</span>
-          </Button>
-          <Button onClick={goNext} disabled={sending} className="min-h-11 flex-1">
-            {index === BUILDER_STEPS.length - 1
-              ? sending
-                ? t("umrahBuilder.nav.submitting")
-                : t("umrahBuilder.nav.submit")
-              : t("umrahBuilder.nav.next")}
-          </Button>
         </div>
       </div>
     </SiteLayout>
@@ -555,9 +852,11 @@ function StayStep({
 }) {
   const { t } = useTranslation();
 
+  const totalNights = totalTripNights(state);
   const nights = city === "makkah" ? state.makkahNights : state.madinahNights;
   const mode = city === "makkah" ? state.makkahMode : state.madinahMode;
   const hotelId = city === "makkah" ? state.makkahHotelId : state.madinahHotelId;
+  const customHotelName = city === "makkah" ? state.makkahHotelName : state.madinahHotelName;
   const area = city === "makkah" ? state.makkahArea : state.madinahArea;
   const preference = city === "makkah" ? state.makkahPreference : state.madinahPreference;
   const areas = city === "makkah" ? MAKKAH_AREAS : MADINAH_AREAS;
@@ -570,18 +869,71 @@ function StayStep({
     patch(prefixed as Partial<BuilderState>);
   };
 
+  const isHotelMode = mode === "hotel" || mode === "custom_hotel" || mode === "";
+
   return (
     <StepShell
       title={t(`umrahBuilder.${city}.title`)}
       subtitle={t(`umrahBuilder.${city}.subtitle`)}
     >
+      {/* Night Allocation Summary Card */}
+      <div className="space-y-3 rounded-3xl border border-primary/25 bg-primary/[0.04] p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle/70 pb-3">
+          <div>
+            <span className="text-caption font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("umrahBuilder.stay.totalTripLabel")}
+            </span>
+            <p className="text-body font-bold text-foreground">
+              {totalNights > 0
+                ? t("umrahBuilder.stay.totalTripNights", { count: totalNights })
+                : t("umrahBuilder.summary.nightsCount", { count: nights })}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                "rounded-full px-3 py-1 text-caption font-bold transition-colors",
+                city === "makkah"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-surface-sunken text-foreground/80",
+              )}
+            >
+              {t("umrahBuilder.stay.makkahNightsSummary", { count: state.makkahNights })}
+            </span>
+            <span
+              className={cn(
+                "rounded-full px-3 py-1 text-caption font-bold transition-colors",
+                city === "madinah"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-surface-sunken text-foreground/80",
+              )}
+            >
+              {t("umrahBuilder.stay.madinahNightsSummary", { count: state.madinahNights })}
+            </span>
+          </div>
+        </div>
+
+        <p className="text-caption leading-relaxed text-muted-foreground">
+          {city === "makkah"
+            ? t("umrahBuilder.stay.makkahHint")
+            : t("umrahBuilder.stay.madinahHint")}
+        </p>
+      </div>
+
       <Counter
         label={t("umrahBuilder.stay.nights")}
-        hint={t("umrahBuilder.stay.nightsHint")}
+        hint={t("umrahBuilder.stay.autoAdjusted")}
         value={nights}
         min={0}
-        max={60}
-        onChange={(v) => set({ nights: v })}
+        max={totalNights > 0 ? totalNights : 60}
+        onChange={(v) => {
+          if (totalNights > 0) {
+            const balanced = rebalanceNights(totalNights, state.makkahNights, city, v);
+            patch(balanced);
+          } else {
+            set({ nights: v });
+          }
+        }}
       />
 
       {nights === 0 ? (
@@ -592,10 +944,12 @@ function StayStep({
         <>
           <div className="grid gap-3 sm:grid-cols-2">
             <ChoiceCard
-              selected={mode === "hotel"}
+              selected={isHotelMode}
               title={t("umrahBuilder.stay.modeHotel")}
               description={t("umrahBuilder.stay.modeHotelDesc")}
-              onClick={() => set({ mode: "hotel", area: "" })}
+              onClick={() =>
+                set({ mode: mode === "custom_hotel" ? "custom_hotel" : "hotel", area: "" })
+              }
             />
             <ChoiceCard
               selected={mode === "area"}
@@ -605,14 +959,19 @@ function StayStep({
             />
           </div>
 
-          {mode === "hotel" && (
+          {isHotelMode && (
             <HotelSelector
               city={city}
               selectedId={hotelId}
+              customHotelName={customHotelName}
+              mode={mode === "custom_hotel" ? "custom_hotel" : "hotel"}
               nights={nights}
               from={state.departureDate}
               to={state.returnDate}
-              onSelect={(hotel, name) => set({ hotelId: hotel.id, hotelName: name })}
+              onSelect={(hotel, name) => set({ mode: "hotel", hotelId: hotel.id, hotelName: name })}
+              onSelectCustom={(name) =>
+                set({ mode: "custom_hotel", hotelId: null, hotelName: name })
+              }
               onFallback={() => set({ mode: "area", hotelId: null, hotelName: "" })}
               onStaleSelection={() => set({ hotelId: null, hotelName: "" })}
             />

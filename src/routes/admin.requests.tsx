@@ -2,7 +2,22 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Inbox, Plane, CalendarCheck, Sparkles, MessageSquare, Clock, X } from "lucide-react";
+import {
+  Inbox,
+  Plane,
+  CalendarCheck,
+  Sparkles,
+  MessageSquare,
+  Clock,
+  X,
+  Calendar,
+  Users,
+  Phone,
+  MessageCircle,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
+import i18n from "@/lib/i18n";
 import { listRequests } from "@/lib/admin/command.functions";
 import {
   Avatar,
@@ -39,9 +54,6 @@ import { requestSummary } from "@/lib/admin/request-summary";
 
 export const Route = createFileRoute("/admin/requests")({
   ssr: false,
-  // Filters live in the URL so returning from a request keeps the view, and a
-  // filtered inbox can be shared or reloaded (`?request=` is the Phase 7.4
-  // notification deep link and is preserved).
   validateSearch: (
     s: Record<string, unknown>,
   ): {
@@ -70,15 +82,8 @@ const KIND_ICON = {
   custom_package: Sparkles,
 } as const;
 
-/**
- * Four buckets, not eleven statuses.
- *
- * The status filter used to be a `<select>` built from whichever raw statuses
- * happened to be present — "offer_preparing", "quoted", "waiting" — so the
- * operator had to know the lifecycle of four different tables to filter their
- * own inbox. These are the states the job actually has.
- */
-const STAGE_FILTERS: StageFilter[] = ["all", "open", "confirmed", "declined"];
+/** Canonical operational stage filters with live counts. */
+const STAGE_FILTERS: StageFilter[] = ["all", "new", "processing", "confirmed", "declined"];
 
 /** The price already agreed on a request, when it carries one. */
 function requestPrice(row: UnifiedRequest): string | null {
@@ -92,6 +97,7 @@ function requestPrice(row: UnifiedRequest): string | null {
 function RequestsPage() {
   const fetchRequests = useServerFn(listRequests);
   const { t } = useTranslation("admin");
+  const isRtl = i18n.dir() === "rtl";
   const navigate = useNavigate();
   const { request: deepLinkId, kind: kindParam, stage: stageParam, q: qParam } = Route.useSearch();
 
@@ -101,12 +107,10 @@ function RequestsPage() {
   const [openId, setOpenId] = useState<string | null>(deepLinkId ?? null);
   const debounced = useDebounced(search);
 
-  // Follow the deep link whenever it changes (clicking another notification).
   useEffect(() => {
     if (deepLinkId) setOpenId(deepLinkId);
   }, [deepLinkId]);
 
-  /** Write one filter into the URL, dropping it when it returns to "all". */
   const setFilter = (patch: { kind?: Kind; stage?: StageFilter; q?: string }) => {
     const next: Record<string, string> = {};
     const k = patch.kind ?? kind;
@@ -118,8 +122,6 @@ function RequestsPage() {
     navigate({ to: "/admin/requests", search: next as never, replace: true });
   };
 
-  // The typed query is debounced before it reaches the URL, so each keystroke
-  // does not become a history entry.
   useEffect(() => {
     const current = qParam ?? "";
     if (debounced.trim() === current) return;
@@ -140,8 +142,23 @@ function RequestsPage() {
     staleTime: 30_000,
   });
 
-  // Stable identity so the memos below do not recompute on every render.
   const rows = useMemo(() => (q.data ?? []) as unknown as UnifiedRequest[], [q.data]);
+
+  // Real live counts per stage
+  const stageCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      all: rows.length,
+      new: 0,
+      processing: 0,
+      confirmed: 0,
+      declined: 0,
+    };
+    rows.forEach((r) => {
+      const st = stageOf(r.kind, r.status);
+      if (st in counts) counts[st] = (counts[st] ?? 0) + 1;
+    });
+    return counts;
+  }, [rows]);
 
   const filtered = useMemo(() => {
     const needle = debounced.trim().toLowerCase();
@@ -149,15 +166,11 @@ function RequestsPage() {
       if (kind !== "all" && r.kind !== kind) return false;
       if (!matchesStageFilter(stageFilter, r.kind, r.status)) return false;
       if (!needle) return true;
-      // Phone and email stay searchable — an agent often has the customer on
-      // the line — but neither is rendered in the list.
       return [r.name, r.phone, r.email, r.reference, r.summary]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(needle));
     });
 
-    // Same ordering the Command Center queue uses: soonest departure, then
-    // longest waiting. Rows with no trip keep their newest-first order.
     return matches.sort((a, b) =>
       byUrgency(
         { status: a.status, createdAt: a.created_at, departureDate: a.departureDate },
@@ -166,12 +179,11 @@ function RequestsPage() {
     );
   }, [rows, kind, stageFilter, debounced]);
 
-  // Look up in the full set, not the filtered view: a deep-linked request must
-  // open even when the current tab or search would hide it.
   const active = rows.find((r) => r.id === openId) ?? null;
 
   return (
     <Page title={t("ops.requests.title")} description={t("ops.requests.description")}>
+      {/* ----------------------------- Kind Tabs & Search ----------------------------- */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <FilterTabs
           value={kind}
@@ -179,9 +191,9 @@ function RequestsPage() {
           tabs={[
             { value: "all", label: t("ops.requests.tabs.all"), count: rows.length },
             {
-              value: "booking",
-              label: t("ops.requests.tabs.bookings"),
-              count: rows.filter((r) => r.kind === "booking").length,
+              value: "custom_package",
+              label: t("ops.requests.tabs.custom"),
+              count: rows.filter((r) => r.kind === "custom_package").length,
             },
             {
               value: "flight",
@@ -189,14 +201,14 @@ function RequestsPage() {
               count: rows.filter((r) => r.kind === "flight").length,
             },
             {
+              value: "booking",
+              label: t("ops.requests.tabs.bookings"),
+              count: rows.filter((r) => r.kind === "booking").length,
+            },
+            {
               value: "contact",
               label: t("ops.requests.tabs.messages"),
               count: rows.filter((r) => r.kind === "contact").length,
-            },
-            {
-              value: "custom_package",
-              label: t("ops.requests.tabs.custom"),
-              count: rows.filter((r) => r.kind === "custom_package").length,
             },
           ]}
         />
@@ -208,52 +220,72 @@ function RequestsPage() {
         />
       </div>
 
-      {/* Four states the operator recognises, as buttons rather than a select. */}
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-caption text-muted-foreground">{t("ops.stages.title")}</span>
-        {STAGE_FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            aria-pressed={stageFilter === f}
-            onClick={() => setFilter({ stage: f })}
-            className={cn(
-              "h-9 rounded-full border px-3.5 text-caption font-semibold transition-colors max-md:h-11",
-              stageFilter === f
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
-            )}
-          >
-            {f === "all"
+      {/* ----------------------------- Operational Status Filter Pills ----------------------------- */}
+      <div className="mt-3.5 flex flex-wrap items-center gap-2">
+        <span className="text-caption font-semibold text-muted-foreground">
+          {t("ops.stages.title")}
+        </span>
+        {STAGE_FILTERS.map((f) => {
+          const count = stageCounts[f] ?? 0;
+          const label =
+            f === "all"
               ? t("ops.requests.filters.allStatuses")
-              : f === "open"
-                ? t("ops.requests.filters.stageOpen")
-                : t(`ops.stages.state.${f}`)}
-          </button>
-        ))}
+              : f === "new"
+                ? "جديد"
+                : f === "processing"
+                  ? "قيد المعالجة"
+                  : t(`ops.stages.state.${f}`);
+
+          return (
+            <button
+              key={f}
+              type="button"
+              aria-pressed={stageFilter === f}
+              onClick={() => setFilter({ stage: f })}
+              className={cn(
+                "inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-caption font-semibold transition-all max-md:h-11",
+                stageFilter === f
+                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+              )}
+            >
+              <span>{label}</span>
+              <span
+                className={cn(
+                  "rounded-full px-1.5 py-0.2 text-micro tabular-nums font-bold",
+                  stageFilter === f
+                    ? "bg-primary-foreground/25 text-primary-foreground"
+                    : "bg-muted text-muted-foreground",
+                )}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
 
         {filtersActive && (
-          <Button size="sm" variant="ghost" onClick={clearFilters}>
-            <X className="me-1.5 h-4 w-4" aria-hidden="true" />
+          <Button size="xs" variant="ghost" onClick={clearFilters}>
+            <X className="me-1.5 h-3.5 w-3.5" aria-hidden="true" />
             {t("ops.requests.filters.clear")}
           </Button>
         )}
 
-        <span className="text-caption text-muted-foreground" aria-live="polite">
+        <span className="text-caption text-muted-foreground sm:ms-auto" aria-live="polite">
           {t("ops.requests.filters.showing", { count: filtered.length, total: rows.length })}
         </span>
       </div>
 
+      {/* ----------------------------- Request Rows List ----------------------------- */}
       <Panel className="mt-4" bodyClassName="p-0 sm:p-0">
         {q.isLoading ? (
           <div className="p-4">
             <SkeletonRows rows={6} />
           </div>
         ) : q.isError ? (
-          // Shared primitive, so an outage reads the same on every screen.
           <ErrorState onRetry={() => q.refetch()} />
         ) : filtered.length === 0 ? (
-          <div className="p-4">
+          <div className="p-6">
             <EmptyState
               icon={Inbox}
               title={filtersActive ? t("ops.requests.noMatchTitle") : t("ops.requests.emptyTitle")}
@@ -272,7 +304,7 @@ function RequestsPage() {
             />
           </div>
         ) : (
-          <ul className="divide-y divide-border-subtle">
+          <ul className="divide-y divide-border/60">
             {filtered.map((r) => {
               const Icon = KIND_ICON[r.kind];
               const urgency = urgencyOf({
@@ -283,82 +315,144 @@ function RequestsPage() {
               });
               const days = daysToDeparture(r.departureDate);
               const price = requestPrice(r);
+              const phoneDigits = (r.phone ?? "").replace(/\D/g, "");
+              const stage = stageOf(r.kind, r.status);
 
               return (
-                <li key={`${r.kind}-${r.id}`}>
-                  {/*
-                   * One row answers: who, what kind, which reference, when they
-                   * travel, how long they have waited, what it costs and where
-                   * it stands. The "next action" hint that used to sit at the
-                   * end is gone — the three buttons inside the request say it
-                   * better than a word at the edge of a list.
-                   */}
-                  <button
-                    type="button"
-                    onClick={() => setOpenId(r.id)}
-                    aria-label={t("ops.requests.openRequest", {
-                      name: r.name,
-                      reference: r.reference ?? "",
-                    })}
-                    className="flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-start transition-colors hover:bg-accent focus-visible:bg-accent sm:px-5"
-                  >
-                    <Avatar name={r.name} />
+                <li
+                  key={`${r.kind}-${r.id}`}
+                  className="group relative transition-colors duration-fast hover:bg-accent/40"
+                >
+                  <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4 sm:px-5">
+                    {/* Customer Avatar */}
+                    <Avatar name={r.name} className="h-11 w-11 text-small shrink-0" />
 
-                    <div className="min-w-0 flex-1 basis-48">
-                      <p className="flex items-center gap-2 truncate text-small font-medium">
-                        <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                        <span className="truncate">{r.name}</span>
+                    {/* Main Content Area */}
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      {/* Top Meta Line: Name, Kind, Ref, Status */}
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                        <span className="font-bold text-foreground text-small sm:text-body">
+                          {r.name}
+                        </span>
+
+                        <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-0.5 text-caption font-semibold text-foreground border border-border/50">
+                          <Icon className="h-3 w-3 text-primary" aria-hidden="true" />
+                          <span>{t(`ops.requests.kinds.${r.kind}`)}</span>
+                        </span>
+
                         {r.reference && (
-                          <span className="shrink-0 text-caption text-muted-foreground" dir="ltr">
+                          <span
+                            dir="ltr"
+                            className="rounded bg-muted/60 px-2 py-0.5 font-mono text-caption text-muted-foreground border border-border/40 font-semibold"
+                          >
                             {r.reference}
                           </span>
                         )}
-                      </p>
-                      <p className="truncate text-caption text-muted-foreground">
+
+                        <StageBadge stage={stage} className="ms-auto sm:ms-0" />
+
+                        {urgency && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-semibold",
+                              urgency === "departure"
+                                ? "bg-danger-muted text-destructive"
+                                : "bg-warning-muted text-warning",
+                            )}
+                          >
+                            <Clock className="h-3 w-3" aria-hidden="true" />
+                            {urgency === "departure" && days != null
+                              ? t("ops.requests.urgency.inDays", { count: days })
+                              : t(urgencyLabelKey(urgency))}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Summary line */}
+                      <p className="text-small font-medium text-foreground/90 line-clamp-1">
                         {requestSummary(
                           (r as unknown as { summaryParams: never }).summaryParams,
                           r.summary,
                           t,
                         )}
                       </p>
+
+                      {/* Bottom Facts Row: Travel date, travelers, price, contact links, created time */}
+                      <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-caption text-muted-foreground">
+                        {r.departureDate && (
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                            <span>{shortDate(r.departureDate)}</span>
+                          </span>
+                        )}
+
+                        {r.travellers != null && r.travellers > 0 && (
+                          <span className="inline-flex items-center gap-1">
+                            <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span>{r.travellers} مسافر</span>
+                          </span>
+                        )}
+
+                        {price && (
+                          <span className="font-semibold text-foreground bg-primary/10 px-2 py-0.5 rounded text-caption border border-primary/20">
+                            {price}
+                          </span>
+                        )}
+
+                        {/* Quick Contact Links */}
+                        {r.phone && (
+                          <div className="flex items-center gap-2 border-s border-border/60 ps-2.5">
+                            <a
+                              href={`tel:${r.phone}`}
+                              onClick={(e) => e.stopPropagation()}
+                              dir="ltr"
+                              title="اتصال هاتفي"
+                              className="inline-flex items-center gap-1 text-primary hover:underline"
+                            >
+                              <Phone className="h-3 w-3" />
+                              <span className="font-mono">{r.phone}</span>
+                            </a>
+                            {phoneDigits.length >= 6 && (
+                              <a
+                                href={`https://wa.me/${phoneDigits}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                title="مراسلة واتساب"
+                                className="text-brand-green hover:opacity-80 inline-flex items-center"
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        )}
+
+                        <span className="hidden sm:inline ms-auto text-caption text-muted-foreground">
+                          {relativeDate(r.created_at)}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Departure is the fact that decides priority, so it is
-                        shown on every width rather than hidden on mobile. */}
-                    {r.departureDate && (
-                      <span className="whitespace-nowrap text-caption text-muted-foreground">
-                        {shortDate(r.departureDate)}
+                    {/* Operational Action Button */}
+                    <div className="shrink-0 pt-2 sm:pt-0 flex items-center justify-between sm:justify-end gap-2 border-t border-border/40 sm:border-t-0">
+                      <span className="text-caption text-muted-foreground sm:hidden">
+                        {relativeDate(r.created_at)}
                       </span>
-                    )}
-
-                    {price && (
-                      <span className="whitespace-nowrap text-caption font-semibold text-foreground">
-                        {price}
-                      </span>
-                    )}
-
-                    {urgency && (
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-caption font-semibold",
-                          urgency === "departure"
-                            ? "bg-danger-muted text-destructive"
-                            : "bg-warning-muted text-warning",
-                        )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setOpenId(r.id)}
+                        className="group-hover:border-primary/50 group-hover:bg-primary group-hover:text-primary-foreground font-semibold transition-colors"
                       >
-                        <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                        {urgency === "departure" && days != null
-                          ? t("ops.requests.urgency.inDays", { count: days })
-                          : t(urgencyLabelKey(urgency))}
-                      </span>
-                    )}
-
-                    <span className="hidden whitespace-nowrap text-caption text-muted-foreground md:inline">
-                      {relativeDate(r.created_at)}
-                    </span>
-
-                    <StageBadge stage={stageOf(r.kind, r.status)} />
-                  </button>
+                        <span>عرض الطلب</span>
+                        {isRtl ? (
+                          <ArrowLeft className="ms-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                        ) : (
+                          <ArrowRight className="ms-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </li>
               );
             })}
@@ -366,6 +460,7 @@ function RequestsPage() {
         )}
       </Panel>
 
+      {/* ----------------------------- Operational Drawer ----------------------------- */}
       <Drawer
         open={!!active}
         onClose={() => setOpenId(null)}

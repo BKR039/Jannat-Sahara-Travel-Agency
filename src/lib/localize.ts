@@ -265,3 +265,11 @@ export function pickLocalizedList(
   if (translated.length > 0) return translated;
   return asList(blob[key]).filter((v) => !hasArabic(v));
 }
+
+/**
+ * Format a monetary amount for display with Tunisian Dinar (د.ت) or other currency symbol.
+ */
+export function formatMoney(amount: number | null | undefined, currency = "TND"): string {
+  const val = Number(amount ?? 0);
+  return `${val.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${currency === "TND" ? "د.ت" : currency}`;
+}

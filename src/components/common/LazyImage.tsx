@@ -30,7 +30,7 @@ function LazyImageBase({
   sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw",
   onClick,
 }: LazyImageProps) {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(priority);
 
   /*
    * `onLoad` alone is not enough to know an image has arrived.
@@ -51,8 +51,11 @@ function LazyImageBase({
       className={cn("relative overflow-hidden bg-surface-sunken", wrapperClassName)}
       onClick={onClick}
     >
-      {!loaded && (
-        <div aria-hidden="true" className="absolute inset-0 animate-pulse bg-surface-sunken" />
+      {!loaded && !priority && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-surface-sunken/80 motion-reduce:animate-none"
+        />
       )}
       {src && (
         <img

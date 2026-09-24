@@ -7,10 +7,12 @@ export function ShareButtons({
   slug,
   title,
   className = "",
+  variant = "standard",
 }: {
   slug: string;
   title: string;
   className?: string;
+  variant?: "standard" | "editorial";
 }) {
   const { t } = useTranslation();
   const links = shareLinks(slug, title);
@@ -37,8 +39,65 @@ export function ShareButtons({
     }
   };
 
-  const base =
-    "inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-card text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary hover:text-primary";
+  const buttonBase =
+    "inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-card text-muted-foreground transition-all duration-base ease-standard hover:-translate-y-0.5 hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+
+  if (variant === "editorial") {
+    return (
+      <div className={`flex flex-wrap items-center justify-between gap-4 py-4 ${className}`}>
+        <span className="text-small font-medium text-muted-foreground">
+          {t("blog.shareArticle")}
+        </span>
+        <div className="flex items-center gap-2">
+          {typeof navigator !== "undefined" && "share" in navigator && (
+            <button
+              type="button"
+              onClick={nativeShare}
+              className={buttonBase}
+              aria-label={t("blog.shareArticle")}
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+            </button>
+          )}
+          <a
+            href={links.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonBase}
+            aria-label={t("blog.shareWhatsapp")}
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden />
+          </a>
+          <a
+            href={links.facebook}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonBase}
+            aria-label={t("blog.shareFacebook")}
+          >
+            <Facebook className="h-4 w-4" aria-hidden />
+          </a>
+          <a
+            href={links.x}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonBase}
+            aria-label={t("blog.shareX")}
+          >
+            <Twitter className="h-4 w-4" aria-hidden />
+          </a>
+          <button
+            type="button"
+            onClick={copy}
+            className={buttonBase}
+            aria-label={t("blog.copyLink")}
+          >
+            <Copy className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -46,40 +105,40 @@ export function ShareButtons({
       <button
         type="button"
         onClick={nativeShare}
-        className={base}
+        className={buttonBase}
         aria-label={t("blog.shareArticle")}
       >
-        <Share2 className="h-4 w-4" />
+        <Share2 className="h-4 w-4" aria-hidden />
       </button>
       <a
         href={links.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
-        className={base}
+        className={buttonBase}
         aria-label={t("blog.shareWhatsapp")}
       >
-        <MessageCircle className="h-4 w-4" />
+        <MessageCircle className="h-4 w-4" aria-hidden />
       </a>
       <a
         href={links.facebook}
         target="_blank"
         rel="noopener noreferrer"
-        className={base}
+        className={buttonBase}
         aria-label={t("blog.shareFacebook")}
       >
-        <Facebook className="h-4 w-4" />
+        <Facebook className="h-4 w-4" aria-hidden />
       </a>
       <a
         href={links.x}
         target="_blank"
         rel="noopener noreferrer"
-        className={base}
+        className={buttonBase}
         aria-label={t("blog.shareX")}
       >
-        <Twitter className="h-4 w-4" />
+        <Twitter className="h-4 w-4" aria-hidden />
       </a>
-      <button type="button" onClick={copy} className={base} aria-label={t("blog.copyLink")}>
-        <Copy className="h-4 w-4" />
+      <button type="button" onClick={copy} className={buttonBase} aria-label={t("blog.copyLink")}>
+        <Copy className="h-4 w-4" aria-hidden />
       </button>
     </div>
   );

@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { useAuth, useUserRoles, hasAdminRole, isSuperAdmin } from "@/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth, useUserPermissions, hasAdminConsoleAccess } from "@/hooks/useAuth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { AdminContext } from "@/components/admin/context";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { adminDocTitle } from "@/lib/admin/doc-title";
+import { NotFoundPage } from "@/components/common/NotFoundPage";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -15,13 +17,21 @@ export const Route = createFileRoute("/admin")({
     meta: [{ title: adminDocTitle("dashboard") }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminLayout,
+  notFoundComponent: () => (
+    <NotFoundPage
+      title="صفحة الإدارة غير موجودة"
+      description="تعذر العثور على شاشة لوحة التحكم المطلوبة. تحقق من الرابط أو عد لمركز القيادة."
+      isDashboard={true}
+    />
+  ),
 });
 
 function AdminLayout() {
   const { t } = useTranslation("admin");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, loading, isAuthenticated } = useAuth();
-  const rolesQuery = useUserRoles(user?.id);
+  const authPermissions = useUserPermissions(user?.id);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -30,12 +40,9 @@ function AdminLayout() {
   }, [loading, isAuthenticated, navigate]);
 
   /*
-   * A bare spinner centred on an empty viewport told the operator nothing and
-   * made the console feel like it was failing to load. This is the shape of
-   * the shell that is about to appear — sidebar rail, header bar, page block —
-   * so the layout does not jump when the real thing arrives.
+   * Skeleton loader while validating authentication & permissions
    */
-  if (loading || (isAuthenticated && rolesQuery.isLoading)) {
+  if (loading || (isAuthenticated && authPermissions.isLoading)) {
     return (
       <div
         className="min-h-screen bg-surface-sunken/60"
@@ -74,8 +81,8 @@ function AdminLayout() {
 
   if (!isAuthenticated) return null;
 
-  const roles = rolesQuery.data;
-  if (!hasAdminRole(roles)) {
+  const roles = authPermissions.roles;
+  if (!hasAdminConsoleAccess(roles)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="max-w-md rounded-card border border-border-subtle bg-card p-8 text-center">
@@ -88,6 +95,8 @@ function AdminLayout() {
             <Button
               variant="outline"
               onClick={async () => {
+                await queryClient.cancelQueries();
+                queryClient.clear();
                 await supabase.auth.signOut();
                 navigate({ to: "/auth", replace: true });
               }}
@@ -105,8 +114,13 @@ function AdminLayout() {
     <AdminContext.Provider
       value={{
         user: user!,
-        roles: roles!,
-        isSuperAdmin: isSuperAdmin(roles),
+        roles: authPermissions.roles,
+        permissions: authPermissions.permissions,
+        isSuperAdmin: authPermissions.isSuperAdmin,
+        isAdmin: authPermissions.isAdmin,
+        isStaff: authPermissions.isStaff,
+        hasPermission: authPermissions.hasPermission,
+        hasAnyPermission: authPermissions.hasAnyPermission,
       }}
     >
       <AdminShell>

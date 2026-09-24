@@ -1,22 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { adminDocTitle } from "@/lib/admin/doc-title";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Edit3, Trash2, HelpCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, HelpCircle, FolderTree } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { NumberInput } from "@/components/ui/number-input";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,36 +25,91 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { PageHeader, AdminCard, EmptyState } from "@/components/admin/ui";
+import {
+  Drawer,
+  EmptyState,
+  ErrorState,
+  FilterTabs,
+  Page,
+  Panel,
+  SearchInput,
+  SkeletonRows,
+  StatusSwitch,
+  useDebounced,
+} from "@/components/admin/kit";
+import { LocalizedField } from "@/components/admin/LocalizedField";
 import type { Database } from "@/integrations/supabase/types";
 import { useTranslation } from "react-i18next";
-import { LocalizedField } from "@/components/admin/LocalizedField";
-import { ErrorState } from "@/components/admin/kit";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/faq")({
+  ssr: false,
   head: () => ({
-    meta: [{ title: adminDocTitle("faq") }],
+    meta: [{ title: adminDocTitle("faq") }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: FaqAdminPage,
 });
-type F = Database["public"]["Tables"]["faqs"]["Row"];
+
+type Row = Database["public"]["Tables"]["faqs"]["Row"];
+
+interface FaqDraft {
+  id: string | null;
+  question: string;
+  question_fr: string;
+  question_en: string;
+  answer: string;
+  answer_fr: string;
+  answer_en: string;
+  category: string;
+  sort_order: number;
+  active: boolean;
+}
+
+const EMPTY_FAQ: FaqDraft = {
+  id: null,
+  question: "",
+  question_fr: "",
+  question_en: "",
+  answer: "",
+  answer_fr: "",
+  answer_en: "",
+  category: "",
+  sort_order: 0,
+  active: true,
+};
 
 function FaqAdminPage() {
   const { t } = useTranslation("admin");
   const qc = useQueryClient();
-  const [editing, setEditing] = useState<F | null>(null);
-  const [creating, setCreating] = useState(false);
+
+  const [draft, setDraft] = useState<FaqDraft | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Row | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [search, setSearch] = useState("");
+  const [pendingFaqId, setPendingFaqId] = useState<string | null>(null);
+  const debounced = useDebounced(search);
 
   const list = useQuery({
     queryKey: ["admin-faqs"] as const,
     queryFn: async () => {
-      const { data, error } = await supabase.from("faqs").select("*").order("sort_order");
+      const { data, error } = await supabase
+        .from("faqs")
+        .select("*")
+        .order("sort_order")
+        .order("created_at", { ascending: true });
       if (error) throw error;
-      return data as F[];
+      return data as Row[];
     },
+    staleTime: 30_000,
   });
+
+  const items = useMemo(() => list.data ?? [], [list.data]);
+
+  const categories = useMemo(() => {
+    return Array.from(new Set(items.map((f) => f.category).filter(Boolean))) as string[];
+  }, [items]);
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["admin-faqs"] });
@@ -69,216 +123,387 @@ function FaqAdminPage() {
     },
     onSuccess: () => {
       toast.success(t("content.common.deleted"));
+      setConfirmDelete(null);
       invalidate();
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setConfirmDelete(null);
     },
   });
 
   const toggle = useMutation({
-    mutationFn: async (f: F) => {
-      const { error } = await supabase.from("faqs").update({ active: !f.active }).eq("id", f.id);
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const { error } = await supabase.from("faqs").update({ active }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: (_r, v) => {
+      toast.success(
+        t(v.active ? "content.services.toasts.activated" : "content.services.toasts.deactivated"),
+      );
+      invalidate();
+    },
+    onError: (e: Error) => {
+      toast.error(e.message || "فشل تحديث حالة السؤال");
+    },
+    onSettled: () => setPendingFaqId(null),
   });
 
-  return (
-    <>
-      <PageHeader
-        title={t("content.faq.pageTitle")}
-        actions={
-          <Button onClick={() => setCreating(true)}>
-            <Plus className="me-2 h-4 w-4" />
-            {t("content.faq.newFaq")}
-          </Button>
-        }
-      />
-      <AdminCard>
-        {list.isLoading ? (
-          <p className="text-small text-muted-foreground">{t("content.faq.loading")}</p>
-        ) : list.isError ? (
-          // A failed query must never look like an empty table.
-          <ErrorState onRetry={() => list.refetch()} />
-        ) : !list.data?.length ? (
-          <EmptyState title={t("content.faq.empty")} icon={HelpCircle} />
-        ) : (
-          <div className="divide-y divide-border -mx-4 sm:-mx-5">
-            {list.data.map((f) => (
-              <div key={f.id} className="flex items-start justify-between gap-3 px-4 sm:px-5 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium">{f.question}</p>
-                  <p className="mt-1 text-small text-muted-foreground line-clamp-2">{f.answer}</p>
-                  {f.category && (
-                    <p className="mt-1 text-caption text-muted-foreground">
-                      {t("content.faq.category")}: {f.category}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Switch
-                    checked={f.active}
-                    onCheckedChange={() => toggle.mutate(f)}
-                    aria-label={t("content.common.toggleActive")}
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    aria-label={t("content.common.edit")}
-                    onClick={() => setEditing(f)}
-                  >
-                    <Edit3 className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        aria-label={t("content.common.delete")}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{t("content.faq.deleteTitle")}</AlertDialogTitle>
-                        <AlertDialogDescription>{f.question}</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t("ops.common.cancel")}</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => remove.mutate(f.id)}>
-                          {t("ops.common.delete")}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </AdminCard>
+  const saveMutation = useMutation({
+    mutationFn: async (d: FaqDraft) => {
+      const payload = {
+        question: d.question.trim(),
+        question_fr: d.question_fr.trim() || null,
+        question_en: d.question_en.trim() || null,
+        answer: d.answer.trim(),
+        answer_fr: d.answer_fr.trim() || null,
+        answer_en: d.answer_en.trim() || null,
+        category: d.category.trim() || null,
+        sort_order: Number(d.sort_order) || 0,
+        active: d.active,
+      };
 
-      {(editing || creating) && (
-        <FaqEditor
-          initial={editing}
-          onClose={() => {
-            setEditing(null);
-            setCreating(false);
-          }}
-          onSaved={() => {
-            invalidate();
-            setEditing(null);
-            setCreating(false);
-          }}
-        />
-      )}
-    </>
-  );
-}
-
-function FaqEditor({
-  initial,
-  onClose,
-  onSaved,
-}: {
-  initial: F | null;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const { t } = useTranslation("admin");
-  const [f, setF] = useState({
-    question: initial?.question ?? "",
-    question_fr: initial?.question_fr ?? "",
-    question_en: initial?.question_en ?? "",
-    answer: initial?.answer ?? "",
-    answer_fr: initial?.answer_fr ?? "",
-    answer_en: initial?.answer_en ?? "",
-    category: initial?.category ?? "",
-    sort_order: initial?.sort_order ?? 0,
-    active: initial?.active ?? true,
-  });
-  const [saving, setSaving] = useState(false);
-  const isEdit = !!initial;
-
-  async function save() {
-    if (!f.question.trim() || !f.answer.trim())
-      return toast.error(t("content.faq.toasts.questionAnswerRequired"));
-    setSaving(true);
-    const payload = {
-      question: f.question.trim(),
-      // Empty stays NULL so the documented public fallback applies.
-      question_fr: f.question_fr.trim() || null,
-      question_en: f.question_en.trim() || null,
-      answer: f.answer.trim(),
-      answer_fr: f.answer_fr.trim() || null,
-      answer_en: f.answer_en.trim() || null,
-      category: f.category.trim() || null,
-      sort_order: Number(f.sort_order) || 0,
-      active: f.active,
-    };
-    try {
-      if (isEdit && initial) {
-        const { error } = await supabase.from("faqs").update(payload).eq("id", initial.id);
+      if (d.id) {
+        const { error } = await supabase.from("faqs").update(payload).eq("id", d.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from("faqs").insert(payload);
         if (error) throw error;
       }
+    },
+    onSuccess: () => {
       toast.success(t("content.faq.toasts.saved"));
-      onSaved();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Save failed");
-    } finally {
-      setSaving(false);
-    }
+      setDraft(null);
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : t("content.faq.toasts.saveFailed"));
+    },
+  });
+
+  const filtered = useMemo(() => {
+    const needle = debounced.trim().toLowerCase();
+    return items.filter((f) => {
+      if (statusFilter === "active" && !f.active) return false;
+      if (statusFilter === "inactive" && f.active) return false;
+      if (categoryFilter !== "all" && f.category !== categoryFilter) return false;
+      if (!needle) return true;
+      return [
+        f.question,
+        f.question_fr,
+        f.question_en,
+        f.answer,
+        f.answer_fr,
+        f.answer_en,
+        f.category,
+      ]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(needle));
+    });
+  }, [items, statusFilter, categoryFilter, debounced]);
+
+  function edit(row: Row) {
+    setDraft({
+      id: row.id,
+      question: row.question ?? "",
+      question_fr: row.question_fr ?? "",
+      question_en: row.question_en ?? "",
+      answer: row.answer ?? "",
+      answer_fr: row.answer_fr ?? "",
+      answer_en: row.answer_en ?? "",
+      category: row.category ?? "",
+      sort_order: row.sort_order ?? 0,
+      active: row.active ?? true,
+    });
   }
 
+  const canSave = Boolean(
+    draft && draft.question.trim().length > 1 && draft.answer.trim().length > 1,
+  );
+
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? t("content.faq.editTitle") : t("content.faq.newTitle")}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-3">
-          <LocalizedField
-            label={t("content.faq.fields.question")}
-            values={{ base: f.question, fr: f.question_fr, en: f.question_en }}
-            onChange={(v) => setF({ ...f, question: v.base, question_fr: v.fr, question_en: v.en })}
+    <Page
+      title={t("content.faq.pageTitle")}
+      description="إدارة الأسئلة المتكررة وإجاباتها المعروضة في صفحة الأسئلة الشائعة وتفاصيل الباقات."
+      actions={
+        <Button onClick={() => setDraft({ ...EMPTY_FAQ })}>
+          <Plus className="me-2 h-4 w-4" />
+          {t("content.faq.newFaq")}
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <FilterTabs
+          value={statusFilter}
+          onChange={setStatusFilter}
+          tabs={[
+            { value: "all", label: t("content.services.filters.all"), count: items.length },
+            {
+              value: "active",
+              label: t("content.services.filters.active"),
+              count: items.filter((r) => r.active).length,
+            },
+            {
+              value: "inactive",
+              label: t("content.services.filters.inactive"),
+              count: items.filter((r) => !r.active).length,
+            },
+          ]}
+        />
+
+        <div className="flex flex-wrap items-center gap-2 lg:ms-auto">
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[180px] h-11 bg-card">
+              <SelectValue placeholder={t("content.faq.category")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع التصنيفات</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="ابحث بالسؤال أو الإجابة أو التصنيف…"
+            className="w-full sm:w-64"
           />
-          <LocalizedField
-            label={t("content.faq.fields.answer")}
-            rows={5}
-            values={{ base: f.answer, fr: f.answer_fr, en: f.answer_en }}
-            onChange={(v) => setF({ ...f, answer: v.base, answer_fr: v.fr, answer_en: v.en })}
-          />
-          <div className="grid gap-1">
-            <Label>{t("content.faq.category")}</Label>
-            <Input value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })} />
+        </div>
+      </div>
+
+      <Panel className="mt-4" bodyClassName="p-0 sm:p-0">
+        {list.isLoading ? (
+          <div className="p-4">
+            <SkeletonRows rows={4} />
           </div>
-          <div className="grid gap-1">
-            <Label>{t("content.faq.fields.sortOrder")}</Label>
-            <Input
-              type="number"
-              value={f.sort_order}
-              onChange={(e) => setF({ ...f, sort_order: Number(e.target.value) || 0 })}
+        ) : list.isError ? (
+          <ErrorState onRetry={() => list.refetch()} />
+        ) : filtered.length === 0 ? (
+          <div className="p-4">
+            <EmptyState
+              title={
+                items.length === 0 ? t("content.faq.empty") : t("content.services.noMatchTitle")
+              }
+              description={
+                items.length === 0
+                  ? "أضف أسئلة متكررة وإجاباتها لتسهيل تصفح المسافرين."
+                  : t("content.services.noMatchDescription")
+              }
+              icon={HelpCircle}
+              action={
+                items.length === 0 ? (
+                  <Button onClick={() => setDraft({ ...EMPTY_FAQ })}>
+                    <Plus className="me-2 h-4 w-4" />
+                    {t("content.faq.newFaq")}
+                  </Button>
+                ) : undefined
+              }
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Switch checked={f.active} onCheckedChange={(v) => setF({ ...f, active: v })} />
-            <Label>{t("content.faq.fields.active")}</Label>
+        ) : (
+          <ul className="divide-y divide-border-subtle">
+            {filtered.map((f) => (
+              <li
+                key={f.id}
+                className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:px-5 hover:bg-surface-sunken/20 transition-colors"
+              >
+                {/* Question and Answer preview */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-foreground text-small leading-snug">
+                      {f.question}
+                    </p>
+                    {f.category && (
+                      <span className="rounded-md bg-accent px-2 py-0.5 text-caption font-medium text-accent-foreground">
+                        {f.category}
+                      </span>
+                    )}
+                    <span className="text-caption font-mono text-muted-foreground px-1.5 py-0.2 rounded bg-surface-sunken/60">
+                      #{f.sort_order ?? 0}
+                    </span>
+                  </div>
+
+                  <p className="mt-1.5 text-small text-muted-foreground leading-relaxed line-clamp-2">
+                    {f.answer}
+                  </p>
+                </div>
+
+                {/* Status and Action Buttons */}
+                <div className="flex items-center justify-between gap-3 shrink-0 pt-2 sm:pt-0 sm:justify-end">
+                  <StatusSwitch
+                    checked={Boolean(f.active)}
+                    disabled={toggle.isPending && pendingFaqId === f.id}
+                    isPending={toggle.isPending && pendingFaqId === f.id}
+                    onCheckedChange={(active) => {
+                      setPendingFaqId(f.id);
+                      toggle.mutate({ id: f.id, active });
+                    }}
+                    activeLabel={t("content.common.active")}
+                    inactiveLabel={t("content.common.hidden")}
+                    ariaLabel={t("content.common.toggleActive")}
+                  />
+
+                  <div className="flex items-center gap-1">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="text-muted-foreground hover:text-foreground"
+                      aria-label={t("content.common.edit")}
+                      onClick={() => edit(f)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="text-destructive"
+                      aria-label={t("content.common.delete")}
+                      onClick={() => setConfirmDelete(f)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      {/* ------------------------------------------------------------ editor */}
+      <Drawer
+        open={!!draft}
+        onClose={() => setDraft(null)}
+        title={draft?.id ? t("content.faq.editTitle") : t("content.faq.newTitle")}
+        description="إدارة نصوص السؤال والإجابة، التصنيف وترتيب العرض."
+        footer={
+          draft ? (
+            <div className="flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setDraft(null)}>
+                {t("ops.common.cancel")}
+              </Button>
+              <Button
+                type="button"
+                disabled={!canSave || saveMutation.isPending}
+                onClick={() => {
+                  if (canSave && !saveMutation.isPending) {
+                    saveMutation.mutate(draft);
+                  }
+                }}
+              >
+                {saveMutation.isPending ? t("content.common.saving") : t("ops.common.save")}
+              </Button>
+            </div>
+          ) : undefined
+        }
+      >
+        {draft && (
+          <div className="space-y-6">
+            {/* SECTION 1 — QUESTION */}
+            <div className="space-y-3">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5 flex items-center gap-2">
+                <HelpCircle className="h-4 w-4 text-primary" />
+                {t("content.faq.fields.question")}
+              </h3>
+              <LocalizedField
+                label={t("content.faq.fields.question")}
+                values={{ base: draft.question, fr: draft.question_fr, en: draft.question_en }}
+                onChange={(v) =>
+                  setDraft({ ...draft, question: v.base, question_fr: v.fr, question_en: v.en })
+                }
+              />
+            </div>
+
+            {/* SECTION 2 — ANSWER */}
+            <div className="space-y-3">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                {t("content.faq.fields.answer")}
+              </h3>
+              <LocalizedField
+                label={t("content.faq.fields.answer")}
+                rows={5}
+                values={{ base: draft.answer, fr: draft.answer_fr, en: draft.answer_en }}
+                onChange={(v) =>
+                  setDraft({ ...draft, answer: v.base, answer_fr: v.fr, answer_en: v.en })
+                }
+              />
+            </div>
+
+            {/* SECTION 3 — METADATA & DISPLAY */}
+            <div className="space-y-4">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                التصنيف وإعدادات العرض
+              </h3>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="faq-category">{t("content.faq.category")}</Label>
+                <Input
+                  id="faq-category"
+                  value={draft.category}
+                  onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+                  placeholder="مثال: umrah, trips, visa"
+                  list="faq-category-suggestions"
+                />
+                <datalist id="faq-category-suggestions">
+                  {categories.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="faq-order">{t("content.faq.fields.sortOrder")}</Label>
+                <NumberInput
+                  id="faq-order"
+                  dir="ltr"
+                  value={draft.sort_order}
+                  onChange={(v) => setDraft({ ...draft, sort_order: v ?? 0 })}
+                  min={0}
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-3 rounded-card border border-border-subtle bg-surface-sunken/20 p-3.5">
+                <div className="min-w-0">
+                  <p className="text-small font-medium">{t("content.faq.fields.active")}</p>
+                  <p className="text-caption text-muted-foreground">
+                    التحكم في ظهور هذا السؤال في صفحة الأسئلة الشائعة العامة.
+                  </p>
+                </div>
+                <StatusSwitch
+                  checked={Boolean(draft.active)}
+                  onCheckedChange={(v) => setDraft({ ...draft, active: v })}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={saving}>
-            {t("ops.common.cancel")}
-          </Button>
-          <Button onClick={save} disabled={saving}>
-            {saving ? t("content.common.saving") : t("content.common.save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        )}
+      </Drawer>
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("content.faq.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmDelete?.question
+                ? `هل أنت متأكد من حذف «${confirmDelete.question}»؟`
+                : "هل أنت متأكد من حذف هذا السؤال؟"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("ops.common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => confirmDelete && remove.mutate(confirmDelete.id)}
+            >
+              {t("ops.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Page>
   );
 }

@@ -16,30 +16,21 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { Toaster } from "@/components/ui/sonner";
-import { siteSettingsQuery } from "@/lib/queries";
+import { siteSettingsQuery, contactInfoQuery, branchesQuery } from "@/lib/queries";
 import { DEFAULT_PUBLIC_SETTINGS } from "@/lib/site-settings";
 import { primeCanonicalBase } from "@/lib/seo";
 import { brandThemeCss } from "@/lib/brand-theme";
+import {
+  PrivacyConsentProvider,
+  FirstVisitWelcome,
+  CookieConsentPanel,
+  PrivacySettingsDialog,
+} from "@/components/privacy";
+import { RouteTransitionIndicator } from "@/components/common/RouteTransitionIndicator";
+import { NotFoundPage } from "@/components/common/NotFoundPage";
 
 function NotFoundComponent() {
-  const { t } = useTranslation();
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-h5 font-semibold text-foreground">{t("notFound.title")}</h2>
-        <p className="mt-2 text-small text-muted-foreground">{t("notFound.description")}</p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-small font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            {t("notFound.goHome")}
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  return <NotFoundPage />;
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
@@ -86,9 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
    * components) and the canonical base (for `absoluteUrl`).
    */
   loader: async ({ context }) => {
-    const settings = await context.queryClient
-      .ensureQueryData(siteSettingsQuery())
-      .catch(() => DEFAULT_PUBLIC_SETTINGS);
+    const [settings] = await Promise.all([
+      context.queryClient.ensureQueryData(siteSettingsQuery()).catch(() => DEFAULT_PUBLIC_SETTINGS),
+      context.queryClient.ensureQueryData(contactInfoQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(branchesQuery()).catch(() => []),
+    ]);
     primeCanonicalBase(settings.seoCanonicalBase);
     return settings;
   },
@@ -162,7 +155,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500&family=Plus+Jakarta+Sans:wght@700&family=Inter:wght@400;500;600&display=swap",
         },
       ],
     };
@@ -178,27 +171,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
         <HeadContent />
-        {/* Meta Pixel Code */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '686261157163328');
-fbq('track', 'PageView');`,
-          }}
-        />
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=686261157163328&ev=PageView&noscript=1" />`,
-          }}
-        />
-        {/* End Meta Pixel Code */}
       </head>
       <body>
         {children}
@@ -221,8 +193,14 @@ function RootComponent() {
       {themeCss && <style data-brand-theme>{themeCss}</style>}
       <ThemeProvider defaultTheme="light">
         <LanguageProvider>
-          <Outlet />
-          <Toaster position="top-center" richColors closeButton />
+          <PrivacyConsentProvider>
+            <RouteTransitionIndicator />
+            <Outlet />
+            <FirstVisitWelcome />
+            <CookieConsentPanel />
+            <PrivacySettingsDialog />
+            <Toaster position="top-center" richColors closeButton />
+          </PrivacyConsentProvider>
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>

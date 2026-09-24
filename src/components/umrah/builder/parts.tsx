@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Minus, Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useLocalized } from "@/lib/localize";
-import { parseISODate, toISODate, type BuilderState, type BuilderStep } from "./model";
+import { parseISODate, toISODate, totalTripNights, type BuilderState, type BuilderStep } from "./model";
 
 /* ------------------------------------------------------------------ stepper */
 
@@ -110,7 +111,7 @@ export function ChoiceCard({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "group relative flex w-full items-start gap-3 rounded-2xl border p-4 text-start transition-all hover:-translate-y-0.5",
+        "group relative flex w-full items-start gap-3 rounded-card border p-4 text-start transition-all hover:-translate-y-0.5",
         selected
           ? "border-primary bg-primary/[0.06] shadow-sm"
           : "border-border-subtle bg-card hover:border-primary/40",
@@ -166,7 +167,7 @@ export function Counter({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border-subtle bg-card p-4">
+    <div className="flex items-center justify-between gap-4 rounded-card border border-border-subtle bg-card p-4">
       <div className="min-w-0">
         <p className="text-small font-semibold">{label}</p>
         {hint && <p className="text-caption text-muted-foreground">{hint}</p>}
@@ -231,7 +232,7 @@ export function DateRangeField({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="grid w-full grid-cols-1 gap-3 rounded-2xl border border-border-subtle bg-card p-4 text-start transition-colors hover:border-primary/50 sm:grid-cols-2"
+          className="grid w-full grid-cols-1 gap-3 rounded-card border border-border-subtle bg-card p-4 text-start transition-colors hover:border-primary/50 sm:grid-cols-2"
         >
           {[
             { label: labelFrom, value: from },
@@ -291,6 +292,102 @@ function SummaryBlock({ label, children }: { label: string; children: ReactNode 
   );
 }
 
+export function RouteVisualizer({ state }: { state: BuilderState }) {
+  const { t } = useTranslation();
+  const origin = state.departureAirport || t("umrahBuilder.flights.itineraryOrigin");
+  const dest =
+    state.returnAirport || state.departureAirport || t("umrahBuilder.flights.itineraryOrigin");
+
+  const nodes: { label: string; badge?: string; type?: "holy" | "stopover" | "transit" }[] = [
+    { label: origin },
+  ];
+
+  if (
+    state.flightPreference === "stopover" &&
+    state.destinationTiming === "before_umrah" &&
+    state.additionalDestination.trim()
+  ) {
+    nodes.push({
+      label: state.additionalDestination.trim(),
+      badge: t("umrahBuilder.summary.additionalDestination"),
+      type: "stopover",
+    });
+  } else if (state.flightPreference === "transit" && state.transitHub.trim()) {
+    nodes.push({
+      label: state.transitHub.trim(),
+      badge: t("umrahBuilder.flights.preferences.transit"),
+      type: "transit",
+    });
+  }
+
+  const isMadinahFirst = state.arrivalAirport === "Madinah" || state.flightRoute === "المدينة / جدة";
+
+  const makkahNode =
+    state.makkahNights > 0
+      ? {
+          label: t("umrahBuilder.summary.makkah"),
+          badge: t("umrahBuilder.summary.nightsCount", { count: state.makkahNights }),
+          type: "holy" as const,
+        }
+      : null;
+
+  const madinahNode =
+    state.madinahNights > 0
+      ? {
+          label: t("umrahBuilder.summary.madinah"),
+          badge: t("umrahBuilder.summary.nightsCount", { count: state.madinahNights }),
+          type: "holy" as const,
+        }
+      : null;
+
+  if (isMadinahFirst) {
+    if (madinahNode) nodes.push(madinahNode);
+    if (makkahNode) nodes.push(makkahNode);
+  } else {
+    if (makkahNode) nodes.push(makkahNode);
+    if (madinahNode) nodes.push(madinahNode);
+  }
+
+  if (
+    state.flightPreference === "stopover" &&
+    state.destinationTiming === "after_umrah" &&
+    state.additionalDestination.trim()
+  ) {
+    nodes.push({
+      label: state.additionalDestination.trim(),
+      badge: t("umrahBuilder.summary.additionalDestination"),
+      type: "stopover",
+    });
+  }
+
+  nodes.push({ label: dest });
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 text-caption font-semibold">
+      {nodes.map((n, i) => (
+        <span key={i} className="inline-flex items-center gap-1.5">
+          {i > 0 && <span className="text-muted-foreground rtl:rotate-180">→</span>}
+          <span
+            className={cn(
+              "rounded-lg px-2 py-0.5 text-[11px] transition-colors",
+              n.type === "holy"
+                ? "bg-primary/10 font-bold text-primary"
+                : n.type === "stopover"
+                  ? "bg-amber-500/10 font-bold text-amber-700 dark:text-amber-400"
+                  : n.type === "transit"
+                    ? "bg-sky-500/10 font-bold text-sky-700 dark:text-sky-400"
+                    : "bg-surface-sunken text-foreground",
+            )}
+          >
+            {n.label}
+            {n.badge && <span className="ms-1 text-[10px] font-normal opacity-80">({n.badge})</span>}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function SummaryBody({
   state,
   areaLabel,
@@ -311,23 +408,37 @@ export function SummaryBody({
     </span>
   );
 
+  const totalNights = totalTripNights(state);
+
   const stay = (city: "makkah" | "madinah") => {
     const nights = city === "makkah" ? state.makkahNights : state.madinahNights;
     const hotel = city === "makkah" ? state.makkahHotelName : state.madinahHotelName;
+    const isCustom =
+      city === "makkah"
+        ? state.makkahMode === "custom_hotel" || (!state.makkahHotelId && !!state.makkahHotelName)
+        : state.madinahMode === "custom_hotel" ||
+          (!state.madinahHotelId && !!state.madinahHotelName);
     const area = city === "makkah" ? state.makkahArea : state.madinahArea;
     const budget = city === "makkah" ? state.makkahPreference : state.madinahPreference;
     const place = hotel || (area ? areaLabel(city, area) : "");
     return (
       <SummaryBlock label={t(`umrahBuilder.summary.${city}`)}>
         {place ? (
-          <p
-            className={cn(
-              "text-small font-bold leading-snug",
-              hotel ? "text-primary" : "text-foreground",
+          <div>
+            <p
+              className={cn(
+                "text-small font-bold leading-snug",
+                hotel ? "text-primary" : "text-foreground",
+              )}
+            >
+              {place}
+            </p>
+            {isCustom && (
+              <span className="mt-0.5 inline-block rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                {t("umrahBuilder.summary.customTag")}
+              </span>
             )}
-          >
-            {place}
-          </p>
+          </div>
         ) : (
           <p>{pending}</p>
         )}
@@ -347,17 +458,61 @@ export function SummaryBody({
 
   return (
     <div className="space-y-3.5">
+      {state.packageTitle && (
+        <SummaryBlock label="برنامج العمرة المختار">
+          <p className="text-small font-bold text-primary">{state.packageTitle}</p>
+          {state.flightRoute && (
+            <p className="text-caption font-medium text-foreground/80">
+              المسار: <span className="font-bold">{state.flightRoute}</span>
+            </p>
+          )}
+          {state.arrivalAirport && state.returnAirport && (
+            <p className="text-[11px] text-muted-foreground">
+              الوصول: {state.arrivalAirport === "Jeddah" ? "جدة (JED)" : state.arrivalAirport === "Madinah" ? "المدينة المنورة (MED)" : state.arrivalAirport}
+              {" · "}
+              المغادرة: {state.returnAirport === "Madinah" ? "المدينة المنورة (MED)" : state.returnAirport === "Jeddah" ? "جدة (JED)" : state.returnAirport}
+            </p>
+          )}
+          {state.packagePrice ? (
+            <p className="mt-1 text-caption font-semibold text-foreground">
+              السعر الرسمي: <span className="text-primary font-bold">{state.packagePrice} TND</span>
+            </p>
+          ) : null}
+          {state.packageNotes && state.packageNotes !== "-" && (
+            <p className="mt-0.5 text-[11px] text-muted-foreground italic">
+              {state.packageNotes}
+            </p>
+          )}
+        </SummaryBlock>
+      )}
+
       <SummaryBlock label={t("umrahBuilder.summary.dates")}>
         {state.departureDate ? (
-          <p className="text-small font-bold leading-snug">
-            {longDate(state.departureDate)}
-            {state.returnDate ? (
-              <>
-                <span className="mx-1 text-muted-foreground">→</span>
-                {longDate(state.returnDate)}
-              </>
-            ) : null}
-          </p>
+          <>
+            <p className="text-small font-bold leading-snug">
+              {longDate(state.departureDate)}
+              {state.returnDate ? (
+                <>
+                  <span className="mx-1 text-muted-foreground">→</span>
+                  {longDate(state.returnDate)}
+                </>
+              ) : null}
+            </p>
+            {totalNights > 0 && (
+              <p className="mt-1 inline-flex items-center gap-2 text-caption font-bold text-primary">
+                <span>
+                  {t("umrahBuilder.summary.totalNights")}:{" "}
+                  {t("umrahBuilder.summary.nightsCount", { count: totalNights })}
+                </span>
+              </p>
+            )}
+            {(state.makkahNights > 0 || state.madinahNights > 0) && (
+              <p className="text-[11px] text-muted-foreground">
+                {t("umrahBuilder.stay.makkahNightsSummary", { count: state.makkahNights })} ·{" "}
+                {t("umrahBuilder.stay.madinahNightsSummary", { count: state.madinahNights })}
+              </p>
+            )}
+          </>
         ) : (
           <p>{pending}</p>
         )}
@@ -371,6 +526,34 @@ export function SummaryBody({
               ? `${state.departureAirport} → ${state.returnAirport}`
               : pending}
         </p>
+        {state.flightPreference && (
+          <p className="text-caption text-muted-foreground">
+            {state.flightPreference === "direct" && t("umrahBuilder.summary.directFlight")}
+            {state.flightPreference === "transit" && (
+              <>
+                {t("umrahBuilder.summary.transitFlight")}
+                {state.transitHub ? ` · ${state.transitHub}` : ""}
+              </>
+            )}
+            {state.flightPreference === "stopover" && (
+              <>
+                {t("umrahBuilder.summary.stopoverFlight")}
+                {state.additionalDestination ? `: ${state.additionalDestination}` : ""}
+                {state.destinationTiming && (
+                  <span className="opacity-80">
+                    {" "}
+                    ({t(`umrahBuilder.flights.stopoverTiming.${state.destinationTiming}`)})
+                  </span>
+                )}
+              </>
+            )}
+          </p>
+        )}
+        {state.departureDate && state.returnDate && (
+          <div className="mt-2.5">
+            <RouteVisualizer state={state} />
+          </div>
+        )}
       </SummaryBlock>
 
       <SummaryBlock label={t("umrahBuilder.summary.travellers")}>
@@ -391,7 +574,7 @@ export function SummaryPanel({ children }: { children: ReactNode }) {
   return (
     <>
       <aside className="hidden lg:block">
-        <div className="sticky top-24 overflow-hidden rounded-3xl border border-border-subtle bg-card shadow-sm">
+        <div className="sticky top-24 overflow-hidden rounded-card-lg border border-border-subtle bg-card shadow-sm">
           <div className="border-b border-border-subtle bg-surface-sunken/50 px-5 py-4">
             <h2 className="text-small font-bold tracking-wide">
               {t("umrahBuilder.summary.title")}
@@ -402,7 +585,7 @@ export function SummaryPanel({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="lg:hidden">
-        <div className="overflow-hidden rounded-3xl border border-border-subtle bg-card">
+        <div className="overflow-hidden rounded-card-lg border border-border-subtle bg-card">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -450,7 +633,7 @@ export function TextField({
         {label}
         {required && <span className="text-primary"> *</span>}
       </label>
-      <input
+      <Input
         id={id}
         type={type}
         inputMode={inputMode}
@@ -459,8 +642,8 @@ export function TextField({
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={!!error}
         className={cn(
-          "h-12 w-full rounded-2xl border bg-card px-4 text-small outline-none transition-colors placeholder:text-muted-foreground focus:border-primary",
-          error ? "border-destructive" : "border-border-subtle",
+          "h-11",
+          error && "border-destructive focus-visible:ring-destructive",
         )}
       />
       {error && <p className="text-caption text-destructive">{error}</p>}

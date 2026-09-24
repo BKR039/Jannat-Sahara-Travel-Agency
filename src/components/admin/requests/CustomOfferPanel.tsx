@@ -10,6 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { shortDate } from "@/components/admin/kit";
 import {
   AlertDialog,
@@ -105,6 +112,8 @@ export function CustomOfferPanel({ row }: { row: RequestRow }) {
     // "awaiting offer" insight, so the Command Center must refetch too.
     queryClient.invalidateQueries({ queryKey: ["admin-command-center"] });
     queryClient.invalidateQueries({ queryKey: ["admin-request-activity", id] });
+    queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-customers"] });
   };
 
   const parsedAmount = amount.trim() === "" ? null : Number(amount);
@@ -190,40 +199,47 @@ export function CustomOfferPanel({ row }: { row: RequestRow }) {
         <div className="mt-4 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="offer-hotels">{t("ops.offers.proposedHotels")}</Label>
-            <div className="flex flex-wrap gap-2">
-              <select
-                aria-label={t("ops.offers.addMakkahHotel")}
-                value=""
-                onChange={(e) =>
-                  e.target.value &&
-                  setProposedHotels((v) => upsertHotelLine(v, "Makkah", e.target.value))
-                }
-                className="h-9 rounded-lg border border-border bg-background px-2 text-caption"
+              <Select
+                value="__placeholder__"
+                onValueChange={(val) => {
+                  if (val && val !== "__placeholder__") {
+                    setProposedHotels((v) => upsertHotelLine(v, "Makkah", val));
+                  }
+                }}
               >
-                <option value="">{t("ops.offers.addMakkahHotel")}</option>
-                {(makkahHotels ?? []).map((h) => (
-                  <option key={h.id} value={h.name}>
-                    {h.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label={t("ops.offers.addMadinahHotel")}
-                value=""
-                onChange={(e) =>
-                  e.target.value &&
-                  setProposedHotels((v) => upsertHotelLine(v, "Madinah", e.target.value))
-                }
-                className="h-9 rounded-lg border border-border bg-background px-2 text-caption"
+                <SelectTrigger className="h-9 w-auto min-w-[140px] text-caption">
+                  <SelectValue placeholder={t("ops.offers.addMakkahHotel")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__placeholder__" disabled>{t("ops.offers.addMakkahHotel")}</SelectItem>
+                  {(makkahHotels ?? []).map((h) => (
+                    <SelectItem key={h.id} value={h.name}>
+                      {h.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value="__placeholder__"
+                onValueChange={(val) => {
+                  if (val && val !== "__placeholder__") {
+                    setProposedHotels((v) => upsertHotelLine(v, "Madinah", val));
+                  }
+                }}
               >
-                <option value="">{t("ops.offers.addMadinahHotel")}</option>
-                {(madinahHotels ?? []).map((h) => (
-                  <option key={h.id} value={h.name}>
-                    {h.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <SelectTrigger className="h-9 w-auto min-w-[140px] text-caption">
+                  <SelectValue placeholder={t("ops.offers.addMadinahHotel")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__placeholder__" disabled>{t("ops.offers.addMadinahHotel")}</SelectItem>
+                  {(madinahHotels ?? []).map((h) => (
+                    <SelectItem key={h.id} value={h.name}>
+                      {h.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             <Textarea
               id="offer-hotels"
               rows={3}
@@ -261,18 +277,21 @@ export function CustomOfferPanel({ row }: { row: RequestRow }) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="offer-currency">{t("ops.offers.currency")}</Label>
-              <select
-                id="offer-currency"
+              <Select
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="h-10 w-full rounded-lg border border-border bg-background px-3 text-small"
+                onValueChange={setCurrency}
               >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="offer-currency" className="h-10 w-full text-small">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { BadgeCheck, Pencil, Plus, Power, Trash2 } from "lucide-react";
+import { BadgeCheck, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,6 +14,7 @@ import {
   Panel,
   SearchInput,
   SkeletonRows,
+  StatusSwitch,
   useDebounced,
 } from "@/components/admin/kit";
 import { LocalizedField } from "@/components/admin/LocalizedField";
@@ -21,7 +22,7 @@ import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { NumberInput } from "@/components/ui/number-input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -62,6 +63,9 @@ const ICON_SUGGESTIONS = [
   "shield-check",
   "building",
   "sparkles",
+  "heart-handshake",
+  "clock",
+  "users",
 ];
 
 function FeaturesPage() {
@@ -72,6 +76,7 @@ function FeaturesPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [draft, setDraft] = useState<FeatureDraft | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Row | null>(null);
+  const [pendingFeatureId, setPendingFeatureId] = useState<string | null>(null);
   const debounced = useDebounced(search);
 
   const q = useQuery({
@@ -104,7 +109,6 @@ function FeaturesPage() {
       if (d.id) {
         const current = rows.find((r) => r.id === d.id);
         const patch = changedColumns(current, columns);
-        // Nothing to write is a successful no-op, not an empty UPDATE.
         if (Object.keys(patch).length === 0) return;
         const { error } = await supabase
           .from("features")
@@ -136,6 +140,7 @@ function FeaturesPage() {
       invalidate();
     },
     onError: () => toast.error(failed()),
+    onSettled: () => setPendingFeatureId(null),
   });
 
   const deleteMutation = useMutation({
@@ -160,8 +165,7 @@ function FeaturesPage() {
       if (statusFilter === "active" && !r.active) return false;
       if (statusFilter === "inactive" && r.active) return false;
       if (!needle) return true;
-      // Search covers all three languages so an English editor can find a row.
-      return [r.title, r.title_fr, r.title_en]
+      return [r.title, r.title_fr, r.title_en, r.description]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(needle));
     });
@@ -227,7 +231,6 @@ function FeaturesPage() {
             <SkeletonRows rows={4} />
           </div>
         ) : q.isError ? (
-          // A failed query must never look like an empty table.
           <ErrorState onRetry={() => q.refetch()} />
         ) : filtered.length === 0 ? (
           <div className="p-4">
@@ -257,69 +260,67 @@ function FeaturesPage() {
         ) : (
           <ul className="divide-y divide-border-subtle">
             {filtered.map((row) => (
-              <li key={row.id} className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <DynamicIcon name={row.icon} className="h-4 w-4" />
-                </span>
+              <li
+                key={row.id}
+                className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                    <DynamicIcon name={row.icon} className="h-5 w-5" />
+                  </span>
 
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-small font-medium">{row.title}</p>
-                  {row.description && (
-                    <p className="truncate text-caption text-muted-foreground">{row.description}</p>
-                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-foreground truncate">{row.title}</p>
+                    {row.description && (
+                      <p className="mt-0.5 text-caption text-muted-foreground line-clamp-1">
+                        {row.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <TranslationChips row={row} />
+                <div className="flex items-center justify-between gap-3 sm:justify-end">
+                  <TranslationChips row={row} />
 
-                <span className="hidden text-caption tabular-nums text-muted-foreground sm:inline">
-                  {t("content.features.fields.sortOrder")} {row.sort_order ?? 0}
-                </span>
+                  <span className="text-caption tabular-nums text-muted-foreground font-medium px-2 py-0.5 rounded border border-border-subtle bg-surface-sunken/30">
+                    #{row.sort_order ?? 0}
+                  </span>
 
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-0.5 text-caption font-semibold",
-                    row.active
-                      ? "bg-primary/10 text-primary"
-                      : "bg-surface-sunken text-muted-foreground",
-                  )}
-                >
-                  {t(
-                    row.active
-                      ? "content.features.filters.active"
-                      : "content.features.filters.inactive",
-                  )}
-                </span>
-
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t("ops.common.edit")}
-                    onClick={() => edit(row)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t(
-                      row.active
-                        ? "content.features.actions.deactivate"
-                        : "content.features.actions.activate",
-                    )}
-                    disabled={activeMutation.isPending}
-                    onClick={() => activeMutation.mutate({ id: row.id, active: !row.active })}
-                  >
-                    <Power className={cn("h-4 w-4", row.active && "text-primary")} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t("ops.common.delete")}
-                    onClick={() => setConfirmDelete(row)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <StatusSwitch
+                      checked={Boolean(row.active)}
+                      disabled={activeMutation.isPending && pendingFeatureId === row.id}
+                      isPending={activeMutation.isPending && pendingFeatureId === row.id}
+                      onCheckedChange={(active) => {
+                        setPendingFeatureId(row.id);
+                        activeMutation.mutate({ id: row.id, active });
+                      }}
+                      activeLabel={t("content.features.filters.active")}
+                      inactiveLabel={t("content.features.filters.inactive")}
+                      ariaLabel={t(
+                        row.active
+                          ? "content.features.actions.deactivate"
+                          : "content.features.actions.activate",
+                      )}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t("ops.common.edit")}
+                      onClick={() => edit(row)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive"
+                      title={t("ops.common.delete")}
+                      onClick={() => setConfirmDelete(row)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}
@@ -333,120 +334,142 @@ function FeaturesPage() {
         onClose={() => setDraft(null)}
         title={draft?.id ? t("content.features.editTitle") : t("content.features.newTitle")}
         description={t("content.features.formHint")}
-      >
-        {draft && (
-          <form
-            className="space-y-5"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!canSave || saveMutation.isPending) return;
-              saveMutation.mutate(draft);
-            }}
-          >
-            <LocalizedField
-              label={t("content.features.fields.title")}
-              values={{ base: draft.title, fr: draft.title_fr, en: draft.title_en }}
-              onChange={(v) =>
-                setDraft({ ...draft, title: v.base, title_fr: v.fr, title_en: v.en })
-              }
-            />
-            {errors.title && (
-              <p className="text-caption text-destructive">
-                {t("content.features.errors.titleRequired")}
-              </p>
-            )}
-
-            <LocalizedField
-              label={t("content.features.fields.description")}
-              rows={3}
-              values={{
-                base: draft.description,
-                fr: draft.description_fr,
-                en: draft.description_en,
-              }}
-              onChange={(v) =>
-                setDraft({
-                  ...draft,
-                  description: v.base,
-                  description_fr: v.fr,
-                  description_en: v.en,
-                })
-              }
-            />
-
-            <div className="space-y-1.5">
-              <Label htmlFor="feature-icon">{t("content.features.fields.icon")}</Label>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-sunken/50 text-primary">
-                  <DynamicIcon name={draft.icon} className="h-5 w-5" />
-                </span>
-                <Input
-                  id="feature-icon"
-                  dir="ltr"
-                  value={draft.icon}
-                  onChange={(e) => setDraft({ ...draft, icon: e.target.value })}
-                  placeholder={ICON_SUGGESTIONS[0]}
-                />
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {ICON_SUGGESTIONS.map((name) => (
-                  <button
-                    key={name}
-                    type="button"
-                    title={name}
-                    onClick={() => setDraft({ ...draft, icon: name })}
-                    className={cn(
-                      "inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors",
-                      draft.icon === name
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border-subtle text-muted-foreground hover:bg-accent",
-                    )}
-                  >
-                    <DynamicIcon name={name} className="h-4 w-4" />
-                  </button>
-                ))}
-              </div>
-              <p className="text-caption text-muted-foreground">
-                {t("content.features.fields.iconHint")}
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="feature-order">{t("content.features.fields.sortOrder")}</Label>
-              <Input
-                id="feature-order"
-                type="number"
-                dir="ltr"
-                value={draft.sort_order}
-                onChange={(e) => setDraft({ ...draft, sort_order: Number(e.target.value) || 0 })}
-              />
-              <p className="text-caption text-muted-foreground">
-                {t("content.features.fields.sortOrderHint")}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-border-subtle p-3">
-              <div className="min-w-0">
-                <p className="text-small font-medium">{t("content.features.fields.active")}</p>
-                <p className="text-caption text-muted-foreground">
-                  {t("content.features.fields.activeHint")}
-                </p>
-              </div>
-              <Switch
-                checked={draft.active}
-                onCheckedChange={(v) => setDraft({ ...draft, active: v })}
-              />
-            </div>
-
-            <div className="flex justify-end gap-2">
+        footer={
+          draft ? (
+            <div className="flex items-center justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setDraft(null)}>
                 {t("ops.common.cancel")}
               </Button>
-              <Button type="submit" disabled={!canSave || saveMutation.isPending}>
+              <Button
+                type="button"
+                disabled={!canSave || saveMutation.isPending}
+                onClick={() => {
+                  if (canSave && !saveMutation.isPending) {
+                    saveMutation.mutate(draft);
+                  }
+                }}
+              >
                 {saveMutation.isPending ? t("content.common.saving") : t("ops.common.save")}
               </Button>
             </div>
-          </form>
+          ) : undefined
+        }
+      >
+        {draft && (
+          <div className="space-y-6">
+            {/* SECTION 1 — CONTENT */}
+            <div className="space-y-4">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                المحتوى والعناوين
+              </h3>
+
+              <div className="space-y-1">
+                <LocalizedField
+                  label={t("content.features.fields.title")}
+                  values={{ base: draft.title, fr: draft.title_fr, en: draft.title_en }}
+                  onChange={(v) =>
+                    setDraft({ ...draft, title: v.base, title_fr: v.fr, title_en: v.en })
+                  }
+                />
+                {errors.title && (
+                  <p className="text-caption text-destructive">
+                    {t("content.features.errors.titleRequired")}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <LocalizedField
+                  label={t("content.features.fields.description")}
+                  rows={3}
+                  values={{
+                    base: draft.description,
+                    fr: draft.description_fr,
+                    en: draft.description_en,
+                  }}
+                  onChange={(v) =>
+                    setDraft({
+                      ...draft,
+                      description: v.base,
+                      description_fr: v.fr,
+                      description_en: v.en,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            {/* SECTION 2 — DISPLAY & VISUAL */}
+            <div className="space-y-4">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                المظهر وإعدادات العرض
+              </h3>
+
+              <div className="space-y-2">
+                <Label htmlFor="feature-icon">{t("content.features.fields.icon")}</Label>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-sunken/50 text-primary">
+                    <DynamicIcon name={draft.icon} className="h-5 w-5" />
+                  </span>
+                  <Input
+                    id="feature-icon"
+                    dir="ltr"
+                    value={draft.icon}
+                    onChange={(e) => setDraft({ ...draft, icon: e.target.value })}
+                    placeholder={ICON_SUGGESTIONS[0]}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {ICON_SUGGESTIONS.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      title={name}
+                      onClick={() => setDraft({ ...draft, icon: name })}
+                      className={cn(
+                        "inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors",
+                        draft.icon === name
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border-subtle text-muted-foreground hover:bg-accent",
+                      )}
+                    >
+                      <DynamicIcon name={name} className="h-4 w-4" />
+                    </button>
+                  ))}
+                </div>
+                <p className="text-caption text-muted-foreground">
+                  {t("content.features.fields.iconHint")}
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="feature-order">{t("content.features.fields.sortOrder")}</Label>
+                <NumberInput
+                  id="feature-order"
+                  dir="ltr"
+                  value={draft.sort_order}
+                  onChange={(v) => setDraft({ ...draft, sort_order: v ?? 0 })}
+                  min={0}
+                />
+                <p className="text-caption text-muted-foreground">
+                  {t("content.features.fields.sortOrderHint")}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 rounded-card border border-border-subtle bg-surface-sunken/20 p-3.5">
+                <div className="min-w-0">
+                  <p className="text-small font-medium">{t("content.features.fields.active")}</p>
+                  <p className="text-caption text-muted-foreground">
+                    {t("content.features.fields.activeHint")}
+                  </p>
+                </div>
+                <StatusSwitch
+                  checked={Boolean(draft.active)}
+                  onCheckedChange={(v) => setDraft({ ...draft, active: v })}
+                />
+              </div>
+            </div>
+          </div>
         )}
       </Drawer>
 
@@ -461,6 +484,7 @@ function FeaturesPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>{t("ops.common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => confirmDelete && deleteMutation.mutate(confirmDelete.id)}
             >
               {t("ops.common.delete")}
@@ -480,7 +504,7 @@ function TranslationChips({ row }: { row: { title_fr: string | null; title_en: s
   ) as string[];
   if (missing.length === 0) return null;
   return (
-    <span className="rounded-full bg-warning-muted px-2.5 py-0.5 text-caption font-medium text-warning">
+    <span className="rounded-full bg-warning-muted px-2 py-0.5 text-caption font-medium text-warning shrink-0">
       {t("content.common.missingTranslations", {
         langs: missing.map((l) => t(`ops.localized.${l}`)).join(" · "),
       })}

@@ -134,7 +134,7 @@ const BranchTile = memo(function BranchTile({
       }}
       style={{ animationDelay: `${Math.min(index, 6) * 50}ms` }}
       className={cn(
-        "group ds-reveal relative flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 text-start transition-all duration-base ease-standard",
+        "group ds-reveal relative flex cursor-pointer items-start gap-2.5 rounded-lg border p-3 text-start transition-all duration-base ease-standard",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
         active
           ? "border-primary/50 bg-primary/8 shadow-md shadow-primary/10"
@@ -143,7 +143,7 @@ const BranchTile = memo(function BranchTile({
     >
       <span
         className={cn(
-          "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all duration-base ease-standard",
           active
             ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
             : "bg-primary/10 text-primary group-hover:scale-105",
@@ -157,39 +157,53 @@ const BranchTile = memo(function BranchTile({
       </span>
 
       {/*
-       * Real branch names run to ~45 characters of Arabic
-       * ("وكالة جنة الصحراء للاسفار فرع المروج تونس"), so nothing here may
-       * truncate: the name wraps, and the address clamps to two lines with the
-       * full value always shown in the panel below.
+       * Three rows, not five.
+       *
+       * The card used to spend a row each on the type/city line, the name, a
+       * two-line address and the phone, which made every tile ~148px tall and
+       * left the map with the remainder. Address and phone now share one row —
+       * the address takes the space that is left and the phone, which is a
+       * fixed handful of digits, keeps its own end of it — so the same facts
+       * fit in ~105px and the difference goes to the map.
+       *
+       * Real branch names run to ~45 Arabic characters
+       * ("وكالة جنة الصحراء للاسفار فرع المروج تونس"), so the name is the one
+       * thing that may still wrap — capped at two lines, never truncated. The
+       * full address is always shown in the panel under the map.
        */}
       <div className="min-w-0 flex-1">
-        <p className="text-caption font-semibold uppercase tracking-[0.06em] text-primary/80">
-          {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} ·{" "}
-          {L(branch, "city", "base")}
+        {/*
+         * The "selected" chip rides the meta line rather than sitting beside
+         * the text column. As a sibling of the column it narrowed every row of
+         * the active card, which is why that one card's address truncated to a
+         * few words while the others showed in full.
+         */}
+        <p className="flex items-center gap-1.5 text-caption font-semibold uppercase tracking-normal text-primary/80">
+          <span className="min-w-0 flex-1 truncate">
+            {branch.is_main_branch ? t("branches.mainBranch") : t("branches.office")} ·{" "}
+            {L(branch, "city", "base")}
+          </span>
+          {active && (
+            <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-caption font-bold tracking-normal text-primary-foreground">
+              {t("branches.active")}
+            </span>
+          )}
         </p>
-        <h3 className="mt-0.5 text-small font-bold leading-snug text-foreground [overflow-wrap:anywhere]">
+        <h3 className="mt-0.5 line-clamp-2 text-small font-bold leading-snug text-foreground [overflow-wrap:anywhere]">
           {L(branch, "name", "base")}
         </h3>
-        <p className="mt-0.5 line-clamp-2 text-caption leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
-          {L(branch, "address", "base")}
-        </p>
-        {/* Plain text, not a link: the card itself is the control. */}
-        {branch.phone && (
-          <p
-            dir="ltr"
-            className="mt-1.5 inline-flex items-center gap-1.5 text-caption font-semibold text-foreground/80"
-          >
-            <Phone className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
-            {branch.phone}
-          </p>
-        )}
+        <div className="mt-1 flex items-baseline gap-2 text-caption">
+          <span className="min-w-0 flex-1 truncate text-muted-foreground">
+            {L(branch, "address", "base")}
+          </span>
+          {/* Plain text, not a link: the card itself is the control. */}
+          {branch.phone && (
+            <span dir="ltr" className="shrink-0 font-semibold text-foreground/80">
+              {branch.phone}
+            </span>
+          )}
+        </div>
       </div>
-
-      {active && (
-        <span className="mt-1 shrink-0 rounded-full bg-primary px-2 py-0.5 text-caption font-bold text-primary-foreground">
-          {t("branches.active")}
-        </span>
-      )}
     </article>
   );
 });
@@ -277,74 +291,81 @@ function ActiveBranchPanel({ branch }: { branch: Branch }) {
           </div>
         </div>
 
-        {/* facts — wrap onto as many rows as they need */}
-        {facts.length > 0 && (
-          <div className="flex min-w-0 flex-wrap items-start gap-x-6 gap-y-3">
-            {facts.map((f) => (
-              <div key={f.key} className="flex min-w-0 items-center gap-2.5">
-                <IconBadge icon={f.icon} size="sm" tone="accent" />
-                <div className="min-w-0">
-                  <p className="text-caption font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                    {f.label}
-                  </p>
-                  <p
+        {/*
+         * Contact details and the things you can do with them share one row.
+         *
+         * Each fact used to be an icon badge over a stacked label and value,
+         * and the buttons sat on a row of their own below — three stacked
+         * blocks for what is, for every branch the agency actually has, a
+         * single phone number. The label is kept for screen readers; sighted
+         * readers get the icon, which says the same thing in one line. Only at
+         * phone widths does this wrap to a second row.
+         */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
+          {facts.length > 0 && (
+            <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1.5">
+              {facts.map((f) => (
+                <span
+                  key={f.key}
+                  className="inline-flex min-w-0 items-center gap-2 text-small font-semibold text-foreground"
+                >
+                  <f.icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span className="sr-only">{f.label}</span>
+                  <span
                     dir={f.ltr ? "ltr" : undefined}
-                    className={cn(
-                      "mt-0.5 text-small font-semibold leading-snug text-foreground [overflow-wrap:anywhere]",
-                      f.ltr && "text-start",
-                    )}
+                    className={cn("min-w-0 truncate", f.ltr && "text-start")}
                   >
                     {f.value}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* actions — always a separate group, never shrink into the text */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {branch.phone && (
-            <>
-              <a
-                href={whatsappHref(branch.phone)}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={t("branches.whatsapp")}
-                aria-label={t("branches.whatsapp")}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-              >
-                <MessageCircle className="h-5 w-5" aria-hidden="true" />
-              </a>
-              <a
-                href={`tel:${branch.phone.replace(/\s+/g, "")}`}
-                title={t("branches.call")}
-                aria-label={t("branches.call")}
-                className={ACTION_BTN}
-              >
-                <Phone className="h-5 w-5" aria-hidden="true" />
-              </a>
-            </>
+                  </span>
+                </span>
+              ))}
+            </div>
           )}
-          <a
-            href={mapsHref(branch)}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={t("branches.directions")}
-            aria-label={t("branches.directions")}
-            className={ACTION_BTN}
-          >
-            <Navigation className="h-5 w-5" aria-hidden="true" />
-          </a>
-          <button
-            type="button"
-            title={t("branches.copyAddress")}
-            aria-label={t("branches.copyAddress")}
-            onClick={() => copyToClipboard(`${name} — ${address}`, t("branches.addressCopied"))}
-            className={ACTION_BTN}
-          >
-            <Copy className="h-5 w-5" aria-hidden="true" />
-          </button>
+
+          {/* actions — never shrink into the text */}
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {branch.phone && (
+              <>
+                <a
+                  href={whatsappHref(branch.phone)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={t("branches.whatsapp")}
+                  aria-label={t("branches.whatsapp")}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm shadow-primary/25 transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                >
+                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                </a>
+                <a
+                  href={`tel:${branch.phone.replace(/\s+/g, "")}`}
+                  title={t("branches.call")}
+                  aria-label={t("branches.call")}
+                  className={ACTION_BTN}
+                >
+                  <Phone className="h-5 w-5" aria-hidden="true" />
+                </a>
+              </>
+            )}
+            <a
+              href={mapsHref(branch)}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t("branches.directions")}
+              aria-label={t("branches.directions")}
+              className={ACTION_BTN}
+            >
+              <Navigation className="h-5 w-5" aria-hidden="true" />
+            </a>
+            <button
+              type="button"
+              title={t("branches.copyAddress")}
+              aria-label={t("branches.copyAddress")}
+              onClick={() => copyToClipboard(`${name} — ${address}`, t("branches.addressCopied"))}
+              className={ACTION_BTN}
+            >
+              <Copy className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -702,7 +723,7 @@ export function BranchesSection() {
          * weight; `items-start` keeps both cards on the same top edge whatever
          * their natural heights.
          */}
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.9fr)_minmax(340px,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,2.05fr)_minmax(380px,1fr)] 2xl:grid-cols-[minmax(0,2.6fr)_minmax(420px,1fr)]">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(330px,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,2.2fr)_minmax(370px,1fr)] 2xl:grid-cols-[minmax(0,2.9fr)_minmax(400px,1fr)]">
           {/* ---------- where we are: one branch explorer ---------- */}
           <div className="ds-reveal flex h-full flex-col overflow-hidden rounded-card-lg border border-border-subtle bg-card">
             {/*
@@ -717,26 +738,29 @@ export function BranchesSection() {
              * card's full width. The picker keeps the space it used to spend on
              * a header for branch tiles instead.
              */}
-            <div className="flex flex-col gap-2.5 border-b border-border/50 bg-muted/30 px-4 py-3 md:px-5 md:py-3.5">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
-                  {t("branches.ourBranches")}
-                </p>
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-caption font-bold text-primary">
-                  {filtered.length} {t("branches.branchesCount")}
-                </span>
-                <div className="relative ms-auto w-full sm:w-64 xl:w-72">
-                  <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    type="search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    aria-label={t("branches.searchPlaceholder")}
-                    placeholder={t("branches.searchPlaceholder")}
-                    className="h-11 w-full rounded-full border border-border/60 bg-background/70 ps-10 pe-4 text-small text-foreground outline-none transition-all duration-base ease-standard placeholder:text-muted-foreground hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_12%,transparent)]"
-                  />
-                </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-border/50 bg-muted/30 px-4 py-2.5 md:px-5 md:py-3">
+              {/*
+               * Search, the city filters and the result count on one line.
+               *
+               * They used to be stacked — a heading and the count on one row,
+               * the search pushed to the far end of it, the chips on a row of
+               * their own — which read as a block of mostly empty toolbar above
+               * the explorer. The "فروعنا" heading went with it: the section
+               * already carries that title a few lines above, and the count
+               * badge says the same thing with a number attached.
+               */}
+              <div className="relative w-full shrink-0 sm:w-56 xl:w-64">
+                <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  aria-label={t("branches.searchPlaceholder")}
+                  placeholder={t("branches.searchPlaceholder")}
+                  className="h-11 w-full rounded-full border border-border/60 bg-background/70 ps-10 pe-4 text-small text-foreground outline-none transition-all duration-base ease-standard placeholder:text-muted-foreground hover:border-primary/40 focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-orange-500)_12%,transparent)]"
+                />
               </div>
+
               {cities.length > 1 && (
                 /*
                  * Wraps rather than scrolls. A chip row that overflows its
@@ -747,7 +771,7 @@ export function BranchesSection() {
                 <div
                   role="group"
                   aria-label={t("branches.allCities")}
-                  className="flex flex-wrap gap-2"
+                  className="flex min-w-0 flex-wrap gap-2"
                 >
                   {[{ id: "all", label: t("branches.allCities") }, ...cities].map((c) => (
                     <button
@@ -767,6 +791,10 @@ export function BranchesSection() {
                   ))}
                 </div>
               )}
+
+              <span className="ms-auto shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-caption font-bold text-primary">
+                {filtered.length} {t("branches.branchesCount")}
+              </span>
             </div>
 
             {/*
@@ -776,13 +804,13 @@ export function BranchesSection() {
              * the picker — because a side-by-side pair at phone width leaves
              * both halves too narrow to use.
              */}
-            <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_minmax(250px,1.05fr)] lg:grid-cols-[minmax(0,1.68fr)_minmax(275px,1.05fr)] xl:grid-cols-[minmax(0,1.62fr)_minmax(310px,1.05fr)] lg:min-h-[400px]">
+            <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(0,1.72fr)_minmax(250px,1.05fr)] lg:grid-cols-[minmax(0,1.74fr)_minmax(280px,1.05fr)] xl:grid-cols-[minmax(0,1.78fr)_minmax(310px,1.05fr)] lg:min-h-[520px]">
               {/* map + the selected branch's live details */}
               <div className="order-1 flex min-w-0 flex-col">
                 {/* map — chunk + tiles load only once the panel nears the viewport */}
                 <div
                   ref={mapRef}
-                  className="relative h-[320px] sm:h-[380px] md:h-auto md:min-h-[310px] md:flex-1"
+                  className="relative h-[320px] sm:h-[380px] md:h-auto md:min-h-[420px] md:flex-1"
                 >
                   <Suspense fallback={<MapSkeleton />}>
                     {mounted && mapInView && filtered.length > 0 ? (

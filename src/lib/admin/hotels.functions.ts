@@ -17,24 +17,41 @@ import { z } from "zod";
  */
 
 /** Real areas per city. `suggest` is a Builder fallback, never a hotel's area. */
-export const HOTEL_AREAS = {
+export const HOTEL_AREAS: Record<string, readonly string[]> = {
   makkah: ["haram_close", "central", "ibrahim_khalil", "ajyad"],
   madinah: ["very_close", "close", "value"],
-} as const;
+};
 
-const HotelInput = z.object({
+export const HotelInput = z.object({
   name: z.string().trim().min(2).max(160),
-  city: z.enum(["makkah", "madinah"]),
-  area: z.string().trim().max(40).optional().nullable(),
-  location: z.string().trim().max(200).optional().nullable(),
+  city: z.string().trim().min(1).max(100),
+  area: z.string().trim().max(60).optional().nullable(),
+  location: z.string().trim().max(500).optional().nullable(),
+  stars: z.number().int().min(1).max(5).optional().nullable(),
+  description: z.string().trim().max(1500).optional().nullable(),
+  images: z.array(z.string().trim()).optional().nullable(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  distance_to_haram: z.number().optional().nullable(),
+  distance_to_masjid_nabawi: z.number().optional().nullable(),
   active: z.boolean().default(true),
 });
 
-/** The area, when given, must belong to the chosen city. */
-function normalizeArea(city: "makkah" | "madinah", area: string | null | undefined): string | null {
+export function isMakkahCity(city: string): boolean {
+  const c = city.trim().toLowerCase();
+  return c === "makkah" || c === "mecca" || c === "مكة" || c === "مكة المكرمة";
+}
+
+export function isMadinahCity(city: string): boolean {
+  const c = city.trim().toLowerCase();
+  return c === "madinah" || c === "medina" || c === "المدينة" || c === "المدينة المنورة";
+}
+
+/** The area, when given, is cleaned. */
+function normalizeArea(city: string, area: string | null | undefined): string | null {
   const value = (area ?? "").trim();
   if (!value) return null;
-  return (HOTEL_AREAS[city] as readonly string[]).includes(value) ? value : null;
+  return value;
 }
 
 async function writeAudit(
@@ -59,13 +76,16 @@ async function writeAudit(
 export const listHotels = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "hotels.view");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data, error } = await supabaseAdmin
       .from("hotels")
-      .select("id, name, city, area, location, active, sort_order, created_at")
+      .select(
+        "id, name, city, area, location, stars, images, description, latitude, longitude, distance_to_haram, distance_to_masjid_nabawi, active, sort_order, created_at",
+      )
       .order("city")
       .order("sort_order")
       .order("name");
@@ -83,15 +103,20 @@ export const listHotels = createServerFn({ method: "GET" })
       }
     });
 
-    return (data ?? []).map((h) => ({ ...h, requestCount: usage.get(h.id) ?? 0 }));
+    return (data ?? []).map((h) => ({
+      ...h,
+      images: Array.isArray(h.images) ? (h.images as string[]) : [],
+      requestCount: usage.get(h.id) ?? 0,
+    }));
   });
 
 export const createHotel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => HotelInput.parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "hotels.create");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const name = data.name.trim();
@@ -112,6 +137,15 @@ export const createHotel = createServerFn({ method: "POST" })
         city: data.city,
         area: normalizeArea(data.city, data.area),
         location: data.location?.trim() || null,
+        stars: data.stars ?? null,
+        description: data.description?.trim() || null,
+        images: Array.isArray(data.images) ? data.images.filter(Boolean) : [],
+        latitude: data.latitude ?? null,
+        longitude: data.longitude ?? null,
+        distance_to_haram: isMakkahCity(data.city) ? (data.distance_to_haram ?? null) : null,
+        distance_to_masjid_nabawi: isMadinahCity(data.city)
+          ? (data.distance_to_masjid_nabawi ?? null)
+          : null,
         active: data.active,
         source: "agency",
       } as never)
@@ -136,8 +170,9 @@ export const updateHotel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => HotelInput.extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "hotels.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const name = data.name.trim();
@@ -157,6 +192,15 @@ export const updateHotel = createServerFn({ method: "POST" })
         city: data.city,
         area: normalizeArea(data.city, data.area),
         location: data.location?.trim() || null,
+        stars: data.stars ?? null,
+        description: data.description?.trim() || null,
+        images: Array.isArray(data.images) ? data.images.filter(Boolean) : [],
+        latitude: data.latitude ?? null,
+        longitude: data.longitude ?? null,
+        distance_to_haram: isMakkahCity(data.city) ? (data.distance_to_haram ?? null) : null,
+        distance_to_masjid_nabawi: isMadinahCity(data.city)
+          ? (data.distance_to_masjid_nabawi ?? null)
+          : null,
         active: data.active,
       } as never)
       .eq("id", data.id);
@@ -182,8 +226,9 @@ export const setHotelActive = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), active: z.boolean() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "hotels.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { error } = await supabaseAdmin
@@ -215,8 +260,9 @@ export const deleteHotel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "hotels.delete");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { count, error: countError } = await supabaseAdmin

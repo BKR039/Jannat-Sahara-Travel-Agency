@@ -6,16 +6,20 @@ import { useTranslation } from "react-i18next";
 import { Newspaper, Search, X } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { SkeletonGrid } from "@/components/common/SkeletonGrid";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { ArticleCard } from "@/components/blog/ArticleCard";
 import { FeaturedArticle } from "@/components/blog/FeaturedArticle";
 import { articlesQuery } from "@/lib/queries";
 import { articleTags } from "@/lib/blog";
 import { useLocalized } from "@/lib/localize";
-import { canonical, jsonLd } from "@/lib/seo";
+import { absoluteUrl, canonical, jsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData(articlesQuery());
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.blog.title") },
@@ -23,7 +27,7 @@ export const Route = createFileRoute("/blog")({
       { property: "og:title", content: i18n.t("seo.blog.title") },
       { property: "og:description", content: i18n.t("seo.blog.ogDescription") },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/blog" },
+      { property: "og:url", content: absoluteUrl("/blog") },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: i18n.t("seo.blog.title") },
       { name: "twitter:description", content: i18n.t("seo.blog.ogDescription") },
@@ -37,7 +41,7 @@ export const Route = createFileRoute("/blog")({
           "@type": "Blog",
           name: i18n.t("seo.blog.jsonName"),
           description: i18n.t("seo.blog.description"),
-          url: "/blog",
+          url: absoluteUrl("/blog"),
         }),
       },
     ],
@@ -127,7 +131,7 @@ function BlogPage() {
         {isLoading ? (
           <SkeletonGrid count={6} aspect="aspect-[16/10]" />
         ) : !filtered.length ? (
-          <EmptyState label={t("common.empty")} />
+          <EmptyState title={t("common.empty")} density="comfortable" />
         ) : (
           /*
            * The lead article gets the weight; the rest share the grid.
@@ -138,11 +142,11 @@ function BlogPage() {
            * editorial choice.
            */
           <div className="space-y-8">
-            {!isFiltered && lead && <FeaturedArticle article={lead} onOpen={setOpenSlug} />}
+            {!isFiltered && lead && <FeaturedArticle article={lead} />}
             {rest.length > 0 && (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {rest.map((a, i) => (
-                  <ArticleCard key={a.id} article={a} index={i} onOpen={setOpenSlug} />
+                  <ArticleCard key={a.id} article={a} index={i} />
                 ))}
               </div>
             )}

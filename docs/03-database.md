@@ -18,7 +18,7 @@ Content / CMS:
 
 | Table | Role |
 | --- | --- |
-| `packages` | Trips/Umrah/visa/flight offers. Rich columns: pricing (`price`, `discount`, `discount_price`, `child_price`, `infant_price`, `currency`), logistics (`destination`, `city`, `country`, `duration`, `departure_date`, `return_date`, `hotel`, `hotel_rating`, `airline`, `transport`, `meeting_point`, `seats`, `total_seats`), JSON arrays (`gallery`, `included`, `excluded`, `timeline`, `required_documents`), media (`cover`, `brochure_pdf`), SEO (`seo_title`, `seo_description`, `seo_keywords`), plus `status`, `featured`, `sort_order` and `_fr`/`_en` translations of most text columns |
+| `packages` | Trips/Umrah/visa/flight offers. Rich columns: pricing (`price`, `discount`, `discount_price`, `child_price`, `infant_price`, `currency`), logistics (`destination`, `city`, `country`, `duration`, `departure_date`, `return_date`, `arrival_airport`, `departure_airport`, `flight_route`, `notes`, `hotel`, `hotel_rating`, `airline`, `transport`, `meeting_point`, `seats`, `total_seats`), JSON arrays (`gallery`, `included`, `excluded`, `timeline`, `required_documents`), media (`cover`, `brochure_pdf`), SEO (`seo_title`, `seo_description`, `seo_keywords`), plus `status`, `featured`, `sort_order` and `_fr`/`_en` translations of most text columns |
 | `articles` | Blog posts (`published`, `published_at`, `slug`) |
 | `gallery_items`, `testimonials`, `faqs`, `services`, `features` | Homepage/site content, each with `active` + `sort_order` |
 | `site_content` | Keyed content blocks (e.g. `hero`) with `title/subtitle/body/image/cta_label/cta_href/data` and `_fr`/`_en` |
@@ -37,6 +37,8 @@ Operations:
 | `contact_messages` | Contact form submissions, `handled` flag |
 | `newsletter_subscribers` | Email subscriptions |
 | `customer_notes` | CRM notes attached to a customer identity |
+| `customer_profiles` | Persistent customer identity CRM records (`customer_key`, `full_name`, `phone`, `email`, `city`, `status`, `branch_id`, `notes`). Admin-only RLS via `is_admin()`. |
+| `installments` | Structured payment schedules linked to bookings/requests (`customer_key`, `booking_id`, `installment_number`, `amount`, `currency`, `due_date`, `paid_at`, `status`). Admin-only RLS via `is_admin()`. |
 | `notifications` | In-dashboard notification feed (`kind`, `title`, `body`, `entity`, `entity_id`, `read_at`) |
 | `audit_logs` | Written by the `log_audit_event()` trigger and by admin server functions |
 | `rate_limits` | Fixed-window rate-limit ledger (service-role only) |
@@ -87,6 +89,8 @@ Every table has RLS enabled. Two shapes dominate:
    - `user_roles`: `user_roles_self_read` (a user may read their own roles) — this
      is what `useUserRoles` relies on.
    - `notifications`: `notifications_admin_all`.
+   - `customer_profiles`: `customer_profiles_admin_*` (SELECT, INSERT, UPDATE, DELETE strictly restricted to `is_admin(auth.uid())`; anon access revoked; service-role full access).
+   - `installments`: `installments_admin_*` (SELECT, INSERT, UPDATE, DELETE strictly restricted to `is_admin(auth.uid())`; anon access revoked; service-role full access).
    - `rate_limits`: service-role only.
 
 `site_settings` is publicly readable (`USING (true)`) because brand/SEO/contact

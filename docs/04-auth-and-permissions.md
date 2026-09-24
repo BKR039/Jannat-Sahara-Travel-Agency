@@ -2,84 +2,80 @@
 
 ## Model
 
-- **Only staff authenticate.** There is no customer account, no public sign-up flow
-  in the UI, and no profile table. Visitors interact anonymously.
-- Auth provider is Supabase Auth via the generated browser client
-  (`@/integrations/supabase/client`).
+- **Only staff/operators authenticate.** There is no customer account or public sign-up flow in the UI. Visitors interact anonymously.
+- Auth provider is Supabase Auth via the generated browser client (`@/integrations/supabase/client`).
+- Multi-user admin architecture enforces:
+  `ROLE` → `PERMISSIONS` → `DATABASE ACCESS (RLS)` → `SERVER AUTHORIZATION` → `UI ACCESS`
+- All security boundaries are enforced server-side via Supabase RLS, verified middleware tokens (`requireSupabaseAuth`), and server-side authorization gates (`src/lib/admin/authorize.server.ts`).
 
-## Screens
+## Roles & Permissions
 
-| Route | Purpose |
-| --- | --- |
-| `src/routes/auth.tsx` | Staff sign-in (localized). Redirects into `/admin` on success. |
-| `src/routes/reset-password.tsx` | Password reset completion screen. |
+Three primary roles are supported:
 
-## Client-side session
+| Role | Scope | Default Permissions | Safeguards |
+| :--- | :--- | :--- | :--- |
+| `super_admin` | Full control over platform, CMS, bookings, settings, and team | All 39 system permissions (`*`) | Protected against self-demotion, self-deletion, and removal of the last Super Admin. |
+| `admin` | Operational administrator | Operational bookings, trips, hotels, CMS, customers, branches, reports, settings view/edit, team view | Cannot promote/create Super Admins, cannot delete/deactivate Super Admins, cannot manage advanced security. |
+| `staff` | Restricted operator / read-only | View dashboard, customers, bookings, trips, hotels, branches | No create, edit, delete, settings, team, or reports permissions by default unless granted via `user_permissions`. |
 
-`src/hooks/useAuth.ts`:
+## Centralized Permission Architecture
 
-- `useAuth()` — subscribes with `supabase.auth.onAuthStateChange`, then calls
-  `getSession()`; returns `{ session, user, loading, isAuthenticated }`.
-- `useUserRoles(userId)` — TanStack Query reading `user_roles` for that user
-  (allowed by the `user_roles_self_read` RLS policy), `staleTime` 60 s.
-- `hasAdminRole(roles)` → true for `super_admin` or `admin`.
-- `isSuperAdmin(roles)` → true for `super_admin` only.
-- `AppRole = "super_admin" | "admin" | "staff"`. `staff` is recognised by the type
-  but **is not granted admin access** by `hasAdminRole`. `KNOWN LIMITATION`: RLS
-  policies check `has_role(auth.uid(),'admin')`, so a `staff`-only user can neither
-  enter the dashboard nor read operational tables.
+- Defined in `src/lib/admin/permissions.ts`.
+- Groups: Dashboard, Customers, Bookings, Trips, Hotels, Branches, Reports, CMS, Settings, Team, Security.
+- Overrides: Persisted in `public.user_permissions (user_id, permission, granted, created_at, updated_at)`.
+- Evaluation: `computeEffectivePermissions(roles, overrides)` merges role-based defaults with user-level overrides.
 
-## The admin gate
+## Database Tables & RLS
 
-`src/routes/admin.tsx` (layout route, `ssr: false`):
+### `public.user_roles`
+- Columns: `id`, `user_id` (references `auth.users`), `role` (`app_role`), `created_at`.
+- RLS Policies:
+  - `user_roles_self_read`: SELECT allowed for self or admin.
+  - `user_roles_super_admin_insert`: INSERT only by `is_super_admin(auth.uid())`.
+  - `user_roles_super_admin_update`: UPDATE only by `is_super_admin(auth.uid())`.
+  - `user_roles_super_admin_delete`: DELETE only by `is_super_admin(auth.uid())`.
 
-1. `useAuth()` — while `loading`, render a spinner.
-2. If not authenticated → `navigate({ to: "/auth", replace: true })`.
-3. Load roles; while loading, spinner.
-4. If `!hasAdminRole(roles)` → render an "access denied" card with sign-out and
-   back-to-site actions.
-5. Otherwise provide `AdminContext` (`{ user, roles, isSuperAdmin }` from
-   `src/components/admin/context.ts`) and render `AdminShell` + `<Outlet />`.
+### `public.user_permissions`
+- Columns: `id`, `user_id` (references `auth.users`), `permission`, `granted`, `created_at`, `updated_at`.
+- RLS Policies:
+  - `user_permissions_read`: SELECT allowed for self or admin.
+  - `user_permissions_super_admin_insert/update/delete`: Mutation only by `is_super_admin(auth.uid())`.
 
-`head()` sets `robots: noindex, nofollow` for the whole admin subtree.
+## Server-Side Authorization Gates
 
-This is a **client-side gate**. It is not the security boundary — the real boundary is:
+All server operations requiring elevated access import `src/lib/admin/authorize.server.ts`:
+- `assertActiveUser(userId)`: Verifies caller account is active and rejects banned or disabled accounts (`app_metadata.disabled === true`).
+- `requirePermission(userId, permission)`: Gating function verifying that caller's effective permissions include `permission`. Strictly enforced across all mutation and privileged read endpoints (`bookings.delete`, `bookings.edit`, `trips.create`, `hotels.*`, `dashboard.view`, `reports.view`, etc.).
+- `requireAnyPermission(userId, permissions)`: Gating function for multi-capability operations.
+- `requireAdmin(userId)`: Validates active portal access across `["super_admin", "admin", "staff"]`, ensuring operators pass into granular permission evaluation without arbitrary role deadlocks.
+- `requireSuperAdmin(userId)`: Verifies role is `super_admin`.
 
-- **RLS** for everything the admin UI reads/writes with the browser client.
-- **`requireSupabaseAuth` + `assertAdmin`** for server functions.
+## Storage & Redirect Security Controls
 
-## Server-side authorization
+- **Passport Access & Storage (SEC-12)**: `getPassportSignedUrl` enforces `bookings.view` permission, strictly validates object paths against `^bookings\/[0-9a-f-]{36}\/passport\.(jpg|jpeg|png|webp|heic|pdf)$`, and verifies database presence in `bookings` or `booking_passengers` to prevent arbitrary storage enumeration.
+- **Redirect Hardening (SEC-14 & SEC-15)**: Centralized in `src/lib/redirect.ts`. `safeNext` verifies same-origin paths, rejects backslashes (`\`), protocol-relative URLs (`//`), control characters, and pseudo-protocols (`javascript:`, `data:`, `vbscript:`). `assertSafeRedirect` enforces explicit HTTP/HTTPS protocols on OAuth consent redirects.
+- **Customer Note Authorship (SEC-10)**: `deleteCustomerNote` enforces author matching (`author_id === context.userId`), granting override solely to `super_admin` or users with `customers.delete` permissions.
 
-- `src/lib/admin/command.functions.ts` and `src/lib/admin/admin.functions.ts` use
-  `.middleware([requireSupabaseAuth])`, then `assertAdmin(context.userId)`
-  (`src/lib/admin/dashboard.server.ts`) before touching `supabaseAdmin`.
-- `src/start.ts` registers `attachSupabaseAuth` as `functionMiddleware`, which
-  attaches the caller's bearer token so the middleware can verify it.
-- `supabaseAdmin` (service role, bypasses RLS) is always imported **inside** the
-  handler after the role check.
+## Client-Side Context & Navigation Gates
 
-Because protected server functions throw `401` without a session, they must never be
-called from a public route loader — the admin screens call them from components /
-`useQuery`.
+- `src/hooks/useAuth.ts`:
+  - `useUserPermissions(userId)`: Loads roles and custom overrides, providing instant evaluation (`hasPermission`, `hasAnyPermission`, `isSuperAdmin`, `isAdmin`, `isStaff`).
+  - `hasAdminConsoleAccess(roles)`: Allows `super_admin`, `admin`, and `staff` into `/admin`.
+- `src/components/admin/kit/PermissionGate.tsx`:
+  - Declarative route and component gate. Unpermitted access renders a localized 403 / Access Denied screen instead of loading protected components or queries.
+- `src/components/admin/AdminShell.tsx`:
+  - Dynamically filters navigation links according to `hasPermission(item.requiredPermission)`.
 
-## Admin user management
+## Team Management (`/admin/admins`)
 
-`src/lib/admin/admin.functions.ts` (all authenticated):
-
-- `listAdmins` — reads `user_roles` and enriches each row via
-  `supabaseAdmin.auth.admin.getUserById`.
-- `inviteAdmin` — `auth.admin.inviteUserByEmail`, then inserts the `user_roles` row
-  and writes an `audit_logs` entry.
-- `removeUserRole` — deletes the role row and writes an `audit_logs` entry.
-- `getPassportSignedUrl` — mints a short-lived signed URL for a booking passport.
-- `getDashboardStats` — aggregate counts for the dashboard.
-
-UI: `src/routes/admin.admins.tsx` and the Team section under Settings.
-
-## Password gate / other auth
-
-None. There is no shared-password site gate, no OAuth social provider configured in
-code (`UNKNOWN — VERIFY IN CODE` whether a provider is enabled in the Cloud
-project), and no per-end-user connector flow. The `/.lovable/oauth/consent` route
-and `/.well-known/oauth-protected-resource` exist solely for the MCP server
-(see `10-operations.md`).
+- **KPI Cards**: Total members, Active, Invited, Disabled, Super Admins.
+- **Search & Filters**: Search by name/email; filters by role and account status.
+- **Member Table**: Displays identity, role, account status badge (`نشط`, `مدعو`, `معطل`), email confirmation, and last sign-in.
+- **Member Manage Drawer**:
+  - Identity (name, email).
+  - Access (role selector, status switch).
+  - Permission Matrix Inspector: Displays grouped permissions, distinguishing role-inherited from custom overrides, with live toggles for Super Admins.
+  - Security: Email confirmation status, last sign-in, secure password reset email trigger (recovery links/tokens are dispatched via email and never exposed to the client or returned in API responses).
+  - Activity: Created date and audit records.
+  - Danger Zone: Safe deletion and deactivation with safeguards.
+- **Invite Drawer**: Zero-knowledge secure email invitation flow via Supabase Auth admin invitation links (temporary passwords removed from production flow to ensure industry-standard secret hygiene).

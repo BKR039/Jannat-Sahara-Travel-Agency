@@ -23,6 +23,8 @@ function oauthApi(): OAuthApi {
   return (supabase.auth as unknown as { oauth: OAuthApi }).oauth;
 }
 
+import { assertSafeRedirect } from "@/lib/redirect";
+
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
   head: () => ({
@@ -46,7 +48,10 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     const { data, error } = await oauthApi().getAuthorizationDetails(authorizationId);
     if (error) throw new Error(error.message);
     const immediate = data?.redirect_url ?? data?.redirect_to;
-    if (immediate && !data?.client) throw redirect({ href: immediate });
+    if (immediate && !data?.client) {
+      assertSafeRedirect(immediate);
+      throw redirect({ href: immediate });
+    }
     return data;
   },
   component: Consent,
@@ -84,6 +89,7 @@ function Consent() {
       setError("No redirect returned by the authorization server.");
       return;
     }
+    assertSafeRedirect(target);
     window.location.href = target;
   }
 

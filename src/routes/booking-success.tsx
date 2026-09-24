@@ -42,7 +42,7 @@ function BookingSuccess() {
           <Button
             asChild
             size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            variant="solid"
           >
             <Link to="/">
               <Home className="me-2 h-4 w-4" />

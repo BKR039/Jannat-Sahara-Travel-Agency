@@ -18,6 +18,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { uploadPassport } from "@/lib/public.functions";
 import type { Package } from "@/lib/queries";
 import { useLocalized } from "@/lib/localize";
@@ -387,16 +394,19 @@ export function PassengerForm({
 
         <div className="grid gap-2">
           <Label htmlFor={`${uid}-gender`}>{t("bookingFlow.fields.gender")}</Label>
-          <select
-            id={`${uid}-gender`}
-            value={passenger.gender}
-            onChange={(e) => onChange({ gender: e.target.value })}
-            className="h-10 rounded-sm border border-input bg-background px-3 text-body outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          <Select
+            value={passenger.gender || "__none__"}
+            onValueChange={(val) => onChange({ gender: val === "__none__" ? "" : val })}
           >
-            <option value="">—</option>
-            <option value="male">{t("bookingFlow.fields.male")}</option>
-            <option value="female">{t("bookingFlow.fields.female")}</option>
-          </select>
+            <SelectTrigger id={`${uid}-gender`} className="h-10">
+              <SelectValue placeholder="—" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">—</SelectItem>
+              <SelectItem value="male">{t("bookingFlow.fields.male")}</SelectItem>
+              <SelectItem value="female">{t("bookingFlow.fields.female")}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {isPrimary && (
@@ -472,7 +482,16 @@ export function SummaryPanel({
       t("bookingFlow.summary.departure"),
       pkg.departure_date ? new Date(pkg.departure_date).toLocaleDateString() : "—",
     ],
+    ...(pkg.return_date
+      ? ([["العودة", new Date(pkg.return_date).toLocaleDateString()]] as Array<[string, string]>)
+      : []),
     [t("bookingFlow.summary.duration"), pkg.duration ?? "—"],
+    ...(pkg.flight_route
+      ? ([["مسار الرحلة", pkg.flight_route]] as Array<[string, string]>)
+      : []),
+    ...(pkg.notes && pkg.notes !== "-"
+      ? ([["ملاحظات", pkg.notes]] as Array<[string, string]>)
+      : []),
     [t("bookingFlow.summary.perAdult"), money(adultPrice(pkg), pkg.currency)],
     ...(counts.children > 0
       ? ([[t("bookingFlow.summary.perChild"), money(childPrice(pkg), pkg.currency)]] as Array<

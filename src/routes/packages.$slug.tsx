@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
-import { MapPin, Clock, Users, Hotel, Plane, ArrowRight, CalendarRange } from "lucide-react";
+import { MapPin, Clock, Users, Hotel, Plane, ArrowRight, CalendarRange, Sparkles } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { PackageCard } from "@/components/common/PackageCard";
@@ -77,7 +77,11 @@ export const Route = createFileRoute("/packages/$slug")({
    * settles it before the response status is written.
    */
   loader: async ({ context, params }) => {
-    const pkg = await context.queryClient.ensureQueryData(packageBySlugQuery(params.slug));
+    const [pkg] = await Promise.all([
+      context.queryClient.ensureQueryData(packageBySlugQuery(params.slug)),
+      context.queryClient.ensureQueryData(packagesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(faqsQuery()).catch(() => []),
+    ]);
     if (!pkg) throw notFound();
     return pkg;
   },
@@ -228,6 +232,30 @@ function PackagePage() {
   const facts: Fact[] = [
     dates && { key: "dates", icon: CalendarRange, label: t("package.dates"), value: dates },
     duration && { key: "duration", icon: Clock, label: t("package.duration"), value: duration },
+    pkg.flight_route && {
+      key: "flight_route",
+      icon: Plane,
+      label: "مسار الرحلة",
+      value: pkg.flight_route,
+    },
+    pkg.arrival_airport && {
+      key: "arrival_airport",
+      icon: Plane,
+      label: "مطار الوصول",
+      value: pkg.arrival_airport === "Jeddah" ? "جدة (JED)" : pkg.arrival_airport === "Madinah" ? "المدينة المنورة (MED)" : pkg.arrival_airport,
+    },
+    pkg.departure_airport && {
+      key: "departure_airport",
+      icon: Plane,
+      label: "مطار العودة",
+      value: pkg.departure_airport === "Madinah" ? "المدينة المنورة (MED)" : pkg.departure_airport === "Jeddah" ? "جدة (JED)" : pkg.departure_airport,
+    },
+    pkg.notes && pkg.notes !== "-" && {
+      key: "notes",
+      icon: Sparkles,
+      label: "ملاحظات البرنامج",
+      value: pkg.notes,
+    },
     destination && {
       key: "destination",
       icon: MapPin,

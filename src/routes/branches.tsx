@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { MapPin, Loader2, ArrowRight } from "lucide-react";
@@ -40,6 +40,10 @@ export const Route = createFileRoute("/branches")({
  */
 function BranchesPage() {
   const { t } = useTranslation();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const { data: branches = [], isLoading } = useQuery(branchesQuery());
 
   const mainBranch = branches.find((b) => b.is_main_branch) ?? null;
@@ -96,17 +100,23 @@ function BranchesPage() {
         <Section space="md" tone="sunken">
           <SectionHeading title={t("branches.mapTitle")} description={t("branches.mapDesc")} />
           <div className="mt-6 overflow-hidden rounded-card-lg border border-border-subtle">
-            <Suspense
-              fallback={
-                <div className="flex h-[420px] items-center justify-center bg-muted/40">
-                  <Loader2 className="h-7 w-7 animate-spin text-primary/70" aria-hidden="true" />
+            {mounted ? (
+              <Suspense
+                fallback={
+                  <div className="flex h-[420px] items-center justify-center bg-muted/40">
+                    <Loader2 className="h-7 w-7 animate-spin text-primary/70" aria-hidden="true" />
+                  </div>
+                }
+              >
+                <div className="h-[420px] w-full">
+                  <BranchesMap branches={mappable} />
                 </div>
-              }
-            >
-              <div className="h-[420px] w-full">
-                <BranchesMap branches={mappable} />
+              </Suspense>
+            ) : (
+              <div className="flex h-[420px] items-center justify-center bg-muted/40">
+                <Loader2 className="h-7 w-7 animate-spin text-primary/70" aria-hidden="true" />
               </div>
-            </Suspense>
+            )}
           </div>
         </Section>
       )}

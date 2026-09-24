@@ -5,7 +5,15 @@ import { CustomPackageCta } from "@/components/umrah/CustomPackageCta";
 import { PackagesPage } from "@/components/sections/PackagesPage";
 import { canonical } from "@/lib/seo";
 
+import { packagesQuery, contentQuery } from "@/lib/queries";
+
 export const Route = createFileRoute("/umrah")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(packagesQuery("umrah")),
+      context.queryClient.ensureQueryData(contentQuery("umrah_hero")),
+    ]);
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.umrah.title") },

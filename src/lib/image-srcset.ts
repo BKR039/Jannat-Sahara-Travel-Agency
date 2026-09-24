@@ -26,8 +26,10 @@ export function transformSrcSet(src: string): string | undefined {
   } catch {
     return undefined;
   }
-  const declared = Number(url.searchParams.get("width"));
-  if (!Number.isFinite(declared) || declared <= 0) return undefined;
+  let declared = Number(url.searchParams.get("width"));
+  if (!Number.isFinite(declared) || declared <= 0) {
+    declared = 1920;
+  }
   // Never upscale past the width the content author chose.
   const widths = SRCSET_WIDTHS.filter((w) => w < declared).concat(declared);
   return widths

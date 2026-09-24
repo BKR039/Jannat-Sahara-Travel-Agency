@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { NotFoundPage } from "@/components/common/NotFoundPage";
 
 export const getRouter = () => {
   const queryClient = new QueryClient({
@@ -21,7 +22,10 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreload: "intent",
-    defaultPreloadStaleTime: 0,
+    defaultPreloadDelay: 50,
+    defaultPreloadStaleTime: 30_000,
+    defaultPreloadGcTime: 5 * 60 * 1000,
+    defaultNotFoundComponent: () => <NotFoundPage />,
   });
 
   return router;

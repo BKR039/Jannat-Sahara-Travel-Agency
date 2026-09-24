@@ -15,9 +15,10 @@ const TABLE_BY_KIND_PUBLIC = {
 export const getCommandCenter = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     const { loadCommandCenter } = await import("./dashboard.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "dashboard.view");
     return loadCommandCenter();
   });
 
@@ -25,9 +26,10 @@ export const getCommandCenter = createServerFn({ method: "GET" })
 export const getReports = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     const { loadReports } = await import("./dashboard.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "reports.view");
     return loadReports();
   });
 
@@ -35,9 +37,10 @@ export const getReports = createServerFn({ method: "GET" })
 export const listCustomers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { requireAdmin } = await import("./authorize.server");
-    const { loadCustomers } = await import("./crm.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "customers.view");
+    const { loadCustomers } = await import("./crm.server");
     const customers = await loadCustomers();
     // The list view needs counts, not the underlying rows; the per-customer
     // detail (getCustomer) is where the related records are actually loaded.
@@ -51,9 +54,10 @@ export const getCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ key: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
-    const { loadCustomer } = await import("./crm.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "customers.view");
+    const { loadCustomer } = await import("./crm.server");
     return loadCustomer(data.key);
   });
 
@@ -64,8 +68,9 @@ export const addCustomerNote = createServerFn({ method: "POST" })
     z.object({ key: z.string().min(1).max(200), note: z.string().min(1).max(2000) }).parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "customers.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("customer_notes").insert({
       customer_key: data.key,
@@ -77,13 +82,51 @@ export const addCustomerNote = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Delete an internal note from a customer (SEC-10 author / super-admin / delete check). */
+export const deleteCustomerNote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ noteId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission, getUserEffectivePermissions } =
+      await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "customers.edit");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: note, error: noteErr } = await supabaseAdmin
+      .from("customer_notes")
+      .select("author_id")
+      .eq("id", data.noteId)
+      .maybeSingle();
+    if (noteErr) throw noteErr;
+    if (!note) throw new Error("NOTE_NOT_FOUND");
+
+    const perms = await getUserEffectivePermissions(context.userId);
+    const { hasPermissionInList } = await import("./permissions");
+    const canDeleteAll = hasPermissionInList(perms, "customers.delete");
+
+    const { data: callerRoles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    const isSuperAdmin = callerRoles?.some((r) => r.role === "super_admin");
+
+    if (note.author_id !== context.userId && !isSuperAdmin && !canDeleteAll) {
+      throw new Error("لا يمكنك حذف ملاحظات تم إنشاؤها بواسطة عضو آخر.");
+    }
+
+    const { deleteCustomerNoteRecord } = await import("./crm.server");
+    return deleteCustomerNoteRecord(data.noteId);
+  });
+
 /** Unified request inbox (flight requests + booking requests + contact messages). */
 export const listRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     const { loadRequests } = await import("./crm.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.view");
     return loadRequests();
   });
 
@@ -111,8 +154,9 @@ export const updateRequest = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date().toISOString();
 
@@ -262,8 +306,9 @@ export const deleteRequest = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.delete");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const table = TABLE_BY_KIND_PUBLIC[data.kind];
@@ -310,8 +355,9 @@ export const getRequestActivity = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.view");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { REQUEST_ENTITY, ACTIVITY_PAGE_SIZE, buildTimeline } = await import("./activity");
 
@@ -367,8 +413,9 @@ export const updateBooking = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const patch: Record<string, unknown> = {};
     if (data.status) patch["status"] = data.status;
@@ -387,8 +434,9 @@ export const duplicateTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "trips.create");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("packages")
@@ -415,4 +463,166 @@ export const duplicateTrip = createServerFn({ method: "POST" })
       .single();
     if (insertError) throw insertError;
     return { id: inserted.id };
+  });
+
+/** Toggle an installment paid status (persisted in DB + auto recalculates booking balance). */
+export const toggleInstallment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        installmentId: z.string().uuid(),
+        paid: z.boolean(),
+        paymentMethod: z.string().max(80).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
+    const { toggleInstallmentPayment } = await import("./crm.server");
+    return toggleInstallmentPayment({
+      installmentId: data.installmentId,
+      paid: data.paid,
+      actorId: context.userId,
+      paymentMethod: data.paymentMethod,
+    });
+  });
+
+/** Add a new installment schedule item for a customer. */
+export const addInstallment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        customerKey: z.string().min(1).max(200),
+        bookingId: z.string().uuid().nullable().optional(),
+        requestId: z.string().uuid().nullable().optional(),
+        title: z.string().min(1).max(200),
+        amount: z.number().positive().max(10_000_000),
+        dueDate: z.string().nullable().optional(),
+        note: z.string().max(1000).nullable().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
+    const { addInstallmentRecord } = await import("./crm.server");
+    return addInstallmentRecord(data);
+  });
+
+/** Delete an installment record and update balances. */
+export const deleteInstallment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ installmentId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
+    const { deleteInstallmentRecord } = await import("./crm.server");
+    return deleteInstallmentRecord(data.installmentId);
+  });
+
+/** Record a direct payment (full payment or partial payment) with bounds checking and recalculation. */
+export const recordPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        customerKey: z.string().min(1),
+        bookingId: z.string().uuid().nullable().optional(),
+        requestId: z.string().uuid().nullable().optional(),
+        amount: z.number().positive("يجب أن يكون مبلغ الدفعة أكبر من صفر"),
+        paymentDate: z.string().nullable().optional(),
+        paymentMethod: z.string().max(50).nullable().optional(),
+        note: z.string().max(2000).nullable().optional(),
+        title: z.string().max(200).nullable().optional(),
+        isFullPayment: z.boolean().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
+    const { recordDirectPayment } = await import("./crm.server");
+    return recordDirectPayment(data);
+  });
+
+/** Edit an existing installment or payment record with recalculation. */
+export const updateInstallment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        installmentId: z.string().uuid(),
+        amount: z.number().positive("يجب أن يكون مبلغ القسط أو الدفعة أكبر من صفر").optional(),
+        dueDate: z.string().nullable().optional(),
+        paidAt: z.string().nullable().optional(),
+        paymentMethod: z.string().max(50).nullable().optional(),
+        note: z.string().max(2000).nullable().optional(),
+        title: z.string().max(200).nullable().optional(),
+        status: z.enum(["pending", "paid", "overdue", "cancelled"]).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
+    const { updateInstallmentRecord } = await import("./crm.server");
+    return updateInstallmentRecord(data);
+  });
+
+/** Save or update customer profile details (city, status, branch, notes). */
+export const updateCustomerProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        customerKey: z.string().min(1).max(200),
+        fullName: z.string().max(200).nullable().optional(),
+        phone: z.string().max(50).nullable().optional(),
+        email: z.string().email().max(200).nullable().optional(),
+        city: z.string().max(100).nullable().optional(),
+        status: z.enum(["lead", "customer", "vip", "inactive", "cancelled"]).optional(),
+        branchId: z.string().uuid().nullable().optional(),
+        notes: z
+          .unknown()
+          .transform((v) => (typeof v === "string" ? v.trim() || null : null))
+          .optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "customers.edit");
+    const { saveCustomerProfile } = await import("./crm.server");
+    return saveCustomerProfile(data);
+  });
+
+/** Archive or reactivate a customer profile. */
+export const archiveCustomer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        customerKey: z.string().min(1).max(200),
+        archived: z.boolean(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
+    await requireAdmin(context.userId);
+    await requirePermission(context.userId, "customers.edit");
+    const { saveCustomerProfile } = await import("./crm.server");
+    return saveCustomerProfile({
+      customerKey: data.customerKey,
+      status: data.archived ? "inactive" : "customer",
+    });
   });

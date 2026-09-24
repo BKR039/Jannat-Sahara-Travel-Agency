@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
 import type { Article } from "@/lib/queries";
@@ -20,13 +21,33 @@ export function FeaturedArticle({
   onOpen,
 }: {
   article: Article;
-  onOpen: (slug: string) => void;
+  onOpen?: (slug: string) => void;
 }) {
   const { t } = useTranslation();
   const { lang, L } = useLocalized();
   const category = articleCategory(article, lang);
   const title = L(article, "title");
   const excerpt = L(article, "excerpt", "empty");
+
+  const actionButton = onOpen ? (
+    <button
+      type="button"
+      onClick={() => onOpen(article.slug)}
+      className="mt-1 inline-flex min-h-11 w-fit items-center gap-2 rounded-button bg-gradient-sunrise px-6 text-small font-bold text-primary-foreground transition-[filter,transform] duration-base ease-standard hover:-translate-y-0.5 hover:brightness-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transform-none"
+    >
+      {t("blog.readMore")}
+      <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+    </button>
+  ) : (
+    <Link
+      to="/blog/$slug"
+      params={{ slug: article.slug }}
+      className="mt-1 inline-flex min-h-11 w-fit items-center gap-2 rounded-button bg-gradient-sunrise px-6 text-small font-bold text-primary-foreground transition-[filter,transform] duration-base ease-standard hover:-translate-y-0.5 hover:brightness-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transform-none"
+    >
+      {t("blog.readMore")}
+      <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+    </Link>
+  );
 
   return (
     <article className="ds-reveal group overflow-hidden rounded-card-lg border border-border-subtle bg-card">
@@ -58,7 +79,23 @@ export function FeaturedArticle({
             {t("blog.featured")}
           </span>
           <h2 className="text-h3 font-bold leading-tight text-foreground transition-colors duration-base group-hover:text-primary [overflow-wrap:anywhere]">
-            {title}
+            {onOpen ? (
+              <button
+                type="button"
+                onClick={() => onOpen(article.slug)}
+                className="text-start hover:text-primary transition-colors"
+              >
+                {title}
+              </button>
+            ) : (
+              <Link
+                to="/blog/$slug"
+                params={{ slug: article.slug }}
+                className="hover:text-primary transition-colors"
+              >
+                {title}
+              </Link>
+            )}
           </h2>
           {excerpt && (
             <p className="line-clamp-4 text-body leading-relaxed text-muted-foreground">
@@ -71,14 +108,7 @@ export function FeaturedArticle({
               {t("common.minutesShort", { count: readingMinutes(article) })}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => onOpen(article.slug)}
-            className="mt-1 inline-flex min-h-11 w-fit items-center gap-2 rounded-button bg-gradient-sunrise px-6 text-small font-bold text-primary-foreground transition-[filter,transform] duration-base ease-standard hover:-translate-y-0.5 hover:brightness-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transform-none"
-          >
-            {t("blog.readMore")}
-            <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
-          </button>
+          {actionButton}
         </div>
       </div>
     </article>

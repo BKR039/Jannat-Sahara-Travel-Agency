@@ -3,7 +3,16 @@ import i18n from "@/lib/i18n";
 import { UmrahBuilder } from "@/components/umrah/builder/UmrahBuilder";
 import { canonical } from "@/lib/seo";
 
+import { packagesQuery, hotelsQuery } from "@/lib/queries";
+
 export const Route = createFileRoute("/umrah_/builder")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(packagesQuery("umrah")),
+      context.queryClient.ensureQueryData(hotelsQuery("makkah")),
+      context.queryClient.ensureQueryData(hotelsQuery("madinah")),
+    ]);
+  },
   head: () => ({
     meta: [
       { title: i18n.t("umrahBuilder.seo.title") },

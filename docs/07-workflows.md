@@ -123,3 +123,52 @@ There is no editorial workflow engine. "Publishing" = flipping a row flag:
 RLS enforces the same predicate, so an unpublished row is unreachable for anonymous
 visitors even if a query forgot the filter. Visibility on the public site follows the
 TanStack Query cache window described in `01-project-overview.md`.
+
+## Sales Center & Lead Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant V as Visitor / Ad Traffic
+    participant CF as Contact Form / Umrah Builder
+    participant SF as leads.functions.ts
+    participant DB as Postgres (public.leads)
+    participant SC as Sales Center (/admin/sales)
+    participant CRM as Unified Customer CRM
+
+    V->>CF: Enters via Website, Trip (?trip=), Meta Ads, Organic
+    CF->>SF: Submit progressive contact or Umrah Builder config
+    SF->>SF: Normalize phone (+216), validate honeypot, calculate intent
+    SF->>DB: Insert lead + builder_snapshot + lead_activities
+    DB-->>SC: Real-time update in Sales Center & KPIs
+    SC->>SC: Sales Agent contacts lead (Call / WhatsApp)
+    SC->>DB: Status: NEW -> CONTACTED -> QUALIFIED
+    SC->>DB: Schedule Follow-up (Overdue / Today / Upcoming)
+    SC->>DB: Log Objections or Draft/Send Custom Offer
+    alt Lost
+        SC->>DB: Transition to LOST with mandatory loss_reason
+    else Confirmed
+        SC->>DB: Convert to Confirmed Booking & Customer Profile
+        DB-->>CRM: Customer & Booking linked to unified identity
+    end
+```
+
+### Lead Lifecycle Invariants
+1. **Separation of Lead and Customer**: A visitor submitting an interest or quote is a `Lead`, not automatically an active `Customer`. Conversion happens deliberately upon confirmation.
+2. **Deterministic Single Identity**: Every lead computes a canonical `customerKey` (deterministic hash of normalized phone & email) matching the core CRM identity engine.
+3. **Builder Snapshot Integrity**: When submitting from `/umrah/builder`, a frozen JSON snapshot of all parameters (dates, airports, hotels, nights, room type, calculated server-authoritative price) is preserved in `builder_snapshot`.
+4. **Observable Intent Scoring**: High intent (Builder completed, package selected, traveler count > 1), Medium intent (general contact inquiry), Low intent (minimal inquiry). Zero unexplained AI black-box scoring.
+5. **Loss Reasons**: Moving a lead to `lost` strictly enforces a structured `loss_reason` (`price`, `hotel`, `flight`, `dates`, `family_decision`, `comparing_agencies`, `not_ready`, `other`) and optional notes.
+6. **Soft Archive vs Hard Delete**:
+   - `archiveLead`: Sets `archived_at`, `archived_by`, `archived_by_name`, and `archive_reason`. Completely isolates archived records from default active queries while preserving timeline, builder snapshots, offers, and follow-ups. Restorable with 1-click (`restoreLead`).
+   - `deleteLead`: Role-gated by `leads.delete` (Super Admin / Admin only). Requires explicit confirmation input ("حذف").
+7. **Customer Identity Protection Invariant**:
+   - Deleting a lead strictly checks if the associated customer key or contact identity possesses other records (`bookings`, `installments`, `custom_package_requests`, or other `leads`).
+   - If any business/financial records exist, the `customer_profiles` record and financial history are preserved.
+8. **Pure RFC-4180 CSV Import Engine**:
+   - Zero heavy dependencies; standard compliant stream parser handling quotes, multiline cells, Arabic comma (`،`), and UTF-8 BOM (`\uFEFF`).
+   - Multilingual fuzzy header recognition (Arabic, French, English) across 9 target fields.
+   - Comprehensive duplicate detection across file duplicates, active leads, archived leads, and existing customers.
+9. **Bulk Operations & Traceability**:
+   - Bulk status transition, bulk team assignment, bulk archiving, and bulk export with permission gating (`leads.edit`, `leads.delete`, `leads.export`).
+
+

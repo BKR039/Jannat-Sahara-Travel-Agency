@@ -6,7 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useLocalized } from "@/lib/localize";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { SkeletonGrid } from "@/components/common/SkeletonGrid";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ImageLightbox } from "@/components/common/ImageLightbox";
 import { LazyImage } from "@/components/common/LazyImage";
 import { Images } from "lucide-react";
@@ -16,6 +17,9 @@ import { categoryKey } from "@/lib/category-label";
 import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/gallery")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData(galleryQuery());
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.gallery.title") },
@@ -100,7 +104,7 @@ function GalleryPage() {
         {isLoading ? (
           <SkeletonGrid count={8} />
         ) : !filtered.length ? (
-          <EmptyState label={t("common.empty")} />
+          <EmptyState title={t("common.empty")} density="comfortable" />
         ) : (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
             {filtered.slice(0, visible).map((g, i) => (

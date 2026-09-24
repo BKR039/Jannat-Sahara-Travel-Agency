@@ -48,8 +48,10 @@ export function primeCanonicalBase(origin: string | null | undefined): void {
   runtimeSiteUrl = normalizeBase(origin ?? undefined);
 }
 
+export const DEFAULT_PRODUCTION_URL = "https://janatsahara.vercel.app";
+
 function siteUrl(): string {
-  return ENV_SITE_URL || runtimeSiteUrl;
+  return ENV_SITE_URL || runtimeSiteUrl || DEFAULT_PRODUCTION_URL;
 }
 
 /** @deprecated read through `absoluteUrl()`; kept for existing call sites. */

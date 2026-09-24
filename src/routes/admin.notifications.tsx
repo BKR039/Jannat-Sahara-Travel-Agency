@@ -35,7 +35,11 @@ function linkFor(n: { kind: string; entity: string | null; entity_id: string | n
   to: string;
   search?: Record<string, string>;
 } {
-  if (n.kind === "booking") return { to: "/admin/bookings" };
+  if (n.kind === "booking") {
+    return n.entity_id
+      ? { to: "/admin/requests", search: { request: n.entity_id } }
+      : { to: "/admin/requests" };
+  }
   if (n.kind === "contact") return { to: "/admin/messages" };
   if (n.kind === "custom_package") {
     return n.entity_id

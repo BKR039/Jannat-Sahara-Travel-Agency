@@ -59,8 +59,9 @@ export const saveOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => OfferInput.parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: current, error: readError } = await supabaseAdmin
@@ -122,8 +123,9 @@ export const sendOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { requireAdmin } = await import("./authorize.server");
+    const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
+    await requirePermission(context.userId, "bookings.edit");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderOfferEmail } = await import("./offer-email.server");
     const { sanitizeHeaderValue } = await import("@/lib/security.server");

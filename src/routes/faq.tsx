@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { EmptyState } from "@/components/common/SkeletonGrid";
+import { EmptyState } from "@/components/ui/empty-state";
 import { faqsQuery } from "@/lib/queries";
 import { useLocalized } from "@/lib/localize";
 import {
@@ -16,6 +16,9 @@ import {
 import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData(faqsQuery());
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.faq.title") },
@@ -39,7 +42,7 @@ function FaqPage() {
       <section className="mx-auto max-w-3xl px-4 py-16 md:px-6">
         <SectionHeading eyebrow="?" title={t("nav.faq")} as="h1" description={t("brand.tagline")} />
         {!data?.length ? (
-          <EmptyState label={t("common.empty")} />
+          <EmptyState title={t("common.empty")} density="comfortable" />
         ) : (
           <Accordion type="single" collapsible className="space-y-3">
             {data.map((f, i) => (

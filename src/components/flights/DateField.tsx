@@ -17,19 +17,8 @@ import { cn } from "@/lib/utils";
  */
 const CALENDAR_LOCALES = { ar: arLocale, fr: frLocale, en: enGB } as const;
 
-/** `YYYY-MM-DD` (the wire format the schema validates) -> local Date. */
-export function parseISODate(value: string): Date | undefined {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
-  const [y, m, d] = value.split("-").map(Number);
-  const date = new Date(y!, m! - 1, d!);
-  return Number.isNaN(date.getTime()) ? undefined : date;
-}
-
-/** Local Date -> `YYYY-MM-DD`, without the UTC shift `toISOString()` causes. */
-export function toISODate(date: Date): string {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
-}
+import { parseISODate, toISODate } from "@/components/ui/date-picker";
+export { parseISODate, toISODate };
 
 export function startOfToday(): Date {
   const d = new Date();

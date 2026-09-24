@@ -17,7 +17,8 @@ import {
 import { packagesQuery, type Package, type PackageCategory } from "@/lib/queries";
 import { PackageCard } from "@/components/common/PackageCard";
 import { PackageDropdown, effectivePrice, seatsLeft } from "@/components/common/PackageDropdown";
-import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { SkeletonGrid } from "@/components/common/SkeletonGrid";
+import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 import { useLocalized } from "@/lib/localize";
 
@@ -229,7 +230,7 @@ export function PackageSelector() {
         </div>
       ) : byService.length === 0 ? (
         <div className="mt-12">
-          <EmptyState label={t("explorer.empty")} />
+          <EmptyState title={t("explorer.empty")} density="comfortable" />
         </div>
       ) : (
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

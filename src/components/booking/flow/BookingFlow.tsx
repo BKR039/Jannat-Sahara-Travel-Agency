@@ -14,6 +14,7 @@ import { submitBooking } from "@/lib/booking.functions";
 import { useLocalized } from "@/lib/localize";
 import { computeTotal, money, syncPassengers, type Counts, type Passenger } from "./model";
 import { CounterRow, PassengerForm, PassportUpload, StepIndicator, SummaryPanel } from "./parts";
+import { BuilderStepNavigation } from "@/components/common/BuilderStepNavigation";
 
 const DRAFT_KEY = "janat-booking-draft-v2";
 
@@ -485,36 +486,30 @@ export function BookingFlow({ packageSlug = null }: Props) {
             </section>
           )}
 
-          {/* ---------------- nav */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => goTo(Math.max(0, step - 1))}
-              disabled={step === 0 || submitting}
-            >
-              <ArrowRight className="me-2 h-4 w-4 rtl:hidden" />
-              <ArrowLeft className="me-2 hidden h-4 w-4 ltr:inline-block" />
-              {t("bookingFlow.actions.back")}
-            </Button>
-
-            {step < 2 ? (
-              <Button type="button" size="lg" onClick={next}>
-                {t("bookingFlow.actions.next")}
-              </Button>
-            ) : (
-              <Button type="button" size="lg" onClick={onConfirm} disabled={submitting}>
-                {submitting ? (
-                  <>
-                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                    {t("bookingFlow.actions.submitting")}
-                  </>
-                ) : (
-                  t("bookingFlow.actions.submit")
-                )}
-              </Button>
-            )}
-          </div>
+          {/* ---------------- Persistent step nav */}
+          <BuilderStepNavigation
+            onBack={step > 0 ? () => goTo(Math.max(0, step - 1)) : undefined}
+            onNext={step < 2 ? next : onConfirm}
+            backDisabled={step === 0 || submitting}
+            nextDisabled={submitting}
+            isSubmitting={submitting}
+            isFinalStep={step === 2}
+            backLabel={t("bookingFlow.actions.back")}
+            nextLabel={step < 2 ? t("bookingFlow.actions.next") : t("bookingFlow.actions.submit")}
+            submittingLabel={t("bookingFlow.actions.submitting")}
+            selectedSummary={
+              step === 0
+                ? `${passengers.length} ${t("bookingFlow.summary.travellersCount", { count: passengers.length })}`
+                : step === 1
+                  ? communication
+                    ? t(`bookingFlow.options.${communication}`, communication)
+                    : null
+                  : selectedPackage
+                    ? money(total, selectedPackage.currency)
+                    : null
+            }
+            className="sm:rounded-2xl sm:border sm:border-border-subtle sm:bottom-4"
+          />
         </div>
 
         {/* ---------------- sticky summary */}

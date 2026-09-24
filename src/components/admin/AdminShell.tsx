@@ -9,7 +9,6 @@ import {
   LayoutGrid,
   Package as PackageIcon,
   Inbox,
-  Calendar,
   MapPin,
   Image as ImageIcon,
   Newspaper,
@@ -17,6 +16,7 @@ import {
   HelpCircle,
   Users,
   BarChart3,
+  TrendingUp,
   Settings,
   ShieldCheck,
   Bell,
@@ -24,6 +24,7 @@ import {
   X,
   LogOut,
   ExternalLink,
+  Archive,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "./context";
@@ -36,11 +37,14 @@ import { useTranslation } from "react-i18next";
 import { useLocalized } from "@/lib/localize";
 import { TERMINAL_STATUSES } from "@/lib/admin/request-status";
 
+import { type PermissionKey } from "@/lib/admin/permissions";
+
 interface NavItem {
   to: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   superOnly?: boolean;
+  requiredPermission?: PermissionKey;
   badge?: "requests" | "notifications";
 }
 
@@ -58,35 +62,119 @@ function buildNavGroups(t: (key: string) => string): NavGroup[] {
     {
       group: t("shell.nav.groups.today"),
       items: [
-        { to: "/admin", label: t("shell.nav.commandCenter"), icon: LayoutDashboard },
-        { to: "/admin/requests", label: t("shell.nav.requests"), icon: Inbox, badge: "requests" },
-        // Both screens existed and were fully built but had no navigation
-        // entry, so they were only reachable by typing a URL (A-04). They sit
-        // beside Requests because they are the same daily inbox work.
-        { to: "/admin/flight-requests", label: t("shell.nav.flightRequests"), icon: Plane },
-        { to: "/admin/messages", label: t("shell.nav.messages"), icon: Mail },
-        { to: "/admin/bookings", label: t("shell.nav.bookings"), icon: Calendar },
+        {
+          to: "/admin",
+          label: t("shell.nav.commandCenter"),
+          icon: LayoutDashboard,
+          requiredPermission: "dashboard.view",
+        },
+        {
+          to: "/admin/sales",
+          label: t("shell.nav.salesCenter"),
+          icon: TrendingUp,
+          requiredPermission: "leads.view",
+        },
+        {
+          to: "/admin/requests",
+          label: t("shell.nav.requests"),
+          icon: Inbox,
+          badge: "requests",
+          requiredPermission: "bookings.view",
+        },
+        {
+          to: "/admin/flight-requests",
+          label: t("shell.nav.flightRequests"),
+          icon: Plane,
+          requiredPermission: "bookings.view",
+        },
+        {
+          to: "/admin/messages",
+          label: t("shell.nav.messages"),
+          icon: Mail,
+          requiredPermission: "customers.view",
+        },
       ],
     },
     {
       group: t("shell.nav.groups.business"),
       items: [
-        { to: "/admin/packages", label: t("shell.nav.trips"), icon: PackageIcon },
-        { to: "/admin/hotels", label: t("shell.nav.hotels"), icon: Building2 },
-        { to: "/admin/customers", label: t("shell.nav.customers"), icon: Users },
-        { to: "/admin/reports", label: t("shell.nav.reports"), icon: BarChart3 },
-        { to: "/admin/branches", label: t("shell.nav.branches"), icon: MapPin },
+        {
+          to: "/admin/packages",
+          label: t("shell.nav.trips"),
+          icon: PackageIcon,
+          requiredPermission: "trips.view",
+        },
+        {
+          to: "/admin/hotels",
+          label: t("shell.nav.hotels"),
+          icon: Building2,
+          requiredPermission: "hotels.view",
+        },
+        {
+          to: "/admin/customers",
+          label: t("shell.nav.customers"),
+          icon: Users,
+          requiredPermission: "customers.view",
+        },
+        {
+          to: "/admin/reports",
+          label: t("shell.nav.reports"),
+          icon: BarChart3,
+          requiredPermission: "reports.view",
+        },
+        {
+          to: "/admin/branches",
+          label: t("shell.nav.branches"),
+          icon: MapPin,
+          requiredPermission: "branches.view",
+        },
+        {
+          to: "/admin/archive",
+          label: "الأرشيف",
+          icon: Archive,
+          requiredPermission: "archive.view",
+        },
       ],
     },
     {
       group: t("shell.nav.groups.website"),
       items: [
-        { to: "/admin/services", label: t("shell.nav.services"), icon: LayoutGrid },
-        { to: "/admin/features", label: t("shell.nav.features"), icon: BadgeCheck },
-        { to: "/admin/gallery", label: t("shell.nav.gallery"), icon: ImageIcon },
-        { to: "/admin/blog", label: t("shell.nav.blog"), icon: Newspaper },
-        { to: "/admin/testimonials", label: t("shell.nav.testimonials"), icon: Star },
-        { to: "/admin/faq", label: t("shell.nav.faq"), icon: HelpCircle },
+        {
+          to: "/admin/services",
+          label: t("shell.nav.services"),
+          icon: LayoutGrid,
+          requiredPermission: "cms.services",
+        },
+        {
+          to: "/admin/features",
+          label: t("shell.nav.features"),
+          icon: BadgeCheck,
+          requiredPermission: "cms.features",
+        },
+        {
+          to: "/admin/gallery",
+          label: t("shell.nav.gallery"),
+          icon: ImageIcon,
+          requiredPermission: "cms.gallery",
+        },
+        {
+          to: "/admin/blog",
+          label: t("shell.nav.blog"),
+          icon: Newspaper,
+          requiredPermission: "cms.blog",
+        },
+        {
+          to: "/admin/testimonials",
+          label: t("shell.nav.testimonials"),
+          icon: Star,
+          requiredPermission: "cms.testimonials",
+        },
+        {
+          to: "/admin/faq",
+          label: t("shell.nav.faq"),
+          icon: HelpCircle,
+          requiredPermission: "cms.faq",
+        },
       ],
     },
     {
@@ -97,9 +185,20 @@ function buildNavGroups(t: (key: string) => string): NavGroup[] {
           label: t("shell.nav.notifications"),
           icon: Bell,
           badge: "notifications",
+          requiredPermission: "dashboard.view",
         },
-        { to: "/admin/settings", label: t("shell.nav.settings"), icon: Settings },
-        { to: "/admin/admins", label: t("shell.nav.team"), icon: ShieldCheck, superOnly: true },
+        {
+          to: "/admin/settings",
+          label: t("shell.nav.settings"),
+          icon: Settings,
+          requiredPermission: "settings.view",
+        },
+        {
+          to: "/admin/admins",
+          label: t("shell.nav.team"),
+          icon: ShieldCheck,
+          requiredPermission: "team.view",
+        },
       ],
     },
   ];
@@ -159,7 +258,7 @@ function greetingKey(): string {
 export function AdminShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation("admin");
   const { date } = useLocalized();
-  const { user, isSuperAdmin } = useAdmin();
+  const { user, isSuperAdmin, hasPermission } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -174,10 +273,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
       navGroups
         .map((g) => ({
           ...g,
-          items: g.items.filter((n) => (n.superOnly ? isSuperAdmin : true)),
+          items: g.items.filter((n) => {
+            if (n.superOnly && !isSuperAdmin) return false;
+            if (n.requiredPermission && !hasPermission(n.requiredPermission)) return false;
+            return true;
+          }),
         }))
         .filter((g) => g.items.length > 0),
-    [navGroups, isSuperAdmin],
+    [navGroups, isSuperAdmin, hasPermission],
   );
 
   const firstName = (user.email ?? "").split("@")[0] ?? "";

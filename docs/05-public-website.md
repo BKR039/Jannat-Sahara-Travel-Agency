@@ -7,6 +7,7 @@
 | `index.tsx` | `/` | Hero (`site_content` key `hero`) + booking widget + stats + featured packages + services + features + testimonials + gallery preview + latest articles + branches/contact + CTA |
 | `about.tsx` | `/about` | `site_content` / static localized copy |
 | `umrah.tsx` | `/umrah` | `packagesQuery("umrah")` via `PackagesPage` |
+| `umrah_.builder.tsx` | `/umrah/builder` | Custom Umrah package builder (7-step wizard, nights auto-rebalancing, catalogue & custom hotels, transit/stopover flights, full configuration snapshot preservation upon lead submission, high-intent lead creation in Sales Center, and celebratory success state) |
 | `trips.tsx` | `/trips` | `packagesQuery("trip")` |
 | `visa.tsx` | `/visa` | `packagesQuery("visa")` |
 | `flights.tsx` | `/flights` | Flight **request** engine (no static flight cards) |
@@ -14,9 +15,9 @@
 | `booking.tsx` | `/booking` | Booking flow for a selected package |
 | `booking-success.tsx` | `/booking-success` | Confirmation screen |
 | `gallery.tsx` | `/gallery` | `galleryQuery()` + `ImageLightbox` |
-| `blog.tsx`, `blog.$slug.tsx` | `/blog`, `/blog/$slug` | `articlesQuery`, `articleBySlugQuery`, helpers in `src/lib/blog.ts` |
+| `blog.tsx`, `blog_.$slug.tsx` | `/blog`, `/blog/$slug` | `articlesQuery`, `articleBySlugQuery`, helpers in `src/lib/blog.ts`. Premium editorial layout with Table of Contents (sticky rail on desktop, collapsible index on mobile), reading column constraint (max-w 780px), reading progress bar, semantic components (`MiqatGrid`, `SaiTimeline`, `InteractiveChecklist`, `PrayerCard`, `CalloutBox`), and Umrah CTA banner (`UmrahCtaBanner`). |
 | `faq.tsx` | `/faq` | `faqsQuery()` |
-| `contact.tsx` | `/contact` | `contactInfoQuery`, `branchesQuery`, contact form |
+| `contact.tsx` | `/contact` | Premium 5-step progressive consultation lead capture experience ("خلّي فريق جنة الصحراء يتصل بيك"): Step 1 Contact Info (name, phone, 24 Tunisian governorates), Step 2 Trip interest with query param pre-selection (`?trip=`), Step 3 Interest tags, Step 4 Contact channel preference, Step 5 Preferred contact time & notes, with honeypot anti-spam, duplicate protection, and dedicated confirmation screen with direct WhatsApp shortcut |
 | `legal.privacy.tsx`, `legal.terms.tsx` | `/legal/privacy`, `/legal/terms` | Static localized copy |
 
 Shared chrome: `SiteLayout` = `Navbar` (with `LanguageSwitcher`, `ThemeToggle`,
@@ -71,6 +72,7 @@ The map only renders `branches` rows with `is_active = true`, ordered
 | Booking flow step 2 | `uploadPassport` |
 | Booking flow submit | `submitBooking` |
 | Flight request form | `submitFlightRequest` |
+| Umrah builder (`umrah_.builder.tsx`) | `submitCustomPackageRequest` |
 
 See `07-workflows.md` for the full flows.
 

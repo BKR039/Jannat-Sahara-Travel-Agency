@@ -10,7 +10,7 @@ import { Section } from "@/components/common/Section";
 import { SkeletonGrid } from "@/components/common/SkeletonGrid";
 
 /** How many programmes the homepage previews before sending people to /umrah. */
-const PREVIEW_COUNT = 6;
+const PREVIEW_COUNT = 7;
 
 /**
  * Upcoming Umrah programmes — the homepage's primary commercial section.

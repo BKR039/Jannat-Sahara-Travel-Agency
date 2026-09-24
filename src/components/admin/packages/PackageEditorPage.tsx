@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { NumberInput } from "@/components/ui/number-input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +39,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  DateField,
   Field,
   FieldGrid,
   ImageField,
@@ -687,10 +689,11 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   onChange={(v) => update("description_en", v)}
                 />
                 <Field label={t("ops.editor.general.sortOrder")} hint="Lower numbers appear first.">
-                  <Input
-                    type="number"
-                    value={form.sort_order}
-                    onChange={(e) => update("sort_order", e.target.value)}
+                  <NumberInput
+                    value={form.sort_order === "" ? null : Number(form.sort_order)}
+                    onChange={(v) => update("sort_order", v === null ? "" : String(v))}
+                    min={0}
+                    allowEmpty
                   />
                 </Field>
                 <Field
@@ -700,10 +703,10 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   <div className="flex items-center gap-3 pt-2">
                     <Switch
                       id="featured"
-                      checked={form.featured}
-                      onCheckedChange={(v) => update("featured", v)}
+                      checked={Boolean(form.featured)}
+                      onCheckedChange={(v) => update("featured", Boolean(v))}
                     />
-                    <Label htmlFor="featured" className="text-small">
+                    <Label htmlFor="featured" className="text-small cursor-pointer">
                       {t("ops.editor.general.showFeatured")}
                     </Label>
                   </div>
@@ -870,20 +873,17 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   value={form.airline_en}
                   onChange={(v) => update("airline_en", v)}
                 />
-                <Field label={t("ops.editor.flights.departureDate")}>
-                  <Input
-                    type="date"
-                    value={form.departure_date}
-                    onChange={(e) => update("departure_date", e.target.value)}
-                  />
-                </Field>
-                <Field label={t("ops.editor.flights.returnDate")} error={errors.return_date}>
-                  <Input
-                    type="date"
-                    value={form.return_date}
-                    onChange={(e) => update("return_date", e.target.value)}
-                  />
-                </Field>
+                <DateField
+                  label={t("ops.editor.flights.departureDate")}
+                  value={form.departure_date}
+                  onChange={(v) => update("departure_date", v)}
+                />
+                <DateField
+                  label={t("ops.editor.flights.returnDate")}
+                  error={errors.return_date}
+                  value={form.return_date}
+                  onChange={(v) => update("return_date", v)}
+                />
               </FieldGrid>
             </SettingsCard>
           )}
@@ -1116,7 +1116,7 @@ export function PackageEditorPage({ packageId }: { packageId: string }) {
                   <span className="font-medium">{form.required_documents.length}</span>
                 </p>
                 <Link
-                  to="/admin/bookings"
+                  to="/admin/requests"
                   className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
                 >
                   {t("ops.editor.booking.openBookings")}

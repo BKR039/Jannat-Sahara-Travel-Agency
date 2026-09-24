@@ -4,7 +4,15 @@ import i18n from "@/lib/i18n";
 import { PackagesPage } from "@/components/sections/PackagesPage";
 import { canonical } from "@/lib/seo";
 
+import { contentQuery, packagesQuery } from "@/lib/queries";
+
 export const Route = createFileRoute("/trips")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(packagesQuery("trip")),
+      context.queryClient.ensureQueryData(contentQuery("trips_hero")).catch(() => null),
+    ]);
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.trips.title") },

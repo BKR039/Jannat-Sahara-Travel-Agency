@@ -26,11 +26,11 @@ import { transformSrcSet } from "@/lib/image-srcset";
 export function HeroMedia({
   image,
   alt,
-  objectPosition,
+  objectPosition = "center 38%",
 }: {
   image: string | null;
   alt: string;
-  objectPosition: string;
+  objectPosition?: string;
 }) {
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -42,16 +42,22 @@ export function HeroMedia({
           loading="eager"
           decoding="sync"
           fetchPriority="high"
-          sizes="(min-width: 1024px) 55vw, 100vw"
+          sizes="100vw"
           style={{ objectPosition }}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-opacity duration-700 ease-out"
         />
       ) : (
-        <div className="h-full w-full bg-surface-sunken" aria-hidden="true" />
+        <div
+          className="h-full w-full bg-gradient-to-b from-[var(--hero-frame-top)] to-[var(--hero-frame-bottom)]"
+          aria-hidden="true"
+        />
       )}
 
-      {/* Directional wash that softly dissolves the inner edge towards the copy */}
-      <div className="ds-hero-wash pointer-events-none absolute inset-0" aria-hidden="true" />
+      {/* Layered cinematic overlay for full-bleed photography and contrast */}
+      <div
+        className="ds-hero-cinematic-overlay pointer-events-none absolute inset-0"
+        aria-hidden="true"
+      />
     </div>
   );
 }

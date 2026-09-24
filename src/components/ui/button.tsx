@@ -41,6 +41,9 @@ const buttonVariants = cva(
         destructive: "bg-destructive text-primary-foreground hover:bg-destructive/90",
         danger: "bg-destructive text-primary-foreground hover:bg-destructive/90",
         dark: "bg-surface-dark-alt text-primary-foreground hover:bg-surface-dark",
+        /* Frosted translucent glass for hero or dark photographic backdrops. */
+        glass:
+          "border border-white/20 bg-white/10 text-white hover:bg-white/15 hover:border-white/35 hover:text-white backdrop-blur-md shadow-xs",
       },
       /*
        * The compact sizes grow to the 44px touch floor below `md`.
@@ -52,13 +55,31 @@ const buttonVariants = cva(
        * Raising the floor in the primitive fixes every screen at once rather
        * than leaving each one to remember.
        */
+      /*
+       * Radius is a function of height, and the size owns it.
+       *
+       * Compact controls take `rounded-input` (10px) and the standing sizes
+       * take the base `rounded-button` (14px). Stated here because it was
+       * previously only half-true — `sm` set a radius and nothing else did —
+       * which left call sites free to reach for `rounded-xl`. On a 40px
+       * button that token is 28px and reads as a pill, which is how the Sales
+       * Center header came to look like a different product from the
+       * Control Center's.
+       *
+       * `xs` exists because it was already being used without existing: 27
+       * call sites had written `h-8` by hand and 13 more `h-7`, because the
+       * scale started at 36px and dense admin rows needed less. A size that
+       * is missing gets invented locally, one page at a time.
+       */
       size: {
+        xs: "h-8 max-md:h-11 px-3 gap-1.5 text-caption [&_svg]:size-3.5 rounded-input",
         sm: "h-9 max-md:h-11 px-4 text-small [&_svg]:size-4 rounded-input",
         default: "h-11 px-5 text-button [&_svg]:size-5",
         md: "h-11 px-5 text-button [&_svg]:size-5",
         lg: "h-13 px-6 text-[1.0625rem] [&_svg]:size-5",
         icon: "h-11 w-11 [&_svg]:size-5",
         "icon-sm": "h-9 w-9 max-md:h-11 max-md:w-11 rounded-input [&_svg]:size-4",
+        "icon-xs": "h-8 w-8 max-md:h-11 max-md:w-11 rounded-input [&_svg]:size-3.5",
       },
       fullWidth: {
         true: "w-full",

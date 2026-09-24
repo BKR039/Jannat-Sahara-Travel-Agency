@@ -29,12 +29,17 @@ export const CUSTOM_REQUEST_STATUSES = [
   "cancelled",
 ] as const;
 
+export const FLIGHT_PREFERENCES = ["direct", "transit", "stopover"] as const;
+export const DESTINATION_TIMINGS = ["after_umrah", "before_umrah"] as const;
+
 export type MakkahArea = (typeof MAKKAH_AREAS)[number];
 export type MadinahArea = (typeof MADINAH_AREAS)[number];
 export type BudgetLevel = (typeof BUDGET_LEVELS)[number];
 export type RoomType = (typeof ROOM_TYPES)[number];
 export type ContactPreference = (typeof CONTACT_PREFERENCES)[number];
 export type CustomRequestStatus = (typeof CUSTOM_REQUEST_STATUSES)[number];
+export type FlightPreference = (typeof FLIGHT_PREFERENCES)[number];
+export type DestinationTiming = (typeof DESTINATION_TIMINGS)[number];
 
 /* ------------------------------------------------------------ travel limits */
 
@@ -63,6 +68,17 @@ export function isRealISODate(value: string): boolean {
   if (m < 1 || m > 12 || d < 1 || d > 31) return false;
   const date = new Date(Date.UTC(y, m - 1, d));
   return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+}
+
+/** Total calendar nights between two valid ISO dates. */
+export function calculateTotalNights(departureDate: string, returnDate: string): number {
+  if (!isRealISODate(departureDate) || !isRealISODate(returnDate)) return 0;
+  const [y1, m1, d1] = departureDate.split("-").map(Number) as [number, number, number];
+  const [y2, m2, d2] = returnDate.split("-").map(Number) as [number, number, number];
+  const t1 = Date.UTC(y1, m1 - 1, d1);
+  const t2 = Date.UTC(y2, m2 - 1, d2);
+  const diffDays = Math.round((t2 - t1) / 86_400_000);
+  return diffDays > 0 ? diffDays : 0;
 }
 
 /** Today in UTC as `YYYY-MM-DD`. */
@@ -126,6 +142,10 @@ export const CustomPackageRequestInput = z
     departureAirport: OPTIONAL_TEXT(120),
     returnAirport: OPTIONAL_TEXT(120),
     airportFlexible: z.boolean().default(false),
+    flightPreference: z.enum(FLIGHT_PREFERENCES).optional().or(z.literal("")),
+    transitHub: OPTIONAL_TEXT(120),
+    additionalDestination: OPTIONAL_TEXT(120),
+    destinationTiming: z.enum(DESTINATION_TIMINGS).optional().or(z.literal("")),
 
     makkahNights: COUNT(NIGHTS_LIMITS.min, NIGHTS_LIMITS.max),
     makkahHotelId: z.string().uuid().nullable().optional(),
@@ -163,6 +183,17 @@ export const CustomPackageRequestInput = z
   .refine((v) => v.makkahNights + v.madinahNights >= 1, {
     message: "At least one night is required",
     path: ["makkahNights"],
-  });
+  })
+  .refine(
+    (v) => {
+      const total = calculateTotalNights(v.departureDate, v.returnDate);
+      if (total <= 0) return true;
+      return v.makkahNights + v.madinahNights === total;
+    },
+    {
+      message: "The sum of Makkah and Madinah nights must match the total trip duration",
+      path: ["makkahNights"],
+    },
+  );
 
 export type CustomPackageRequestInputType = z.input<typeof CustomPackageRequestInput>;

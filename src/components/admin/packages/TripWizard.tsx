@@ -364,14 +364,14 @@ export function TripWizard() {
                   value={d.price}
                   onChange={(v) => set("price", v)}
                   type="number"
-                  placeholder="4200"
+                  placeholder="السعر بالدينار"
                 />
                 <TextField
                   label={t("ops.wizard.availableSeats")}
                   value={d.seats}
                   onChange={(v) => set("seats", v)}
                   type="number"
-                  placeholder="40"
+                  placeholder="عدد المقاعد"
                 />
                 <TextField
                   label={t("ops.wizard.departureDate")}

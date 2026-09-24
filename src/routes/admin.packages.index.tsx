@@ -15,6 +15,8 @@ import {
   Archive,
   Trash2,
   Edit3,
+  Eye,
+  Hotel as HotelIcon,
   ImageOff,
   Package as PackageIcon,
 } from "lucide-react";
@@ -112,6 +114,7 @@ function PackagesAdminPage() {
   const [cat, setCat] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [availability, setAvailability] = useState<string>("all");
+  const [pendingFeaturedId, setPendingFeaturedId] = useState<string | null>(null);
 
   const list = useQuery({
     queryKey: ["admin-packages", { search, cat, status }] as const,
@@ -119,6 +122,7 @@ function PackagesAdminPage() {
       let q = supabase
         .from("packages")
         .select("*")
+        .is("archived_at", null)
         .order("sort_order")
         .order("created_at", { ascending: false });
       if (cat !== "all") q = q.eq("category", cat as PackageCategory);
@@ -212,15 +216,13 @@ function PackagesAdminPage() {
   });
 
   const toggleFeatured = useMutation({
-    mutationFn: async (p: PackageRow) => {
-      const { error } = await supabase
-        .from("packages")
-        .update({ featured: !p.featured })
-        .eq("id", p.id);
+    mutationFn: async ({ id, featured }: { id: string; featured: boolean }) => {
+      const { error } = await supabase.from("packages").update({ featured }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: invalidate,
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: () => invalidate(),
+    onError: (e: Error) => toast.error(e.message || "فشل تحديث تمييز الرحلة"),
+    onSettled: () => setPendingFeaturedId(null),
   });
 
   const changeStatus = useMutation({
@@ -235,31 +237,20 @@ function PackagesAdminPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const remove = useMutation({
+  const archivePackage = useMutation({
     mutationFn: async (id: string) => {
-      /*
-       * Checked here rather than only in the dialog: the row's booking count
-       * comes from a cached query, so the check that decides whether the row
-       * is destroyed has to read the database at the moment of deletion.
-       */
-      const { count, error: countError } = await supabase
-        .from("bookings")
-        .select("id", { count: "exact", head: true })
-        .eq("package_id", id);
-      if (countError) throw countError;
-
-      const verdict = deleteVerdict({ bookings: count ?? 0 });
-      if (!verdict.canDelete) {
-        throw new Error(
-          t("ops.packagesList.deleteBlocked.has_bookings", { count: verdict.bookings }),
-        );
-      }
-
-      const { error } = await supabase.from("packages").delete().eq("id", id);
-      if (error) throw error;
+      const { archiveRecordFn } = await import("@/lib/admin/archive.functions");
+      await archiveRecordFn({
+        data: {
+          entityType: "trip",
+          subType: "package",
+          id,
+          reason: "أرشفة من إدارة الباقات",
+        },
+      });
     },
     onSuccess: () => {
-      toast.success(t("ops.packagesList.toastDeleted"));
+      toast.success("تم نقل الرحلة إلى الأرشيف بنجاح");
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -438,6 +429,7 @@ function PackagesAdminPage() {
                     <th className="px-4 py-2.5 font-semibold">
                       {t("ops.packagesList.table.destination")}
                     </th>
+                    <th className="px-4 py-2.5 font-semibold">الفنادق</th>
                     <th className="px-4 py-2.5 font-semibold">
                       {t("ops.packagesList.table.price")}
                     </th>
@@ -456,148 +448,173 @@ function PackagesAdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((p) => (
-                    <tr
-                      key={p.id}
-                      className="cursor-pointer border-b border-border-subtle last:border-0 transition-colors hover:bg-accent/40"
-                      onClick={() => navigate({ to: "/admin/packages/$id", params: { id: p.id } })}
-                    >
-                      <td className="px-4 sm:px-5 py-3">
-                        <div className="flex items-center gap-3">
-                          <PackageThumb pkg={p} />
-                          <div className="min-w-0">
-                            <div className="truncate font-medium">{p.title}</div>
-                            <div className="truncate text-caption text-muted-foreground">
-                              {p.departure_date
-                                ? shortDate(p.departure_date)
-                                : t("ops.packagesList.noDeparture")}
+                  {rows.map((p) => {
+                    const dateSummary = [
+                      p.departure_date ? shortDate(p.departure_date) : null,
+                      p.return_date ? shortDate(p.return_date) : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" → ");
+
+                    return (
+                      <tr
+                        key={p.id}
+                        className="cursor-pointer border-b border-border-subtle last:border-0 transition-colors hover:bg-accent/40"
+                        onClick={() =>
+                          navigate({ to: "/admin/packages/$id", params: { id: p.id } })
+                        }
+                      >
+                        <td className="px-4 sm:px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <PackageThumb pkg={p} />
+                            <div className="min-w-0">
+                              <div className="truncate font-medium">{p.title}</div>
+                              <div className="truncate text-caption text-muted-foreground">
+                                {dateSummary || t("ops.packagesList.noDeparture")}
+                                {p.flight_route && ` • ${p.flight_route}`}
+                                {p.notes && p.notes !== "-" && ` (${p.notes})`}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusChip value={p.category} vocab="category" />
-                      </td>
-                      <td className="px-4 py-3">{p.destination ?? "—"}</td>
-                      <td className="px-4 py-3">
-                        {/* `4500 TND` wrapped to two lines here, splitting the
-                          number from its currency. ds-metric keeps the pair
-                          atomic and lines the digits up down the column. */}
-                        <span className="ds-metric">
-                          <span className="ds-metric-value">{p.price}</span>
-                          <span className="ds-metric-unit">{p.currency}</span>
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 tabular-nums">
-                        <SeatCell pkg={p} bookings={seatRows.data ?? []} />
-                      </td>
-                      <td className="px-4 py-3">
-                        {/*
-                         * State only. This cell used to stack the status chip
-                         * together with the publish/hide buttons, so "what this
-                         * is" and "what I can do to it" were the same control.
-                         * The moves now live in the actions column.
-                         */}
-                        <StatusChip value={p.status} vocab="publication" />
-                      </td>
-                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={() => toggleFeatured.mutate(p)}
-                          title={t("ops.packagesList.toggleFeatured")}
-                          aria-label={t("ops.packagesList.toggleFeatured")}
-                        >
-                          <Star
-                            className={`h-4 w-4 ${p.featured ? "fill-primary text-primary" : "text-muted-foreground"}`}
-                          />
-                        </button>
-                      </td>
-                      <td
-                        className="px-4 sm:px-5 py-3 text-end"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="inline-flex items-center gap-1">
-                          {/* Publication moves read as words — they change what
-                            the public sees, so they should not be a glyph. */}
-                          {availableActions(p.status).map((action) => (
-                            <Button
-                              key={action}
-                              size="sm"
-                              variant="outline"
-                              className="h-8 px-2.5 text-caption"
-                              onClick={() => {
-                                const next = applyAction(p.status, action);
-                                if (next) changeStatus.mutate({ id: p.id, status: next });
-                              }}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusChip value={p.category} vocab="category" />
+                        </td>
+                        <td className="px-4 py-3">{p.destination ?? "—"}</td>
+                        <td className="px-4 py-3 text-caption text-muted-foreground max-w-[170px]">
+                          {p.hotel ? (
+                            <span
+                              className="line-clamp-2 text-foreground/80 font-medium"
+                              title={p.hotel}
                             >
-                              {t(
-                                `ops.packagesList.action${action.charAt(0).toUpperCase()}${action.slice(1)}`,
-                              )}
-                            </Button>
-                          ))}
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            title={t("ops.packagesList.edit")}
-                            aria-label={t("ops.packagesList.edit")}
-                            asChild
+                              {p.hotel}
+                            </span>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="ds-metric">
+                            <span className="ds-metric-value">{p.price}</span>
+                            <span className="ds-metric-unit">{p.currency}</span>
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 tabular-nums">
+                          <SeatCell pkg={p} bookings={seatRows.data ?? []} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusChip value={p.status} vocab="publication" />
+                        </td>
+                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            disabled={toggleFeatured.isPending && pendingFeaturedId === p.id}
+                            onClick={() => {
+                              setPendingFeaturedId(p.id);
+                              toggleFeatured.mutate({ id: p.id, featured: !p.featured });
+                            }}
+                            title={t("ops.packagesList.toggleFeatured")}
+                            aria-label={t("ops.packagesList.toggleFeatured")}
+                            className="p-1 rounded hover:bg-muted/50 transition-colors disabled:opacity-50"
                           >
-                            <Link to="/admin/packages/$id" params={{ id: p.id }}>
-                              <Edit3 className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            title={t("ops.packagesList.duplicate")}
-                            aria-label={t("ops.packagesList.duplicate")}
-                            onClick={() => duplicate.mutate(p)}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            title={t("ops.packagesList.archive")}
-                            aria-label={t("ops.packagesList.archive")}
-                            onClick={() => changeStatus.mutate({ id: p.id, status: "archived" })}
-                          >
-                            <Archive className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+                            <Star
+                              className={`h-4 w-4 ${p.featured ? "fill-primary text-primary" : "text-muted-foreground"}`}
+                            />
+                          </button>
+                        </td>
+                        <td
+                          className="px-4 sm:px-5 py-3 text-end"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="inline-flex items-center gap-1">
+                            {p.slug && (
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                className="text-destructive"
-                                title={t("ops.packagesList.delete")}
-                                aria-label={t("ops.packagesList.delete")}
+                                title="معاينة في الموقع العام"
+                                aria-label="معاينة في الموقع العام"
+                                asChild
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <a
+                                  href={`/packages/${p.slug}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </a>
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  {t("ops.packagesList.deleteConfirmTitle")}
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {t("ops.packagesList.deleteConfirmBody", { title: p.title })}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>
-                                  {t("ops.packagesList.cancel")}
-                                </AlertDialogCancel>
-                                <AlertDialogAction onClick={() => remove.mutate(p.id)}>
-                                  {t("ops.packagesList.delete")}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            )}
+                            {availableActions(p.status).map((action) => (
+                              <Button
+                                key={action}
+                                size="xs"
+                                variant="outline"
+                                onClick={() => {
+                                  const next = applyAction(p.status, action);
+                                  if (next) changeStatus.mutate({ id: p.id, status: next });
+                                }}
+                              >
+                                {t(
+                                  `ops.packagesList.action${action.charAt(0).toUpperCase()}${action.slice(1)}`,
+                                )}
+                              </Button>
+                            ))}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              title={t("ops.packagesList.edit")}
+                              aria-label={t("ops.packagesList.edit")}
+                              asChild
+                            >
+                              <Link to="/admin/packages/$id" params={{ id: p.id }}>
+                                <Edit3 className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              title={t("ops.packagesList.duplicate")}
+                              aria-label={t("ops.packagesList.duplicate")}
+                              onClick={() => duplicate.mutate(p)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="text-muted-foreground hover:text-foreground"
+                                  title="أرشفة البرنامج"
+                                  aria-label="أرشفة البرنامج"
+                                >
+                                  <Archive className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    أرشفة البرنامج السياحي
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    هل تريد نقل «{p.title}» إلى الأرشيف؟ سيتم إخفاؤه من قوائم التشغيل الحالية مع الاحتفاظ بكافة بياناته وحجوزاته التاريخية، ويمكنك استرجاعه في أي وقت من قسم الأرشيف.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    إلغاء
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => archivePackage.mutate(p.id)}>
+                                    نقل إلى الأرشيف
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -662,6 +679,16 @@ function PackagesAdminPage() {
                         <SeatCell pkg={p} bookings={seatRows.data ?? []} />
                       </dd>
                     </div>
+                    {p.hotel && (
+                      <div className="col-span-2 min-w-0 border-t border-border-subtle/60 pt-2">
+                        <dt className="text-caption uppercase tracking-wide text-muted-foreground">
+                          الفنادق
+                        </dt>
+                        <dd className="mt-1 text-small font-medium text-foreground line-clamp-1">
+                          {p.hotel}
+                        </dd>
+                      </div>
+                    )}
                   </dl>
 
                   {/* Publication moves stay words, and stay separate from state. */}
@@ -681,6 +708,13 @@ function PackagesAdminPage() {
                         )}
                       </Button>
                     ))}
+                    {p.slug && (
+                      <Button size="sm" variant="ghost" asChild>
+                        <a href={`/packages/${p.slug}`} target="_blank" rel="noopener noreferrer">
+                          <Eye className="me-1 h-3.5 w-3.5" /> معاينة
+                        </a>
+                      </Button>
+                    )}
                     <Button size="sm" variant="ghost" asChild className="ms-auto">
                       <Link to="/admin/packages/$id" params={{ id: p.id }}>
                         {t("ops.packagesList.edit")}
@@ -699,14 +733,11 @@ function PackagesAdminPage() {
 
 /**
  * Cover thumbnail for a programme row.
- *
- * A programme without a cover is a real state — it publishes without an image
- * — so the placeholder says so quietly rather than stretching a broken image.
  */
 function PackageThumb({ pkg }: { pkg: PackageRow }) {
   if (!pkg.cover) {
     return (
-      <span className="grid size-11 shrink-0 place-items-center rounded-input border border-border-subtle bg-surface-sunken/60 text-muted-foreground">
+      <span className="grid h-11 w-16 shrink-0 place-items-center rounded-lg border border-border-subtle bg-surface-sunken/60 text-muted-foreground">
         <ImageOff className="h-4 w-4" aria-hidden />
       </span>
     );
@@ -716,7 +747,7 @@ function PackageThumb({ pkg }: { pkg: PackageRow }) {
       src={pkg.cover}
       alt=""
       loading="lazy"
-      className="size-11 shrink-0 rounded-input border border-border-subtle object-cover"
+      className="h-11 w-16 shrink-0 rounded-lg border border-border-subtle object-cover"
     />
   );
 }

@@ -1,11 +1,16 @@
 import { createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
-import type { AppRole } from "@/hooks/useAuth";
+import type { AppRole, PermissionKey } from "@/lib/admin/permissions";
 
 export interface AdminContextValue {
   user: User;
   roles: AppRole[];
+  permissions: PermissionKey[];
   isSuperAdmin: boolean;
+  isAdmin: boolean;
+  isStaff: boolean;
+  hasPermission: (key: PermissionKey) => boolean;
+  hasAnyPermission: (keys: readonly PermissionKey[]) => boolean;
 }
 
 export const AdminContext = createContext<AdminContextValue | null>(null);

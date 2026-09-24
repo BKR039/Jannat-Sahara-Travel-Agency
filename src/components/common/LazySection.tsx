@@ -23,9 +23,26 @@ export function LazySection({
   const placeholder = fallback ?? (
     <div
       aria-hidden="true"
-      className="mx-auto w-full max-w-7xl animate-pulse rounded-[var(--radius-card)] bg-surface-sunken/60"
+      className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 opacity-70"
       style={{ minHeight }}
-    />
+    >
+      <div className="flex flex-col items-center mb-8 space-y-2.5">
+        <div className="h-3 w-24 rounded-full bg-surface-sunken motion-reduce:animate-none" />
+        <div className="h-5 w-44 rounded-md bg-surface-sunken motion-reduce:animate-none" />
+      </div>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-44 rounded-[var(--radius-card)] border border-border-subtle/50 bg-surface/30 p-4 space-y-3"
+          >
+            <div className="h-3 w-20 rounded-xs bg-surface-sunken motion-reduce:animate-none" />
+            <div className="h-4 w-3/4 rounded-xs bg-surface-sunken motion-reduce:animate-none" />
+            <div className="h-3 w-full rounded-xs bg-surface-sunken/60 motion-reduce:animate-none" />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 
   return (

@@ -39,3 +39,7 @@ dist-ssr
 
 # Supabase CLI
 supabase/.temp/
+
+# Scratch & temporary testing files
+scratch/
+

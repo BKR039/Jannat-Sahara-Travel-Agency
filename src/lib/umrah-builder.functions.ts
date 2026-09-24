@@ -27,7 +27,7 @@ export function resolveCatalogueHotel(
 ): string | null {
   if (!id) return null;
   const row = rows.find((h) => h.id === id);
-  if (!row || row.city !== city) throw new Error("HOTEL_UNAVAILABLE");
+  if (!row || row.city?.toLowerCase() !== city.toLowerCase()) throw new Error("HOTEL_UNAVAILABLE");
   return row.name;
 }
 
@@ -118,11 +118,51 @@ export const submitCustomPackageRequest = createServerFn({ method: "POST" })
       catalogue = (rows ?? []) as CatalogueHotel[];
     }
 
-    const makkahHotelName = resolveCatalogueHotel(catalogue, data.makkahHotelId, "makkah");
-    const madinahHotelName = resolveCatalogueHotel(catalogue, data.madinahHotelId, "madinah");
+    const catalogueMakkah = resolveCatalogueHotel(catalogue, data.makkahHotelId, "makkah");
+    const catalogueMadinah = resolveCatalogueHotel(catalogue, data.madinahHotelId, "madinah");
+
+    // If a catalogue hotel was selected, use its verified name.
+    // If a custom hotel name was typed without a catalogue ID, sanitize and accept it directly.
+    const makkahHotelName =
+      catalogueMakkah ||
+      (data.makkahHotelName ? sanitizeOptionalText(data.makkahHotelName, 200) : null);
+    const madinahHotelName =
+      catalogueMadinah ||
+      (data.madinahHotelName ? sanitizeOptionalText(data.madinahHotelName, 200) : null);
 
     const row_phone = sanitizeText(data.phone, 32);
     const row_email = data.email ? sanitizeEmail(data.email) : null;
+
+    // Structured flight preference details
+    const flightDetailsParts: string[] = [];
+    if (data.flightPreference) {
+      if (data.flightPreference === "direct") {
+        flightDetailsParts.push("نوع الرحلة: مباشرة");
+      } else if (data.flightPreference === "transit") {
+        flightDetailsParts.push("نوع الرحلة: بترانزيت");
+        if (data.transitHub)
+          flightDetailsParts.push(`محطة الترانزيت: ${sanitizeText(data.transitHub, 120)}`);
+      } else if (data.flightPreference === "stopover") {
+        flightDetailsParts.push("نوع الرحلة: مع وجهة إضافية (Stopover)");
+        if (data.additionalDestination) {
+          const timingLabel =
+            data.destinationTiming === "before_umrah" ? "قبل العمرة" : "بعد العمرة";
+          flightDetailsParts.push(
+            `الوجهة الإضافية: ${sanitizeText(data.additionalDestination, 120)} (${timingLabel})`,
+          );
+        }
+      }
+    }
+
+    const proposedFlightsSummary = flightDetailsParts.join(" · ");
+    const userNotes = sanitizeOptionalText(data.notes, 2000) ?? "";
+    const combinedNotes =
+      [
+        proposedFlightsSummary ? `[تفضيل الطيران والمحطات]: ${proposedFlightsSummary}` : "",
+        userNotes,
+      ]
+        .filter(Boolean)
+        .join("\n\n") || null;
 
     const row = {
       reference,
@@ -143,6 +183,7 @@ export const submitCustomPackageRequest = createServerFn({ method: "POST" })
         ? null
         : (sanitizeOptionalText(data.returnAirport, 120) ?? null),
       airport_flexible: !!data.airportFlexible,
+      proposed_flights: proposedFlightsSummary || null,
       makkah_nights: data.makkahNights,
       makkah_hotel_id: data.makkahHotelId ?? null,
       makkah_hotel_name: makkahHotelName,
@@ -156,7 +197,7 @@ export const submitCustomPackageRequest = createServerFn({ method: "POST" })
       adults: data.adults,
       children: data.children,
       infants: data.infants,
-      notes: sanitizeOptionalText(data.notes, 2000) ?? null,
+      notes: combinedNotes,
       // CRM link (Phase 7.1). Derived from the contact details this traveller
       // gave, with the exact rule the customer aggregation uses, so the request
       // lands on the right customer instead of creating a parallel identity.
@@ -193,6 +234,87 @@ export const submitCustomPackageRequest = createServerFn({ method: "POST" })
     if (error || !inserted) {
       console.error("[custom-package] insert failed", error);
       throw new Error("Failed to save your request");
+    }
+
+    // Connect to customer CRM record
+    try {
+      await supabaseAdmin.from("customer_profiles").upsert(
+        {
+          customer_key: row.customer_key,
+          full_name: row.customer_name,
+          phone: row.phone,
+          email: row.email,
+          status: "lead",
+          updated_at: new Date().toISOString(),
+        } as never,
+        { onConflict: "customer_key" },
+      );
+    } catch (profileErr) {
+      console.error("[custom-package] customer profile upsert failed (non-fatal)", profileErr);
+    }
+
+    // Connect to Sales Center leads table with full builder configuration snapshot
+    try {
+      const { normalizePhone } = await import("@/lib/admin/customer-identity");
+      const { data: leadInserted } = await (supabaseAdmin as any)
+        .from("leads")
+        .insert({
+          reference: inserted.reference,
+          customer_key: row.customer_key,
+          full_name: row.customer_name,
+          phone: row.phone,
+          phone_normalized: normalizePhone(row.phone),
+          email: row.email,
+          governorate: "تونس",
+          trip_id: null,
+          trip_name: "عمرة مخصصة",
+          travelers_count: data.adults + data.children + data.infants,
+          adults: data.adults,
+          children: data.children,
+          infants: data.infants,
+          interests: ["booking", "hotels", "flights", "price_program"],
+          contact_preference: data.contactPreference || "whatsapp",
+          preferred_contact_time: "anytime",
+          notes: row.notes,
+          source: "umrah_builder",
+          status: "new",
+          intent: "high",
+          intent_score_reasons: ["تخصيص باقة عمرة عبر الـ Builder"],
+          builder_snapshot: {
+            departureDate: data.departureDate,
+            returnDate: data.returnDate,
+            departureAirport: data.departureAirport,
+            returnAirport: data.returnAirport,
+            airportFlexible: data.airportFlexible,
+            makkahNights: data.makkahNights,
+            makkahHotelId: data.makkahHotelId,
+            makkahHotelName,
+            makkahArea: data.makkahArea,
+            madinahNights: data.madinahNights,
+            madinahHotelId: data.madinahHotelId,
+            madinahHotelName,
+            madinahArea: data.madinahArea,
+            adults: data.adults,
+            children: data.children,
+            infants: data.infants,
+            roomType: data.roomType,
+            currency: "TND",
+          },
+          builder_step_reached: "submitted",
+        })
+        .select("id")
+        .maybeSingle();
+
+      if (leadInserted?.id) {
+        await (supabaseAdmin as any).from("lead_activities").insert({
+          lead_id: leadInserted.id,
+          activity_type: "created",
+          title: "تم بناء رحلة عمرة عبر الـ Builder",
+          description: `عمرة مخصصة: ${data.makkahNights} ليالي مكة، ${data.madinahNights} ليالي المدينة`,
+        });
+      }
+    } catch {
+      // Non-fatal if leads table is not yet created
     }
 
     let emailSent = false;

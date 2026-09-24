@@ -1,5 +1,3 @@
-import { Inbox } from "lucide-react";
-
 /** Skeleton grid — DS /components/06-feedback.md · matches PackageCard geometry */
 export function SkeletonGrid({
   count = 4,
@@ -34,16 +32,6 @@ export function SkeletonGrid({
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-/** Empty state — DS /components/06-feedback.md */
-export function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-[var(--radius-card)] border border-dashed border-border bg-surface p-12 text-center">
-      <Inbox className="h-10 w-10 shrink-0 text-muted-foreground" aria-hidden="true" />
-      <p className="text-body text-muted-foreground">{label}</p>
     </div>
   );
 }

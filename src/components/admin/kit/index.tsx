@@ -514,28 +514,12 @@ export function Drawer({
 
 /* --------------------------- states and skeletons -------------------------- */
 
-export function EmptyState({
-  title,
-  description,
-  action,
-  icon: Icon,
-}: {
-  title: string;
-  description?: string;
-  action?: ReactNode;
-  icon?: React.ComponentType<{ className?: string }>;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-border bg-surface-sunken/40 px-6 py-12 text-center">
-      {Icon && <Icon className="h-8 w-8 text-muted-foreground" />}
-      <p className="mt-3 text-small font-medium">{title}</p>
-      {description && (
-        <p className="mt-1 max-w-sm text-caption text-muted-foreground">{description}</p>
-      )}
-      {action && <div className="mt-4">{action}</div>}
-    </div>
-  );
-}
+/*
+ * Re-exported, not reimplemented. The admin kit is the import surface the
+ * admin screens already use; the component itself now lives with the other
+ * primitives so the public pages and this one cannot drift apart again.
+ */
+export { EmptyState } from "@/components/ui/empty-state";
 
 /**
  * A list whose query failed.
@@ -562,14 +546,15 @@ export function ErrorState({ onRetry, className }: { onRetry?: () => void; class
         {t("shell.states.errorDescription")}
       </p>
       {onRetry && (
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="sm"
           onClick={onRetry}
-          className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-4 text-caption font-semibold transition-colors duration-fast hover:border-primary/50 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="mt-4"
         >
           <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           {t("shell.states.retry")}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -656,3 +641,6 @@ export function Avatar({
     </span>
   );
 }
+
+export { StatusSwitch, type StatusSwitchProps } from "./StatusSwitch";
+export { PermissionGate } from "./PermissionGate";

@@ -257,9 +257,28 @@
   --hero-canvas: color-mix(in srgb, var(--color-gold-50) 55%, var(--bg-canvas));
   --hero-canvas-deep: color-mix(in srgb, var(--color-orange-50) 42%, var(--hero-canvas));
 
+  /* The dark ground the hero photograph sits on, and the gradient that stands
+     in for the photograph before it loads or when the CMS has no image. These
+     are warm near-blacks rather than neutral ones, which is why they are their
+     own tokens and not a step on the neutral ramp; they were written inline as
+     hex in two files, which is exactly how a colour escapes the system. */
+  --hero-frame: #120c08;
+  --hero-frame-top: #18110c;
+  --hero-frame-bottom: #0f0905;
+
+  /* How fast the hero wash closes over the photograph, at the fixed stops in
+     `.ds-hero-wash`. The positions are the composition and never change; these
+     are how opaque the veil is at each of them. */
+  --hero-wash-1: 88%;
+  --hero-wash-2: 68%;
+  --hero-wash-3: 44%;
+  --hero-wash-4: 22%;
+  --hero-wash-5: 6%;
+
   /* ---------- Typography ---------- */
   --font-arabic-display: "The Year of Handicrafts", "Cairo", "Segoe UI", system-ui, sans-serif;
-  --font-arabic-body: "The Year of Handicrafts", "IBM Plex Sans Arabic", "Tajawal", "Segoe UI", system-ui, sans-serif;
+  --font-arabic-body:
+    "The Year of Handicrafts", "IBM Plex Sans Arabic", "Tajawal", "Segoe UI", system-ui, sans-serif;
   --font-latin-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-latin-body: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono-ds: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
@@ -428,6 +447,19 @@
   /* Hero canvas in dark theme: deep luxury navy matching brand dark, not muddy gray */
   --hero-canvas: #0c1527;
   --hero-canvas-deep: #070d18;
+
+  /* Same stops, a gentler curve. Ivory over a sunlit photograph is a small
+     change in luminance, so the light-theme alphas blend invisibly; near-black
+     navy over the same photograph is an enormous one, and at those alphas the
+     last stretch read as an edge rather than a fade. Veiling a little earlier
+     and more evenly spreads the same total change over the whole run, so dark
+     dissolves as softly as light while the photograph keeps its colour instead
+     of going grey. */
+  --hero-wash-1: 84%;
+  --hero-wash-2: 62%;
+  --hero-wash-3: 42%;
+  --hero-wash-4: 26%;
+  --hero-wash-5: 12%;
 
   --ds-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
   --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -811,27 +843,79 @@
      for French and English put the ivory straight over the Kaaba and erased
      it — the copy has to stay on the side the subject is not. Alignment inside
      the column is still logical, so Arabic reads right and Latin reads left. */
+  /* Stops are `vw`, not percentages of this box.
+     A percentage is measured against the media column, so every change to that
+     column's width silently moved the whole transition and the two had to be
+     re-tuned together — and because the column used to be a different width at
+     lg, xl and 2xl, the same gradient described three different compositions.
+     In viewport units it is stated once and holds at 1024, 1440 and 1920 alike:
+     the column's right edge sits at 70vw, so a stop at `Xvw` lands at (70 - X)%
+     across the hero.
+
+     What that spells out, right to left: solid canvas from 62% outwards, where
+     the copy sits; the photograph fading through it from 62% back to 50%, still
+     plainly readable for most of that run; a light veil from 50% to 42%; and
+     untouched photograph from 42% to the left edge. The previous stops reached
+     solid ivory at 54% and the column ended at 62%, so the last eighth of the
+     hero was a pale band with the picture already gone and the text not yet
+     begun. Both themes use these numbers — only `--hero-canvas` differs, so
+     light and dark share one spatial composition and differ only in colour. */
   .ds-hero-wash {
     background-image:
       linear-gradient(
         to left,
-        var(--hero-canvas) 0%,
-        var(--hero-canvas) 15%,
-        color-mix(in srgb, var(--hero-canvas) 85%, transparent) 28%,
-        color-mix(in srgb, var(--hero-canvas) 40%, transparent) 44%,
-        transparent 65%
+        var(--hero-canvas) 0vw,
+        var(--hero-canvas) 8vw,
+        color-mix(in srgb, var(--hero-canvas) var(--hero-wash-1), transparent) 11vw,
+        color-mix(in srgb, var(--hero-canvas) var(--hero-wash-2), transparent) 14vw,
+        color-mix(in srgb, var(--hero-canvas) var(--hero-wash-3), transparent) 17vw,
+        color-mix(in srgb, var(--hero-canvas) var(--hero-wash-4), transparent) 20vw,
+        color-mix(in srgb, var(--hero-canvas) var(--hero-wash-5), transparent) 24vw,
+        transparent 28vw
       ),
       linear-gradient(
         to bottom,
-        color-mix(in srgb, var(--hero-canvas) 35%, transparent) 0%,
-        transparent 10%
+        color-mix(in srgb, var(--hero-canvas) 28%, transparent) 0%,
+        transparent 7%
       ),
       linear-gradient(
         to top,
-        color-mix(in srgb, var(--hero-canvas) 50%, transparent) 0%,
-        transparent 18%
+        color-mix(in srgb, var(--hero-canvas) 35%, transparent) 0%,
+        transparent 12%
       );
   }
+}
+
+/* Full-bleed cinematic hero overlays.
+   Refined multi-layer system with controlled central contrast behind editorial
+   content, while keeping outer architecture, courtyard pilgrims, Kaaba, and
+   sky vibrant and photographic. */
+.ds-hero-cinematic-overlay {
+  background-image:
+    /* Layer 1: Controlled central elliptical scrim focused behind text & CTAs */
+    radial-gradient(
+      ellipse 68% 58% at 50% 48%,
+      rgba(15, 12, 10, 0.52) 0%,
+      rgba(15, 12, 10, 0.38) 42%,
+      rgba(15, 12, 10, 0.1) 72%,
+      transparent 100%
+    ),
+    /* Layer 2: Gentle vertical atmospheric anchoring (top navbar & bottom baseline) */
+    linear-gradient(
+        to top,
+        rgba(15, 12, 10, 0.58) 0%,
+        rgba(15, 12, 10, 0.26) 18%,
+        rgba(15, 12, 10, 0.08) 50%,
+        rgba(15, 12, 10, 0.16) 82%,
+        rgba(15, 12, 10, 0.42) 100%
+      ),
+    /* Layer 3: Warm spiritual golden atmospheric tint */
+    linear-gradient(
+        180deg,
+        rgba(212, 160, 23, 0.05) 0%,
+        transparent 40%,
+        rgba(212, 160, 23, 0.03) 100%
+      );
 }
 
 /* Leaflet ships 30px zoom controls. The map is a first-class control surface
@@ -1109,4 +1193,23 @@
   font-weight: var(--font-weight-semibold);
   color: var(--text-muted);
   letter-spacing: 0.02em;
+}
+
+/* =============================================================
+   Route Transition Progress (Phases 10 & 21)
+   ============================================================= */
+@keyframes route-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-route-progress {
+  animation: route-progress 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }

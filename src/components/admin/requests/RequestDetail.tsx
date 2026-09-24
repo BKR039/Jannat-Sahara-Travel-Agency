@@ -6,14 +6,18 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import {
   CheckCircle2,
+  Download,
+  FileText,
   Loader2,
   Mail,
   MessageCircle,
   Phone,
   UserRound,
   XCircle,
+  Archive,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getPassportSignedUrl } from "@/lib/admin/admin.functions";
 import { updateRequest } from "@/lib/admin/command.functions";
 import { statusLabelKey, type RequestKind } from "@/lib/admin/request-status";
 import {
@@ -28,6 +32,14 @@ import type { CabinClass } from "@/lib/flight-request.schema";
 import { money, shortDate } from "@/components/admin/kit";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { CustomOfferPanel } from "./CustomOfferPanel";
 import { FlightOfferPanel } from "./FlightOfferPanel";
@@ -147,53 +159,129 @@ const umrahLabel = (path: string, value: string): string =>
 
 function RequestFacts({ row }: { row: UnifiedRequest }) {
   const { t } = useTranslation("admin");
+  const getSigned = useServerFn(getPassportSignedUrl);
+  const [openingPassport, setOpeningPassport] = useState(false);
+
+  async function openPassport(path: string) {
+    try {
+      setOpeningPassport(true);
+      const r = await getSigned({ data: { path } });
+      window.open(r.url, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to open passport");
+    } finally {
+      setOpeningPassport(false);
+    }
+  }
+
+  const adults = int(row, "adults");
+  const children = int(row, "children");
+  const infants = int(row, "infants");
 
   const party = [
-    t("ops.requests.travellers.adults", { count: int(row, "adults") }),
-    int(row, "children")
-      ? t("ops.requests.travellers.children", { count: int(row, "children") })
-      : "",
-    int(row, "infants") ? t("ops.requests.travellers.infants", { count: int(row, "infants") }) : "",
+    t("ops.requests.travellers.adults", { count: adults }),
+    children ? t("ops.requests.travellers.children", { count: children }) : "",
+    infants ? t("ops.requests.travellers.infants", { count: infants }) : "",
   ]
     .filter(Boolean)
     .join(" · ");
 
   if (row.kind === "flight") {
+    const tripType = str(row, "trip_type");
+    const isRoundTrip = tripType === "round_trip";
     return (
-      <Group title={t("ops.requests.sections.request")}>
-        <Fact
-          label={t("ops.requests.route")}
-          value={`${str(row, "from_airport")} → ${str(row, "to_airport")}`}
-          wide
-        />
-        <Fact label={t("ops.requests.fields.departure")} value={str(row, "departure_date")} ltr />
-        <Fact label={t("ops.requests.fields.return")} value={str(row, "return_date")} ltr />
-        <Fact label={t("ops.requests.fields.party")} value={party} />
-        <Fact
-          label={t("ops.requests.cabin")}
-          value={cabinLabel(str(row, "cabin_class") as CabinClass)}
-        />
-        <Fact label={t("ops.requests.customerMessage")} value={str(row, "notes")} wide />
-      </Group>
+      <div className="space-y-3">
+        <Group title={t("ops.requests.sections.request")}>
+          <Fact
+            label={t("ops.requests.route")}
+            value={`${str(row, "from_airport")} → ${str(row, "to_airport")}`}
+            wide
+          />
+          <Fact
+            label={t("ops.requests.tripType")}
+            value={
+              isRoundTrip
+                ? t("ops.flightRequests.roundTrip", { defaultValue: "ذهاب وعودة" })
+                : t("ops.flightRequests.oneWay", { defaultValue: "ذهاب فقط" })
+            }
+          />
+          <Fact
+            label={t("ops.requests.cabin")}
+            value={cabinLabel(str(row, "cabin_class") as CabinClass)}
+          />
+          <Fact label={t("ops.requests.fields.departure")} value={str(row, "departure_date")} ltr />
+          {isRoundTrip && (
+            <Fact label={t("ops.requests.fields.return")} value={str(row, "return_date")} ltr />
+          )}
+          <Fact
+            label={t("ops.requests.fields.party")}
+            value={party || `${row.travellers ?? 1} مسافر`}
+          />
+          <Fact label={t("ops.requests.customerMessage")} value={str(row, "notes")} wide />
+        </Group>
+      </div>
     );
   }
 
   if (row.kind === "booking") {
     const price = row.detail["total_price"];
+    const paymentStatus = str(row, "payment_status");
+    const passportPath = str(row, "passport_path");
+    const category = str(row, "package_category");
+
+    const paymentLabel =
+      paymentStatus === "paid"
+        ? "مدفوع بالكامل"
+        : paymentStatus === "partially_paid"
+          ? "مدفوع جزئياً"
+          : paymentStatus === "refunded"
+            ? "مسترجع"
+            : paymentStatus === "unpaid"
+              ? "غير مدفوع"
+              : paymentStatus;
+
     return (
-      <Group title={t("ops.requests.sections.request")}>
-        <Fact label={t("ops.requests.package")} value={str(row, "package_title")} wide />
-        <Fact
-          label={t("ops.requests.fields.party")}
-          value={party || (int(row, "people") ? String(int(row, "people")) : "")}
-        />
-        <Fact
-          label={t("ops.requests.total")}
-          value={price == null ? "" : money(Number(price), str(row, "currency") || "TND")}
-          ltr
-        />
-        <Fact label={t("ops.requests.customerMessage")} value={str(row, "notes")} wide />
-      </Group>
+      <div className="space-y-3">
+        <Group title={t("ops.requests.sections.request")}>
+          <Fact label={t("ops.requests.package")} value={str(row, "package_title")} wide />
+          {category && <Fact label="نوع البرنامج" value={category.toUpperCase()} />}
+          <Fact
+            label={t("ops.requests.fields.party")}
+            value={party || (int(row, "people") ? `${int(row, "people")} مسافر` : "")}
+          />
+          <Fact
+            label={t("ops.requests.total")}
+            value={price == null ? "" : money(Number(price), str(row, "currency") || "TND")}
+            ltr
+          />
+          {paymentLabel && <Fact label="حالة الدفع" value={paymentLabel} />}
+          <Fact label={t("ops.requests.customerMessage")} value={str(row, "notes")} wide />
+        </Group>
+
+        {passportPath && (
+          <Group title="وثائق السفر المرفقة">
+            <div className="flex items-center justify-between gap-3 p-3 bg-card rounded-lg border border-border/60">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                <span className="text-caption font-medium">جواز السفر المرفق</span>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={openingPassport}
+                onClick={() => openPassport(passportPath)}
+              >
+                {openingPassport ? (
+                  <Loader2 className="me-1.5 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Download className="me-1.5 h-3.5 w-3.5" />
+                )}
+                <span>تحميل / عرض الجواز</span>
+              </Button>
+            </div>
+          </Group>
+        )}
+      </div>
     );
   }
 
@@ -208,25 +296,64 @@ function RequestFacts({ row }: { row: UnifiedRequest }) {
 
   /* custom_package — the trip the traveller designed, city by city. */
   const flexible = Boolean(row.detail["airport_flexible"]);
-  const nights = (city: "makkah" | "madinah") => {
-    const n = int(row, `${city}_nights`);
-    return n ? t("ops.requests.fields.nights") + `: ${n}` : "";
+  const makkahNights = int(row, "makkah_nights");
+  const madinahNights = int(row, "madinah_nights");
+  const totalNights = makkahNights + madinahNights;
+
+  let flightPref: {
+    flightPreference?: string;
+    transitHub?: string;
+    additionalDestination?: string;
+    destinationTiming?: string;
+  } | null = null;
+  const rawFlights = str(row, "proposed_flights");
+  try {
+    if (rawFlights && rawFlights.trim().startsWith("{")) {
+      flightPref = JSON.parse(rawFlights);
+    }
+  } catch {
+    // fallback
+  }
+
+  const flightPreferenceLabel = () => {
+    if (flightPref?.flightPreference) {
+      if (flightPref.flightPreference === "direct") return "رحلة مباشرة (بدون توقف)";
+      if (flightPref.flightPreference === "transit") {
+        return `رحلة ترانزيت${flightPref.transitHub ? ` (مطار الترانزيت: ${flightPref.transitHub})` : ""}`;
+      }
+      if (flightPref.flightPreference === "stopover") {
+        const timing =
+          flightPref.destinationTiming === "before_umrah" ? "قبل العمرة" : "بعد العمرة";
+        return `وجهة إضافية (Stopover): ${flightPref.additionalDestination || "غير محددة"} — ${timing}`;
+      }
+      return flightPref.flightPreference;
+    }
+    if (rawFlights) return rawFlights;
+    return null;
   };
-  const cityLine = (city: "makkah" | "madinah") =>
-    [
-      nights(city),
-      str(row, `${city}_hotel_name`),
-      umrahLabel(`areas.${city}`, str(row, `${city}_area`)),
-      umrahLabel("budgets", str(row, `${city}_preference`)),
-    ]
-      .filter(Boolean)
-      .join(" · ");
+
+  const makkahCustom = !row.detail["makkah_hotel_id"] && Boolean(str(row, "makkah_hotel_name"));
+  const makkahHotel = str(row, "makkah_hotel_name")
+    ? `${str(row, "makkah_hotel_name")}${makkahCustom ? " (طلب مخصص - غير مدرج بالكتالوج)" : ""}`
+    : "غير محدد بالاسم";
+
+  const madinahCustom = !row.detail["madinah_hotel_id"] && Boolean(str(row, "madinah_hotel_name"));
+  const madinahHotel = str(row, "madinah_hotel_name")
+    ? `${str(row, "madinah_hotel_name")}${madinahCustom ? " (طلب مخصص - غير مدرج بالكتالوج)" : ""}`
+    : "غير محدد بالاسم";
 
   return (
-    <>
-      <Group title={t("ops.requests.sections.request")}>
+    <div className="space-y-3">
+      {/* Flight & Dates */}
+      <Group
+        title={t("ops.requests.sections.tripDetails", { defaultValue: "تفاصيل الرحلة والمواعيد" })}
+      >
         <Fact label={t("ops.requests.fields.departure")} value={str(row, "departure_date")} ltr />
         <Fact label={t("ops.requests.fields.return")} value={str(row, "return_date")} ltr />
+        <Fact
+          label="إجمالي الليالي"
+          value={`${totalNights} ليالٍ (مكة: ${makkahNights} · المدينة: ${madinahNights})`}
+        />
         <Fact label={t("ops.requests.fields.party")} value={party} />
         <Fact
           label={t("ops.requests.fields.roomType")}
@@ -240,11 +367,44 @@ function RequestFacts({ row }: { row: UnifiedRequest }) {
           label={t("ops.requests.fields.returnAirport")}
           value={flexible ? t("ops.requests.flexibleAirport") : str(row, "return_airport")}
         />
-        <Fact label={t("ops.requests.sections.makkah")} value={cityLine("makkah")} wide />
-        <Fact label={t("ops.requests.sections.madinah")} value={cityLine("madinah")} wide />
-        <Fact label={t("ops.requests.customerMessage")} value={str(row, "notes")} wide />
+        {flightPreferenceLabel() && (
+          <Fact label="تفضيل الطيران والمسار" value={flightPreferenceLabel()!} wide />
+        )}
       </Group>
-    </>
+
+      {/* Makkah Stay */}
+      <Group title={`مكة المكرمة (${makkahNights} ليالٍ)`}>
+        <Fact label={t("ops.requests.fields.hotel")} value={makkahHotel} />
+        <Fact
+          label={t("ops.requests.fields.area")}
+          value={umrahLabel("areas.makkah", str(row, "makkah_area"))}
+        />
+        <Fact
+          label={t("ops.requests.fields.budget")}
+          value={umrahLabel("budgets", str(row, "makkah_preference"))}
+        />
+      </Group>
+
+      {/* Madinah Stay */}
+      <Group title={`المدينة المنورة (${madinahNights} ليالٍ)`}>
+        <Fact label={t("ops.requests.fields.hotel")} value={madinahHotel} />
+        <Fact
+          label={t("ops.requests.fields.area")}
+          value={umrahLabel("areas.madinah", str(row, "madinah_area"))}
+        />
+        <Fact
+          label={t("ops.requests.fields.budget")}
+          value={umrahLabel("budgets", str(row, "madinah_preference"))}
+        />
+      </Group>
+
+      {/* Customer Notes */}
+      {str(row, "notes") && (
+        <Group title={t("ops.requests.customerMessage")}>
+          <Fact label="" value={str(row, "notes")} wide />
+        </Group>
+      )}
+    </div>
   );
 }
 
@@ -276,6 +436,8 @@ export function RequestDetail({ row }: { row: UnifiedRequest }) {
     queryClient.invalidateQueries({ queryKey: ["admin-open-requests"] });
     queryClient.invalidateQueries({ queryKey: ["admin-command-center"] });
     queryClient.invalidateQueries({ queryKey: ["admin-request-activity", row.id] });
+    queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-customers"] });
   };
 
   const mutation = useMutation({
@@ -294,20 +456,63 @@ export function RequestDetail({ row }: { row: UnifiedRequest }) {
     onSettled: () => setPending(null),
   });
 
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const archiveMutation = useMutation({
+    mutationFn: async () => {
+      const { archiveRecordFn } = await import("@/lib/admin/archive.functions");
+      let subType: "booking" | "flight_request" | "custom_package_request" | "contact_message" = "booking";
+      if (row.kind === "flight") subType = "flight_request";
+      else if (row.kind === "custom_package") subType = "custom_package_request";
+      else if (row.kind === "contact") subType = "contact_message";
+
+      return await archiveRecordFn({
+        data: {
+          entityType: "request",
+          subType,
+          id: row.id,
+          reason: "أرشفة من صفحة تفاصيل الطلب",
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("تم نقل الطلب إلى الأرشيف بنجاح");
+      setIsArchiveOpen(false);
+      invalidate();
+    },
+    onError: (err: Error) => toast.error(err.message || "فشل نقل الطلب إلى الأرشيف"),
+  });
+
   const digits = (row.phone ?? "").replace(/\D/g, "");
+  const whatsappNumber = str(row, "whatsapp") || row.phone || "";
+  const whatsappDigits = whatsappNumber.replace(/\D/g, "");
+  const contactPref = str(row, "contact_preference");
 
   return (
     <div className="space-y-4">
       {/* ------------------------------------------------ who, what, when */}
-      <header className="rounded-card border border-primary/25 bg-primary/5 p-4">
+      <header className="rounded-card border border-primary/25 bg-primary/[0.04] p-4.5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-h5 font-bold leading-tight">{row.name}</p>
-            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-muted-foreground">
-              <span className="rounded-full bg-surface px-2 py-0.5 font-semibold text-foreground">
+            <div className="flex items-center gap-2">
+              <p className="text-h5 font-bold leading-tight text-foreground">{row.name}</p>
+              {contactPref && (
+                <span className="rounded-full bg-accent px-2 py-0.5 text-micro font-semibold text-primary">
+                  {contactPref === "whatsapp" ? "يفضّل واتساب" : "يفضّل الهاتف"}
+                </span>
+              )}
+            </div>
+            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-muted-foreground">
+              <span className="rounded-full bg-surface px-2.5 py-0.5 font-semibold text-foreground border border-border/50">
                 {t(`ops.requests.kinds.${row.kind}`)}
               </span>
-              {row.reference && <span dir="ltr">{row.reference}</span>}
+              {row.reference && (
+                <span
+                  dir="ltr"
+                  className="font-mono font-semibold text-foreground bg-muted/60 px-2 py-0.5 rounded"
+                >
+                  {row.reference}
+                </span>
+              )}
               <span>{shortDate(row.created_at)}</span>
             </p>
           </div>
@@ -315,34 +520,42 @@ export function RequestDetail({ row }: { row: UnifiedRequest }) {
         </div>
 
         {/* Reaching the customer is one tap, not a lookup. */}
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3.5 flex flex-wrap gap-2 pt-2 border-t border-border/40">
           {row.phone && (
-            <>
-              <Button asChild size="sm" variant="outline">
-                <a href={`tel:${row.phone}`} dir="ltr">
-                  <Phone className="me-2 h-4 w-4" aria-hidden="true" />
-                  {row.phone}
-                </a>
-              </Button>
-              {digits.length >= 6 && (
-                <Button asChild size="sm" variant="outline">
-                  <a href={`https://wa.me/${digits}`} target="_blank" rel="noreferrer">
-                    <MessageCircle className="me-2 h-4 w-4" aria-hidden="true" />
-                    {t("ops.requests.whatsapp")}
-                  </a>
-                </Button>
-              )}
-            </>
-          )}
-          {row.email && (
             <Button asChild size="sm" variant="outline">
-              <a href={`mailto:${row.email}`}>
-                <Mail className="me-2 h-4 w-4" aria-hidden="true" />
-                {t("ops.requests.email")}
+              <a href={`tel:${row.phone}`} dir="ltr">
+                <Phone className="me-2 h-4 w-4 text-primary" aria-hidden="true" />
+                {row.phone}
               </a>
             </Button>
           )}
-          <Button asChild size="sm" variant="ghost">
+          {whatsappDigits.length >= 6 && (
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="text-brand-green"
+            >
+              <a href={`https://wa.me/${whatsappDigits}`} target="_blank" rel="noreferrer">
+                <MessageCircle className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("ops.requests.whatsapp")}
+              </a>
+            </Button>
+          )}
+          {row.email && (
+            <Button asChild size="sm" variant="outline">
+              <a href={`mailto:${row.email}`} dir="ltr">
+                <Mail className="me-2 h-4 w-4" aria-hidden="true" />
+                {row.email}
+              </a>
+            </Button>
+          )}
+          <Button
+            asChild
+            size="sm"
+            variant="ghost"
+            className="ms-auto text-muted-foreground hover:text-foreground"
+          >
             <Link to="/admin/customers" search={{ customer: row.customerKey }}>
               <UserRound className="me-2 h-4 w-4" aria-hidden="true" />
               {t("ops.requests.viewCustomer")}
@@ -434,12 +647,45 @@ export function RequestDetail({ row }: { row: UnifiedRequest }) {
               {t(stageActionKey(o.action))}
             </Button>
           ))}
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => setIsArchiveOpen(true)}
+          >
+            <Archive className="me-2 h-4 w-4" aria-hidden="true" />
+            أرشفة الطلب
+          </Button>
         </div>
         <p className="mt-2.5 text-caption text-muted-foreground">
           {t("ops.stages.detailedStatus", { status: t(statusLabelKey(row.status)) })}
           {options.every((o) => !o.enabled) && ` — ${t("ops.requests.closedHint")}`}
         </p>
       </section>
+
+      {/* Confirmation Dialog for Archiving */}
+      <Dialog open={isArchiveOpen} onOpenChange={setIsArchiveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>أرشفة الطلب / الحجز</DialogTitle>
+            <DialogDescription>
+              هل تريد نقل هذا الطلب إلى الأرشيف؟ سيتم إخفاؤه من قوائم العمليات النشطة مع الحفاظ الكامل على كافة السجلات والبيانات المرتبطة، ويمكنك استرجاعه في أي وقت من قسم الأرشيف.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsArchiveOpen(false)}>
+              إلغاء
+            </Button>
+            <Button
+              variant="default"
+              disabled={archiveMutation.isPending}
+              onClick={() => archiveMutation.mutate()}
+            >
+              {archiveMutation.isPending ? "جاري الأرشفة..." : "تأكيد الأرشفة"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Audit history is unchanged and still comes from `audit_logs`. */}
       <RequestActivity requestId={row.id} kind={row.kind} />

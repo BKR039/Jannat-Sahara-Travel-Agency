@@ -114,6 +114,15 @@ function HotelOption({
   const cityLabel = t(`umrahBuilder.summary.${city}`);
   const place = [cityLabel, area || location].filter(Boolean).join(" · ");
 
+  const images = Array.isArray(hotel.images) ? (hotel.images as string[]) : [];
+  const cover = images[0];
+  const distance =
+    city === "makkah" && hotel.distance_to_haram
+      ? `${hotel.distance_to_haram} م من المسجد الحرام`
+      : city === "madinah" && hotel.distance_to_masjid_nabawi
+        ? `${hotel.distance_to_masjid_nabawi} م من المسجد النبوي`
+        : null;
+
   return (
     <label
       className={cn(
@@ -132,14 +141,34 @@ function HotelOption({
         )}
       />
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start gap-4">
+        {cover ? (
+          <img
+            src={cover}
+            alt={name}
+            loading="lazy"
+            className="h-16 w-20 shrink-0 rounded-2xl border border-border-subtle object-cover"
+          />
+        ) : null}
+
         <div className="min-w-0 flex-1">
-          <h3 className="break-words text-h4 leading-snug text-foreground">{name}</h3>
-          <p className="mt-2 flex items-start gap-1.5 text-small text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="break-words text-h4 leading-snug text-foreground">{name}</h3>
+            {hotel.stars ? (
+              <span className="inline-flex items-center text-caption font-bold text-amber-500">
+                {"★".repeat(hotel.stars)}
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-1.5 flex items-start gap-1.5 text-small text-muted-foreground">
             <MapPin className="ds-icon-lead text-primary/70" aria-hidden="true" />
             <span className="break-words">{place}</span>
           </p>
+          {distance ? (
+            <p className="mt-1 text-caption font-medium text-foreground/80">{distance}</p>
+          ) : null}
         </div>
+
         <span
           aria-hidden="true"
           className={cn(
@@ -240,12 +269,58 @@ function ConciergeCard({
   );
 }
 
+function HotelCustomInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3.5 rounded-3xl border border-primary/35 bg-card p-5 sm:p-6 shadow-sm">
+      <div className="flex items-start gap-3.5">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <Sparkles className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <label htmlFor="custom-hotel-input" className="block text-small font-bold text-foreground">
+            {t("umrahBuilder.hotels.customTitle")}
+          </label>
+          <p className="mt-1 text-caption text-muted-foreground leading-relaxed">
+            {t("umrahBuilder.hotels.customHint")}
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-1">
+        <input
+          id="custom-hotel-input"
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={t("umrahBuilder.hotels.customPlaceholder")}
+          className="h-13 w-full rounded-2xl border border-border-subtle bg-surface-sunken/40 px-4 text-body font-medium outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:shadow-sm"
+        />
+      </div>
+
+      <p className="inline-flex items-center gap-1.5 text-caption font-medium text-amber-600 dark:text-amber-400">
+        <Check className="h-3.5 w-3.5 shrink-0" />
+        {t("umrahBuilder.hotels.customDisclaimer")}
+      </p>
+    </div>
+  );
+}
+
 /* ---------------------------------------------------------------- selector */
 
 export function HotelSelector({
   city,
   selectedId,
+  customHotelName = "",
+  mode = "hotel",
   onSelect,
+  onSelectCustom,
   onFallback,
   onStaleSelection,
   nights = 0,
@@ -254,7 +329,10 @@ export function HotelSelector({
 }: {
   city: City;
   selectedId: string | null;
+  customHotelName?: string;
+  mode?: "hotel" | "custom_hotel" | "area" | "";
   onSelect: (hotel: Hotel, name: string) => void;
+  onSelectCustom: (name: string) => void;
   /** Switch the builder to the "suggest an area" fallback flow. */
   onFallback: () => void;
   /** The stored hotel is gone from the catalogue — clear it upstream. */
@@ -265,6 +343,9 @@ export function HotelSelector({
 }) {
   const { t } = useTranslation();
   const { L } = useLocalized();
+  const [subTab, setSubTab] = useState<"catalogue" | "custom">(
+    mode === "custom_hotel" || (!selectedId && customHotelName) ? "custom" : "catalogue",
+  );
   const [search, setSearch] = useState("");
   const { data: hotels, isLoading, isError } = useQuery(hotelsQuery(city));
 
@@ -305,24 +386,16 @@ export function HotelSelector({
 
   if (isError) {
     return (
-      <ConciergeCard
-        tone="error"
-        title={t("umrahBuilder.hotels.errorTitle")}
-        hint={t("umrahBuilder.hotels.errorHint")}
-        actionLabel={t("umrahBuilder.hotels.fallbackAction")}
-        onAction={onFallback}
-      />
-    );
-  }
-
-  if (rows.length === 0) {
-    return (
-      <ConciergeCard
-        title={t("umrahBuilder.hotels.noneTitle")}
-        hint={t("umrahBuilder.hotels.noneHint")}
-        actionLabel={t("umrahBuilder.hotels.fallbackAction")}
-        onAction={onFallback}
-      />
+      <div className="space-y-4">
+        <HotelCustomInput value={customHotelName} onChange={onSelectCustom} />
+        <ConciergeCard
+          tone="error"
+          title={t("umrahBuilder.hotels.errorTitle")}
+          hint={t("umrahBuilder.hotels.errorHint")}
+          actionLabel={t("umrahBuilder.hotels.fallbackAction")}
+          onAction={onFallback}
+        />
+      </div>
     );
   }
 
@@ -330,53 +403,121 @@ export function HotelSelector({
     <div className="space-y-5">
       <StayContext city={city} nights={nights} from={from} to={to} count={rows.length} />
 
-      {staleSelection && (
-        <ConciergeCard
-          tone="warning"
-          title={t("umrahBuilder.hotels.staleTitle")}
-          hint={t("umrahBuilder.hotels.staleHint")}
-        />
-      )}
-
-      <HotelSearch
-        value={search}
-        onChange={setSearch}
-        placeholder={t("umrahBuilder.hotels.searchPlaceholder")}
-      />
-
-      {visible.length === 0 ? (
-        <ConciergeCard
-          title={t("umrahBuilder.hotels.empty")}
-          hint={t("umrahBuilder.hotels.conciergeDesc")}
-          actionLabel={t("umrahBuilder.hotels.fallbackAction")}
-          onAction={onFallback}
-        />
-      ) : (
-        <div
-          className="ds-reveal grid gap-4 sm:grid-cols-2"
-          role="radiogroup"
-          aria-label={t(`umrahBuilder.${city}.title`)}
-        >
-          {visible.map(({ hotel, name }) => (
-            <HotelOption
-              key={hotel.id}
-              hotel={hotel}
-              city={city}
-              name={name}
-              groupName={`builder-hotel-${city}`}
-              selected={selectedId === hotel.id}
-              onSelect={() => onSelect(hotel, name)}
-            />
-          ))}
+      {/* Mode Switcher: Catalogue vs Custom Hotel */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex rounded-2xl border border-border-subtle bg-surface-sunken/60 p-1 text-caption font-semibold">
+          <button
+            type="button"
+            onClick={() => setSubTab("catalogue")}
+            className={cn(
+              "rounded-xl px-4 py-2 transition-all cursor-pointer",
+              subTab === "catalogue"
+                ? "bg-card text-foreground shadow-xs font-bold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {t("umrahBuilder.hotels.tabCatalogue")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSubTab("custom")}
+            className={cn(
+              "rounded-xl px-4 py-2 transition-all cursor-pointer",
+              subTab === "custom"
+                ? "bg-card text-foreground shadow-xs font-bold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {t("umrahBuilder.hotels.tabCustom")}
+          </button>
         </div>
-      )}
 
-      <ConciergeCard
-        title={t("umrahBuilder.hotels.conciergeTitle")}
-        hint={t("umrahBuilder.hotels.conciergeDesc")}
-        actionLabel={t("umrahBuilder.hotels.fallbackAction")}
-        onAction={onFallback}
-      />
+        {subTab === "custom" && customHotelName && (
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-caption font-semibold text-primary">
+            {customHotelName}
+          </span>
+        )}
+      </div>
+
+      {subTab === "custom" ? (
+        <HotelCustomInput value={customHotelName} onChange={onSelectCustom} />
+      ) : (
+        <>
+          {staleSelection && (
+            <ConciergeCard
+              tone="warning"
+              title={t("umrahBuilder.hotels.staleTitle")}
+              hint={t("umrahBuilder.hotels.staleHint")}
+            />
+          )}
+
+          <HotelSearch
+            value={search}
+            onChange={setSearch}
+            placeholder={t("umrahBuilder.hotels.searchPlaceholder")}
+          />
+
+          {visible.length === 0 ? (
+            <div className="space-y-4">
+              <div className="rounded-3xl border border-border-subtle bg-card p-6 text-start space-y-3">
+                <p className="text-small font-bold text-foreground">
+                  {t("umrahBuilder.hotels.notFoundInCatalogue")}
+                </p>
+                <p className="text-caption text-muted-foreground">
+                  {t("umrahBuilder.hotels.customHint")}
+                </p>
+                {search.trim().length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSelectCustom(search.trim());
+                      setSubTab("custom");
+                    }}
+                    className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-caption font-bold text-primary-foreground transition-all hover:brightness-105"
+                  >
+                    <Sparkles className="me-2 h-4 w-4" />
+                    {t("umrahBuilder.hotels.useAsCustomAction")}: «{search.trim()}»
+                  </button>
+                )}
+              </div>
+
+              <ConciergeCard
+                title={t("umrahBuilder.hotels.empty")}
+                hint={t("umrahBuilder.hotels.conciergeDesc")}
+                actionLabel={t("umrahBuilder.hotels.fallbackAction")}
+                onAction={onFallback}
+              />
+            </div>
+          ) : (
+            <div
+              className="ds-reveal grid gap-4 sm:grid-cols-2"
+              role="radiogroup"
+              aria-label={t(`umrahBuilder.${city}.title`)}
+            >
+              {visible.map(({ hotel, name }) => (
+                <HotelOption
+                  key={hotel.id}
+                  hotel={hotel}
+                  city={city}
+                  name={name}
+                  groupName={`builder-hotel-${city}`}
+                  selected={selectedId === hotel.id && subTab === "catalogue"}
+                  onSelect={() => {
+                    onSelect(hotel, name);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          <ConciergeCard
+            title={t("umrahBuilder.hotels.conciergeTitle")}
+            hint={t("umrahBuilder.hotels.conciergeDesc")}
+            actionLabel={t("umrahBuilder.hotels.fallbackAction")}
+            onAction={onFallback}
+          />
+        </>
+      )}
     </div>
   );
 }

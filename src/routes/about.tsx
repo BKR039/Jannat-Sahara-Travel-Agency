@@ -6,11 +6,18 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { FeaturesSection, TestimonialsSection } from "@/components/sections/HomeSections";
 import { StatsSection } from "@/components/sections/StatsSection";
-import { contentQuery } from "@/lib/queries";
+import { contentQuery, featuresQuery, statsQuery } from "@/lib/queries";
 import { pickLocalized, pickLocalizedList, useLocalized } from "@/lib/localize";
 import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(contentQuery("about")).catch(() => null),
+      context.queryClient.ensureQueryData(featuresQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(statsQuery()).catch(() => []),
+    ]);
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.about.title") },

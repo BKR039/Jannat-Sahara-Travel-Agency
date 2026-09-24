@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Plane, Sparkles } from "lucide-react";
+import { ArrowRight, Plane, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { IconBadge } from "@/components/common/IconBadge";
@@ -19,10 +19,10 @@ import { IconBadge } from "@/components/common/IconBadge";
 export function HeroEyebrow({ label }: { label: string }) {
   if (!label) return null;
   return (
-    <p className="ds-reveal inline-flex items-center gap-2 rounded-badge border border-primary/20 bg-primary/[0.07] py-1.5 pe-4 ps-3 text-small font-semibold text-primary">
-      <Sparkles className="h-4 w-4 shrink-0" aria-hidden="true" />
-      {label}
-    </p>
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/30 px-3.5 py-1 text-caption sm:text-small font-medium text-white/90 backdrop-blur-md">
+      <Shield className="h-3.5 w-3.5 shrink-0 text-secondary/90" aria-hidden="true" />
+      <span>{label}</span>
+    </div>
   );
 }
 
@@ -52,7 +52,12 @@ export function HeroBenefits({ items }: { items: HeroBenefit[] }) {
         >
           {/* Same badge as the features section below: one icon language for
               the page, rather than a circle here and a rounded square there. */}
-          <IconBadge name={b.icon} size="md" tone="surface" className="bg-surface shadow-xs shrink-0" />
+          <IconBadge
+            name={b.icon}
+            size="md"
+            tone="surface"
+            className="bg-surface shadow-xs shrink-0"
+          />
           <span className="min-w-0">
             <span className="block text-small font-bold leading-snug text-foreground">
               {b.title}
@@ -80,12 +85,16 @@ export function HeroActions({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="ds-reveal mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center">
-      <Button asChild size="lg" className="group font-bold px-6 shadow-brand-glow hover:shadow-brand-glow-lg transition-all">
+    <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-3.5 w-full sm:w-auto">
+      <Button
+        asChild
+        size="lg"
+        className="group w-full sm:w-auto transition-all duration-base hover:-translate-y-0.5"
+      >
         <Link to={primaryHref}>
           {primaryLabel}
           <ArrowRight
-            className="ms-2 h-5 w-5 shrink-0 transition-transform duration-base ease-standard group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+            className="ms-2 h-4.5 w-4.5 shrink-0 transition-transform duration-base ease-standard group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
             aria-hidden="true"
           />
         </Link>
@@ -97,11 +106,11 @@ export function HeroActions({
       <Button
         asChild
         size="lg"
-        variant="outline"
-        className="border-border-strong bg-surface/80 text-foreground hover:border-primary hover:bg-surface hover:text-primary px-6 font-semibold backdrop-blur-xs transition-all"
+        variant="glass"
+        className="w-full sm:w-auto transition-all duration-base hover:-translate-y-0.5"
       >
         <Link to="/flights">
-          <Plane className="me-2 h-5 w-5 shrink-0" aria-hidden="true" />
+          <Plane className="me-2 h-4.5 w-4.5 shrink-0" aria-hidden="true" />
           {t("nav.flights")}
         </Link>
       </Button>
@@ -150,11 +159,10 @@ export function HeroTrust({ stats }: { stats: HeroStat[] }) {
 /* ---------------------------------------------------------- media card */
 
 /**
- * Floating editorial teaser over the photograph.
+ * Discreet floating editorial teaser over the photograph.
  *
- * This is intentionally NOT a video player. The CMS holds no video URL of any
- * kind, and a play button that plays nothing is a fake control — so the card
- * points at the gallery, which is real content, and says so.
+ * Designed as a subtle, compact pill that directs to the gallery without
+ * competing with the centered primary Hero message.
  */
 export function HeroMediaCard({
   image,
@@ -171,24 +179,21 @@ export function HeroMediaCard({
     <Link
       to="/gallery"
       aria-label={`${title} — ${cta}`}
-      className="group flex items-center gap-3 rounded-card border border-border-subtle bg-surface/90 p-2.5 shadow-lg backdrop-blur-md transition-transform duration-base ease-standard hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="group inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/30 px-2.5 py-1 shadow-none backdrop-blur-md transition-all duration-base hover:bg-black/50 hover:border-white/25 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
-      <span className="relative block h-14 w-16 shrink-0 overflow-hidden rounded-input bg-surface-sunken">
-        {image && (
+      {image && (
+        <span className="relative block h-5 w-5 shrink-0 overflow-hidden rounded-full ring-1 ring-white/25">
           <img src={image} alt="" aria-hidden="true" className="h-full w-full object-cover" />
-        )}
-        <span className="absolute inset-0 grid place-items-center bg-black/25">
-          <span className="grid h-7 w-7 place-items-center rounded-full bg-surface/90 text-primary">
-            <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
-          </span>
         </span>
+      )}
+      <span className="text-[0.75rem] font-medium text-white/80 group-hover:text-white">
+        <span className="text-secondary/90 font-medium me-1">{eyebrow}</span>
+        <span>{title}</span>
       </span>
-      <span className="min-w-0 pe-2">
-        <span className="block text-caption font-semibold text-primary">{eyebrow}</span>
-        <span className="mt-0.5 block text-small font-bold leading-snug text-foreground">
-          {title}
-        </span>
-      </span>
+      <ArrowRight
+        className="h-3 w-3 text-white/50 rtl:-scale-x-100 group-hover:text-white/85 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform duration-base shrink-0"
+        aria-hidden="true"
+      />
     </Link>
   );
 }
@@ -197,5 +202,9 @@ export function HeroMediaCard({
 
 /** Content column: keeps the editorial measure honest at every width. */
 export function HeroCopy({ children }: { children: ReactNode }) {
-  return <div className="w-full max-w-xl lg:max-w-2xl xl:max-w-[42rem]">{children}</div>;
+  return (
+    <div className="w-full max-w-3xl lg:max-w-4xl mx-auto flex flex-col items-center text-center">
+      {children}
+    </div>
+  );
 }

@@ -1,16 +1,21 @@
 import {
   BUDGET_LEVELS,
   CONTACT_PREFERENCES,
+  DESTINATION_TIMINGS,
+  FLIGHT_PREFERENCES,
   MADINAH_AREAS,
   MAKKAH_AREAS,
   NIGHTS_LIMITS,
   ROOM_TYPES,
   TRAVELLER_LIMITS,
+  calculateTotalNights,
   earliestDepartureISO,
   isRealISODate,
   latestDepartureISO,
   type BudgetLevel,
   type ContactPreference,
+  type DestinationTiming,
+  type FlightPreference,
   type MadinahArea,
   type MakkahArea,
   type RoomType,
@@ -23,14 +28,18 @@ export interface BuilderState {
   departureAirport: string;
   returnAirport: string;
   airportFlexible: boolean;
+  flightPreference: FlightPreference | "";
+  transitHub: string;
+  additionalDestination: string;
+  destinationTiming: DestinationTiming | "";
   makkahNights: number;
-  makkahMode: "hotel" | "area" | "";
+  makkahMode: "hotel" | "custom_hotel" | "area" | "";
   makkahHotelId: string | null;
   makkahHotelName: string;
   makkahArea: MakkahArea | "";
   makkahPreference: BudgetLevel | "";
   madinahNights: number;
-  madinahMode: "hotel" | "area" | "";
+  madinahMode: "hotel" | "custom_hotel" | "area" | "";
   madinahHotelId: string | null;
   madinahHotelName: string;
   madinahArea: MadinahArea | "";
@@ -45,21 +54,37 @@ export interface BuilderState {
   whatsapp: string;
   email: string;
   contactPreference: ContactPreference | "";
+  packageId?: string | null;
+  packageTitle?: string;
+  arrivalAirport?: string;
+  flightRoute?: string;
+  packagePrice?: number;
+  packageNotes?: string;
 }
 
 export const INITIAL_STATE: BuilderState = {
+  packageId: null,
+  packageTitle: "",
+  arrivalAirport: "",
+  flightRoute: "",
+  packagePrice: 0,
+  packageNotes: "",
   departureDate: "",
   returnDate: "",
   departureAirport: "",
   returnAirport: "",
   airportFlexible: false,
-  makkahNights: 5,
+  flightPreference: "direct",
+  transitHub: "",
+  additionalDestination: "",
+  destinationTiming: "after_umrah",
+  makkahNights: 7,
   makkahMode: "",
   makkahHotelId: null,
   makkahHotelName: "",
   makkahArea: "",
   makkahPreference: "",
-  madinahNights: 4,
+  madinahNights: 5,
   madinahMode: "",
   madinahHotelId: null,
   madinahHotelName: "",
@@ -137,12 +162,34 @@ function sanitizeDraft(raw: unknown): BuilderState {
   const datesUsable =
     !!departureDate &&
     !!returnDate &&
-    returnDate >= departureDate &&
+    returnDate > departureDate &&
     departureDate >= earliest &&
     departureDate <= latest;
 
-  const mode = (v: unknown): "hotel" | "area" | "" => (v === "hotel" || v === "area" ? v : "");
+  const totalNights = datesUsable ? calculateTotalNights(departureDate, returnDate) : 0;
+
+  const mode = (v: unknown): "hotel" | "custom_hotel" | "area" | "" =>
+    v === "hotel" || v === "custom_hotel" || v === "area" ? v : "";
   const hotelId = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
+
+  let rawMakkah = clampCount(
+    d["makkahNights"],
+    NIGHTS_LIMITS.min,
+    NIGHTS_LIMITS.max,
+    INITIAL_STATE.makkahNights,
+  );
+  let rawMadinah = clampCount(
+    d["madinahNights"],
+    NIGHTS_LIMITS.min,
+    NIGHTS_LIMITS.max,
+    INITIAL_STATE.madinahNights,
+  );
+
+  // If total nights are known, enforce hard constraint on restored draft
+  if (totalNights > 0) {
+    rawMakkah = Math.min(totalNights, rawMakkah);
+    rawMadinah = totalNights - rawMakkah;
+  }
 
   return {
     departureDate: datesUsable ? departureDate : "",
@@ -150,23 +197,17 @@ function sanitizeDraft(raw: unknown): BuilderState {
     departureAirport: asString(d["departureAirport"], 120),
     returnAirport: asString(d["returnAirport"], 120),
     airportFlexible: d["airportFlexible"] === true,
-    makkahNights: clampCount(
-      d["makkahNights"],
-      NIGHTS_LIMITS.min,
-      NIGHTS_LIMITS.max,
-      INITIAL_STATE.makkahNights,
-    ),
+    flightPreference: pickEnum(d["flightPreference"], FLIGHT_PREFERENCES) || "direct",
+    transitHub: asString(d["transitHub"], 120),
+    additionalDestination: asString(d["additionalDestination"], 120),
+    destinationTiming: pickEnum(d["destinationTiming"], DESTINATION_TIMINGS) || "after_umrah",
+    makkahNights: rawMakkah,
     makkahMode: mode(d["makkahMode"]),
     makkahHotelId: hotelId(d["makkahHotelId"]),
     makkahHotelName: asString(d["makkahHotelName"], 200),
     makkahArea: pickEnum(d["makkahArea"], MAKKAH_AREAS),
     makkahPreference: pickEnum(d["makkahPreference"], BUDGET_LEVELS),
-    madinahNights: clampCount(
-      d["madinahNights"],
-      NIGHTS_LIMITS.min,
-      NIGHTS_LIMITS.max,
-      INITIAL_STATE.madinahNights,
-    ),
+    madinahNights: rawMadinah,
     madinahMode: mode(d["madinahMode"]),
     madinahHotelId: hotelId(d["madinahHotelId"]),
     madinahHotelName: asString(d["madinahHotelName"], 200),
@@ -266,6 +307,54 @@ export function tripDays(from: string, to: string): number {
   return diff >= 0 ? diff + 1 : 0;
 }
 
+/** Total calendar nights for a trip (0 if dates are not set). */
+export function totalTripNights(departureDate: string, returnDate: string): number;
+export function totalTripNights(
+  state: { departureDate?: string; returnDate?: string } | null | undefined,
+): number;
+export function totalTripNights(
+  arg1: string | { departureDate?: string; returnDate?: string } | null | undefined,
+  arg2?: string,
+): number {
+  if (!arg1) return 0;
+  if (typeof arg1 === "object") {
+    return calculateTotalNights(arg1.departureDate ?? "", arg1.returnDate ?? "");
+  }
+  return calculateTotalNights(arg1, arg2 ?? "");
+}
+
+/**
+ * Authoritative night allocation balancer.
+ * Ensures makkahNights + madinahNights === totalTripNights at all times.
+ */
+export function rebalanceNights(
+  totalNights: number,
+  currentMakkah: number,
+  cityChanged: "makkah" | "madinah",
+  nextValue: number,
+): { makkahNights: number; madinahNights: number } {
+  if (totalNights <= 0) {
+    const val = Math.max(0, Math.trunc(nextValue));
+    return {
+      makkahNights: cityChanged === "makkah" ? val : currentMakkah,
+      madinahNights: cityChanged === "madinah" ? val : 0,
+    };
+  }
+
+  const clamped = Math.max(0, Math.min(totalNights, Math.trunc(nextValue)));
+  if (cityChanged === "makkah") {
+    return {
+      makkahNights: clamped,
+      madinahNights: totalNights - clamped,
+    };
+  } else {
+    return {
+      makkahNights: totalNights - clamped,
+      madinahNights: clamped,
+    };
+  }
+}
+
 export function travellersTotal(state: BuilderState): number {
   return state.adults + state.children + state.infants;
 }
@@ -274,10 +363,6 @@ export function travellersTotal(state: BuilderState): number {
 export function stepValid(step: BuilderStep, state: BuilderState): boolean {
   switch (step) {
     case "dates":
-      // Mirrors the server rules in CustomPackageRequestInput so the client can
-      // never advance with a range the server will reject. `>` not `>=`: a
-      // same-day return is zero nights, which no stay can fit into — caught
-      // here rather than three steps later.
       return (
         isRealISODate(state.departureDate) &&
         isRealISODate(state.returnDate) &&
@@ -285,17 +370,26 @@ export function stepValid(step: BuilderStep, state: BuilderState): boolean {
         state.departureDate >= earliestDepartureISO() &&
         state.departureDate <= latestDepartureISO()
       );
-    case "flights":
-      return state.airportFlexible || (!!state.departureAirport && !!state.returnAirport);
+    case "flights": {
+      const airportsValid =
+        state.airportFlexible || (!!state.departureAirport && !!state.returnAirport);
+      if (!airportsValid) return false;
+      if (state.flightPreference === "stopover") {
+        return state.additionalDestination.trim().length >= 2;
+      }
+      return true;
+    }
     case "makkah":
       if (state.makkahNights === 0) return true;
       if (state.makkahMode === "hotel") return !!state.makkahHotelId;
+      if (state.makkahMode === "custom_hotel") return state.makkahHotelName.trim().length >= 2;
       if (state.makkahMode === "area")
         return !!state.makkahArea && (state.makkahArea !== "suggest" || !!state.makkahPreference);
       return false;
     case "madinah":
       if (state.madinahNights === 0) return true;
       if (state.madinahMode === "hotel") return !!state.madinahHotelId;
+      if (state.madinahMode === "custom_hotel") return state.madinahHotelName.trim().length >= 2;
       if (state.madinahMode === "area")
         return (
           !!state.madinahArea && (state.madinahArea !== "suggest" || !!state.madinahPreference)
@@ -303,8 +397,12 @@ export function stepValid(step: BuilderStep, state: BuilderState): boolean {
       return false;
     case "travellers":
       return state.adults >= 1;
-    case "room":
-      return !!state.roomType && state.makkahNights + state.madinahNights >= 1;
+    case "room": {
+      const total = calculateTotalNights(state.departureDate, state.returnDate);
+      const sum = state.makkahNights + state.madinahNights;
+      if (total > 0 && sum !== total) return false;
+      return !!state.roomType && sum >= 1;
+    }
     case "contact":
       return (
         state.name.trim().length >= 2 &&
@@ -331,18 +429,53 @@ export function buildWhatsAppMessage(
 ): string {
   const lines: string[] = [t("umrahBuilder.whatsapp.intro"), ""];
 
+  if (state.packageTitle) {
+    lines.push(`برنامج العمرة المختار: ${state.packageTitle}`);
+    if (state.flightRoute) lines.push(`المسار: ${state.flightRoute}`);
+    if (state.arrivalAirport && state.returnAirport) {
+      lines.push(`مطار الوصول: ${state.arrivalAirport} | مطار العودة: ${state.returnAirport}`);
+    }
+    if (state.packagePrice) lines.push(`السعر الرسمي: ${state.packagePrice} TND`);
+    if (state.packageNotes && state.packageNotes !== "-") lines.push(`ملاحظات: ${state.packageNotes}`);
+    lines.push("");
+  }
+
   lines.push(`${t("umrahBuilder.summary.dates")}:`);
   lines.push(`${fmt.date(state.departureDate)} → ${fmt.date(state.returnDate)}`);
+  const total = calculateTotalNights(state.departureDate, state.returnDate);
+  if (total > 0) {
+    lines.push(t("umrahBuilder.summary.nightsCount", { count: total }));
+  }
   lines.push("");
 
   lines.push(`${t("umrahBuilder.summary.flights")}:`);
   if (state.airportFlexible) lines.push(t("umrahBuilder.flights.flexible"));
   else lines.push(`${state.departureAirport} → ${state.returnAirport}`);
+
+  if (state.flightPreference) {
+    const prefKey =
+      state.flightPreference === "direct"
+        ? "directFlight"
+        : state.flightPreference === "transit"
+          ? "transitFlight"
+          : "stopoverFlight";
+    lines.push(`${t("umrahBuilder.summary.flightPreference")}: ${t(`umrahBuilder.summary.${prefKey}`)}`);
+    if (state.flightPreference === "transit" && state.transitHub) {
+      lines.push(`${t("umrahBuilder.flights.transitHubLabel")}: ${state.transitHub}`);
+    }
+    if (state.flightPreference === "stopover" && state.additionalDestination) {
+      const timing = state.destinationTiming
+        ? ` (${t(`umrahBuilder.flights.stopoverTiming.${state.destinationTiming}`)})`
+        : "";
+      lines.push(`${t("umrahBuilder.summary.additionalDestination")}: ${state.additionalDestination}${timing}`);
+    }
+  }
   lines.push("");
 
   const place = (
     city: "makkah" | "madinah",
     nights: number,
+    mode: "hotel" | "custom_hotel" | "area" | "",
     hotel: string,
     area: string,
     budget: string,
@@ -350,8 +483,13 @@ export function buildWhatsAppMessage(
     if (nights === 0) return;
     lines.push(`${t(`umrahBuilder.summary.${city}`)}:`);
     lines.push(t("umrahBuilder.summary.nightsCount", { count: nights }));
-    if (hotel) lines.push(`${t("umrahBuilder.summary.hotel")}: ${hotel}`);
-    else if (area) lines.push(`${t("umrahBuilder.summary.area")}: ${fmt.area(city, area)}`);
+    if (mode === "custom_hotel" && hotel) {
+      lines.push(`${t("umrahBuilder.summary.customHotel")}: ${hotel}`);
+    } else if (hotel) {
+      lines.push(`${t("umrahBuilder.summary.hotel")}: ${hotel}`);
+    } else if (area) {
+      lines.push(`${t("umrahBuilder.summary.area")}: ${fmt.area(city, area)}`);
+    }
     if (budget) lines.push(`${t("umrahBuilder.summary.budget")}: ${fmt.budget(budget)}`);
     lines.push("");
   };
@@ -359,6 +497,7 @@ export function buildWhatsAppMessage(
   place(
     "makkah",
     state.makkahNights,
+    state.makkahMode,
     state.makkahHotelName,
     state.makkahArea,
     state.makkahPreference,
@@ -366,6 +505,7 @@ export function buildWhatsAppMessage(
   place(
     "madinah",
     state.madinahNights,
+    state.madinahMode,
     state.madinahHotelName,
     state.madinahArea,
     state.madinahPreference,

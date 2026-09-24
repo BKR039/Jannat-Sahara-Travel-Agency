@@ -8,6 +8,8 @@ import {
   testimonialsQuery,
   galleryQuery,
   articlesQuery,
+  faqsQuery,
+  contentQuery,
 } from "@/lib/queries";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Section } from "@/components/common/Section";
@@ -16,7 +18,23 @@ import { ImageLightbox } from "@/components/common/ImageLightbox";
 import { LazyImage } from "@/components/common/LazyImage";
 import { ArticleDialog } from "@/components/common/ArticleDialog";
 import { Link } from "@tanstack/react-router";
-import { Star, ArrowRight, Sparkles, LayoutGrid, Camera, Newspaper, Phone } from "lucide-react";
+import {
+  Star,
+  ArrowRight,
+  Sparkles,
+  LayoutGrid,
+  Camera,
+  Newspaper,
+  Phone,
+  HelpCircle,
+  Compass,
+} from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { serviceHref } from "@/lib/admin/content-rows";
 import { cn } from "@/lib/utils";
 
@@ -188,7 +206,7 @@ function TestimonialsSectionBase() {
 function GalleryPreviewSectionBase() {
   const { t } = useTranslation();
   const { L } = useLocalized();
-  const { data } = useQuery(galleryQuery());
+  const { data } = useQuery(galleryQuery(undefined, 8));
   const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
 
   // Rows with no usable image are dropped rather than rendered as empty boxes.
@@ -327,6 +345,15 @@ function LatestArticlesSectionBase() {
  */
 function CtaSectionBase() {
   const { t } = useTranslation();
+  const { L } = useLocalized();
+  const { data: cta } = useQuery(contentQuery("cta"));
+
+  const title = (cta ? L(cta, "title", "empty") : "") || t("home.finalCtaTitle");
+  const desc = (cta ? (L(cta, "subtitle", "empty") || L(cta, "body", "empty")) : "") || t("home.finalCtaDesc");
+  const ctaLabel = (cta ? L(cta, "cta_label", "empty") : "") || t("contact.title");
+  const ctaHref = cta?.cta_href || "/contact";
+  const isExternal = ctaHref.startsWith("http://") || ctaHref.startsWith("https://");
+
   return (
     <Section
       space="sm"
@@ -337,15 +364,102 @@ function CtaSectionBase() {
         className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_50%_15%,rgba(255,255,255,0.18),transparent)]"
       />
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
-        <h2 className="text-h2 font-extrabold text-balance">{t("home.finalCtaTitle")}</h2>
-        <p className="text-body-lg leading-relaxed opacity-95">{t("home.finalCtaDesc")}</p>
+        <h2 className="text-h2 font-extrabold text-balance">{title}</h2>
+        {desc && <p className="text-body-lg leading-relaxed opacity-95">{desc}</p>}
+        {isExternal ? (
+          <a
+            href={ctaHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-12 items-center gap-2 rounded-button bg-surface px-8 text-small font-bold text-primary transition-[transform,box-shadow] duration-base ease-standard hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-dark motion-reduce:transform-none"
+          >
+            <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {ctaLabel}
+          </a>
+        ) : (
+          <Link
+            to={ctaHref}
+            className="inline-flex h-12 items-center gap-2 rounded-button bg-surface px-8 text-small font-bold text-primary transition-[transform,box-shadow] duration-base ease-standard hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-dark motion-reduce:transform-none"
+          >
+            <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {ctaLabel}
+          </Link>
+        )}
+      </div>
+    </Section>
+  );
+}
+
+function AboutHomeSectionBase() {
+  const { t } = useTranslation();
+  const { L } = useLocalized();
+  const { data } = useQuery(contentQuery("about"));
+  if (!data?.title && !data?.body) return null;
+
+  return (
+    <Section tone="sunken">
+      <SectionHeading
+        eyebrow={L(data, "subtitle", "empty") || t("nav.about")}
+        icon={Compass}
+        title={L(data, "title", "base") || t("nav.about")}
+        description={L(data, "body", "empty")}
+      />
+      <div className="mt-6 text-center">
         <Link
-          to="/contact"
-          className="inline-flex h-12 items-center gap-2 rounded-button bg-surface px-8 text-small font-bold text-primary transition-[transform,box-shadow] duration-base ease-standard hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-dark motion-reduce:transform-none"
+          to="/about"
+          className="inline-flex items-center gap-1.5 text-small font-semibold text-primary hover:underline"
         >
-          <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
-          {t("contact.title")}
+          {t("actions.learnMore")}
+          <ArrowRight className="h-4 w-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
         </Link>
+      </div>
+    </Section>
+  );
+}
+
+function FaqHomeSectionBase() {
+  const { t } = useTranslation();
+  const { L } = useLocalized();
+  const { data } = useQuery(faqsQuery());
+  if (!data?.length) return null;
+
+  const topFaqs = data.slice(0, 4);
+
+  return (
+    <Section>
+      <SectionHeading
+        eyebrow={t("nav.faq")}
+        icon={HelpCircle}
+        title={t("nav.faq")}
+        description={t("brand.tagline")}
+      />
+      <div className="mx-auto max-w-3xl">
+        <Accordion type="single" collapsible className="space-y-3">
+          {topFaqs.map((f, i) => (
+            <AccordionItem
+              key={f.id}
+              value={f.id}
+              className="rounded-lg border border-border-subtle bg-surface px-5 shadow-sm ds-reveal"
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              <AccordionTrigger className="text-start text-body font-semibold">
+                {L(f, "question")}
+              </AccordionTrigger>
+              <AccordionContent className="text-small leading-relaxed text-muted-foreground">
+                {L(f, "answer")}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+        <div className="mt-8 text-center">
+          <Link
+            to="/faq"
+            className="inline-flex items-center gap-1.5 text-small font-semibold text-primary hover:underline"
+          >
+            {t("actions.viewAll")}
+            <ArrowRight className="h-4 w-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
+          </Link>
+        </div>
       </div>
     </Section>
   );
@@ -357,3 +471,5 @@ export const TestimonialsSection = memo(TestimonialsSectionBase);
 export const GalleryPreviewSection = memo(GalleryPreviewSectionBase);
 export const LatestArticlesSection = memo(LatestArticlesSectionBase);
 export const CtaSection = memo(CtaSectionBase);
+export const AboutHomeSection = memo(AboutHomeSectionBase);
+export const FaqHomeSection = memo(FaqHomeSectionBase);

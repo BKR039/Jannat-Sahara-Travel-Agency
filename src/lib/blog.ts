@@ -44,10 +44,15 @@ export function articleText(
 }
 
 /** Rough reading time in minutes (~200 words/min, works for Arabic too). */
-export function readingMinutes(article: Pick<Article, "content" | "excerpt">): number {
-  const text = `${article.excerpt ?? ""} ${article.content ?? ""}`.trim();
-  if (!text) return 1;
+export function readingMinutes(article?: Partial<Pick<Article, "content" | "excerpt">> | null): number {
+  if (!article) return 3;
+  const text = `${article.content ?? article.excerpt ?? ""}`.trim();
+  if (!text) return 3;
   const words = text.split(/\s+/).length;
+  // If content was omitted in a list query, estimate reading time from excerpt or default to 4 min
+  if (!article.content && article.excerpt) {
+    return Math.max(3, Math.min(15, Math.round(words / 15)));
+  }
   return Math.max(1, Math.round(words / 200));
 }
 

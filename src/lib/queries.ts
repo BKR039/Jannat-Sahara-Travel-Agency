@@ -17,21 +17,29 @@ export type Article = Database["public"]["Tables"]["articles"]["Row"];
 export type Faq = Database["public"]["Tables"]["faqs"]["Row"];
 export type SiteStat = Database["public"]["Tables"]["site_stats"]["Row"];
 export type SiteContent = Database["public"]["Tables"]["site_content"]["Row"];
+export type SiteSection = Database["public"]["Tables"]["site_sections"]["Row"];
 export type ContactInfo = Database["public"]["Tables"]["contact_info"]["Row"];
 export type Branch = Database["public"]["Tables"]["branches"]["Row"];
 export type PackageCategory = Database["public"]["Enums"]["package_category"];
 
-async function unwrap<T>(p: PromiseLike<{ data: T | null; error: unknown }>): Promise<T> {
+async function unwrap<T>(p: PromiseLike<{ data: unknown; error: unknown }>): Promise<T> {
   const { data, error } = await p;
   if (error) throw error;
-  return data ?? ([] as unknown as T);
+  return (data ?? []) as unknown as T;
 }
 
 export const packagesQuery = (category?: PackageCategory, featuredOnly = false) =>
   queryOptions({
     queryKey: ["packages", category ?? "all", featuredOnly] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      let q = supabase.from("packages").select("*").eq("status", "published").order("sort_order");
+      let q = supabase
+        .from("packages")
+        .select(
+          "id, title, title_fr, title_en, slug, category, cover, short_description, short_description_fr, short_description_en, destination, destination_fr, destination_en, duration, duration_fr, duration_en, price, discount, discount_price, currency, seats, featured, hotel, hotel_rating, airline, departure_date, return_date, status, sort_order",
+        )
+        .eq("status", "published")
+        .order("sort_order");
       if (category) q = q.eq("category", category);
       if (featuredOnly) q = q.eq("featured", true);
       return unwrap<Package[]>(q);
@@ -41,6 +49,7 @@ export const packagesQuery = (category?: PackageCategory, featuredOnly = false) 
 export const packageBySlugQuery = (slug: string) =>
   queryOptions({
     queryKey: ["package", slug] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("packages")
@@ -55,12 +64,14 @@ export const packageBySlugQuery = (slug: string) =>
 export const statsQuery = () =>
   queryOptions({
     queryKey: ["site_stats"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: () => unwrap<SiteStat[]>(supabase.from("site_stats").select("*").order("sort_order")),
   });
 
 export const servicesQuery = () =>
   queryOptions({
     queryKey: ["services"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: () =>
       unwrap<Service[]>(
         supabase.from("services").select("*").eq("active", true).order("sort_order"),
@@ -70,6 +81,7 @@ export const servicesQuery = () =>
 export const featuresQuery = () =>
   queryOptions({
     queryKey: ["features"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: () =>
       unwrap<Feature[]>(
         supabase.from("features").select("*").eq("active", true).order("sort_order"),
@@ -79,18 +91,25 @@ export const featuresQuery = () =>
 export const testimonialsQuery = () =>
   queryOptions({
     queryKey: ["testimonials"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: () =>
       unwrap<Testimonial[]>(
         supabase.from("testimonials").select("*").eq("active", true).order("sort_order"),
       ),
   });
 
-export const galleryQuery = (category?: string) =>
+export const galleryQuery = (category?: string, limit?: number) =>
   queryOptions({
-    queryKey: ["gallery", category ?? "all"] as const,
+    queryKey: ["gallery", category ?? "all", limit ?? "all"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      let q = supabase.from("gallery_items").select("*").eq("active", true).order("sort_order");
+      let q = supabase
+        .from("gallery_items")
+        .select("id, image, title, title_fr, title_en, category, sort_order, active")
+        .eq("active", true)
+        .order("sort_order");
       if (category) q = q.eq("category", category);
+      if (limit) q = q.limit(limit);
       return unwrap<GalleryItem[]>(q);
     },
   });
@@ -98,10 +117,13 @@ export const galleryQuery = (category?: string) =>
 export const articlesQuery = (limit?: number) =>
   queryOptions({
     queryKey: ["articles", limit ?? "all"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       let q = supabase
         .from("articles")
-        .select("*")
+        .select(
+          "id, slug, title, title_fr, title_en, excerpt, excerpt_fr, excerpt_en, cover, tags, tags_fr, tags_en, author, author_fr, author_en, published_at, published, updated_at",
+        )
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (limit) q = q.limit(limit);
@@ -112,11 +134,13 @@ export const articlesQuery = (limit?: number) =>
 export const articleBySlugQuery = (slug: string) =>
   queryOptions({
     queryKey: ["article", slug] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
         .select("*")
         .eq("slug", slug)
+        .eq("published", true)
         .maybeSingle();
       if (error) throw error;
       return data as Article | null;
@@ -126,6 +150,7 @@ export const articleBySlugQuery = (slug: string) =>
 export const faqsQuery = () =>
   queryOptions({
     queryKey: ["faqs"] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: () =>
       unwrap<Faq[]>(supabase.from("faqs").select("*").eq("active", true).order("sort_order")),
   });
@@ -133,6 +158,7 @@ export const faqsQuery = () =>
 export const contentQuery = (key: string) =>
   queryOptions({
     queryKey: ["content", key] as const,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("site_content")
@@ -147,6 +173,7 @@ export const contentQuery = (key: string) =>
 export const contactInfoQuery = () =>
   queryOptions({
     queryKey: ["contact_info"] as const,
+    staleTime: 10 * 60 * 1000,
     queryFn: () =>
       unwrap<ContactInfo[]>(supabase.from("contact_info").select("*").order("sort_order")),
   });
@@ -154,6 +181,7 @@ export const contactInfoQuery = () =>
 export const branchesQuery = () =>
   queryOptions({
     queryKey: ["branches"] as const,
+    staleTime: 10 * 60 * 1000,
     queryFn: () =>
       unwrap<Branch[]>(
         supabase
@@ -251,12 +279,54 @@ export type { PublicSiteSettings };
 
 export type Hotel = Database["public"]["Tables"]["hotels"]["Row"];
 
-/** Hotel catalogue for the custom Umrah package builder (agency-managed). */
-export const hotelsQuery = (city: "makkah" | "madinah") =>
+export const hotelsQuery = (city: "makkah" | "madinah" | string) =>
   queryOptions({
     queryKey: ["hotels", city] as const,
-    queryFn: () =>
-      unwrap<Hotel[]>(
-        supabase.from("hotels").select("*").eq("city", city).eq("active", true).order("sort_order"),
-      ),
+    staleTime: 10 * 60 * 1000,
+    queryFn: () => {
+      const canonicalCity =
+        city.toLowerCase() === "makkah"
+          ? "Makkah"
+          : city.toLowerCase() === "madinah"
+            ? "Madinah"
+            : city;
+      return unwrap<Hotel[]>(
+        supabase
+          .from("hotels")
+          .select("id, name, name_fr, name_en, city, sort_order, active")
+          .ilike("city", canonicalCity)
+          .eq("active", true)
+          .order("sort_order"),
+      );
+    },
   });
+
+/* -------------------------------------------------------- site sections */
+
+export const siteSectionsQuery = (page = "home") =>
+  queryOptions({
+    queryKey: ["site_sections", page] as const,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_sections")
+        .select("*")
+        .eq("page", page)
+        .order("sort_order");
+      if (error) {
+        console.error("[site_sections] query failed", error.message);
+        return [];
+      }
+      return data ?? [];
+    },
+  });
+
+export function isSectionVisible(
+  sections: SiteSection[] | undefined,
+  key: string,
+  fallback = true,
+): boolean {
+  if (!sections || sections.length === 0) return fallback;
+  const match = sections.find((s) => s.section_key === key);
+  return match ? match.enabled : fallback;
+}

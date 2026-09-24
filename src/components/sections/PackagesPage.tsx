@@ -6,7 +6,8 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { PackageCard } from "@/components/common/PackageCard";
 import { ProgrammeCard } from "@/components/common/ProgrammeCard";
-import { SkeletonGrid, EmptyState } from "@/components/common/SkeletonGrid";
+import { SkeletonGrid } from "@/components/common/SkeletonGrid";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Section } from "@/components/common/Section";
 import { contentQuery, packagesQuery, type PackageCategory } from "@/lib/queries";
 
@@ -73,7 +74,7 @@ export function PackagesPage({
         {isLoading ? (
           <SkeletonGrid count={8} />
         ) : !data?.length ? (
-          <EmptyState label={t("common.empty")} />
+          <EmptyState title={t("common.empty")} density="comfortable" />
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {data.map((p, i) => (

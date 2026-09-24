@@ -13,6 +13,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,8 @@ import { cn } from "@/lib/utils";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { uploadMedia } from "@/lib/admin/media";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { useTrackDirty } from "./SettingsDirtyContext";
 
 /* ----------------------------- section scaffold ---------------------------- */
 
@@ -142,6 +146,53 @@ export function TextField({
   type?: string;
   maxCount?: number;
 }) {
+  /*
+   * `type` names the kind of value, not the HTML element.
+   *
+   * Passing it straight to <Input> is what put the browser's own date control
+   * and number spinner into the admin forms. Each kind is routed to the one
+   * component the system owns for it, so a field becomes canonical by saying
+   * what it holds rather than by every call site remembering to import the
+   * right control.
+   */
+  if (type === "number") {
+    return (
+      <Field label={label} hint={hint} error={error} wide={wide}>
+        {(id) => (
+          <NumberInput
+            id={id}
+            value={value === "" ? null : Number(value)}
+            onChange={(v) => onChange(v === null ? "" : String(v))}
+            placeholder={placeholder}
+            invalid={!!error}
+            allowDecimal
+            allowEmpty
+            /* Typed, not nudged: these hold prices and seat counts that are
+               entered outright, and a pair of arrows beside every one of them
+               is noise. Counters opt back in where stepping is the point. */
+            showSteppers={false}
+            min={0}
+            max={9_999_999}
+          />
+        )}
+      </Field>
+    );
+  }
+
+  if (type === "date") {
+    return (
+      <DateField
+        label={label}
+        hint={hint}
+        error={error}
+        wide={wide}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+      />
+    );
+  }
+
   return (
     <Field label={label} hint={hint} error={error} wide={wide}>
       {(id) => (
@@ -164,6 +215,38 @@ export function TextField({
             </p>
           )}
         </>
+      )}
+    </Field>
+  );
+}
+
+export function DateField({
+  label,
+  hint,
+  error,
+  wide,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: ReactNode;
+  hint?: string;
+  error?: string | null;
+  wide?: boolean;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <Field label={label} hint={hint} error={error} wide={wide}>
+      {(id) => (
+        <DatePicker
+          id={id}
+          value={value}
+          onChange={(d) => onChange(d || "")}
+          placeholder={placeholder}
+          invalid={Boolean(error)}
+        />
       )}
     </Field>
   );
@@ -348,7 +431,7 @@ export function IconPicker({ value, onChange }: { value: string; onChange: (v: s
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="outline" className="w-full justify-start gap-2 font-normal">
+        <Button type="button" variant="outline" className="w-full justify-start">
           <DynamicIcon name={value} className="h-4 w-4 text-primary" />
           <span className="truncate text-muted-foreground">{value || "Choose icon"}</span>
         </Button>
@@ -422,6 +505,7 @@ export function SaveBar({
   onDiscard: () => void;
 }) {
   const { t } = useTranslation("admin");
+  useTrackDirty(dirty, lastSaved);
   return (
     <StatusPill
       dirty={dirty}
@@ -503,8 +587,8 @@ function StatusPill({
       {(dirty || hasErrors) && !saving && (
         <Button
           variant="ghost"
-          size="sm"
-          className="h-9 px-2.5 text-muted-foreground"
+          size="icon-sm"
+          className="text-muted-foreground"
           onClick={onDiscard}
           aria-label={t("content.settings.saveBar.discardChanges")}
         >
@@ -513,7 +597,6 @@ function StatusPill({
       )}
       <Button
         size="sm"
-        className="h-9 px-4"
         disabled={!dirty || saving || hasErrors}
         onClick={onSave}
       >
@@ -602,18 +685,25 @@ export function SwitchField({
   onChange: (v: boolean) => void;
   disabled?: boolean;
 }) {
+  const id = useId();
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-sunken/40 px-4 py-3.5 transition-colors hover:bg-accent/40">
-      <span className="min-w-0">
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-sunken/40 px-4 py-3.5 transition-colors hover:bg-accent/30">
+      <label htmlFor={id} className="min-w-0 flex-1 cursor-pointer">
         <span className="block text-small font-medium text-foreground">{label}</span>
         {hint && (
           <span className="mt-0.5 block text-caption leading-relaxed text-muted-foreground">
             {hint}
           </span>
         )}
-      </span>
-      <Switch checked={checked} onCheckedChange={onChange} disabled={disabled} />
-    </label>
+      </label>
+      <Switch
+        id={id}
+        checked={Boolean(checked)}
+        onCheckedChange={(next) => !disabled && onChange(Boolean(next))}
+        disabled={disabled}
+        aria-label={label}
+      />
+    </div>
   );
 }
 
@@ -746,7 +836,6 @@ export function BrandPreview({
 /* ------------------------------ bilingual fields ----------------------------- */
 
 import { MissingFrBadge, isEmptyFr } from "@/components/admin/ui";
-import { useTranslation } from "react-i18next";
 
 /** Two-column Arabic/French pair for a single-line text field. */
 export function BilingualTextField({

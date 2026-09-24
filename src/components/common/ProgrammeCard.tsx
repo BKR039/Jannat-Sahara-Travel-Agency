@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarRange, Clock, MapPin } from "lucide-react";
+import { ArrowRight, CalendarRange, Clock, MapPin, Plane, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Package } from "@/lib/queries";
 import { LazyImage } from "@/components/common/LazyImage";
@@ -99,6 +99,20 @@ function ProgrammeCardBase({
             <Clock className="h-4 w-4 shrink-0 text-primary/80" aria-hidden="true" />
             {duration}
           </p>
+        )}
+
+        {pkg.flight_route && (
+          <p className="inline-flex items-center gap-1.5 text-caption font-medium text-foreground/80">
+            <Plane className="h-3.5 w-3.5 shrink-0 text-primary/80" aria-hidden="true" />
+            <span>{pkg.flight_route}</span>
+          </p>
+        )}
+
+        {pkg.notes && pkg.notes !== "-" && (
+          <span className="inline-flex w-fit items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+            <Sparkles className="h-3 w-3 shrink-0" aria-hidden="true" />
+            {pkg.notes}
+          </span>
         )}
 
         {/*

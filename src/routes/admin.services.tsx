@@ -2,7 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { LayoutGrid, Pencil, Plus, Power, Trash2 } from "lucide-react";
+import {
+  LayoutGrid,
+  Pencil,
+  Plus,
+  Trash2,
+  Upload,
+  ExternalLink,
+  Image as ImageIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,6 +22,7 @@ import {
   Panel,
   SearchInput,
   SkeletonRows,
+  StatusSwitch,
   useDebounced,
 } from "@/components/admin/kit";
 import { LocalizedField } from "@/components/admin/LocalizedField";
@@ -21,7 +30,7 @@ import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { NumberInput } from "@/components/ui/number-input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,7 +68,16 @@ export const Route = createFileRoute("/admin/services")({
 type Row = Database["public"]["Tables"]["services"]["Row"];
 
 /** Icons already used by the seeded service cards — a starting point, not a limit. */
-const ICON_SUGGESTIONS = ["moon", "palm-tree", "plane", "stamp", "map-pin", "compass"];
+const ICON_SUGGESTIONS = [
+  "moon",
+  "palm-tree",
+  "plane",
+  "stamp",
+  "map-pin",
+  "compass",
+  "tickets-plane",
+  "sparkles",
+];
 
 function ServicesPage() {
   const { t } = useTranslation("admin");
@@ -69,6 +87,8 @@ function ServicesPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [draft, setDraft] = useState<ServiceDraft | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Row | null>(null);
+  const [pendingServiceId, setPendingServiceId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const debounced = useDebounced(search);
 
   const q = useQuery({
@@ -105,7 +125,6 @@ function ServicesPage() {
       if (d.id) {
         const current = rows.find((r) => r.id === d.id);
         const patch = changedColumns(current, columns);
-        // Nothing to write is a successful no-op, not an empty UPDATE.
         if (Object.keys(patch).length === 0) return;
         const { error } = await supabase
           .from("services")
@@ -137,6 +156,7 @@ function ServicesPage() {
       invalidate();
     },
     onError: (e) => toast.error(failed(e)),
+    onSettled: () => setPendingServiceId(null),
   });
 
   const deleteMutation = useMutation({
@@ -161,8 +181,7 @@ function ServicesPage() {
       if (statusFilter === "active" && !r.active) return false;
       if (statusFilter === "inactive" && r.active) return false;
       if (!needle) return true;
-      // Search covers all three languages so an English editor can find a row.
-      return [r.title, r.title_fr, r.title_en, r.slug]
+      return [r.title, r.title_fr, r.title_en, r.slug, r.description]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(needle));
     });
@@ -191,11 +210,16 @@ function ServicesPage() {
   async function uploadCover(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !draft) return;
+    setIsUploading(true);
     try {
       const url = await uploadMedia(file, "services");
       setDraft((d) => (d ? { ...d, cover: url } : d));
+      toast.success(t("content.common.saved"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("content.services.toasts.uploadFailed"));
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
     }
   }
 
@@ -241,7 +265,6 @@ function ServicesPage() {
             <SkeletonRows rows={4} />
           </div>
         ) : q.isError ? (
-          // A failed query must never look like an empty table.
           <ErrorState onRetry={() => q.refetch()} />
         ) : filtered.length === 0 ? (
           <div className="p-4">
@@ -271,69 +294,75 @@ function ServicesPage() {
         ) : (
           <ul className="divide-y divide-border-subtle">
             {filtered.map((row) => (
-              <li key={row.id} className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <DynamicIcon name={row.icon} className="h-4 w-4" />
-                </span>
+              <li
+                key={row.id}
+                className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                    <DynamicIcon name={row.icon} className="h-5 w-5" />
+                  </span>
 
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-small font-medium">{row.title}</p>
-                  <p className="truncate text-caption text-muted-foreground" dir="ltr">
-                    /{row.slug}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-foreground truncate">{row.title}</p>
+                      <span
+                        className="text-caption font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-surface-sunken/60"
+                        dir="ltr"
+                      >
+                        /{row.slug}
+                      </span>
+                    </div>
+                    {row.description && (
+                      <p className="mt-0.5 text-caption text-muted-foreground line-clamp-1">
+                        {row.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <TranslationChips row={row} />
+                <div className="flex items-center justify-between gap-3 sm:justify-end">
+                  <TranslationChips row={row} />
 
-                <span className="hidden text-caption tabular-nums text-muted-foreground sm:inline">
-                  {t("content.services.fields.sortOrder")} {row.sort_order ?? 0}
-                </span>
+                  <span className="text-caption tabular-nums text-muted-foreground font-medium px-2 py-0.5 rounded border border-border-subtle bg-surface-sunken/30">
+                    #{row.sort_order ?? 0}
+                  </span>
 
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-0.5 text-caption font-semibold",
-                    row.active
-                      ? "bg-primary/10 text-primary"
-                      : "bg-surface-sunken text-muted-foreground",
-                  )}
-                >
-                  {t(
-                    row.active
-                      ? "content.services.filters.active"
-                      : "content.services.filters.inactive",
-                  )}
-                </span>
-
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t("ops.common.edit")}
-                    onClick={() => edit(row)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t(
-                      row.active
-                        ? "content.services.actions.deactivate"
-                        : "content.services.actions.activate",
-                    )}
-                    disabled={activeMutation.isPending}
-                    onClick={() => activeMutation.mutate({ id: row.id, active: !row.active })}
-                  >
-                    <Power className={cn("h-4 w-4", row.active && "text-primary")} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t("ops.common.delete")}
-                    onClick={() => setConfirmDelete(row)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <StatusSwitch
+                      checked={Boolean(row.active)}
+                      disabled={activeMutation.isPending && pendingServiceId === row.id}
+                      isPending={activeMutation.isPending && pendingServiceId === row.id}
+                      onCheckedChange={(active) => {
+                        setPendingServiceId(row.id);
+                        activeMutation.mutate({ id: row.id, active });
+                      }}
+                      activeLabel={t("content.services.filters.active")}
+                      inactiveLabel={t("content.services.filters.inactive")}
+                      ariaLabel={t(
+                        row.active
+                          ? "content.services.actions.deactivate"
+                          : "content.services.actions.activate",
+                      )}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t("ops.common.edit")}
+                      onClick={() => edit(row)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive"
+                      title={t("ops.common.delete")}
+                      onClick={() => setConfirmDelete(row)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}
@@ -347,170 +376,222 @@ function ServicesPage() {
         onClose={() => setDraft(null)}
         title={draft?.id ? t("content.services.editTitle") : t("content.services.newTitle")}
         description={t("content.services.formHint")}
+        footer={
+          draft ? (
+            <div className="flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setDraft(null)}>
+                {t("ops.common.cancel")}
+              </Button>
+              <Button
+                type="button"
+                disabled={!canSave || saveMutation.isPending}
+                onClick={() => {
+                  if (canSave && !saveMutation.isPending) {
+                    saveMutation.mutate(draft);
+                  }
+                }}
+              >
+                {saveMutation.isPending ? t("content.common.saving") : t("ops.common.save")}
+              </Button>
+            </div>
+          ) : undefined
+        }
       >
         {draft && (
-          <form
-            className="space-y-5"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!canSave || saveMutation.isPending) return;
-              saveMutation.mutate(draft);
-            }}
-          >
-            <LocalizedField
-              label={t("content.services.fields.title")}
-              values={{ base: draft.title, fr: draft.title_fr, en: draft.title_en }}
-              onChange={(v) =>
-                setDraft({ ...draft, title: v.base, title_fr: v.fr, title_en: v.en })
-              }
-            />
-            {errors.title && (
-              <p className="text-caption text-destructive">
-                {t("content.services.errors.titleRequired")}
-              </p>
-            )}
-
-            <LocalizedField
-              label={t("content.services.fields.description")}
-              rows={3}
-              values={{
-                base: draft.description,
-                fr: draft.description_fr,
-                en: draft.description_en,
-              }}
-              onChange={(v) =>
-                setDraft({
-                  ...draft,
-                  description: v.base,
-                  description_fr: v.fr,
-                  description_en: v.en,
-                })
-              }
-            />
-
-            <div className="space-y-1.5">
-              <Label htmlFor="service-slug">{t("content.services.fields.slug")} *</Label>
-              <Input
-                id="service-slug"
-                dir="ltr"
-                list="service-slug-options"
-                value={draft.slug}
-                onChange={(e) => setDraft({ ...draft, slug: e.target.value })}
-                onBlur={() => setDraft({ ...draft, slug: normalizeSlug(draft.slug) })}
-                placeholder={SERVICE_TARGETS[0]}
+          <div className="space-y-6">
+            {/* SECTION 1 — CONTENT */}
+            <div className="space-y-3">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                {t("content.services.fields.title")}
+              </h3>
+              <LocalizedField
+                label={t("content.services.fields.title")}
+                values={{ base: draft.title, fr: draft.title_fr, en: draft.title_en }}
+                onChange={(v) =>
+                  setDraft({ ...draft, title: v.base, title_fr: v.fr, title_en: v.en })
+                }
               />
-              <datalist id="service-slug-options">
-                {SERVICE_TARGETS.map((s) => (
-                  <option key={s} value={s} />
-                ))}
-              </datalist>
-              {errors.slug ? (
+              {errors.title && (
                 <p className="text-caption text-destructive">
-                  {t(`content.services.errors.${errors.slug}`)}
-                </p>
-              ) : draft.slug && !isKnownServiceTarget(normalizeSlug(draft.slug)) ? (
-                <p className="text-caption text-warning">
-                  {t("content.services.fields.slugUnknown")}
-                </p>
-              ) : (
-                <p className="text-caption text-muted-foreground">
-                  {t("content.services.fields.slugHint")}
+                  {t("content.services.errors.titleRequired")}
                 </p>
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="service-icon">{t("content.services.fields.icon")}</Label>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-sunken/50 text-primary">
-                  <DynamicIcon name={draft.icon} className="h-5 w-5" />
-                </span>
-                <Input
-                  id="service-icon"
-                  dir="ltr"
-                  value={draft.icon}
-                  onChange={(e) => setDraft({ ...draft, icon: e.target.value })}
-                  placeholder={ICON_SUGGESTIONS[0]}
-                />
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {ICON_SUGGESTIONS.map((name) => (
-                  <button
-                    key={name}
-                    type="button"
-                    title={name}
-                    onClick={() => setDraft({ ...draft, icon: name })}
-                    className={cn(
-                      "inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors",
-                      draft.icon === name
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border-subtle text-muted-foreground hover:bg-accent",
-                    )}
-                  >
-                    <DynamicIcon name={name} className="h-4 w-4" />
-                  </button>
-                ))}
-              </div>
-              <p className="text-caption text-muted-foreground">
-                {t("content.services.fields.iconHint")}
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="service-cover">{t("content.services.fields.cover")}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="service-cover"
-                  dir="ltr"
-                  value={draft.cover}
-                  onChange={(e) => setDraft({ ...draft, cover: e.target.value })}
-                />
-                <label className="inline-flex cursor-pointer items-center rounded-md border border-input px-3 text-small hover:bg-accent">
-                  {t("content.services.actions.upload")}
-                  <input type="file" accept="image/*" className="sr-only" onChange={uploadCover} />
-                </label>
-              </div>
-              <p className="text-caption text-muted-foreground">
-                {t("content.services.fields.coverHint")}
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="service-order">{t("content.services.fields.sortOrder")}</Label>
-              <Input
-                id="service-order"
-                type="number"
-                dir="ltr"
-                value={draft.sort_order}
-                onChange={(e) => setDraft({ ...draft, sort_order: Number(e.target.value) || 0 })}
+            {/* SECTION 2 — DESCRIPTION */}
+            <div className="space-y-3">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                {t("content.services.fields.description")}
+              </h3>
+              <LocalizedField
+                label={t("content.services.fields.description")}
+                rows={3}
+                values={{
+                  base: draft.description,
+                  fr: draft.description_fr,
+                  en: draft.description_en,
+                }}
+                onChange={(v) =>
+                  setDraft({
+                    ...draft,
+                    description: v.base,
+                    description_fr: v.fr,
+                    description_en: v.en,
+                  })
+                }
               />
-              <p className="text-caption text-muted-foreground">
-                {t("content.services.fields.sortOrderHint")}
-              </p>
             </div>
 
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-border-subtle p-3">
-              <div className="min-w-0">
-                <p className="text-small font-medium">{t("content.services.fields.active")}</p>
+            {/* SECTION 3 — VISUAL & LINK */}
+            <div className="space-y-4">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                {t("content.services.fields.icon")} والصفحة المرتبطة
+              </h3>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="service-slug">{t("content.services.fields.slug")} *</Label>
+                <Input
+                  id="service-slug"
+                  dir="ltr"
+                  list="service-slug-options"
+                  value={draft.slug}
+                  onChange={(e) => setDraft({ ...draft, slug: e.target.value })}
+                  onBlur={() => setDraft({ ...draft, slug: normalizeSlug(draft.slug) })}
+                  placeholder={SERVICE_TARGETS[0]}
+                />
+                <datalist id="service-slug-options">
+                  {SERVICE_TARGETS.map((s) => (
+                    <option key={s} value={s} />
+                  ))}
+                </datalist>
+                {errors.slug ? (
+                  <p className="text-caption text-destructive">
+                    {t(`content.services.errors.${errors.slug}`)}
+                  </p>
+                ) : draft.slug && !isKnownServiceTarget(normalizeSlug(draft.slug)) ? (
+                  <p className="text-caption text-warning">
+                    {t("content.services.fields.slugUnknown")}
+                  </p>
+                ) : (
+                  <p className="text-caption text-muted-foreground">
+                    {t("content.services.fields.slugHint")}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="service-icon">{t("content.services.fields.icon")}</Label>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-sunken/50 text-primary">
+                    <DynamicIcon name={draft.icon} className="h-5 w-5" />
+                  </span>
+                  <Input
+                    id="service-icon"
+                    dir="ltr"
+                    value={draft.icon}
+                    onChange={(e) => setDraft({ ...draft, icon: e.target.value })}
+                    placeholder={ICON_SUGGESTIONS[0]}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {ICON_SUGGESTIONS.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      title={name}
+                      onClick={() => setDraft({ ...draft, icon: name })}
+                      className={cn(
+                        "inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors",
+                        draft.icon === name
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border-subtle text-muted-foreground hover:bg-accent",
+                      )}
+                    >
+                      <DynamicIcon name={name} className="h-4 w-4" />
+                    </button>
+                  ))}
+                </div>
                 <p className="text-caption text-muted-foreground">
-                  {t("content.services.fields.activeHint")}
+                  {t("content.services.fields.iconHint")}
                 </p>
               </div>
-              <Switch
-                checked={draft.active}
-                onCheckedChange={(v) => setDraft({ ...draft, active: v })}
-              />
+
+              <div className="space-y-2">
+                <Label htmlFor="service-cover">{t("content.services.fields.cover")}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="service-cover"
+                    dir="ltr"
+                    value={draft.cover}
+                    onChange={(e) => setDraft({ ...draft, cover: e.target.value })}
+                    placeholder="https://…"
+                  />
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-input border border-border px-3 text-small font-medium hover:bg-accent shrink-0">
+                    <Upload className="h-4 w-4" />
+                    {isUploading
+                      ? t("content.common.saving")
+                      : t("content.services.actions.upload")}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={uploadCover}
+                      disabled={isUploading}
+                    />
+                  </label>
+                </div>
+                {draft.cover && (
+                  <div className="relative mt-2 h-28 w-full max-w-sm rounded-lg overflow-hidden border border-border-subtle bg-surface-sunken">
+                    <img src={draft.cover} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setDraft({ ...draft, cover: "" })}
+                      className="absolute top-2 end-2 rounded-full bg-foreground/70 p-1 text-background hover:bg-foreground"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+                <p className="text-caption text-muted-foreground">
+                  {t("content.services.fields.coverHint")}
+                </p>
+              </div>
             </div>
 
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setDraft(null)}>
-                {t("ops.common.cancel")}
-              </Button>
-              <Button type="submit" disabled={!canSave || saveMutation.isPending}>
-                {saveMutation.isPending ? t("content.common.saving") : t("ops.common.save")}
-              </Button>
+            {/* SECTION 4 — DISPLAY */}
+            <div className="space-y-4">
+              <h3 className="text-small font-semibold text-foreground border-b border-border-subtle pb-1.5">
+                إعدادات العرض
+              </h3>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="service-order">{t("content.services.fields.sortOrder")}</Label>
+                <NumberInput
+                  id="service-order"
+                  dir="ltr"
+                  value={draft.sort_order}
+                  onChange={(v) => setDraft({ ...draft, sort_order: v ?? 0 })}
+                  min={0}
+                />
+                <p className="text-caption text-muted-foreground">
+                  {t("content.services.fields.sortOrderHint")}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 rounded-card border border-border-subtle bg-surface-sunken/20 p-3.5">
+                <div className="min-w-0">
+                  <p className="text-small font-medium">{t("content.services.fields.active")}</p>
+                  <p className="text-caption text-muted-foreground">
+                    {t("content.services.fields.activeHint")}
+                  </p>
+                </div>
+                <StatusSwitch
+                  checked={Boolean(draft.active)}
+                  onCheckedChange={(v) => setDraft({ ...draft, active: v })}
+                />
+              </div>
             </div>
-          </form>
+          </div>
         )}
       </Drawer>
 
@@ -525,6 +606,7 @@ function ServicesPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>{t("ops.common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => confirmDelete && deleteMutation.mutate(confirmDelete.id)}
             >
               {t("ops.common.delete")}
@@ -544,7 +626,7 @@ function TranslationChips({ row }: { row: { title_fr: string | null; title_en: s
   ) as string[];
   if (missing.length === 0) return null;
   return (
-    <span className="rounded-full bg-warning-muted px-2.5 py-0.5 text-caption font-medium text-warning">
+    <span className="rounded-full bg-warning-muted px-2 py-0.5 text-caption font-medium text-warning shrink-0">
       {t("content.common.missingTranslations", {
         langs: missing.map((l) => t(`ops.localized.${l}`)).join(" · "),
       })}

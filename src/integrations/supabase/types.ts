@@ -4,32 +4,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15";
-  };
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
+    PostgrestVersion: "14.5";
   };
   public: {
     Tables: {
@@ -215,6 +190,11 @@ export type Database = {
       bookings: {
         Row: {
           adults: number;
+          archived_at: string | null;
+          archived_by: string | null;
+          archived_by_name: string | null;
+          archive_reason: string | null;
+          branch_id: string | null;
           children: number;
           communication_preference: string | null;
           created_at: string;
@@ -239,6 +219,11 @@ export type Database = {
         };
         Insert: {
           adults?: number;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
+          branch_id?: string | null;
           children?: number;
           communication_preference?: string | null;
           created_at?: string;
@@ -263,6 +248,11 @@ export type Database = {
         };
         Update: {
           adults?: number;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
+          branch_id?: string | null;
           children?: number;
           communication_preference?: string | null;
           created_at?: string;
@@ -286,6 +276,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "bookings_branch_id_fkey";
+            columns: ["branch_id"];
+            isOneToOne: false;
+            referencedRelation: "branches";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "bookings_package_id_fkey";
             columns: ["package_id"];
@@ -423,6 +420,10 @@ export type Database = {
       };
       contact_messages: {
         Row: {
+          archived_at: string | null;
+          archived_by: string | null;
+          archived_by_name: string | null;
+          archive_reason: string | null;
           created_at: string;
           email: string;
           handled: boolean;
@@ -435,6 +436,10 @@ export type Database = {
           subject: string | null;
         };
         Insert: {
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
           created_at?: string;
           email: string;
           handled?: boolean;
@@ -447,6 +452,10 @@ export type Database = {
           subject?: string | null;
         };
         Update: {
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
           created_at?: string;
           email?: string;
           handled?: boolean;
@@ -464,7 +473,12 @@ export type Database = {
         Row: {
           adults: number;
           airport_flexible: boolean;
+          archived_at: string | null;
+          archived_by: string | null;
+          archived_by_name: string | null;
+          archive_reason: string | null;
           assigned_to: string | null;
+          branch_id: string | null;
           children: number;
           contact_preference: string | null;
           created_at: string;
@@ -507,7 +521,12 @@ export type Database = {
         Insert: {
           adults?: number;
           airport_flexible?: boolean;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
           assigned_to?: string | null;
+          branch_id?: string | null;
           children?: number;
           contact_preference?: string | null;
           created_at?: string;
@@ -550,7 +569,12 @@ export type Database = {
         Update: {
           adults?: number;
           airport_flexible?: boolean;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
           assigned_to?: string | null;
+          branch_id?: string | null;
           children?: number;
           contact_preference?: string | null;
           created_at?: string;
@@ -591,6 +615,13 @@ export type Database = {
           whatsapp?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "custom_package_requests_branch_id_fkey";
+            columns: ["branch_id"];
+            isOneToOne: false;
+            referencedRelation: "branches";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "custom_package_requests_madinah_hotel_id_fkey";
             columns: ["madinah_hotel_id"];
@@ -636,6 +667,65 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      customer_profiles: {
+        Row: {
+          archived_at: string | null;
+          archived_by: string | null;
+          archived_by_name: string | null;
+          archive_reason: string | null;
+          branch_id: string | null;
+          city: string | null;
+          created_at: string;
+          customer_key: string;
+          email: string | null;
+          full_name: string | null;
+          notes: string | null;
+          phone: string | null;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
+          branch_id?: string | null;
+          city?: string | null;
+          created_at?: string;
+          customer_key: string;
+          email?: string | null;
+          full_name?: string | null;
+          notes?: string | null;
+          phone?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
+          branch_id?: string | null;
+          city?: string | null;
+          created_at?: string;
+          customer_key?: string;
+          email?: string | null;
+          full_name?: string | null;
+          notes?: string | null;
+          phone?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_profiles_branch_id_fkey";
+            columns: ["branch_id"];
+            isOneToOne: false;
+            referencedRelation: "branches";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       faqs: {
         Row: {
@@ -737,6 +827,10 @@ export type Database = {
         Row: {
           admin_reply: string | null;
           adults: number;
+          archived_at: string | null;
+          archived_by: string | null;
+          archived_by_name: string | null;
+          archive_reason: string | null;
           assigned_to: string | null;
           cabin_class: string;
           children: number;
@@ -762,6 +856,10 @@ export type Database = {
         Insert: {
           admin_reply?: string | null;
           adults?: number;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
           assigned_to?: string | null;
           cabin_class?: string;
           children?: number;
@@ -787,6 +885,10 @@ export type Database = {
         Update: {
           admin_reply?: string | null;
           adults?: number;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          archive_reason?: string | null;
           assigned_to?: string | null;
           cabin_class?: string;
           children?: number;
@@ -940,6 +1042,75 @@ export type Database = {
         };
         Relationships: [];
       };
+      installments: {
+        Row: {
+          amount: number;
+          booking_id: string | null;
+          created_at: string;
+          currency: string;
+          customer_key: string;
+          due_date: string | null;
+          id: string;
+          installment_number: number;
+          note: string | null;
+          paid_at: string | null;
+          payment_method: string | null;
+          request_id: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          amount: number;
+          booking_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          customer_key: string;
+          due_date?: string | null;
+          id?: string;
+          installment_number?: number;
+          note?: string | null;
+          paid_at?: string | null;
+          payment_method?: string | null;
+          request_id?: string | null;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          booking_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          customer_key?: string;
+          due_date?: string | null;
+          id?: string;
+          installment_number?: number;
+          note?: string | null;
+          paid_at?: string | null;
+          payment_method?: string | null;
+          request_id?: string | null;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "installments_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "installments_request_id_fkey";
+            columns: ["request_id"];
+            isOneToOne: false;
+            referencedRelation: "custom_package_requests";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       newsletter_subscribers: {
         Row: {
           created_at: string;
@@ -1003,6 +1174,11 @@ export type Database = {
           airline: string | null;
           airline_en: string | null;
           airline_fr: string | null;
+          archive_reason: string | null;
+          archived_at: string | null;
+          archived_by: string | null;
+          archived_by_name: string | null;
+          arrival_airport: string | null;
           brochure_pdf: string | null;
           category: Database["public"]["Enums"]["package_category"];
           child_price: number | null;
@@ -1015,6 +1191,7 @@ export type Database = {
           cover: string | null;
           created_at: string;
           currency: string;
+          departure_airport: string | null;
           departure_date: string | null;
           description: string | null;
           description_en: string | null;
@@ -1031,6 +1208,7 @@ export type Database = {
           excluded_en: Json | null;
           excluded_fr: Json | null;
           featured: boolean;
+          flight_route: string | null;
           gallery: Json | null;
           hotel: string | null;
           hotel_en: string | null;
@@ -1044,6 +1222,7 @@ export type Database = {
           meeting_point: string | null;
           meeting_point_en: string | null;
           meeting_point_fr: string | null;
+          notes: string | null;
           price: number;
           required_documents: Json | null;
           required_documents_en: Json | null;
@@ -1082,6 +1261,11 @@ export type Database = {
           airline?: string | null;
           airline_en?: string | null;
           airline_fr?: string | null;
+          archive_reason?: string | null;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          arrival_airport?: string | null;
           brochure_pdf?: string | null;
           category: Database["public"]["Enums"]["package_category"];
           child_price?: number | null;
@@ -1094,6 +1278,7 @@ export type Database = {
           cover?: string | null;
           created_at?: string;
           currency?: string;
+          departure_airport?: string | null;
           departure_date?: string | null;
           description?: string | null;
           description_en?: string | null;
@@ -1110,6 +1295,7 @@ export type Database = {
           excluded_en?: Json | null;
           excluded_fr?: Json | null;
           featured?: boolean;
+          flight_route?: string | null;
           gallery?: Json | null;
           hotel?: string | null;
           hotel_en?: string | null;
@@ -1123,6 +1309,7 @@ export type Database = {
           meeting_point?: string | null;
           meeting_point_en?: string | null;
           meeting_point_fr?: string | null;
+          notes?: string | null;
           price?: number;
           required_documents?: Json | null;
           required_documents_en?: Json | null;
@@ -1161,6 +1348,11 @@ export type Database = {
           airline?: string | null;
           airline_en?: string | null;
           airline_fr?: string | null;
+          archive_reason?: string | null;
+          archived_at?: string | null;
+          archived_by?: string | null;
+          archived_by_name?: string | null;
+          arrival_airport?: string | null;
           brochure_pdf?: string | null;
           category?: Database["public"]["Enums"]["package_category"];
           child_price?: number | null;
@@ -1173,6 +1365,7 @@ export type Database = {
           cover?: string | null;
           created_at?: string;
           currency?: string;
+          departure_airport?: string | null;
           departure_date?: string | null;
           description?: string | null;
           description_en?: string | null;
@@ -1189,6 +1382,7 @@ export type Database = {
           excluded_en?: Json | null;
           excluded_fr?: Json | null;
           featured?: boolean;
+          flight_route?: string | null;
           gallery?: Json | null;
           hotel?: string | null;
           hotel_en?: string | null;
@@ -1202,6 +1396,7 @@ export type Database = {
           meeting_point?: string | null;
           meeting_point_en?: string | null;
           meeting_point_fr?: string | null;
+          notes?: string | null;
           price?: number;
           required_documents?: Json | null;
           required_documents_en?: Json | null;
@@ -1375,6 +1570,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      site_sections: {
+        Row: {
+          created_at: string;
+          description: string;
+          enabled: boolean;
+          id: string;
+          label: string;
+          label_en: string | null;
+          label_fr: string | null;
+          page: string;
+          section_key: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description: string;
+          enabled?: boolean;
+          id?: string;
+          label: string;
+          label_en?: string | null;
+          label_fr?: string | null;
+          page?: string;
+          section_key: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string;
+          enabled?: boolean;
+          id?: string;
+          label?: string;
+          label_en?: string | null;
+          label_fr?: string | null;
+          page?: string;
+          section_key?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       site_settings: {
         Row: {
           created_at: string;
@@ -1513,6 +1750,210 @@ export type Database = {
           id?: string;
           role?: Database["public"]["Enums"]["app_role"];
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      user_permissions: {
+        Row: {
+          created_at: string;
+          id: string;
+          permission: string;
+          granted: boolean;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          permission: string;
+          granted?: boolean;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          permission?: string;
+          granted?: boolean;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      leads: {
+        Row: {
+          id: string;
+          reference: string;
+          customer_key: string;
+          full_name: string;
+          phone: string;
+          phone_normalized: string;
+          email: string | null;
+          governorate: string | null;
+          city: string | null;
+          trip_id: string | null;
+          trip_name: string | null;
+          travelers_count: number;
+          adults: number;
+          children: number;
+          infants: number;
+          interests: Json;
+          contact_preference: string;
+          preferred_contact_time: string;
+          notes: string | null;
+          source: string;
+          source_details: Json;
+          status: string;
+          loss_reason: string | null;
+          loss_notes: string | null;
+          intent: string;
+          intent_score_reasons: Json;
+          builder_snapshot: Json | null;
+          builder_step_reached: string | null;
+          next_follow_up_date: string | null;
+          next_follow_up_time: string | null;
+          follow_up_note: string | null;
+          assigned_to: string | null;
+          assigned_to_name: string | null;
+          branch_id: string | null;
+          offer_amount: number | null;
+          offer_currency: string;
+          offer_status: string | null;
+          offer_notes: string | null;
+          offer_sent_at: string | null;
+          last_contact_at: string | null;
+          converted_booking_id: string | null;
+          converted_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          reference: string;
+          customer_key: string;
+          full_name: string;
+          phone: string;
+          phone_normalized: string;
+          email?: string | null;
+          governorate?: string | null;
+          city?: string | null;
+          trip_id?: string | null;
+          trip_name?: string | null;
+          travelers_count?: number;
+          adults?: number;
+          children?: number;
+          infants?: number;
+          interests?: Json;
+          contact_preference?: string;
+          preferred_contact_time?: string;
+          notes?: string | null;
+          source?: string;
+          source_details?: Json;
+          status?: string;
+          loss_reason?: string | null;
+          loss_notes?: string | null;
+          intent?: string;
+          intent_score_reasons?: Json;
+          builder_snapshot?: Json | null;
+          builder_step_reached?: string | null;
+          next_follow_up_date?: string | null;
+          next_follow_up_time?: string | null;
+          follow_up_note?: string | null;
+          assigned_to?: string | null;
+          assigned_to_name?: string | null;
+          branch_id?: string | null;
+          offer_amount?: number | null;
+          offer_currency?: string;
+          offer_status?: string | null;
+          offer_notes?: string | null;
+          offer_sent_at?: string | null;
+          last_contact_at?: string | null;
+          converted_booking_id?: string | null;
+          converted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          reference?: string;
+          customer_key?: string;
+          full_name?: string;
+          phone?: string;
+          phone_normalized?: string;
+          email?: string | null;
+          governorate?: string | null;
+          city?: string | null;
+          trip_id?: string | null;
+          trip_name?: string | null;
+          travelers_count?: number;
+          adults?: number;
+          children?: number;
+          infants?: number;
+          interests?: Json;
+          contact_preference?: string;
+          preferred_contact_time?: string;
+          notes?: string | null;
+          source?: string;
+          source_details?: Json;
+          status?: string;
+          loss_reason?: string | null;
+          loss_notes?: string | null;
+          intent?: string;
+          intent_score_reasons?: Json;
+          builder_snapshot?: Json | null;
+          builder_step_reached?: string | null;
+          next_follow_up_date?: string | null;
+          next_follow_up_time?: string | null;
+          follow_up_note?: string | null;
+          assigned_to?: string | null;
+          assigned_to_name?: string | null;
+          branch_id?: string | null;
+          offer_amount?: number | null;
+          offer_currency?: string;
+          offer_status?: string | null;
+          offer_notes?: string | null;
+          offer_sent_at?: string | null;
+          last_contact_at?: string | null;
+          converted_booking_id?: string | null;
+          converted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      lead_activities: {
+        Row: {
+          id: string;
+          lead_id: string;
+          activity_type: string;
+          title: string;
+          description: string | null;
+          metadata: Json | null;
+          author_id: string | null;
+          author_name: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          lead_id: string;
+          activity_type: string;
+          title: string;
+          description?: string | null;
+          metadata?: Json | null;
+          author_id?: string | null;
+          author_name?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          lead_id?: string;
+          activity_type?: string;
+          title?: string;
+          description?: string | null;
+          metadata?: Json | null;
+          author_id?: string | null;
+          author_name?: string | null;
+          created_at?: string;
         };
         Relationships: [];
       };
@@ -1658,9 +2099,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "staff"],
