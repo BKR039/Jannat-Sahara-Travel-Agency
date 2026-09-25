@@ -77,12 +77,12 @@ export function BuilderStepNavigation({
       className={cn(
         "z-30 w-full transition-all duration-200",
         sticky &&
-          "sticky bottom-0 border-t border-border-subtle bg-card/95 backdrop-blur-md shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.08)] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 px-3 sm:px-6 sm:py-3.5",
+          "sticky bottom-0 border-t border-border-subtle bg-card/95 backdrop-blur-md shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.08)] px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:px-6 sm:py-3.5",
         !sticky && "pt-4",
         className,
       )}
     >
-      <div className="mx-auto flex max-w-full flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="mx-auto flex max-w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         {/* Selected Item Summary Chip / Status on start side */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
           {selectedSummary ? (

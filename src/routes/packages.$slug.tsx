@@ -557,7 +557,7 @@ function PackagePage() {
       </Section>
 
       {related.length > 0 && (
-        <Container className="pb-20">
+        <Container className="pb-28 lg:pb-20">
           <SectionHeading title={t("package.related")} />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((p) => (
@@ -567,22 +567,22 @@ function PackagePage() {
         </Container>
       )}
 
-      {/* Mobile booking bar. Genuinely floating, so it keeps its shadow. */}
-      <div className="sticky bottom-0 z-40 border-t border-border-subtle bg-card/95 p-3 shadow-[0_-4px_16px_-8px_hsl(0_0%_0%/0.15)] backdrop-blur lg:hidden">
-        <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0">
+      {/* Mobile booking bar. Genuinely floating with safe-area support. */}
+      <div className="sticky bottom-0 z-40 border-t border-border-subtle bg-card/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_16px_-8px_hsl(0_0%_0%/0.15)] backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
             {hasPrice ? (
               <>
                 <p className="text-caption text-muted-foreground">{t("package.from")}</p>
-                <p className="truncate text-h5 font-extrabold text-primary">{priceText}</p>
+                <p className="text-h5 font-extrabold text-primary [overflow-wrap:anywhere]">{priceText}</p>
               </>
             ) : (
-              <p className="truncate text-small font-semibold text-foreground">
+              <p className="text-small font-semibold text-foreground [overflow-wrap:anywhere]">
                 {t("package.priceOnRequest")}
               </p>
             )}
           </div>
-          <Button asChild size="lg" className="shrink-0">
+          <Button asChild size="default" className="shrink-0 min-w-[7.5rem]">
             {bookLink}
           </Button>
         </div>

@@ -118,7 +118,7 @@ function PackageCardBase({ pkg, className }: { pkg: Package; className?: string 
           params={{ slug: pkg.slug }}
           className="flex min-h-11 items-center rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <h3 className="line-clamp-1 text-card-title font-semibold text-foreground transition-colors duration-fast group-hover:text-primary">
+          <h3 className="line-clamp-2 text-card-title font-semibold leading-snug text-foreground transition-colors duration-fast group-hover:text-primary [overflow-wrap:anywhere]">
             {L(pkg, "title", "base")}
           </h3>
         </Link>

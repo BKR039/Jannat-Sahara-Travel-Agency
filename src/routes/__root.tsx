@@ -144,13 +144,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           type: "font/otf",
           crossOrigin: "anonymous",
         },
-        {
-          rel: "preload",
-          href: "/fonts/alfont_com_TheYearofHandicrafts-Black.otf",
-          as: "font",
-          type: "font/otf",
-          crossOrigin: "anonymous",
-        },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         {

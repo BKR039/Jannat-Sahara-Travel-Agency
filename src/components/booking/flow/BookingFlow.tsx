@@ -208,25 +208,20 @@ export function BookingFlow({ packageSlug = null }: Props) {
   }
 
   if (pkgQuery.isLoading) {
-    return (
-      <div className="mx-auto max-w-7xl animate-pulse space-y-6 px-4 py-16 md:px-6">
-        <div className="h-10 w-1/3 rounded bg-muted" />
-        <div className="h-64 rounded-xl bg-muted" />
-      </div>
-    );
+    return <BookingFlowSkeleton />;
   }
 
   return (
-    <div ref={topRef} className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-      <header className="mb-8 max-w-2xl">
+    <div ref={topRef} className="mx-auto max-w-7xl px-3 py-6 sm:px-6 sm:py-12 pb-36 sm:pb-24">
+      <header className="mb-6 max-w-2xl sm:mb-8">
         <p className="text-caption font-semibold uppercase tracking-[0.18em] text-primary">
           {t("bookingFlow.eyebrow")}
         </p>
         <h1 className="mt-2 text-h1 font-extrabold">{t("bookingFlow.title")}</h1>
-        <p className="mt-3 text-body text-muted-foreground">{t("bookingFlow.subtitle")}</p>
+        <p className="mt-2 text-body text-muted-foreground sm:mt-3">{t("bookingFlow.subtitle")}</p>
       </header>
 
-      <div className="mb-10">
+      <div className="mb-8 sm:mb-10">
         <StepIndicator steps={steps} current={step} onJump={goTo} />
       </div>
 
@@ -234,45 +229,75 @@ export function BookingFlow({ packageSlug = null }: Props) {
         <div className="min-w-0 space-y-6">
           {/* ---------------- selected package (chosen on the landing page) */}
           {selectedPackage && (
-            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-border-subtle bg-card p-4 shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-border-subtle bg-card shadow-sm transition-shadow duration-base sm:flex sm:items-center sm:gap-4 sm:p-4">
               {selectedPackage.cover && (
-                <img
-                  src={selectedPackage.cover}
-                  alt={L(selectedPackage, "title")}
-                  loading="lazy"
-                  className="h-16 w-24 shrink-0 rounded-lg object-cover"
-                />
+                <div className="relative aspect-[21/9] w-full overflow-hidden bg-surface-sunken sm:aspect-[16/10] sm:h-24 sm:w-36 sm:shrink-0 sm:rounded-lg">
+                  <img
+                    src={selectedPackage.cover}
+                    alt={L(selectedPackage, "title")}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute top-2.5 start-2.5 sm:hidden">
+                    <span className="inline-block rounded-full bg-primary px-2.5 py-0.5 text-caption font-semibold text-primary-foreground shadow-xs">
+                      {t(`categories.${selectedPackage.category}`)}
+                    </span>
+                  </div>
+                </div>
               )}
-              <div className="min-w-0 flex-1">
-                <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-caption font-semibold text-primary">
-                  {t(`categories.${selectedPackage.category}`)}
-                </span>
-                <h2 className="mt-1 truncate text-body font-bold">{L(selectedPackage, "title")}</h2>
-                <p className="mt-0.5 truncate text-caption text-muted-foreground">
+              <div className="min-w-0 flex-1 p-4 sm:p-0">
+                <div className="hidden sm:block">
+                  <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-caption font-semibold text-primary">
+                    {t(`categories.${selectedPackage.category}`)}
+                  </span>
+                </div>
+                {!selectedPackage.cover && (
+                  <div className="mb-2 sm:hidden">
+                    <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-caption font-semibold text-primary">
+                      {t(`categories.${selectedPackage.category}`)}
+                    </span>
+                  </div>
+                )}
+                {/* Critical text must NEVER be clipped: allowed to wrap gracefully */}
+                <h2 className="mt-1 text-body font-bold leading-snug text-foreground [overflow-wrap:anywhere] sm:text-h5">
+                  {L(selectedPackage, "title")}
+                </h2>
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-muted-foreground">
                   {[
                     L(selectedPackage, "destination", "empty"),
                     L(selectedPackage, "duration", "empty"),
                     departure,
                   ]
                     .filter(Boolean)
-                    .join(" • ")}
+                    .map((item, idx, arr) => (
+                      <span key={item} className="inline-flex items-center gap-1.5">
+                        <span>{item}</span>
+                        {idx < arr.length - 1 && (
+                          <span className="text-muted-foreground/50" aria-hidden="true">
+                            •
+                          </span>
+                        )}
+                      </span>
+                    ))}
                 </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link
-                  to="/packages/$slug"
-                  params={{ slug: selectedPackage.slug }}
-                  className="text-small font-semibold text-primary hover:underline"
-                >
-                  {t("actions.viewDetails")}
-                </Link>
-                <Link
-                  to="/"
-                  hash="packages"
-                  className="text-small font-semibold text-muted-foreground hover:underline"
-                >
-                  {t("bookingFlow.actions.changePackage")}
-                </Link>
+
+                {/* Mobile action bar inside card */}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border-subtle pt-3 sm:mt-2 sm:border-0 sm:pt-0 sm:justify-start">
+                  <Link
+                    to="/packages/$slug"
+                    params={{ slug: selectedPackage.slug }}
+                    className="inline-flex min-h-[40px] items-center text-small font-semibold text-primary hover:underline"
+                  >
+                    {t("actions.viewDetails")}
+                  </Link>
+                  <Link
+                    to="/"
+                    hash="packages"
+                    className="inline-flex min-h-[40px] items-center text-small font-semibold text-muted-foreground hover:underline"
+                  >
+                    {t("bookingFlow.actions.changePackage")}
+                  </Link>
+                </div>
               </div>
             </div>
           )}
@@ -499,7 +524,7 @@ export function BookingFlow({ packageSlug = null }: Props) {
             submittingLabel={t("bookingFlow.actions.submitting")}
             selectedSummary={
               step === 0
-                ? `${passengers.length} ${t("bookingFlow.summary.travellersCount", { count: passengers.length })}`
+                ? t("bookingFlow.summary.travellersCount", { count: passengers.length })
                 : step === 1
                   ? communication
                     ? t(`bookingFlow.options.${communication}`, communication)
@@ -535,6 +560,86 @@ function ReviewRow({ k, v }: { k: string; v: string }) {
     <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-1.5">
       <dt className="text-muted-foreground">{k}</dt>
       <dd className="font-semibold">{v || "—"}</dd>
+    </div>
+  );
+}
+
+function BookingFlowSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="جاري تحميل الحجز"
+      className="mx-auto max-w-7xl animate-pulse space-y-8 px-3 py-6 motion-reduce:animate-none sm:px-6 sm:py-12"
+    >
+      <div className="max-w-2xl space-y-3">
+        <div className="h-3.5 w-24 rounded bg-surface-sunken" />
+        <div className="h-8 w-60 rounded-md bg-surface-sunken" />
+        <div className="h-4 w-80 max-w-full rounded bg-surface-sunken" />
+      </div>
+
+      {/* Stepper skeleton */}
+      <div className="flex flex-wrap items-center gap-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="h-8 w-24 rounded-full bg-surface-sunken" />
+            {i < 3 && <div className="h-px w-6 bg-border" />}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="min-w-0 space-y-6">
+          {/* Selected package card skeleton */}
+          <div className="overflow-hidden rounded-xl border border-border-subtle bg-card shadow-sm sm:flex sm:items-center sm:gap-4 sm:p-4">
+            <div className="aspect-[21/9] w-full bg-surface-sunken sm:aspect-auto sm:h-24 sm:w-36 sm:shrink-0 sm:rounded-lg" />
+            <div className="space-y-2 p-4 sm:min-w-0 sm:flex-1 sm:p-0">
+              <div className="h-5 w-20 rounded-full bg-surface-sunken" />
+              <div className="h-5 w-48 max-w-full rounded bg-surface-sunken" />
+              <div className="h-3.5 w-64 max-w-full rounded bg-surface-sunken" />
+              <div className="flex gap-4 pt-1">
+                <div className="h-4 w-16 rounded bg-surface-sunken" />
+                <div className="h-4 w-20 rounded bg-surface-sunken" />
+              </div>
+            </div>
+          </div>
+
+          {/* Form section skeleton */}
+          <div className="space-y-4">
+            <div className="h-6 w-44 rounded bg-surface-sunken" />
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-20 rounded-xl border border-border-subtle bg-card p-4">
+                  <div className="h-4 w-16 rounded bg-surface-sunken" />
+                  <div className="mt-2 h-3 w-24 rounded bg-surface-sunken" />
+                </div>
+              ))}
+            </div>
+            <div className="h-64 rounded-xl border border-border-subtle bg-card p-6">
+              <div className="h-5 w-32 rounded bg-surface-sunken" />
+              <div className="mt-6 space-y-3">
+                <div className="h-10 w-full rounded bg-surface-sunken" />
+                <div className="h-10 w-full rounded bg-surface-sunken" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Aside summary skeleton */}
+        <div className="hidden lg:block">
+          <div className="space-y-4 rounded-xl border border-border-subtle bg-card p-6">
+            <div className="h-5 w-28 rounded bg-surface-sunken" />
+            <div className="space-y-2 pt-2">
+              <div className="h-4 w-full rounded bg-surface-sunken" />
+              <div className="h-4 w-full rounded bg-surface-sunken" />
+              <div className="h-4 w-full rounded bg-surface-sunken" />
+            </div>
+            <div className="border-t border-border pt-4">
+              <div className="h-7 w-32 rounded bg-surface-sunken" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

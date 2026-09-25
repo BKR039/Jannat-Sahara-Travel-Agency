@@ -291,12 +291,12 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
 
-  --font-size-display: clamp(2.35rem, 1.85rem + 2.2vw, 4rem);
-  --font-size-h1: clamp(2rem, 1.7rem + 1.6vw, 3.125rem);
-  --font-size-h2: clamp(1.75rem, 1.5rem + 1.1vw, 2.5rem);
-  --font-size-h3: clamp(1.4rem, 1.25rem + 0.7vw, 1.9rem);
-  --font-size-h4: clamp(1.2rem, 1.1rem + 0.4vw, 1.45rem);
-  --font-size-h5: clamp(1.1rem, 1.02rem + 0.25vw, 1.2rem);
+  --font-size-display: clamp(1.875rem, 1.5rem + 1.6vw, 3.75rem);
+  --font-size-h1: clamp(1.5rem, 1.25rem + 1.2vw, 2.875rem);
+  --font-size-h2: clamp(1.25rem, 1.1rem + 0.75vw, 2.25rem);
+  --font-size-h3: clamp(1.125rem, 1.02rem + 0.5vw, 1.75rem);
+  --font-size-h4: clamp(1rem, 0.95rem + 0.3vw, 1.35rem);
+  --font-size-h5: clamp(0.95rem, 0.9rem + 0.2vw, 1.15rem);
   --font-size-body-lg: 1.125rem;
   --font-size-body: 1rem;
   --font-size-small: 0.875rem;
@@ -305,7 +305,7 @@
   --font-size-label: 0.8125rem;
   --font-size-nav: 0.9375rem;
   --font-size-input: 1rem;
-  --font-size-card-title: 1.25rem;
+  --font-size-card-title: clamp(1.05rem, 0.95rem + 0.35vw, 1.25rem);
   --font-size-card-desc: 0.9375rem;
 
   --line-height-display: 1.15;

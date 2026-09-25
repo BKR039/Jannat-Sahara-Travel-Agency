@@ -243,28 +243,28 @@ export function CounterRow({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-border-subtle bg-card p-5">
-      <div>
-        <p className="text-body font-bold">{label}</p>
-        <p className="text-caption text-muted-foreground">{hint}</p>
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-border-subtle bg-card p-4 sm:p-5">
+      <div className="min-w-0 flex-1">
+        <p className="text-body font-bold leading-snug">{label}</p>
+        <p className="text-caption text-muted-foreground leading-normal">{hint}</p>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <button
           type="button"
           aria-label={`- ${label}`}
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground transition-colors duration-fast hover:bg-muted disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground transition-colors duration-fast hover:bg-muted disabled:opacity-40"
         >
           <Minus className="h-4 w-4" />
         </button>
-        <span className="w-8 text-center text-h5 font-bold tabular-nums">{value}</span>
+        <span className="w-6 sm:w-8 text-center text-body sm:text-h5 font-bold tabular-nums">{value}</span>
         <button
           type="button"
           aria-label={`+ ${label}`}
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors duration-fast hover:bg-primary/90 disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors duration-fast hover:bg-primary/90 disabled:opacity-40 shadow-xs"
         >
           <Plus className="h-4 w-4" />
         </button>

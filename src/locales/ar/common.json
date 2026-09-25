@@ -373,6 +373,12 @@
       "perChild": "سعر الطفل",
       "perInfant": "سعر الرضيع",
       "passengers": "عدد المسافرين",
+      "travellersCount": "{{count}} مسافر",
+      "travellersCount_one": "مسافر واحد",
+      "travellersCount_two": "مسافران",
+      "travellersCount_few": "{{count}} مسافرين",
+      "travellersCount_many": "{{count}} مسافراً",
+      "travellersCount_other": "{{count}} مسافر",
       "total": "المجموع"
     },
     "review": {

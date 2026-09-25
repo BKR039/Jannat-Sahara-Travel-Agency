@@ -5,6 +5,7 @@ import { z } from "zod";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { BookingFlow } from "@/components/booking/flow/BookingFlow";
 import { canonical } from "@/lib/seo";
+import { packageBySlugQuery } from "@/lib/queries";
 
 const searchSchema = z.object({
   pkg: z.string().max(200).optional(),
@@ -12,6 +13,12 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/booking")({
   validateSearch: searchSchema,
+  loaderDeps: ({ search: { pkg } }) => ({ pkg }),
+  loader: async ({ context, deps: { pkg } }) => {
+    if (pkg) {
+      await context.queryClient.ensureQueryData(packageBySlugQuery(pkg)).catch(() => null);
+    }
+  },
   head: () => ({
     meta: [
       { title: i18n.t("seo.booking.title") },

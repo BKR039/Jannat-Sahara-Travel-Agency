@@ -373,6 +373,9 @@
       "perChild": "Child Price",
       "perInfant": "Infant Price",
       "passengers": "Travelers",
+      "travellersCount": "{{count}} traveler(s)",
+      "travellersCount_one": "1 traveler",
+      "travellersCount_other": "{{count}} travelers",
       "total": "Total"
     },
     "review": {
