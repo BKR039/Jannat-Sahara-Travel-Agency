@@ -18,7 +18,7 @@ import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/gallery")({
   loader: async ({ context }) => {
-    return context.queryClient.ensureQueryData(galleryQuery());
+    return context.queryClient.ensureQueryData(galleryQuery()).catch(() => []);
   },
   head: () => ({
     meta: [

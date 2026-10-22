@@ -1,12 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy } from "react";
 import { useQuery } from "@tanstack/react-query";
 import i18n from "@/lib/i18n";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { UmrahProgrammes } from "@/components/sections/UmrahProgrammes";
-import { ServicesSection } from "@/components/sections/HomeSections";
-import { LazySection } from "@/components/common/LazySection";
+import {
+  ServicesSection,
+  FeaturesSection,
+  LatestArticlesSection,
+  CtaSection,
+  GalleryPreviewSection,
+  TestimonialsSection,
+  AboutHomeSection,
+  FaqHomeSection,
+} from "@/components/sections/HomeSections";
+import { StatsSection } from "@/components/sections/StatsSection";
+import { BranchesSection } from "@/components/sections/BranchesSection";
 import {
   contentQuery,
   packagesQuery,
@@ -20,46 +29,17 @@ import { canonical } from "@/lib/seo";
 import { transformSrcSet } from "@/lib/image-srcset";
 import { DEFAULT_PUBLIC_SETTINGS } from "@/lib/site-settings";
 
-/* Below-the-fold secondary sections are code-split and mounted on intersection. */
-const FeaturesSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.FeaturesSection })),
-);
-const LatestArticlesSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.LatestArticlesSection })),
-);
-const CtaSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.CtaSection })),
-);
-const BranchesSection = lazy(() =>
-  import("@/components/sections/BranchesSection").then((m) => ({ default: m.BranchesSection })),
-);
-const GalleryPreviewSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.GalleryPreviewSection })),
-);
-const TestimonialsSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.TestimonialsSection })),
-);
-const StatsSection = lazy(() =>
-  import("@/components/sections/StatsSection").then((m) => ({ default: m.StatsSection })),
-);
-const AboutHomeSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.AboutHomeSection })),
-);
-const FaqHomeSection = lazy(() =>
-  import("@/components/sections/HomeSections").then((m) => ({ default: m.FaqHomeSection })),
-);
-
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     const [settings, hero] = await Promise.all([
       context.queryClient.ensureQueryData(siteSettingsQuery()).catch(() => DEFAULT_PUBLIC_SETTINGS),
-      context.queryClient.ensureQueryData(contentQuery("hero")),
-      context.queryClient.ensureQueryData(siteSectionsQuery("home")),
-      context.queryClient.ensureQueryData(packagesQuery("umrah")),
+      context.queryClient.ensureQueryData(contentQuery("hero")).catch(() => null),
+      context.queryClient.ensureQueryData(siteSectionsQuery("home")).catch(() => []),
+      context.queryClient.ensureQueryData(packagesQuery("umrah")).catch(() => []),
       context.queryClient.ensureQueryData(servicesQuery()).catch(() => []),
       context.queryClient.ensureQueryData(galleryQuery("umrah", 1)).catch(() => []),
     ]);
-    return { settings, hero };
+    return { settings: settings ?? DEFAULT_PUBLIC_SETTINGS, hero: hero ?? null };
   },
   head: ({ loaderData }) => {
     const s = loaderData?.settings;
@@ -123,65 +103,47 @@ function Index() {
       )}
       {isVisible("features", true) && (
         <div data-section="features">
-          <LazySection minHeight="26rem">
-            <FeaturesSection />
-          </LazySection>
+          <FeaturesSection />
         </div>
       )}
       {isVisible("branches", true) && (
         <div data-section="branches">
-          <LazySection minHeight="34rem">
-            <BranchesSection />
-          </LazySection>
+          <BranchesSection />
         </div>
       )}
       {isVisible("gallery", true) && (
         <div data-section="gallery">
-          <LazySection minHeight="28rem">
-            <GalleryPreviewSection />
-          </LazySection>
+          <GalleryPreviewSection />
         </div>
       )}
-      {isVisible("testimonials", false) && (
+      {isVisible("testimonials", true) && (
         <div data-section="testimonials">
-          <LazySection minHeight="24rem">
-            <TestimonialsSection />
-          </LazySection>
+          <TestimonialsSection />
         </div>
       )}
       {isVisible("blog", true) && (
         <div data-section="blog">
-          <LazySection minHeight="30rem">
-            <LatestArticlesSection />
-          </LazySection>
+          <LatestArticlesSection />
         </div>
       )}
-      {isVisible("faq", false) && (
+      {isVisible("faq", true) && (
         <div data-section="faq">
-          <LazySection minHeight="24rem">
-            <FaqHomeSection />
-          </LazySection>
+          <FaqHomeSection />
         </div>
       )}
       {isVisible("stats", true) && (
         <div data-section="stats">
-          <LazySection minHeight="20rem">
-            <StatsSection />
-          </LazySection>
+          <StatsSection />
         </div>
       )}
       {isVisible("about", true) && (
         <div data-section="about">
-          <LazySection minHeight="22rem">
-            <AboutHomeSection />
-          </LazySection>
+          <AboutHomeSection />
         </div>
       )}
       {isVisible("cta", true) && (
         <div data-section="cta">
-          <LazySection minHeight="18rem">
-            <CtaSection />
-          </LazySection>
+          <CtaSection />
         </div>
       )}
     </SiteLayout>

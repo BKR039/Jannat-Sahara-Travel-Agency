@@ -9,9 +9,10 @@ import { contentQuery, packagesQuery } from "@/lib/queries";
 export const Route = createFileRoute("/trips")({
   loader: async ({ context }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(packagesQuery("trip")),
+      context.queryClient.ensureQueryData(packagesQuery("trip")).catch(() => []),
       context.queryClient.ensureQueryData(contentQuery("trips_hero")).catch(() => null),
     ]);
+    return { ok: true };
   },
   head: () => ({
     meta: [

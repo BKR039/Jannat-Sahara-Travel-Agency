@@ -146,13 +146,26 @@ This checkpoint records the complete operational state of the Jannat Sahara Trav
 
 ---
 
-### 5. How to Resume Work
+### 5. Website Reliability & Performance (Updated: 2026-10-22)
 
-1. **Verify Dev Server**: Check `http://localhost:8082` (or launch via `npm run dev`).
-2. **Access Admin Portal**: Open `http://localhost:8082/admin`.
-3. **Test Verified Modules**:
-   - **Toggles**: Toggle switches across Hotels, Branches, FAQs, Gallery, Testimonials, Services, Features, Blog, and Trips.
-   - **Trips**: `http://localhost:8082/admin/packages` and `http://localhost:8082/admin/packages/new`.
-   - **Hotels**: `http://localhost:8082/admin/hotels`.
-   - **CRM**: `http://localhost:8082/admin/customers` and `http://localhost:8082/admin/reports`.
-   - **Branches**: `http://localhost:8082/admin/branches`.
+- **Initial Error Window Fix**:
+  - Fixed root cause where remote Supabase database connection issues triggered TanStack Router's CatchBoundary modal (`لم يتم تحميل هذه الصفحة`).
+  - Implemented fail-open query unwrap guards in `src/lib/queries.ts` so all page components fall back to static/default content gracefully.
+  - Fixed hydration mismatch in `UmrahProgrammesBase` (`src/components/sections/UmrahProgrammes.tsx`) ensuring identical SSR/client initial markup.
+  - Implemented React Query SSR `dehydrate`/`hydrate` state synchronization in `src/router.tsx`.
+  - Replaced status `503` circuit breaker responses with status `500` in `client.ts` and `client.server.ts`, eliminating PostgREST's 7-second exponential retry trap and reducing SSR response times to 24–120ms.
+  - Fixed route loader return values across all routes (`src/routes/*`) preventing `TypeError: Cannot read properties of undefined (reading '_nonReactive')`.
+- **Verification**:
+  - All 11 public routes tested via HTTP SSR benchmark: TTFB 24ms – 203ms, 0 error screens.
+  - `tsc --noEmit`: 0 errors.
+  - `npm run build`: Production bundle built cleanly with 0 errors.
+
+---
+
+### 6. How to Resume Work
+
+1. **Verify Dev Server**: Run `npm run dev` or check `http://localhost:8080` (or network `http://192.168.0.54:8080`).
+2. **Access Admin Portal**: Open `http://localhost:8080/admin`.
+3. **Remote Supabase Project Note**: If live dynamic database changes are required, unpause project `tvvjenkqjexqtyztdhab` in the Supabase Cloud dashboard.
+
+

@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { BookingInput } from "./booking.schema";
 
 export const submitBooking = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => BookingInput.parse(data))
+  .validator((data: unknown) => BookingInput.parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { renderEmail } = await import("./booking-email.server");

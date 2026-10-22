@@ -18,6 +18,7 @@ export const Route = createFileRoute("/booking")({
     if (pkg) {
       await context.queryClient.ensureQueryData(packageBySlugQuery(pkg)).catch(() => null);
     }
+    return { ok: true };
   },
   head: () => ({
     meta: [

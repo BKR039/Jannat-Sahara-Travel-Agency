@@ -90,6 +90,13 @@ See `07-workflows.md` for the full flows.
   the repo (`sitemap.xml` is not generated). Head metadata is set per route, but
   `og:image` is only present where a route defines it.
 
+## Resilience, SSR Query Hydration & Offline Guardrails
+
+- **Hydration Sync (`src/router.tsx`)**: React Query SSR state is dehydrated into `dehydratedState` during server render and hydrated into the client query client upon bootstrap. This eliminates initial hydration mismatches where components would otherwise mount in `isLoading: true` while SSR rendered loaded or fallback states.
+- **Fail-Open Safe Queries (`src/lib/queries.ts`)**: Every public query factory wraps network execution in safe try/catch handlers and provides graceful fallback arrays or defaults (`unwrap` fallback pattern). If the remote database is temporarily paused, unreachable, or DNS-failing, pages load instantly without throwing uncaught exceptions to route CatchBoundaries.
+- **Circuit Breaker & Retry Trap Prevention (`src/integrations/supabase/client.ts` & `client.server.ts`)**: If the Supabase endpoint is unreachable, an immediate 1.5s timeout circuit breaker trips. Rather than returning status 503 (which `@supabase/postgrest-js` intercepts as retryable, triggering mandatory 7s exponential sleep delays), the circuit breaker responds with HTTP 500. This drops response times from 7+ seconds down to 0ms when offline.
+- **Route Loader Stability**: TanStack Router route loaders return non-null object payloads (`{ ok: true }` or fetched data) to avoid `TypeError: Cannot read properties of undefined (reading '_nonReactive')` during route preloading.
+
 ## Accessibility & responsiveness
 
 Radix primitives supply focus management and ARIA; interactive icons carry

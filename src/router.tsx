@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, dehydrate, hydrate } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { NotFoundPage } from "@/components/common/NotFoundPage";
@@ -12,7 +12,7 @@ export const getRouter = () => {
         gcTime: 30 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
-        retry: 1,
+        retry: false,
       },
     },
   });
@@ -20,6 +20,14 @@ export const getRouter = () => {
   const router = createRouter({
     routeTree,
     context: { queryClient },
+    dehydrate: () => ({
+      queryClientState: dehydrate(queryClient) as any,
+    }),
+    hydrate: (dehydrated: any) => {
+      if (dehydrated?.queryClientState) {
+        hydrate(queryClient, dehydrated.queryClientState);
+      }
+    },
     scrollRestoration: true,
     defaultPreload: "intent",
     defaultPreloadDelay: 50,

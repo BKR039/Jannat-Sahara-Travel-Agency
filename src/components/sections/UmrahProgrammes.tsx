@@ -32,7 +32,7 @@ function UmrahProgrammesBase() {
     [data],
   );
 
-  if (!isLoading && programmes.length === 0) return null;
+  if (programmes.length === 0) return null;
 
   return (
     <Section id="programmes" tone="sunken">

@@ -7,7 +7,7 @@ import { ContactMessageInput, NewsletterInput, PassportUploadInput } from "./pub
  */
 
 export const submitContactMessage = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => ContactMessageInput.parse(d))
+  .validator((d: unknown) => ContactMessageInput.parse(d))
   .handler(async ({ data }) => {
     const { enforceRateLimit, sanitizeText, sanitizeOptionalText, sanitizeEmail } =
       await import("./security.server");
@@ -30,7 +30,7 @@ export const submitContactMessage = createServerFn({ method: "POST" })
   });
 
 export const subscribeNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => NewsletterInput.parse(d))
+  .validator((d: unknown) => NewsletterInput.parse(d))
   .handler(async ({ data }) => {
     const { enforceRateLimit, sanitizeEmail } = await import("./security.server");
     await enforceRateLimit({ scope: "newsletter", limit: 5, windowSeconds: 600 });
@@ -59,7 +59,7 @@ export const subscribeNewsletter = createServerFn({ method: "POST" })
  * the storage path is generated server-side.
  */
 export const uploadPassport = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => PassportUploadInput.parse(d))
+  .validator((d: unknown) => PassportUploadInput.parse(d))
   .handler(async ({ data }) => {
     const {
       enforceRateLimit,

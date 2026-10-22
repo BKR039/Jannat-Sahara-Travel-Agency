@@ -6,8 +6,36 @@ function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
 
+const GLOBAL_OFFLINE_KEY = "__supabase_offline_until";
+const OFFLINE_COOLDOWN_MS = 60000; // 60s cooldown when database is down
+
+function getOfflineUntil(): number {
+  return ((globalThis as any)[GLOBAL_OFFLINE_KEY] as number) || 0;
+}
+
+function setOfflineUntil(until: number): void {
+  (globalThis as any)[GLOBAL_OFFLINE_KEY] = until;
+}
+
 function createSupabaseFetch(supabaseKey: string): typeof fetch {
-  return (input, init) => {
+  return async (input, init) => {
+    const now = Date.now();
+    if (now < getOfflineUntil()) {
+      return new Response(
+        JSON.stringify({
+          message: "Database service temporarily unreachable",
+          details: "Supabase host is currently unreachable (circuit open)",
+          hint: "",
+          code: "503",
+        }),
+        {
+          status: 500,
+          statusText: "Database Unavailable",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
     const headers = new Headers(
       typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
     );
@@ -25,7 +53,41 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
     }
 
     headers.set("apikey", supabaseKey);
-    return fetch(input, { ...init, headers });
+
+    let controller: AbortController | undefined;
+    let signal = init?.signal;
+    let timeoutId: NodeJS.Timeout | number | undefined;
+
+    if (!signal) {
+      controller = new AbortController();
+      signal = controller.signal;
+      timeoutId = setTimeout(() => {
+        controller?.abort();
+      }, 1500);
+    }
+
+    try {
+      const response = await fetch(input, { ...init, headers, signal });
+      setOfflineUntil(0);
+      return response;
+    } catch (err: any) {
+      setOfflineUntil(Date.now() + OFFLINE_COOLDOWN_MS);
+      return new Response(
+        JSON.stringify({
+          message: err?.message || "Database service temporarily unreachable",
+          details: String(err?.cause || err),
+          hint: "",
+          code: "503",
+        }),
+        {
+          status: 500,
+          statusText: "Database Unavailable",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
   };
 }
 

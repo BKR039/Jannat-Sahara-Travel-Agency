@@ -10,9 +10,10 @@ import { packagesQuery, contentQuery } from "@/lib/queries";
 export const Route = createFileRoute("/umrah")({
   loader: async ({ context }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(packagesQuery("umrah")),
-      context.queryClient.ensureQueryData(contentQuery("umrah_hero")),
+      context.queryClient.ensureQueryData(packagesQuery("umrah")).catch(() => []),
+      context.queryClient.ensureQueryData(contentQuery("umrah_hero")).catch(() => null),
     ]);
+    return { ok: true };
   },
   head: () => ({
     meta: [

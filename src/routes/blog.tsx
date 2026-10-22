@@ -18,7 +18,7 @@ import { absoluteUrl, canonical, jsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog")({
   loader: async ({ context }) => {
-    return context.queryClient.ensureQueryData(articlesQuery());
+    return context.queryClient.ensureQueryData(articlesQuery()).catch(() => []);
   },
   head: () => ({
     meta: [

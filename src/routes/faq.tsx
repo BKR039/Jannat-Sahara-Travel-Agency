@@ -17,7 +17,7 @@ import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
   loader: async ({ context }) => {
-    return context.queryClient.ensureQueryData(faqsQuery());
+    return context.queryClient.ensureQueryData(faqsQuery()).catch(() => []);
   },
   head: () => ({
     meta: [

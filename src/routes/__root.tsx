@@ -82,8 +82,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       context.queryClient.ensureQueryData(contactInfoQuery()).catch(() => []),
       context.queryClient.ensureQueryData(branchesQuery()).catch(() => []),
     ]);
-    primeCanonicalBase(settings.seoCanonicalBase);
-    return settings;
+    const resolved = settings ?? DEFAULT_PUBLIC_SETTINGS;
+    primeCanonicalBase(resolved.seoCanonicalBase);
+    return resolved;
   },
   head: ({ loaderData }) => {
     const s = loaderData ?? DEFAULT_PUBLIC_SETTINGS;

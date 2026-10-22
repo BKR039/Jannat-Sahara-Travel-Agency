@@ -18,7 +18,7 @@ import { absoluteUrl, canonical, jsonLd } from "@/lib/seo";
 export const Route = createFileRoute("/blog_/$slug")({
   loader: async ({ context, params }) => {
     const [article] = await Promise.all([
-      context.queryClient.ensureQueryData(articleBySlugQuery(params.slug)),
+      context.queryClient.ensureQueryData(articleBySlugQuery(params.slug)).catch(() => null),
       context.queryClient.ensureQueryData(articlesQuery()).catch(() => []),
     ]);
     if (!article) throw notFound();

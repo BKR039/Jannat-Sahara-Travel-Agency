@@ -17,6 +17,7 @@ export const Route = createFileRoute("/about")({
       context.queryClient.ensureQueryData(featuresQuery()).catch(() => []),
       context.queryClient.ensureQueryData(statsQuery()).catch(() => []),
     ]);
+    return { ok: true };
   },
   head: () => ({
     meta: [

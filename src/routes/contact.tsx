@@ -66,6 +66,7 @@ export const Route = createFileRoute("/contact")({
       context.queryClient.ensureQueryData(branchesQuery()).catch(() => []),
       context.queryClient.ensureQueryData(packagesQuery("umrah")).catch(() => []),
     ]);
+    return { ok: true };
   },
   head: () => ({
     meta: [

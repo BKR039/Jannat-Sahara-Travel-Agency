@@ -3,7 +3,7 @@ import { FlightRequestInput } from "./flight-request.schema";
 
 /** Public flight-request endpoint: validated, sanitized and rate limited. */
 export const submitFlightRequest = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => FlightRequestInput.parse(d))
+  .validator((d: unknown) => FlightRequestInput.parse(d))
   .handler(async ({ data }) => {
     const {
       enforceRateLimit,

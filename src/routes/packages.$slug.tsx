@@ -78,7 +78,7 @@ export const Route = createFileRoute("/packages/$slug")({
    */
   loader: async ({ context, params }) => {
     const [pkg] = await Promise.all([
-      context.queryClient.ensureQueryData(packageBySlugQuery(params.slug)),
+      context.queryClient.ensureQueryData(packageBySlugQuery(params.slug)).catch(() => null),
       context.queryClient.ensureQueryData(packagesQuery()).catch(() => []),
       context.queryClient.ensureQueryData(faqsQuery()).catch(() => []),
     ]);

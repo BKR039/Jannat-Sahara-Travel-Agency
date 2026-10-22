@@ -76,7 +76,7 @@ export function isSameRequest(a: DuplicateProbe, b: DuplicateProbe): boolean {
  * stored with the service-role client (the table has no anonymous insert policy).
  */
 export const submitCustomPackageRequest = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => CustomPackageRequestInput.parse(d))
+  .validator((d: unknown) => CustomPackageRequestInput.parse(d))
   .handler(async ({ data }) => {
     const {
       enforceRateLimit,
