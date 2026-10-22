@@ -135,7 +135,7 @@ async function checkLeadsTable(supabaseAdmin: any): Promise<boolean> {
  * Validates, rate-limits, sanitizes, detects duplicates, stores lead, and syncs CRM profile.
  */
 export const submitLeadFromContact = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => ContactLeadInput.parse(d))
+  .validator((d: unknown) => ContactLeadInput.parse(d))
   .handler(async ({ data }) => {
     const {
       enforceRateLimit,
@@ -344,7 +344,7 @@ export const submitLeadFromContact = createServerFn({ method: "POST" })
  * Saves lead with full builder snapshot (hotels, flights, room, travelers, estimated price).
  */
 export const submitLeadFromBuilder = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => BuilderLeadInput.parse(d))
+  .validator((d: unknown) => BuilderLeadInput.parse(d))
   .handler(async ({ data }) => {
     const {
       enforceRateLimit,
@@ -522,7 +522,7 @@ export const submitLeadFromBuilder = createServerFn({ method: "POST" })
  */
 export const listLeads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (d: unknown) =>
       z
         .object({
@@ -802,7 +802,7 @@ export const listLeads = createServerFn({ method: "POST" })
  */
 export const getLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ leadId: z.string() }).parse(d))
+  .validator((d: unknown) => z.object({ leadId: z.string() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -940,7 +940,7 @@ export const getLead = createServerFn({ method: "POST" })
  */
 export const createManualLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ManualLeadInput.parse(d))
+  .validator((d: unknown) => ManualLeadInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { sanitizeText, sanitizeOptionalText, sanitizeEmail } = await import("@/lib/security.server");
@@ -1055,7 +1055,7 @@ export const createManualLead = createServerFn({ method: "POST" })
  */
 export const updateLeadStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => UpdateLeadStatusInput.parse(d))
+  .validator((d: unknown) => UpdateLeadStatusInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { sanitizeOptionalText } = await import("@/lib/security.server");
@@ -1124,7 +1124,7 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
  */
 export const addLeadNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => AddLeadNoteInput.parse(d))
+  .validator((d: unknown) => AddLeadNoteInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { sanitizeText } = await import("@/lib/security.server");
@@ -1192,7 +1192,7 @@ export const addLeadNote = createServerFn({ method: "POST" })
  */
 export const scheduleLeadFollowUp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ScheduleLeadFollowUpInput.parse(d))
+  .validator((d: unknown) => ScheduleLeadFollowUpInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { sanitizeOptionalText } = await import("@/lib/security.server");
@@ -1246,7 +1246,7 @@ export const scheduleLeadFollowUp = createServerFn({ method: "POST" })
  */
 export const recordLeadObjection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => RecordLeadObjectionInput.parse(d))
+  .validator((d: unknown) => RecordLeadObjectionInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { sanitizeOptionalText } = await import("@/lib/security.server");
@@ -1281,7 +1281,7 @@ export const recordLeadObjection = createServerFn({ method: "POST" })
  */
 export const saveLeadOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => SaveLeadOfferInput.parse(d))
+  .validator((d: unknown) => SaveLeadOfferInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { sanitizeOptionalText } = await import("@/lib/security.server");
@@ -1346,7 +1346,7 @@ export const saveLeadOffer = createServerFn({ method: "POST" })
  */
 export const convertLeadToBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ConvertLeadToBookingInput.parse(d))
+  .validator((d: unknown) => ConvertLeadToBookingInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1480,7 +1480,7 @@ export const convertLeadToBooking = createServerFn({ method: "POST" })
  */
 export const updateLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => EditLeadInput.parse(d))
+  .validator((d: unknown) => EditLeadInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1585,7 +1585,7 @@ export const updateLead = createServerFn({ method: "POST" })
  */
 export const archiveLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ArchiveLeadInput.parse(d))
+  .validator((d: unknown) => ArchiveLeadInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1631,7 +1631,7 @@ export const archiveLead = createServerFn({ method: "POST" })
  */
 export const restoreLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => RestoreLeadInput.parse(d))
+  .validator((d: unknown) => RestoreLeadInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1675,7 +1675,7 @@ export const restoreLead = createServerFn({ method: "POST" })
  */
 export const deleteLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => DeleteLeadInput.parse(d))
+  .validator((d: unknown) => DeleteLeadInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1748,7 +1748,7 @@ export const deleteLead = createServerFn({ method: "POST" })
  */
 export const bulkUpdateLeadsStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => BulkUpdateLeadStatusInput.parse(d))
+  .validator((d: unknown) => BulkUpdateLeadStatusInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1788,7 +1788,7 @@ export const bulkUpdateLeadsStatus = createServerFn({ method: "POST" })
  */
 export const bulkArchiveLeads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => BulkArchiveLeadsInput.parse(d))
+  .validator((d: unknown) => BulkArchiveLeadsInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1836,7 +1836,7 @@ export const bulkArchiveLeads = createServerFn({ method: "POST" })
  */
 export const bulkDeleteLeads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => BulkDeleteLeadsInput.parse(d))
+  .validator((d: unknown) => BulkDeleteLeadsInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1863,7 +1863,7 @@ export const bulkDeleteLeads = createServerFn({ method: "POST" })
  */
 export const assignLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => AssignLeadInput.parse(d))
+  .validator((d: unknown) => AssignLeadInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1903,7 +1903,7 @@ export const assignLead = createServerFn({ method: "POST" })
  */
 export const bulkAssignLeads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => BulkAssignLeadsInput.parse(d))
+  .validator((d: unknown) => BulkAssignLeadsInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1985,7 +1985,7 @@ export const listSalesAssignees = createServerFn({ method: "GET" })
  */
 export const importLeadsBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ImportLeadsBatchInput.parse(d))
+  .validator((d: unknown) => ImportLeadsBatchInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, assertActiveUser } = await import("@/lib/admin/authorize.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

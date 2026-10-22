@@ -52,7 +52,7 @@ export const listCustomers = createServerFn({ method: "GET" })
 /** Full customer profile: bookings, requests, messages and internal notes. */
 export const getCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ key: z.string().min(1).max(200) }).parse(d))
+  .validator((d: unknown) => z.object({ key: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -64,7 +64,7 @@ export const getCustomer = createServerFn({ method: "POST" })
 /** Add an internal note to a customer. */
 export const addCustomerNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ key: z.string().min(1).max(200), note: z.string().min(1).max(2000) }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -85,7 +85,7 @@ export const addCustomerNote = createServerFn({ method: "POST" })
 /** Delete an internal note from a customer (SEC-10 author / super-admin / delete check). */
 export const deleteCustomerNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ noteId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ noteId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, getUserEffectivePermissions } =
       await import("./authorize.server");
@@ -133,7 +133,7 @@ export const listRequests = createServerFn({ method: "GET" })
 /** Update the status / assignment / internal note of any request type. */
 export const updateRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -297,7 +297,7 @@ export const updateRequest = createServerFn({ method: "POST" })
  */
 export const deleteRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -344,7 +344,7 @@ export const deleteRequest = createServerFn({ method: "POST" })
  */
 export const getRequestActivity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -400,7 +400,7 @@ export const getRequestActivity = createServerFn({ method: "POST" })
 /** Update a booking's operational and payment status. */
 export const updateBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -432,7 +432,7 @@ export const updateBooking = createServerFn({ method: "POST" })
 /** Duplicate a trip: copies everything, clears dates, saves as draft. */
 export const duplicateTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -468,7 +468,7 @@ export const duplicateTrip = createServerFn({ method: "POST" })
 /** Toggle an installment paid status (persisted in DB + auto recalculates booking balance). */
 export const toggleInstallment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         installmentId: z.string().uuid(),
@@ -493,7 +493,7 @@ export const toggleInstallment = createServerFn({ method: "POST" })
 /** Add a new installment schedule item for a customer. */
 export const addInstallment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         customerKey: z.string().min(1).max(200),
@@ -517,7 +517,7 @@ export const addInstallment = createServerFn({ method: "POST" })
 /** Delete an installment record and update balances. */
 export const deleteInstallment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ installmentId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ installmentId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -529,7 +529,7 @@ export const deleteInstallment = createServerFn({ method: "POST" })
 /** Record a direct payment (full payment or partial payment) with bounds checking and recalculation. */
 export const recordPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         customerKey: z.string().min(1),
@@ -555,7 +555,7 @@ export const recordPayment = createServerFn({ method: "POST" })
 /** Edit an existing installment or payment record with recalculation. */
 export const updateInstallment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         installmentId: z.string().uuid(),
@@ -580,7 +580,7 @@ export const updateInstallment = createServerFn({ method: "POST" })
 /** Save or update customer profile details (city, status, branch, notes). */
 export const updateCustomerProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         customerKey: z.string().min(1).max(200),
@@ -608,7 +608,7 @@ export const updateCustomerProfile = createServerFn({ method: "POST" })
 /** Archive or reactivate a customer profile. */
 export const archiveCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         customerKey: z.string().min(1).max(200),

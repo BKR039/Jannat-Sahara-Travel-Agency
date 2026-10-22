@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, type ErrorComponentProps } from "@tanstack/react-router";
 import { TripEditorPage } from "@/components/admin/packages/TripEditorPage";
 import { adminDocTitle } from "@/lib/admin/doc-title";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,8 @@ function PackageEditorRoute() {
   return <TripEditorPage key={id} packageId={id} />;
 }
 
-function PackageEditorError({ error, reset }: { error: Error; reset: () => void }) {
+function PackageEditorError({ error, reset }: ErrorComponentProps) {
+  const message = error instanceof Error ? error.message : "";
   return (
     <div className="mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center gap-4 text-center px-4">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
@@ -29,7 +30,7 @@ function PackageEditorError({ error, reset }: { error: Error; reset: () => void 
       </div>
       <h1 className="text-h5 font-bold text-foreground">تعذّر تحميل الرحلة</h1>
       <p className="text-small text-muted-foreground">
-        {error?.message || "حدث خطأ غير متوقع أثناء تحميل بيانات الرحلة"}
+        {message || "حدث خطأ غير متوقع أثناء تحميل بيانات الرحلة"}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Button variant="outline" size="sm" onClick={reset}>

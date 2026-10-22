@@ -57,7 +57,7 @@ async function assertKnownHotels(proposedHotels: string | null | undefined) {
 /** Persist the draft offer. Never marks it as sent. */
 export const saveOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => OfferInput.parse(d))
+  .validator((d: unknown) => OfferInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -121,7 +121,7 @@ export const saveOffer = createServerFn({ method: "POST" })
  */
 export const sendOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);

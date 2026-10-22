@@ -119,7 +119,7 @@ const InviteInput = z.object({
  */
 export const inviteAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => InviteInput.parse(d))
+  .validator((d: unknown) => InviteInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission, getUserEffectivePermissions } =
       await import("./authorize.server");
@@ -223,7 +223,7 @@ const UpdateAdminInput = z.object({
  */
 export const updateAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => UpdateAdminInput.parse(d))
+  .validator((d: unknown) => UpdateAdminInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -353,7 +353,7 @@ const UpdatePermissionsInput = z.object({
  */
 export const updateUserPermissions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => UpdatePermissionsInput.parse(d))
+  .validator((d: unknown) => UpdatePermissionsInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireSuperAdmin } = await import("./authorize.server");
     await requireSuperAdmin(context.userId);
@@ -395,7 +395,7 @@ const ToggleStatusInput = z.object({
  */
 export const toggleAdminStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ToggleStatusInput.parse(d))
+  .validator((d: unknown) => ToggleStatusInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -469,7 +469,7 @@ const ResetPasswordInput = z.object({
  */
 export const resetAdminPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => ResetPasswordInput.parse(d))
+  .validator((d: unknown) => ResetPasswordInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -528,7 +528,7 @@ const DeleteAdminInput = z.object({
  */
 export const deleteAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => DeleteAdminInput.parse(d))
+  .validator((d: unknown) => DeleteAdminInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireSuperAdmin } = await import("./authorize.server");
     await requireSuperAdmin(context.userId);
@@ -582,7 +582,7 @@ const RemoveRoleInput = z.object({
 
 export const removeUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => RemoveRoleInput.parse(d))
+  .validator((d: unknown) => RemoveRoleInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireSuperAdmin } = await import("./authorize.server");
     await requireSuperAdmin(context.userId);
@@ -615,7 +615,7 @@ export const removeUserRole = createServerFn({ method: "POST" })
  */
 export const getPassportSignedUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         path: z

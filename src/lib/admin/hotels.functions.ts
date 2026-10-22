@@ -112,7 +112,7 @@ export const listHotels = createServerFn({ method: "GET" })
 
 export const createHotel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => HotelInput.parse(d))
+  .validator((d: unknown) => HotelInput.parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -168,7 +168,7 @@ export const createHotel = createServerFn({ method: "POST" })
 
 export const updateHotel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => HotelInput.extend({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => HotelInput.extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -224,7 +224,7 @@ export const updateHotel = createServerFn({ method: "POST" })
 
 export const setHotelActive = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), active: z.boolean() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid(), active: z.boolean() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
@@ -258,7 +258,7 @@ export const setHotelActive = createServerFn({ method: "POST" })
  */
 export const deleteHotel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { requireAdmin, requirePermission } = await import("./authorize.server");
     await requireAdmin(context.userId);
