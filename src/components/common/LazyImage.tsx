@@ -32,6 +32,8 @@ function LazyImageBase({
   onClick,
 }: LazyImageProps) {
   const [loaded, setLoaded] = useState(priority);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const showFallback = !!src && failedSrc === src;
 
   /*
    * `onLoad` alone is not enough to know an image has arrived.
@@ -61,8 +63,8 @@ function LazyImageBase({
       {src && (
         <img
           ref={attach}
-          src={src}
-          srcSet={transformSrcSet(src)}
+          src={showFallback ? fallbackImage : src}
+          srcSet={showFallback ? undefined : transformSrcSet(src)}
           alt={alt}
           sizes={sizes}
           loading={priority ? "eager" : "lazy"}
@@ -70,14 +72,11 @@ function LazyImageBase({
           fetchPriority={priority ? "high" : "auto"}
           onLoad={() => setLoaded(true)}
           onError={(event) => {
-            const imageElement = event.currentTarget;
-            if (imageElement.src.endsWith(fallbackImage)) {
+            if (showFallback) {
               setLoaded(true);
               return;
             }
-            imageElement.onerror = null;
-            imageElement.removeAttribute("srcset");
-            imageElement.src = fallbackImage;
+            setFailedSrc(src ?? null);
             setLoaded(true);
           }}
           className={cn(

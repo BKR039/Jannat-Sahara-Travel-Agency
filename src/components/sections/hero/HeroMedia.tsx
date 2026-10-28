@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { transformSrcSet } from "@/lib/image-srcset";
 import fallbackImage from "@/img/umrah images (13).jpg";
 
@@ -33,22 +34,22 @@ export function HeroMedia({
   alt: string;
   objectPosition?: string;
 }) {
+  const [failedImage, setFailedImage] = useState<string | null>(null);
+  const showFallback = !!image && failedImage === image;
+
   return (
     <div className="relative h-full w-full overflow-hidden">
       {image ? (
         <img
-          src={image}
-          srcSet={transformSrcSet(image)}
+          src={showFallback ? fallbackImage : image}
+          srcSet={showFallback ? undefined : transformSrcSet(image)}
           alt={alt}
           loading="eager"
           decoding="sync"
           fetchPriority="high"
           sizes="100vw"
-          onError={(event) => {
-            const imageElement = event.currentTarget;
-            imageElement.onerror = null;
-            imageElement.removeAttribute("srcset");
-            imageElement.src = fallbackImage;
+          onError={() => {
+            if (!showFallback) setFailedImage(image);
           }}
           style={{ objectPosition }}
           className="h-full w-full object-cover transition-opacity duration-700 ease-out"
