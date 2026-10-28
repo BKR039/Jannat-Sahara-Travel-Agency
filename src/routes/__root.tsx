@@ -80,9 +80,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   loader: async ({ context }) => {
     const [settings] = await Promise.all([
       context.queryClient.ensureQueryData(siteSettingsQuery()).catch(() => DEFAULT_PUBLIC_SETTINGS),
-      context.queryClient.ensureQueryData(contactInfoQuery()).catch(() => []),
-      context.queryClient.ensureQueryData(branchesQuery()).catch(() => []),
     ]);
+    // Footer data is not needed for the first paint; warm the cache without
+    // making the entire route wait for two more database round trips.
+    void context.queryClient.prefetchQuery(contactInfoQuery()).catch(() => undefined);
+    void context.queryClient.prefetchQuery(branchesQuery()).catch(() => undefined);
     const resolved = settings ?? DEFAULT_PUBLIC_SETTINGS;
     primeCanonicalBase(resolved.seoCanonicalBase);
     return resolved;

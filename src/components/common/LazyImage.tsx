@@ -1,6 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { transformSrcSet } from "@/lib/image-srcset";
+import fallbackImage from "@/img/umrah images (13).jpg";
 
 type LazyImageProps = {
   src?: string | null;
@@ -68,7 +69,17 @@ function LazyImageBase({
           decoding={priority ? "sync" : "async"}
           fetchPriority={priority ? "high" : "auto"}
           onLoad={() => setLoaded(true)}
-          onError={() => setLoaded(true)}
+          onError={(event) => {
+            const imageElement = event.currentTarget;
+            if (imageElement.src.endsWith(fallbackImage)) {
+              setLoaded(true);
+              return;
+            }
+            imageElement.onerror = null;
+            imageElement.removeAttribute("srcset");
+            imageElement.src = fallbackImage;
+            setLoaded(true);
+          }}
           className={cn(
             "h-full w-full object-cover transition-opacity duration-slow ease-standard",
             loaded ? "opacity-100" : "opacity-0",

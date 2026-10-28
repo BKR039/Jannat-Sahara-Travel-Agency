@@ -1,4 +1,5 @@
 import { transformSrcSet } from "@/lib/image-srcset";
+import fallbackImage from "@/img/umrah images (13).jpg";
 
 /**
  * The photograph.
@@ -43,6 +44,12 @@ export function HeroMedia({
           decoding="sync"
           fetchPriority="high"
           sizes="100vw"
+          onError={(event) => {
+            const imageElement = event.currentTarget;
+            imageElement.onerror = null;
+            imageElement.removeAttribute("srcset");
+            imageElement.src = fallbackImage;
+          }}
           style={{ objectPosition }}
           className="h-full w-full object-cover transition-opacity duration-700 ease-out"
         />

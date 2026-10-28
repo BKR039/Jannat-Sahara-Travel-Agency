@@ -34,11 +34,15 @@ export const Route = createFileRoute("/")({
     const [settings, hero] = await Promise.all([
       context.queryClient.ensureQueryData(siteSettingsQuery()).catch(() => DEFAULT_PUBLIC_SETTINGS),
       context.queryClient.ensureQueryData(contentQuery("hero")).catch(() => null),
-      context.queryClient.ensureQueryData(siteSectionsQuery("home")).catch(() => []),
-      context.queryClient.ensureQueryData(packagesQuery("umrah")).catch(() => []),
-      context.queryClient.ensureQueryData(servicesQuery()).catch(() => []),
-      context.queryClient.ensureQueryData(galleryQuery("umrah", 1)).catch(() => []),
     ]);
+    // Only hero data is needed for the first paint and image preload. Start
+    // warming below-fold sections in parallel without blocking the HTML shell.
+    void Promise.all([
+      context.queryClient.prefetchQuery(siteSectionsQuery("home")),
+      context.queryClient.prefetchQuery(packagesQuery("umrah")),
+      context.queryClient.prefetchQuery(servicesQuery()),
+      context.queryClient.prefetchQuery(galleryQuery("umrah", 1)),
+    ]).catch(() => undefined);
     return { settings: settings ?? DEFAULT_PUBLIC_SETTINGS, hero: hero ?? null };
   },
   head: ({ loaderData }) => {

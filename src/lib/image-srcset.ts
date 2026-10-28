@@ -19,13 +19,24 @@ const SRCSET_WIDTHS = [400, 640, 900, 1280, 1920];
 const RESIZE_MODE = "contain";
 
 export function transformSrcSet(src: string): string | undefined {
-  if (!src.includes("/storage/v1/render/image/public/")) return undefined;
   let url: URL;
   try {
     url = new URL(src);
   } catch {
     return undefined;
   }
+
+  // Admin uploads use getPublicUrl(), which returns `/object/public/` URLs.
+  // Convert those to Supabase's image-rendering endpoint so cards and hero
+  // images can request a right-sized variant instead of downloading originals.
+  const objectPath = "/storage/v1/object/public/";
+  const renderPath = "/storage/v1/render/image/public/";
+  if (url.pathname.includes(objectPath)) {
+    url.pathname = url.pathname.replace(objectPath, renderPath);
+  } else if (!url.pathname.includes(renderPath)) {
+    return undefined;
+  }
+
   let declared = Number(url.searchParams.get("width"));
   if (!Number.isFinite(declared) || declared <= 0) {
     declared = 1920;
@@ -36,7 +47,8 @@ export function transformSrcSet(src: string): string | undefined {
     .map((w) => {
       const u = new URL(url);
       u.searchParams.set("width", String(w));
-      // A stored URL missing this would otherwise generate cropped variants.
+      u.searchParams.set("quality", u.searchParams.get("quality") ?? "75");
+      // Avoid a server-side center crop when no explicit dimensions were saved.
       if (!u.searchParams.has("height")) u.searchParams.set("resize", RESIZE_MODE);
       return `${u.toString()} ${w}w`;
     })
