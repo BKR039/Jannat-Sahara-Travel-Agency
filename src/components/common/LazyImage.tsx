@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from "react";
+import { ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { transformSrcSet } from "@/lib/image-srcset";
-import fallbackImage from "@/img/umrah images (13).jpg";
 
 type LazyImageProps = {
   src?: string | null;
@@ -33,7 +33,7 @@ function LazyImageBase({
 }: LazyImageProps) {
   const [loaded, setLoaded] = useState(priority);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const showFallback = !!src && failedSrc === src;
+  const imageFailed = !!src && failedSrc === src;
 
   /*
    * `onLoad` alone is not enough to know an image has arrived.
@@ -60,22 +60,18 @@ function LazyImageBase({
           className="absolute inset-0 bg-surface-sunken/80 motion-reduce:animate-none"
         />
       )}
-      {src && (
+      {src && !imageFailed && (
         <img
           ref={attach}
-          src={showFallback ? fallbackImage : src}
-          srcSet={showFallback ? undefined : transformSrcSet(src)}
+          src={src}
+          srcSet={transformSrcSet(src)}
           alt={alt}
           sizes={sizes}
           loading={priority ? "eager" : "lazy"}
           decoding={priority ? "sync" : "async"}
           fetchPriority={priority ? "high" : "auto"}
           onLoad={() => setLoaded(true)}
-          onError={(event) => {
-            if (showFallback) {
-              setLoaded(true);
-              return;
-            }
+          onError={() => {
             setFailedSrc(src ?? null);
             setLoaded(true);
           }}
@@ -85,6 +81,15 @@ function LazyImageBase({
             className,
           )}
         />
+      )}
+      {imageFailed && (
+        <div
+          className="absolute inset-0 grid place-items-center bg-surface-sunken text-muted-foreground"
+          role="img"
+          aria-label={alt}
+        >
+          <ImageOff className="h-6 w-6 opacity-60" aria-hidden="true" />
+        </div>
       )}
     </div>
   );

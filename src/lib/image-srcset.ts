@@ -26,16 +26,11 @@ export function transformSrcSet(src: string): string | undefined {
     return undefined;
   }
 
-  // Admin uploads use getPublicUrl(), which returns `/object/public/` URLs.
-  // Convert those to Supabase's image-rendering endpoint so cards and hero
-  // images can request a right-sized variant instead of downloading originals.
-  const objectPath = "/storage/v1/object/public/";
   const renderPath = "/storage/v1/render/image/public/";
-  if (url.pathname.includes(objectPath)) {
-    url.pathname = url.pathname.replace(objectPath, renderPath);
-  } else if (!url.pathname.includes(renderPath)) {
-    return undefined;
-  }
+  // Only use transformations for URLs already served by Supabase's render
+  // endpoint. Public object URLs are kept intact: converting them here can
+  // make otherwise valid uploads fail when image transforms are unavailable.
+  if (!url.pathname.includes(renderPath)) return undefined;
 
   let declared = Number(url.searchParams.get("width"));
   if (!Number.isFinite(declared) || declared <= 0) {
